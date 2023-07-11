@@ -8,7 +8,7 @@ import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ToastrService } from 'ngx-toastr';
 import { EmployeeService } from 'app/services/employee.service';
 
-import * as html2pdf from 'html2pdf.js'
+// import * as html2pdf from 'html2pdf.js'
 @Component({
   selector: 'todo-list',
   templateUrl: './todo-list.component.html',
@@ -314,19 +314,19 @@ constructor(
   
   }
   
-  download(){
-    var element = document.getElementById('table');
-  var opt = {
-  margin:       1,
-  filename:     'attendance.pdf',
-  image:        { type: 'jpeg', quality: 0.98 },
-  html2canvas:  { scale: 2 },
-  jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
+  // download(){
+  //   var element = document.getElementById('table');
+  // var opt = {
+  // margin:       1,
+  // filename:     'attendance.pdf',
+  // image:        { type: 'jpeg', quality: 0.98 },
+  // html2canvas:  { scale: 2 },
+  // jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  // };
   
-  // New Promise-based usage:
-  html2pdf().from(element).set(opt).save();
-  }
+  // // New Promise-based usage:
+  // html2pdf().from(element).set(opt).save();
+  // }
   
   
 
