@@ -1,0 +1,201 @@
+<div class="page"  >
+
+    
+
+    <div class="row" *blockUI="'loading'">
+      <!-- <img src="/assets/img/loading.gif"> -->
+        <div class="col-md-16">
+            <div class="card shadow-sm">
+                <div class="card-body p-2">
+                    <!-- <h5 class="card-title m-3"><small><i class="fa-solid fa-file-lines me-2"></i></small></h5> -->
+                    <div class="menus">
+                        <div class="d-flex">
+                            <div class="w-200">
+                           
+                                <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
+                            </div>
+                            <div class="w-100">
+                                <button type="button" class="btn btn-sm btn-info " style="float: right;"  routerLink="/home/custom-reserve">
+                                  New reserve</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table m-0" id="myTable">
+
+                   <thead class="table-light">
+                      <tr class="bg-secondary">
+
+    
+      <th scope="col">Name</th>
+      <th scope="col">Number of Children</th>
+      <th scope="col">Number of Adults</th>
+      <th>Arrival</th>
+      <th>Departure</th>
+
+      <th>Room Type </th>
+      <th>Room Number</th>
+      <th>Price</th>
+      <th>Payment Status</th>
+      <th>Created Date| Time</th>
+      <th>Status</th>
+      
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+    <tr *ngFor="let reserve of reserveList| slice: (page-1) * pageSize : page * pageSize">
+ 
+
+      <td>{{reserve.name}}</td>
+      <td>{{reserve.children}}</td>
+      <td>{{reserve.adult}}</td>
+      <td>{{reserve.arrival}}</td>
+
+      <td>{{reserve.departure}}</td>
+      
+ 
+      <td>{{reserve.room_type}}</td>
+      <td>{{reserve.room_nmber}}</td>
+      <td>GH₵{{reserve.price}}</td>
+
+      <td>{{reserve.Payment_status}}</td>
+      <td>{{reserve.created_date}}</td>
+      <td>{{reserve.status}}</td>
+      <td *ngIf="reserve.status=='pending'" class="text-danger">{{reserve.status}}</td>
+      <td *ngIf="reserve.status=='success'" class="text-success">{{reserve.status}}</td>
+
+
+      <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
+        <!-- <i class="fa fa-edit fa-2x text-info"  (click)="editreserve(reserve.id)"></i> -->
+        <td>   <i class="fa fa-close fa-2x text-danger" (click)="cancelReservation(reserve.id)" ></i>
+          <i   class="fa fa-print fa-2x text-primary"  (click)="printReciept(reserve.id)" ></i></td>
+      <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
+      <!-- <i class="fa fa-trash"></i></button></td>  -->
+    </tr>
+
+  </tbody>
+
+</table>
+</div>
+
+<div class="row pt-3">
+  <div class="col-md-9">
+      <ngb-pagination [collectionSize]="reserveList.length" [pageSize]="pageSize " [(page)]="page"
+          (pageChange)="pageClick()" [maxSize]="5" [rotate]="true" [ellipses]="false"
+          [boundaryLinks]="true">
+          <ng-template ngbPaginationFirst>First</ng-template>
+          <ng-template ngbPaginationLast>Last</ng-template>
+          <ng-template ngbPaginationPrevious>Prev</ng-template>
+          <ng-template ngbPaginationNext>Next</ng-template>
+          <ng-template ngbPaginationEllipsis>...</ng-template>
+          <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+      </ngb-pagination>
+
+      </div>
+  </div>
+
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+</div>
+    
+    
+</div>
+</div>
+</div>
+
+
+
+
+
+
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  [ngStyle]="{'display':openStyle}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+     {{header}}
+      <i class="fa fa-close" (click)="closePopup()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-16" style="width: 100%;">
+          <div class="card card-reserve">
+            <div class="card-header">
+              <!-- <h5 class="card-title">Edit Profile</h5> -->
+            </div>
+            <div class="card-body">
+              <div id="pdfTable" #pdfTable style="text-align: center;">
+                <h3 style="font-smooth: bold;">Yaalex Executive Lodge #{{header}}</h3>
+              
+               <br> 
+            <tr  *ngFor="let item of reserveList"  > 
+             <p><Label >Name:</Label> &emsp; <strong> {{item.name}}</strong></p>
+            
+            
+             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
+             <br>
+             <p> <Label>Arrival Date :</Label> &emsp; <strong> {{item.arrival}}</strong></p>
+             <p> <Label>Departure Date:</Label> &emsp; <strong>{{item.departure}}</strong></p>
+             <!-- <p> <Label>Discount:</Label> &emsp; <strong> {{item.discount +"%"}}</strong></p> -->
+             <p> <Label>Total:</Label> &emsp; <strong>GH₵{{item.price +".00"}}</strong></p>
+             <br>
+  
+             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
+             <br>
+             <p> <Label>Room :</Label> &emsp; <strong> {{item.room_type}}</strong></p>
+             <p> <Label>Children :</Label> &emsp; <strong> {{item.children}}</strong></p>
+             <p> <Label>Adult :</Label> &emsp; <strong> {{item.adult}}</strong></p>
+            
+            
+             <br>
+             <!-- <p> <Label>Address:</Label> &emsp; <strong> Teshie</strong></p>
+            
+             <br>
+            -->
+   
+             <!-- <p> <Label>Status:</Label> &emsp; <strong> {{item.status}}</strong></p> -->
+             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
+             <br>
+           
+             <p> <Label>reserveDate :</Label> &emsp;  <strong> {{item.create_date}}</strong></p>
+  <!--        
+          <br>
+             <p > <Label>Checkout Date :</Label> &emsp; <strong> Jan 22,2022</strong></p>
+          -->
+            </tr>
+  
+  
+          </div>
+          <button class="btn btn-primary" (click)="downloadAsPDF()">Print</button>
+            </div>
+          </div>
+        </div>
+  
+      
+
+
+  
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-danger" 
+                >
+          Close
+        </button>
+      </div> -->
+    </div>
+  </div>
+</div>

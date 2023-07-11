@@ -1,0 +1,237 @@
+<div class="conatiner " >
+
+    <div class="col-md-15 " style="background-color:lightgray" >
+        <div class="card card-house">
+            <div class="card-header">
+              <!-- <h5 class="card-title">Edit Profile</h5> -->
+            </div>
+
+            <div class="card-body">
+    <form role="form " >
+  
+      <div class="row">
+        <div class="col-sm-4">
+      <div class="form-group " >
+      
+         
+        <label for="Username">Room Type </label>
+        <input type="text" class="form-control" placeholder="room type" ><button type ="button"><i class="fa fa-search "></i></button>
+      
+      </div>
+      </div>
+      
+      
+        <div class="col-sm-4">
+      <div class="form-group " >
+         <label for="">Room Number</label>
+        <input type="number" class="form-control"  value="1" >
+        </div>
+      </div>
+  
+  
+      <div class="col-sm-4">
+        <div class="form-group " >
+           <label for="">Condition</label>
+          <select name="cindition" id="" class="form-control">
+            <option value="inhouse">Inhouse</option>
+            <option value="vacant">Vacant</option>
+          </select>
+          </div>
+        </div>
+      
+      </div>
+  
+  
+  
+      <!--status-->
+      <div class="row">
+        <div class="col-sm-4">
+      <div class="form-group " >
+      
+         
+        <label for="Username">Room Status </label>
+        <select name="available" id="" class="form-control" >
+          <option value="available">Available</option>
+          <option value="Occupupied">Occupied</option>
+        </select>
+      
+      </div>
+      </div>
+      
+      
+        <div class="col-sm-4">
+      <div class="form-group " >
+        <label for="Username">House Keeping State </label>
+        <select name="available" id=""  class="form-control">
+          <option value="clean">Clean</option>
+          <option value="dirty">Dirty</option>
+        </select>
+        </div>
+      </div>
+  </div>
+  
+     <button type="submit" class="btn btn-info" style="float: right;">Search</button>
+  
+  
+      </form>
+  
+    </div></div>
+  
+    <div class="card card-house">
+        <div class="card-header">
+          <!-- <h5 class="card-title">Edit Profile</h5> -->
+        </div>
+
+        <div class="card-body">
+    <form type="multipart/form-data"  [formGroup]="createForm" (ngSubmit)="updateHouse(createForm.value)" >
+      <table class="table table-responsive">
+        <thead>
+          <tr>
+            <th>Select </th>
+            <th>Room*</th>
+            <th>Room Type</th>
+            <th>HouseKeeping State*</th>
+          
+            <th>Occupancy State</th>
+            <th>Reservation/Guest</th>
+            <th>Assignee</th>
+            <th>Task <button><i class="fa fa-plus text-info"  data-toggle="modal" data-target="#myModal"></i></button> 
+              <div style="font-size:10px; background: gray; color: white; float: right;"  class="badge bg-danger">{{totalItem}}</div></th>
+            <!-- <th>Comments</th> -->
+           
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of roomList">
+            
+            <td>
+              <div class="form-group">
+              <input type="checkbox" (click)=switchClicked($event,item)>
+            </div>
+          <td>
+            <div class="form-group">
+            <select name="room" id=""  class="form-control">
+              <option value="{{item.room_number}}">{{item.room_number}}</option>
+            </select>
+          </div>
+          </td>
+          <td> 
+            <div class="form-group">
+            <select name="room-type" id=""   class="form-control">
+            <option value="{{item.room_type}}">{{item.room_type}}</option>
+          </select>
+        </div>
+        </td>
+        
+          <td>
+            <div class="form-group">
+              <select name="form-0-house_keeping_state"  class="form-control"  id="id_form-0-house_keeping_state" >
+                
+              
+                <option value="{{item.status}}"  class="form-contol" hidden selected>{{item.status}}</option>
+              
+             
+                <option value="clean" style="background-color: green; color: white;">clean</option>
+                <option value="dirty" style="background-color: brown; color: white;">dirty</option>
+            
+               <!-- [(ngModel)]="item.chkValue" [ngModelOptions]="{standalone:true}" -->
+              </select>
+          </div>
+          </td>
+          <!-- <td>  <div class="form-group">
+            <select name="room-state" id="" class="form-control"   formContolName="maintanance_state" >
+              <option value=""hidden selected>{{item.maintanance}} </option>
+      
+              <option value="good" >good</option>
+              <option value="bad" >bad</option>
+          
+            </select>
+          </div></td> -->
+          <td> <div class="form-group">
+            <select  class="form-control">
+              <option value="" style="background-color: green; color: white;" hidden selected>{{item.occupied_state}}</option>
+       
+              <option value="{{item.occupied_state}}" >{{item.occupied_state}}</option>
+              <option value="occupied" >occupied</option>
+              <option value="available" >available</option>
+          
+            </select></div></td>
+          <td>
+            <div class="form-group">
+             {{item.occupied_by}}
+  
+  
+          </div>
+          <td>
+            <div class="form-group">
+              <select  id="" formControlName="assignee" class="form-control">
+                <option value="" style="background-color: green; color: white;" hidden selected >{{item.assignee}}</option>
+              
+                <option *ngFor="let i of employeeList" value="{{i.firstname}}">{{i.firstname}}</option>
+               
+              </select></div>
+          </td>
+          <td>
+            <div class="form-group"  >
+              <select   formControlName="task_get" class="form-control">
+                <option value="" hidden selected>{{item.task}}</option>
+           
+              <option *ngFor="let t of taskList" value="{{t.name}}">{{t.name}}</option>
+            </select>
+            </div>
+          </td>
+          
+        </tr>
+        </tbody>
+        
+      </table>
+      
+     <button type="submit" class="btn btn-info" style="float: right;">Save</button>
+  
+   
+      </form>
+  
+    </div></div>
+  
+  </div>
+  </div>
+  
+  
+  
+  <div class="modal col-md-12" id="myModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+           <h4 class="modal-title" style="font-size: medium;">Add New Item</h4>
+          <button type="button"
+           class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body col-md-16" style="overflow: scroll;">
+          <form type="multipart/form-data"  [formGroup]="createForm" (ngSubmit)="addTask(createForm.value)" >
+  
+        <div class="form-group">
+          <label for="name">Task name</label>
+          <input type="text" class="form-contol" formControlName="task_name" >
+        </div>
+             <button type="button" type="submit" class=" btn btn-success">Add</button>
+            </form>
+        
+          
+  </div>
+  
+  
+    
+        
+        <!-- Modal footer -->
+         <div class="modal-footer">
+          <!-- <button type="button"
+             class="btn btn-danger" data-dismiss="modal">Close</button> -->
+        
+    </div>
+  </div>
+  
+  

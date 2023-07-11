@@ -1,0 +1,113 @@
+
+
+<div class="card card-block login-card" >
+    <h3 class="form-label">Register </h3>
+    <form  enctype="multipart/form-data"  [formGroup]="createForm" (ngSubmit)="registerGuest(createForm.value)" >
+
+  <br><br><br><br>
+        <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon addon-left" id="username">
+                <i class="fa fa-user fa-fw"></i>
+              </span> 
+              <Label>First Name</Label>
+              <input class="form-control with-primary-addon" placeholder="first name" type="text"  formControlName="firstname">
+            </div>
+        
+          </div>
+
+
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon addon-left" id="username">
+                <i class="fa fa-user fa-fw"></i>
+              </span> 
+              <Label>Last Name</Label><br>
+              <input class="form-control with-primary-addon" placeholder="last name" type="text"  formControlName="lastname">
+            </div>
+        
+          </div>
+
+
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon addon-left" id="username">
+                <i class="fa fa-address fa-fw"></i>
+              </span> 
+              <Label>Address</Label><br>
+              <input class="form-control with-primary-addon" placeholder="7th street" type="text"  formControlName="address">
+            </div>
+        
+          </div>
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon addon-left" id="username">
+                <i class="fa fa-phone fa-fw"></i>
+              </span> 
+              <Label>Phone Number</Label><br>
+              <input class="form-control with-primary-addon" placeholder="phone" type="text"  formControlName="phone">
+            </div>
+        
+          </div>
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon addon-left" id="username">
+                <i class="fa fa-mail fa-fw"></i>
+              </span> 
+              <Label>Email</Label><br>
+              <input class="form-control with-primary-addon" placeholder="first name" type="text"  formControlName="email">
+            </div>
+        
+          </div>
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon addon-left" id="username">
+                <i class="fa fa-user fa-fw"></i>
+              </span> 
+              <Label>About</Label>
+              <input class="form-control with-primary-addon" placeholder="about" type="text"  formControlName="about">
+            </div>
+        
+          </div>
+
+          <div class="form-group">
+            <div class="input-group">
+              <span class="input-group-addon addon-left" id="username">
+                <i class="fa fa-city fa-fw"></i>
+              </span> 
+              <Label>City</Label><br>
+              <input class="form-control with-primary-addon" placeholder="Accra" type="text"  formControlName="city">
+            </div>
+        
+          </div>
+
+    <div class="form-group">
+      <div class="input-group">
+        <span class="input-group-addon addon-left" id="username">
+          <i class="fa fa-user fa-fw"></i>
+        </span> 
+        <label for="">Username</label><br>
+        <input class="form-control with-primary-addon" placeholder="User Account" type="text"  formControlName="username">
+      </div>
+  
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <span class="input-group-addon addon-left" id="password">
+          <i class="fa fa-lock fa-fw"></i>
+        </span>
+        <label for="">Password</label><br>
+        <input class="form-control with-primary-addon" placeholder="Password" type="password" formControlName="password">
+      </div>
+      </div>
+      <button class="btn btn-lg btn-primary" type="submit">Register</button>
+    </form>   
+      <!-- <a href="" class="btn btn-link">Register Now. →</a> -->
+    </div>
+  
+  

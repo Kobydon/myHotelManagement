@@ -1,0 +1,226 @@
+<style>
+  .fa-caret-down {
+    float: right;
+    padding-right: 8px;
+  }
+
+  .dropdown-container {
+
+    padding-left: 5px;
+    display:none;
+    background-color: lightgrey;
+    
+    
+  }
+
+  .dropdown-container :hover{
+  background-color: burlywood;
+  color: white;
+
+
+}
+  .dropdown-container-child {
+
+padding-left: 5px;
+display:none;
+background-color: lightgrey;
+
+}
+
+.dropdown-container-child :hover{
+
+  background-color: burlywood;
+  color: white;
+}
+
+</style>
+<div class="sidebar-wrapper">
+  <div class="logo">
+    <a href="" class="simple-text logo-mini">
+      <div class="logo-image-small">
+        <img src="assets/img/gold.jpeg">
+      </div>
+    </a>
+    <a  class="simple-text logo-normal" >
+ Yaalex executive
+    </a>
+  </div>
+    <ul class="nav">
+      <li >
+      <a  routerLink="dashboard"><i class="fa fa-tachometer text-primar">&nbsp;</i><span>Dashboard</span></a>
+    </li>
+     <li  >
+        <a  routerLink="all-users"><i class="fa fa-users "  >&nbsp;</i><span>User&nbsp;</span>
+          <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+        </a>
+      </li>
+
+      <li  >
+        <a  routerLink="all-guest"><i class="fa fa-user "  >&nbsp;</i><span>Guest&nbsp;</span>
+          <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+        </a>
+      </li>
+<!-- 
+
+
+    
+        <div class="dropdown-container">
+        <li>  <a style="font-size: small;" routerLink="all-users"><i class="fa fa-list " >&nbsp;</i>All</a>
+        </li>
+        <li>
+          <a  style="font-size: small;"  routerLink="add-user"><i class="fa fa-plus " >&nbsp;</i>New User</a>
+        </li>
+        </div> -->
+
+
+
+
+
+        <li   class="transparent" >
+          <a  ><i class="fa fa-bed " >&nbsp;</i><span>Room&nbsp;</span>
+            <!-- <i class="fa fa-caret-down"   ></i> -->
+          </a>
+        </li>
+  
+          <div class="dropdown-container">
+          <li>  <a style="font-size: small;" routerLink="all-rooms"><i class="fa fa-list " >&nbsp;</i>All</a>
+          </li>
+
+          <li>
+            <a  style="font-size: small;"  routerLink="room-types"><i class="fa fa-plus " >&nbsp;</i>Room Types</a>
+          </li>
+
+          <li>
+            <a  style="font-size: small;"  routerLink="all-bookings"><i class="fa fa-money " >&nbsp;</i>Booking</a>
+          </li>
+          <li>
+            <a  style="font-size: small;"  routerLink="payment"><i class="fa fa-book " >&nbsp;</i>Payment</a>
+          </li>
+
+          <!-- <li>  <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Add New Room</a></li> -->
+            <li class="transparent">  <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Reservations</a>
+
+              
+            </li>
+          
+         
+            <div class="dropdown-container-child">
+              <li><a style="font-size: small;" routerLink="all-reservations"><i class="fa fa-list " >&nbsp;</i>Reservation List</a></li>
+              <!-- <li> <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Add New </a></li> -->
+             </div>
+
+
+
+
+
+             <li >  
+              <a style="font-size: small;" routerLink="room-status"><i class="fa fa-list " >&nbsp;</i>Room Status</a>
+
+              
+             </li>
+           
+          
+             <div class="dropdown-container-child">
+               <li><a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-check " >&nbsp;</i>Available</a></li>
+               <li> <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-cancel " >&nbsp;</i>Occupied</a></li>
+              </div>
+              
+ 
+             
+          
+          </div> 
+    
+
+          
+ 
+
+          <li   class="transparent" >
+            <a ><i class="fa fa-users " >&nbsp;</i><span>Employee&nbsp;</span>
+              <!-- <i class="fa fa-caret-down"   ></i> -->
+            </a>
+          </li>
+    
+            <div class="dropdown-container">
+            <li>  <a style="font-size: small;" routerLink="employees"><i class="fa fa-list " >&nbsp;</i>All</a>
+            </li>
+        
+            <li class="transparent">
+              <a  style="font-size: small;" ><i class="fa fa-calendar-o " >&nbsp;</i>Attendance</a>
+            </li>
+
+            
+            <div class="dropdown-container-child">
+              <li><a style="font-size: small;" routerLink="attendance"><i class="fa fa-list " >&nbsp;</i>Attendance List</a></li>
+              <!-- <li> <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Add New </a></li> -->
+             </div>
+
+
+             <!-- <li class="transparent">
+              <a  style="font-size: small;"  routerLink="pages/new-user"><i class="fa fa-money " >&nbsp;</i> Payments</a>
+            </li> -->
+
+<!--             
+            <div class="dropdown-container-child">
+              <li><a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Payment List</a></li>
+              <li> <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Add New </a></li>
+             </div> -->
+
+
+
+
+
+            </div>
+    
+    
+
+
+
+  
+        <li   class="transparent">
+        <a  ><i class="fa fa-list fa-fw " style="color: lih;">&nbsp;</i><span>Todo &nbsp;</span>
+        <!-- <i class="fa fa fa-caret-down"></i> -->
+        </a>
+        </li>
+        <div class="dropdown-container">
+        <li> <a style="font-size: small;"  routerLink="/todo-list"><i class="fa fa-list " >&nbsp;</i>Todo List</a></li> 
+      <!-- <li>
+          <a  style="font-size: small;"  routerLink="pages/add-todo"><i class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>New todo</a>
+        </li> -->
+
+        <li>
+          <a  style="font-size: small;"  routerLink="/house-keeping"><i class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>House Keeping</a>
+        </li>
+        </div>
+<!-- 
+        <li>
+          <a routerLink="Payment"><i class="fa fa-money fa-fw " >&nbsp;</i><span>Payment</span>
+          </a>
+        </li> -->
+
+       
+        <!--inventory-->
+
+        
+         <!-- --
+         <li>
+        <a routerLink="students"><i class="fa fa-envelope fa-fw " >&nbsp;</i><span>Mails</span>
+        </a>
+      </li> -->
+      <!-- <li>
+        <a routerLink="students"><i class="fa fa-briefcase fa-fw " >&nbsp;</i><span>
+          Archieves</span></a></li>-->
+          <!-- <li> 
+        <a   routerLink="students"><i class="fa fa-cogs fa-fw " >&nbsp;</i>
+          <span>Settings</span></a></li>  -->
+          <li> 
+        <a routerLink="user"><i class="fa fa-user fa-fw " style="color: lih;">&nbsp;</i><span>Profile</span></a>
+      </li>  
+       
+        <!-- <a><i="faChalkboardTeacher">&nbsp;</i><span>Teachers</span></a>
+        <a><i="faSchool">&nbsp;</i><span>Schools</span></a>
+        <a><i="faMoneyBillAlt">&nbsp;</i><span>Income</span></a>
+        <a><i="faQuestion">&nbsp;</i><span>Help</span></a>
+        <a><i="faCog">&nbsp;</i><span>Settings</span></a> -->
+
+    </ul>
+</div>

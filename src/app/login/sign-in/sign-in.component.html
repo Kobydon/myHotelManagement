@@ -1,0 +1,29 @@
+<div class="card card-block login-card">
+    <h3 class="form-label">Welcome Back</h3>
+    <form  enctype="multipart/form-data"  [formGroup]="createForm" (ngSubmit)="loginUser()" >
+    <div class="form-group">
+      <div class="input-group">
+        <span class="input-group-addon addon-left" id="username">
+          <i class="fa fa-user fa-fw"></i>
+        </span> 
+        <input class="form-control with-primary-addon" placeholder="User Account" type="text"  formControlName="username">
+      </div>
+  
+    </div>
+    <div class="form-group">
+      <div class="input-group">
+        <span class="input-group-addon addon-left" id="password">
+          <i class="fa fa-lock fa-fw"></i>
+        </span>
+        <input class="form-control with-primary-addon" placeholder="Password" type="password" formControlName="password">
+      </div>
+      </div>
+
+      <a routerLink="/account/signup">Register now</a>
+      <button class="btn btn-lg btn-primary" type="submit">Login</button>
+    </form>   
+      <!-- <a href="" class="btn btn-link">Register Now. →</a> -->
+    </div>
+  
+  
+  

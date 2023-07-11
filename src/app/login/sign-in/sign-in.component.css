@@ -1,0 +1,36 @@
+
+.login-card {
+    padding: 20px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: auto;
+}
+    .form-group {
+        padding: 0;
+    }
+    .form-label {
+        display: block;
+        
+        padding: 0 10px;
+    }
+   
+    .input-group {
+        padding: 0;
+        margin: 25px 0;
+    }
+   
+    .input-group-addon {
+        background: transparent;
+        border: none;
+      
+    }
+    .btn {
+        width: 100%;
+    }
+    /* .btn-link {
+        margin: 10px 0;
+        color: ;
+    } */

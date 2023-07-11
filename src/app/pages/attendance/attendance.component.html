@@ -1,0 +1,225 @@
+<div class="page"  >
+
+<div class="col-md-3 animated fadeIn" style="width: 30%; height: 50%;float: right;"  routerLink ="/employees" >
+    <img src="../../../assets//img/default-avatar.png"   alt="room" class="image" >
+    <div class="card card-block tip-card" >
+   
+      <div class="tip-msg">
+        <h3>Add Employee</h3>
+        <span> </span>
+      </div>
+    
+        <i routerLink="/room/room-list" class="fa fa-check-circle fa-fw fa-2x text-success"></i>
+     
+    </div>
+  </div>
+
+
+    <div class="row" *blockUI="'loading'">
+      <!-- <img src="/assets/img/loading.gif"> -->
+        <div class="col-md-16">
+            <div class="card shadow-sm">
+                <div class="card-body p-2">
+                    <!-- <h5 class="card-title m-3"><small><i class="fa-solid fa-file-lines me-2"></i></small></h5> -->
+                    <div class="menus">
+                        <div class="d-flex">
+                            <div class="w-200">
+                           
+                                <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
+                            </div>
+                            <div class="w-100">
+                                <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
+                                  Mark</button>
+                            </div>
+
+                            <div class="w-100" style="float: right;">
+                                <button type="button" class="btn btn-sm btn-warning " style="float: right;"  (click)="download()" >
+                                  Export </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive table-bordered">
+                      <table class="table m-0" id="table">
+
+                   <thead class="table-light">
+                    <tr><td>Attendance List</td></tr>
+                      <tr class="bg-secondary">
+                  
+      
+      <th scope="col">Name</th>
+      <th>Position</th>
+      <th scope="col">Attendance Date | Time</th> 
+
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+    <tr *ngFor="let attendance of attendanceList | slice: (page-1) * pageSize : page * pageSize">
+
+            <td> {{attendance.name}}</td>
+            <td>{{attendance.position}}</td>
+            <td>{{attendance.created_date}}</td>
+            <td>{{attendance.attendance}}</td>
+            <!-- <td>{{attendance.address}}</td>
+            <td>{{attendance.email}}</td>
+            <td>{{attendance.session}}</td>
+            
+            <td>{{attendance.employment_date}} 
+                  
+            <td>{{attendance.position}}  -->
+            
+     
+            <!-- <td ><i class="fa fa-edit fa-2x text-info" (click)="Editattendance(attendance.id)"></i><i class="fa fa-close fa-2x text-danger" (click)="deletEattendance(attendance.id)"></i></td> -->
+          </tr>
+
+       
+        
+
+  </tbody>
+
+</table>
+</div>
+
+<div class="row pt-3">
+  <div class="col-md-9">
+      <ngb-pagination [collectionSize]="attendanceList.length" [pageSize]="pageSize " [(page)]="page"
+          (pageChange)="pageClick()" [maxSize]="5" [rotate]="true" [ellipses]="false"
+          [boundaryLinks]="true">
+          <ng-template ngbPaginationFirst>First</ng-template>
+          <ng-template ngbPaginationLast>Last</ng-template>
+          <ng-template ngbPaginationPrevious>Prev</ng-template>
+          <ng-template ngbPaginationNext>Next</ng-template>
+          <ng-template ngbPaginationEllipsis>...</ng-template>
+          <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+      </ngb-pagination>
+
+      </div>
+  </div>
+
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+</div>
+    
+    
+</div>
+</div>
+</div>
+
+
+
+
+
+
+
+<button
+  style="margin: 50px; padding: 10px;display: none;"
+  type="button"
+  class="btn btn-primary"
+  (click)="openPopup()">
+</button>
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  [ngStyle]="{'display':displayStyle}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+     {{header}} <i class="fa fa-close" (click)="closePopup()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-16" style="width: 100%;">
+          <div class="card card-room">
+            <div class="card-header">
+              <!-- <h5 class="card-title">Edit Profile</h5> -->
+            </div>
+            <div class="card-body">
+              <form  [formGroup]="createForm" (ngSubmit)="addattendance(createForm.value)">
+                <div class="row">
+      
+                  <div class="col-md-5 pr-1">
+                    <div class="form-group">
+                      <label>Employee Name </label>
+                     
+                      <select class="form-control" formControlName="name"  (ngModelChange)="fetchEmployee(employeeList[0].id)">
+                        <option value=""  hidden selected>Select Employee</option>
+                        <option  *ngFor="let item of employeeList"  value="{{item.first_name + ' '+ item.last_name}}">
+                            {{item.first_name + ' '+ item.last_name}}</option>
+                      </select>
+                  
+                      
+                    </div>
+                  </div>
+
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label> Position</label>
+                    <select formControlName="position" id="" class="form-control">
+                        <option value=""  hidden selected>Select Position</option>
+                        <option   value="Receptionist">Receptionist</option>
+                        <option   value="Security">Security</option>
+
+                    </select>
+                    </div>
+                  </div>
+
+
+
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label> Attendance</label>
+                    <select formControlName="attendance" id="" class="form-control">
+                        <option value=""  hidden selected>Select Status</option>
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+
+                    </select>
+                    </div>
+                  </div>
+
+
+                </div>
+              
+
+         
+               
+                <div class="row">
+                  <div class="update ml-auto mr-auto" *ngIf="header =='Add attendance'">
+                    <button type="submit" class="btn btn-primary btn-round" >
+                      Save</button>
+                  </div>
+
+                  <div class="update ml-auto mr-auto" *ngIf="header =='Edit attendance'">
+                    <button type="button" class="btn btn-primary btn-round"  (click)="updateattendance(createForm.value)">
+                      Update</button>
+                  </div>
+
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+  
+      
+  
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-danger" 
+                >
+          Close
+        </button>
+      </div> -->
+    </div>
+  </div>
+</div>

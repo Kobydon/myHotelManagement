@@ -1,0 +1,51 @@
+<div class="row ">
+    <div class="col-md-3 animated fadeIn"*ngFor="let item of rooms">
+    
+      <div class="card card-block tip-card"  >
+       
+        <div class="tip-msg">
+          <h3>Room {{item.room_number}}</h3>
+          <div  *ngIf="item.occupied_state!='occupied'">
+          <!-- <span>Available</span> -->
+        </div>
+  
+        <div  *ngIf="item.occupied_state!='available'">
+          <!-- <span>Occupied</span> -->
+        </div>
+          <br>
+      
+          <div  *ngIf="item.status!='dirty'">
+          <span>  
+         
+               <h1 class  ="text-success" >Clean</h1> 
+            
+          
+       </span>
+      </div>
+       <div  *ngIf="item.status!='clean'">
+       <span>
+       
+           <h1 style="color: brown;" >Dirty</h1> 
+        
+      
+   </span>
+  </div>    
+        </div>
+        <div  *ngIf="item.occupied_state!='available'">
+          <i   class="fa fa-check-circle fa-fw fa-2x " style="color: lightgray;"></i>
+       </div>
+       <div  *ngIf="item.occupied_state!='occupied'">
+        <i   class="fa fa-check-circle fa-fw fa-2x text-success"></i>
+     </div>
+      </div>
+    </div>
+  
+    </div>
+  
+  
+    
+
+
+
+  <!-- The Modal -->
+  

@@ -1,0 +1,33 @@
+
+.tip-card {
+    padding: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    .tip-msg {
+        flex: 1;
+
+    }}
+
+th, td {
+    padding: 5px;
+    text-align: left;
+  }
+
+  /*  */
+.modal-dialog{
+    overflow-y: initial !important
+}
+.modal-body{
+    height: 80vh;
+    overflow-y: auto;
+}
+
+.tip-card  :hover{
+
+
+    transition: 0.3s ease-in-out;
+    transform: scale(1.1);
+
+
+  }

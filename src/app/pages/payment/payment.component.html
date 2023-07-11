@@ -1,0 +1,389 @@
+<div class="page"  >
+
+
+    <div class="row" *blockUI="'loading'">
+      <!-- <img src="/assets/img/loading.gif"> -->
+        <div class="col-md-16">
+            <div class="card shadow-sm">
+                <div class="card-body p-2">
+                    <!-- <h5 class="card-title m-3"><small><i class="fa-solid fa-file-lines me-2"></i></small></h5> -->
+                    <div class="menus">
+                        <div class="d-flex">
+                            <div class="w-200">
+                           
+                                <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
+                                <form  [formGroup]="paymentForm">
+                      <!-- <select class="form-control" formControlName="name"  (ngModelChange)="applyFilter()">
+                        <option value=""  hidden selected>Select Guest</option>
+                        <option value="daily">  Daily</option>
+                           <option value="Weekly"> Weekly</option>
+                      </select> -->
+                    </form>
+                            </div>
+                            <div class="w-100">
+                                <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
+                                  New Payment</button>
+                                  <button type="button" class="btn btn-sm btn-warning " style="float: right;"  (click)="download()" >
+                                    Export PDF</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table m-0" id="table">
+
+                   <thead class="table-light">
+                      <tr class="bg-secondary">
+
+    
+      <th scope="col">Name</th>
+      <th scope="col">Amount</th>
+      <th scope="col">Discount</th>
+      <th>Method</th>
+      <th>Room Type</th>
+
+      <th>Check In </th>
+      <th>Check Out</th>
+      <th>Payment Date| Time</th>
+      <th>Status</th>
+      
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>  Total Payments: GH₵{{totalAmount|number}}</td>
+  </tr>
+    <tr *ngFor="let payment of paymentList| slice: (page-1) * pageSize : page * pageSize">
+ 
+
+      <td>{{payment.name}}</td>
+      <td>GH₵{{payment.amount}}</td>
+      <td>{{payment.discount}}%</td>
+      <td>{{payment.method}}</td>
+
+      <td>{{payment.room_type}}</td>
+      
+ 
+      <td>{{payment.checkin_date}}</td>
+      <td>{{payment.checkout_date}}</td>
+      <td>{{payment.payment_date}}</td>
+      <td *ngIf="payment.status=='pending'" class="text-danger">{{payment.status}}</td>
+      <td *ngIf="payment.status=='success'" class="text-success">{{payment.status}}</td>
+
+
+      <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
+        <td><i class="fa fa-edit fa-2x text-info"  (click)="editPayment(payment.id)"></i>
+            <i class="fa fa-close fa-2x text-danger" (click)="deletePayment(payment.id)" ></i>
+          <i class="fa fa-print fa-2x text-primary"  (click)="printReciept(payment.id)" ></i></td>
+      <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
+      <!-- <i class="fa fa-trash"></i></button></td>  -->
+    </tr>
+
+  </tbody>
+
+</table>
+</div>
+
+<div class="row pt-3">
+  <div class="col-md-9">
+      <ngb-pagination [collectionSize]="paymentList.length" [pageSize]="pageSize " [(page)]="page"
+          (pageChange)="pageClick()" [maxSize]="5" [rotate]="true" [ellipses]="false"
+          [boundaryLinks]="true">
+          <ng-template ngbPaginationFirst>First</ng-template>
+          <ng-template ngbPaginationLast>Last</ng-template>
+          <ng-template ngbPaginationPrevious>Prev</ng-template>
+          <ng-template ngbPaginationNext>Next</ng-template>
+          <ng-template ngbPaginationEllipsis>...</ng-template>
+          <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+      </ngb-pagination>
+
+      </div>
+  </div>
+
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+</div>
+    
+    
+</div>
+</div>
+</div>
+
+<button
+  style="margin: 50px; padding: 10px;display: none;"
+  type="button"
+  class="btn btn-primary"
+  (click)="openPopup()">
+</button>
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  [ngStyle]="{'display':displayStyle}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+     {{header}} <i class="fa fa-close" (click)="closePopup()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-16" style="width: 100%;">
+          <div class="card card-payment">
+            <div class="card-header">
+              <!-- <h5 class="card-title">Edit Profile</h5> -->
+            </div>
+            <div class="card-body">
+              
+              <form  [formGroup]="paymentForm" (ngSubmit)="addpayment(paymentForm.value)">
+                <div class="row">
+      
+                  <div class="col-md-5 pr-1">
+                    <div class="form-group">
+                      <label>Guest's NAME</label>
+               
+                      <select class="form-control" formControlName="name"  (ngModelChange)="fetchBookings(bookings[0].id)">
+                        <option value=""  hidden selected>Select Guest</option>
+                        <option *ngFor="let item of bookings" value="{{item.name}}">
+                            {{ item.name}}</option>
+                      </select>
+                 
+                    </div>
+                  </div>
+
+
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label> Room Type </label>
+                 
+                      <select class="form-control" formControlName="room_type" (ngModelChange)="fetchRoomType(rooms[0].id)">
+                        <option  value="" hidden selected>---select----</option>
+                  
+                        <option  *ngFor="let item of rooms"  value="{{item.room_type}}" > {{item.room_type}}</option>
+            
+                  
+                      </select>
+             
+                    </div>
+                  </div>
+
+                
+      
+                  <div class="col-md-3 px-1">
+                    <div class="form-group">
+                      <label>Number of Children</label>
+                      <input type="number" formControlName="children"  class="form-control"  >
+                    </div>
+                  </div>
+                  <div class="col-md-3  px-1" >
+                    <div class="form-group">
+                      <label>Number of Adults</label>
+                      <input type="number"  formControlName="adult" class="form-control">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+              
+                  <div class="col-md-6 pl-1">
+                    <div class="form-group">
+                      <label>Arrival Date</label>
+                      <input type="date" formControlName="checkin_date"  class="form-control" >
+                    </div>
+                  </div>
+
+
+                  <div class="col-md-6 pl-1">
+                    <div class="form-group">
+                      <label>Departure Date</label>
+                      <input type="date" formControlName="checkout_date"  class="form-control" >
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 pr-1">
+                    <div class="form-group">
+                      <label>Amount</label>
+                      <input type="text" formControlName="amount" class="form-control" >
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 pr-1">
+                    <div class="form-group">
+                        <label for="phone">Discount </label>
+                        <select id="idType" formControlName="discount"  class="form-control"
+                         (ngModelChange)="calDiscount(paymentForm.value)">
+                          <option value="" hidden> Apply Discount</option>
+                          <option value="0" selected>0%</option>
+                          <option value="10">10%</option>
+                          <option value="20 ">20% </option>  
+                          <option value="30 ">30% </option>  
+                          <option value="40 ">40% </option>  
+                          <option value="50 ">50% </option>  
+                          <!-- <option value="old">floor 2</option> -->
+                         
+                         
+                         
+                      </select>
+                    </div>
+                  </div>
+
+
+
+
+                  <div class="col-md-6 pr-1">
+                    <div class="form-group">
+                                        
+                    <label for="phone">Method </label>
+                    <select id="idType" formControlName="method" class="form-control">
+                        <option value="" hidden selected> payment method</option>
+                        <option value="cash ">Cash </option>
+                        <option value="visa ">Visa </option>  
+                        <option value="cheque ">Cheque </option>  
+                        <!-- <option value="old">floor 2</option> -->
+                        
+                        
+                        
+                    </select>
+                    </div>
+                  </div>
+
+
+                  <div class="col-md-6 pr-1">
+                    <div class="form-group">
+                      <label>Status</label>
+                      <select class="form-control" formControlName="status">
+                        <option value=""  hidden selected>Select payment Status</option>
+                        <option  value="pending">Pending</option>
+                        <option  value="success">Success</option>
+                        <option  value="cancelled">Cancelled</option>
+                      </select>
+                       
+                    </div>
+                  </div>
+
+
+
+
+
+                </div>
+             
+               
+                <div class="row">
+                  <div class="update ml-auto mr-auto" *ngIf="header =='Add Payment'">
+                    <button type="submit" class="btn btn-primary btn-round" >
+                      Save</button>
+                  </div>
+
+                  <div class="update ml-auto mr-auto" *ngIf="header =='Edit Payment'">
+                    <button type="button" class="btn btn-primary btn-round"  (click)="updatePayment(paymentForm.value)">
+                      Update</button>
+                  </div>
+
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+  
+      
+  
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-danger" 
+                >
+          Close
+        </button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  [ngStyle]="{'display':openStyle}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+     {{header}}
+      <i class="fa fa-close" (click)="closePopup()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-16" style="width: 100%;">
+          <div class="card card-payment">
+            <div class="card-header">
+              <!-- <h5 class="card-title">Edit Profile</h5> -->
+            </div>
+            <div class="card-body">
+              <div id="pdfTable" #pdfTable style="text-align: center;">
+                <h3 style="font-smooth: bold;">Yaalex Executive Lodge</h3>
+               -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  -   
+               <br> 
+            <tr  *ngFor="let item of payList"  > 
+             <p><Label >Name:</Label> &emsp; <strong> {{item.name}}</strong></p>
+            
+            
+             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
+             <br>
+             <p> <Label>Payment Method :</Label> &emsp; <strong> {{item.method}}</strong></p>
+             <p> <Label>Amount:</Label> &emsp; <strong>GH₵{{item.amount +".00"}}</strong></p>
+             <p> <Label>Discount:</Label> &emsp; <strong> {{item.discount +"%"}}</strong></p>
+             <p> <Label>Total:</Label> &emsp; <strong>{{item.amount +".00"}}</strong></p>
+             <br>
+  
+             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
+             <br>
+             <p> <Label>Room :</Label> &emsp; <strong> {{item.room_type}}</strong></p>
+            
+            
+             <br>
+             <!-- <p> <Label>Address:</Label> &emsp; <strong> Teshie</strong></p>
+            
+             <br>
+            -->
+   
+             <p> <Label>Status:</Label> &emsp; <strong> {{item.status}}</strong></p>
+             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
+             <br>
+           
+             <p> <Label>PaymentDate :</Label> &emsp;  <strong> {{item.payment_date}}</strong></p>
+  <!--        
+          <br>
+             <p > <Label>Checkout Date :</Label> &emsp; <strong> Jan 22,2022</strong></p>
+          -->
+            </tr>
+  
+  
+          </div>
+          <button class="btn btn-primary" (click)="downloadAsPDF()">Print</button>
+            </div>
+          </div>
+        </div>
+  
+      
+  
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-danger" 
+                >
+          Close
+        </button>
+      </div> -->
+    </div>
+  </div>
+</div>

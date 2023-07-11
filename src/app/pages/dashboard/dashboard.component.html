@@ -1,0 +1,246 @@
+<div class="row">
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-users text-warning"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Guests</p>
+              <p class="card-title" style="font-size: small;">{{guestList.length}}
+                <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <!-- <i class="fa fa-refresh"></i> Update Now -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-bed text-success"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Rooms</p>
+              <p class="card-title" style="font-size: small;">{{rooms.length}}
+                <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <!-- <i class="fa fa-calendar-o"></i> Last day -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-list text-danger"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Reservation</p>
+              <p class="card-title" style="font-size: small;">1
+                <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <!-- <i class="fa fa-clock-o"></i> In the last hour -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+      <div class="card-body ">
+        <div class="row">
+          <div class="col-5 col-md-4">
+            <div class="icon-big text-center icon-warning">
+              <i class="fa fa-check text-success"></i>
+            </div>
+          </div>
+          <div class="col-7 col-md-8">
+            <div class="numbers">
+              <p class="card-category">Account Status</p>
+              <p class="card-title" style="font-size: small;">Active
+                <p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <!-- <i class="fa fa-refresh"></i> Update now -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card ">
+      <div class="card-header ">
+        <p class="card-title">Recent Bookings <i class="fa fa-file text-info"></i></p>
+        
+      </div>
+      <div class="card-body ">
+        <table class="table " style="width:80%; " id="myTable" >
+          <thead>
+            <tr>
+             <th>Name</th>
+             <th>Check-in</th>
+             <th>Check-out</th>
+             <th>Room type</th>
+             
+             <th>Country</th>
+            </tr>
+          </thead>
+          
+          <tbody>
+            <tr  *ngFor="let booking of bookings| slice: (page-1) * pageSize : page * pageSize">
+              <td>{{booking.name}}</td>
+              <td>{{booking.arrival_date}}</td>
+            <td>{{booking.departure_date}}</td>
+            <td>{{booking.room_type}}</td>
+              <td>{{booking.country}}</td>
+             
+              
+            </tr>
+            
+          </tbody>
+          
+          </table>
+          
+          
+          
+      </div>
+      <div class="card-footer ">
+        <hr>
+        <div class="stats">
+          <!-- <i class="fa fa-history"></i> Updated 3 minutes ago -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="card ">
+      <div class="card-header ">
+        <p class="card-title">Rooms Status</p>
+        <!-- <p class="card-category">Lastes</p> -->
+      </div>
+      <div class="card-body ">
+        <table class="table " style="width:80%; " id="myTable" >
+          <thead>
+            <tr >
+             <th> Number</th>
+             <th>Category</th>
+             <th>Status</th>
+             <!-- <th>Available</th> -->
+             
+             <!-- <th>Action</th> -->
+            </tr>
+          </thead>
+          
+          <tbody>
+            <tr  *ngFor="let room of rooms| slice: (page-1) * pageSize : page * pageSize" >
+              <td>{{room.room_number}} </td>
+              <td>{{room.room_type}}</td>
+              <td  *ngIf="room.occupied_state!='occupied'" class="text-success">Available</td>
+              <td  *ngIf="room.occupied_state!='available'" class="text-info">occupied</td>
+             
+             
+              <!-- <td><i class="fa fa-eye text-danger"></i></td> -->
+            </tr>
+            
+          </tbody>
+          
+          </table>
+      </div>
+      <div class="card-footer ">
+        <!-- <div class="legend">
+          <i class="fa fa-circle text-primary"></i> Opened
+          <i class="fa fa-circle text-warning"></i> Read
+          <i class="fa fa-circle text-danger"></i> Deleted
+          <i class="fa fa-circle text-gray"></i> Unopened
+        </div> -->
+        <hr>
+        <div class="stats">
+          <!-- <i class="fa fa-calendar"></i> Number of emails sent -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card card-chart">
+      <div class="card-header">
+        <p class="card-title">Recent Pamyments</p>
+       
+      </div>
+      <div class="card-body">
+        <table class="table " style="width:80%; " id="myTable" >
+          <thead>
+            <tr  >
+             <th> Name</th>
+             <th>Amount</th>
+             <th>Status</th>
+             <!-- <th>Available</th> -->
+             
+             <!-- <th>Action</th> -->
+            </tr>
+          </thead>
+          
+          <tbody>
+            <tr  *ngFor="let item of paymentList| slice: (page-1) * pageSize : page * pageSize">
+              <td> {{item.name}}</td>
+              <td>GH₵{{item.amount}}</td>
+              <td > {{item.status}}</td>
+ 
+             
+             
+              <!-- <td><i class="fa fa-eye text-danger"></i></td> -->
+            </tr>
+            
+          </tbody>
+          
+          </table>
+      </div>
+      <div class="card-footer">
+     
+        <hr/>
+        <div class="card-stats">
+       
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

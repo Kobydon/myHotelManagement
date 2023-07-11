@@ -1,0 +1,28 @@
+
+
+
+<div class="container" >
+
+    <div class="row  ">
+    
+    
+    
+    
+      <div  *ngFor="let item of rooms" class="col-md-3 animated fadeIn" style="width: 60%; height: 60%;"  >
+        <img [src]="item.image_one"   alt="room" >
+        <div class="card card-block tip-card" >
+       
+          <div class="tip-msg">
+            <span>({{item.amenities}})</span>
+            <h3>{{item.room_type}}</h3>
+          
+          </div>
+        
+            <!-- <i routerLink="/room/room-list" class="fa fa-check-circle fa-fw fa-2x text-success"></i> -->
+         
+        </div>
+      </div>
+    
+  </div>
+    
+    </div>
