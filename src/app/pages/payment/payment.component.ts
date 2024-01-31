@@ -14,6 +14,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import htmlToPdfmake from 'html-to-pdfmake';
 import {  ViewChild, ElementRef  } from '@angular/core';
 import * as html2pdf from 'html2pdf.js'
+import { userService } from 'app/user.service';
 @Component({
   selector: 'payment',
   templateUrl: './payment.component.html',
@@ -42,9 +43,11 @@ export class PaymentComponent implements OnInit {
   day_difference:any;
   payList:any;
   payment:any;
+  
   totalAmount:any;
+  user:any;
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
-    private paymentService:PaymentService,private guestService:GuestService) { 
+    private paymentService:PaymentService,private guestService:GuestService,private userService:userService) { 
       
   this.paymentForm = this.fb.group({
     id:['',Validators.required],
@@ -65,7 +68,10 @@ export class PaymentComponent implements OnInit {
 
     children :['',Validators.required],
     adult :['',Validators.required],
-    filter: ['',Validators.required]
+    filter: ['',Validators.required],
+    balance: ['',Validators.required],
+    topay: ['',Validators.required],
+
     
    
   })
@@ -75,6 +81,7 @@ export class PaymentComponent implements OnInit {
   ngOnInit(): void {
 
     this.getPaymentList();
+    this.getUser();
     // this.getGuest();
   }
   async getGuest(){
@@ -260,7 +267,8 @@ async fetchRoomType(id:number){
     var res = await this.roomService.get_room_details(id);
     if (res) this.roomD =res;
     this.paymentForm.patchValue({
-      amount:this.roomD[0].base_price *  this.paymentForm.value.duration
+      amount:this.roomD[0].base_price *  this.paymentForm.value.duration, 
+      topay:this.roomD[0].base_price *  this.paymentForm.value.duration
      
     })
   } catch (error){
@@ -300,8 +308,9 @@ calDiscount(record){
 
     children :record.children,
     adult :record.adult,
-
+    balance: this.paymentForm.value.topay - record.amount
 }
+
 
 try{
   this.loading.start();
@@ -358,6 +367,20 @@ async  editPayment(id:number){
 
 
 }
+
+
+async getUser(){
+  try{
+      var res = await this.userService.getUser()
+      if (res) this.user=res;
+
+  }catch(err){console.log(err)}
+  finally{console.log("success");}
+
+
+
+}
+
 
 
 async printReciept(id:number){

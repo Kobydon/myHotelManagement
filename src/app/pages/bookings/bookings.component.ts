@@ -6,6 +6,7 @@ import { FormBuilder,FormControlName,FormGroup, Validators } from '@angular/form
 import { RoomService } from 'app/services/rooms.service';
 import { GuestService } from 'app/services/guest.service';
 import { error } from 'console';
+import { userService } from 'app/user.service';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { error } from 'console';
   styleUrls: ['./bookings.component.css']
 })
 export class BookingsComponent implements OnInit {
-
+  user:any;
   header:any;
   bookingForm:FormGroup;
   room_info:any;
@@ -32,7 +33,8 @@ export class BookingsComponent implements OnInit {
   pageSize: number = 10;
   @BlockUI('loading') loading!: NgBlockUI
   constructor(private toastr:ToastrService,private fb: FormBuilder,
-    private roomService:RoomService,private guestService:GuestService) { 
+    private roomService:RoomService,private guestService:GuestService,
+    private userService:userService) { 
 
     this.bookingForm =  
       
@@ -51,6 +53,7 @@ export class BookingsComponent implements OnInit {
       arrival_date :['',Validators.required],
       adult :['',Validators.required],
       children:['',Validators.required],
+      day:['',Validators.required],
 
 
 
@@ -69,6 +72,7 @@ export class BookingsComponent implements OnInit {
     this.getBookingList();
 
     this.getRoomType();
+    this.getUser();
  
 
   }
@@ -76,7 +80,17 @@ export class BookingsComponent implements OnInit {
 
 
 
-
+  async getUser(){
+    try{
+        var res = await this.userService.getUser()
+        if (res) this.user=res;
+  
+    }catch(err){console.log(err)}
+    finally{console.log("success");}
+  
+  
+  
+  }
 
 
   async getBookingList(){
@@ -265,9 +279,15 @@ async updateBooking(record){
 
     room_number:record.room_number,
 
-    status: record.status
+    status: record.status,
+    day: 0
 
   }
+  var date1= new Date ( this.bookingForm.value.arrival_date);
+  var date2 = new Date ( this.bookingForm.value.departure_date);
+  var difference_in_time = date2.getTime() - date1.getTime();
+  let day_difference = difference_in_time/(1000 * 3600*24);
+  book.day = day_difference
   try{
     this.loading.start();
     var res = await this.roomService.updateBooking(book); 

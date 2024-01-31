@@ -27,7 +27,7 @@ export const AppRoutes: Routes = [
     children: [
         {
       path: '',
-      loadChildren: () => import('../../../HMS/src/app/login/login.module').then(x => x.LoginModule)
+      loadChildren: () => import('../../src/app/login/login.module').then(x => x.LoginModule)
   }]},
 
 
@@ -39,6 +39,6 @@ export const AppRoutes: Routes = [
     children: [
         {
       path: '',
-      loadChildren: () => import('../../../HMS/src/app/features/features.module').then(x => x.FeaturesModule)
+      loadChildren: () => import('../app/features/features.module').then(x => x.FeaturesModule)
   }]}
 ]

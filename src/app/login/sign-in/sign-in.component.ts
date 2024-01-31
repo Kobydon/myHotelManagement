@@ -85,7 +85,7 @@ export class SignInComponent implements OnInit {
    this.toastr.error(null,error.message)
    }
    finally{
-    if(this.user[0].roles=="guest")
+    if(this.user[0].roles=="guest" )
     this.router.navigate(["/home/features"]);
     else{
       this.router.navigate(["/dashboard"])

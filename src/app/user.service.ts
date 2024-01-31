@@ -23,7 +23,7 @@ const httpOptions = {
 export class userService {
 message:any;
 user:any;
-  private userUrl = 'https://yaalexflask.onrender.com';  // URL to REST API
+  private userUrl = 'http://127.0.0.1:5000';  // URL to REST API
    
  
   isUserLoggedIn: boolean = false;

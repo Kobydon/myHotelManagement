@@ -9,6 +9,7 @@ import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ToastrService } from 'ngx-toastr';
 import { RoomService } from 'app/services/rooms.service';
 import { GuestService } from 'app/services/guest.service';
+import { PaymentService } from 'app/services/payment.service';
 @Component({
   selector: 'guest',
   templateUrl: './guest.component.html',
@@ -40,7 +41,7 @@ pageSize: number = 10;
   constructor(
     private roomService:RoomService,private router:Router,
       private fb:FormBuilder,private route:ActivatedRoute,private guestService:GuestService,
-      private toastr:ToastrService
+      private toastr:ToastrService,private paymentService:PaymentService
      ) {
 
         this.createForm = this.fb.group({
@@ -315,13 +316,16 @@ async checkOut(id:any){
 
   try{
     this.loading.start();
+     
+
+
      var res= await this.guestService.checkout(id)
           // this.toastr.success(null,"successfully updated profile
           if(res)  this.getGuest();
 
   }
   catch(error:any){
-    this.toastr.error(null,error)
+    this.toastr.info(null,"kindly pay all pending bills  before checkout")
   }
  finally{
   this.loading.stop();

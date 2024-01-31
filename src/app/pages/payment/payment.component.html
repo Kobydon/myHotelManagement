@@ -23,8 +23,8 @@
                             <div class="w-100">
                                 <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
                                   New Payment</button>
-                                  <button type="button" class="btn btn-sm btn-warning " style="float: right;"  (click)="download()" >
-                                    Export PDF</button>
+                                  <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="download()" >
+                                   <i class="fa fa-file-excel-o" ></i> Export Excel</button>
                             </div>
                         </div>
                     </div>
@@ -37,6 +37,7 @@
     
       <th scope="col">Name</th>
       <th scope="col">Amount</th>
+      <th scope="col">Balance</th>
       <th scope="col">Discount</th>
       <th>Method</th>
       <th>Room Type</th>
@@ -57,7 +58,8 @@
  
 
       <td>{{payment.name}}</td>
-      <td>GH₵{{payment.amount}}</td>
+      <td>{{payment.amount}}.00</td>
+      <td>{{payment.balance}}.00</td>
       <td>{{payment.discount}}%</td>
       <td>{{payment.method}}</td>
 
@@ -72,8 +74,8 @@
 
 
       <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-        <td><i class="fa fa-edit fa-2x text-info"  (click)="editPayment(payment.id)"></i>
-            <i class="fa fa-close fa-2x text-danger" (click)="deletePayment(payment.id)" ></i>
+        <td ><i *ngIf="user[0].roles=='admin'" class="fa fa-edit fa-2x text-info"  (click)="editPayment(payment.id)"></i>
+            <i  *ngIf="user[0].roles=='admin'" class="fa fa-close fa-2x text-danger" (click)="deletePayment(payment.id)" ></i>
           <i class="fa fa-print fa-2x text-primary"  (click)="printReciept(payment.id)" ></i></td>
       <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
       <!-- <i class="fa fa-trash"></i></button></td>  -->
@@ -259,10 +261,10 @@
                   <div class="col-md-6 pr-1">
                     <div class="form-group">
                       <label>Status</label>
-                      <select class="form-control" formControlName="status">
+                      <select class="form-control" formControlName="status" disabled="">
                         <option value=""  hidden selected>Select payment Status</option>
                         <option  value="pending">Pending</option>
-                        <option  value="success">Success</option>
+                        <option  value="success" selected>Success</option>
                         <option  value="cancelled">Cancelled</option>
                       </select>
                        
@@ -278,7 +280,7 @@
                
                 <div class="row">
                   <div class="update ml-auto mr-auto" *ngIf="header =='Add Payment'">
-                    <button type="submit" class="btn btn-primary btn-round" >
+                    <button   type="submit" class="btn btn-primary btn-round" >
                       Save</button>
                   </div>
 

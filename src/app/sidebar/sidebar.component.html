@@ -7,15 +7,16 @@
   .dropdown-container {
 
     padding-left: 5px;
-    display:none;
+
     background-color: lightgrey;
-    
+    display:none;
     
   }
 
   .dropdown-container :hover{
   background-color: burlywood;
   color: white;
+
 
 
 }
@@ -42,14 +43,14 @@ background-color: lightgrey;
       </div>
     </a>
     <a  class="simple-text logo-normal" >
- Yaalex executive
+    {{user[0].firstname +" " + user[0].lastname}}
     </a>
   </div>
     <ul class="nav">
       <li >
       <a  routerLink="dashboard"><i class="fa fa-tachometer text-primar">&nbsp;</i><span>Dashboard</span></a>
     </li>
-     <li  >
+     <li  *ngIf="user[0].roles=='admin'" >
         <a  routerLink="all-users"><i class="fa fa-users "  >&nbsp;</i><span>User&nbsp;</span>
           <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
         </a>
@@ -77,17 +78,18 @@ background-color: lightgrey;
 
 
         <li   class="transparent" >
-          <a  ><i class="fa fa-bed " >&nbsp;</i><span>Room&nbsp;</span>
+          <a  ><i class="fa fa-bed " >&nbsp;</i><span>Room &nbsp;</span>
+            <!-- <i style="float: right;" class="fa fa-angle-down"></i> -->
             <!-- <i class="fa fa-caret-down"   ></i> -->
           </a>
         </li>
   
           <div class="dropdown-container">
-          <li>  <a style="font-size: small;" routerLink="all-rooms"><i class="fa fa-list " >&nbsp;</i>All</a>
+          <li  *ngIf="user[0].roles=='admin'">  <a style="font-size: small;" routerLink="all-rooms"><i class="fa fa-list " >&nbsp;</i>All</a>
           </li>
 
           <li>
-            <a  style="font-size: small;"  routerLink="room-types"><i class="fa fa-plus " >&nbsp;</i>Room Types</a>
+            <a  *ngIf="user[0].roles=='admin'" style="font-size: small;"  routerLink="room-types"><i class="fa fa-plus " >&nbsp;</i>Room Types</a>
           </li>
 
           <li>
@@ -98,7 +100,7 @@ background-color: lightgrey;
           </li>
 
           <!-- <li>  <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Add New Room</a></li> -->
-            <li class="transparent">  <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Reservations</a>
+            <li class="transparent">  <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-tasks " >&nbsp;</i>Reservations</a>
 
               
             </li>
@@ -114,7 +116,7 @@ background-color: lightgrey;
 
 
              <li >  
-              <a style="font-size: small;" routerLink="room-status"><i class="fa fa-list " >&nbsp;</i>Room Status</a>
+              <a style="font-size: small;" routerLink="room-status"><i class="fa fa-info-circle " >&nbsp;</i>Room Status</a>
 
               
              </li>
@@ -134,17 +136,17 @@ background-color: lightgrey;
           
  
 
-          <li   class="transparent" >
+          <li   class="transparent"  *ngIf="user[0].roles=='admin'" >
             <a ><i class="fa fa-users " >&nbsp;</i><span>Employee&nbsp;</span>
               <!-- <i class="fa fa-caret-down"   ></i> -->
             </a>
           </li>
     
-            <div class="dropdown-container">
+            <div class="dropdown-container"  *ngIf="user[0].roles=='admin'">
             <li>  <a style="font-size: small;" routerLink="employees"><i class="fa fa-list " >&nbsp;</i>All</a>
             </li>
         
-            <li class="transparent">
+            <li class="transparent"  *ngIf="user[0].roles=='admin'" >
               <a  style="font-size: small;" ><i class="fa fa-calendar-o " >&nbsp;</i>Attendance</a>
             </li>
 

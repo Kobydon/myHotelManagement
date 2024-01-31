@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { routeAnimations } from 'app/shared/animation';
+import { userService } from 'app/user.service';
 
 
 export interface RouteInfo {
@@ -41,8 +42,11 @@ export const ROUTES: RouteInfo[] = [
 })
 
 export class SidebarComponent implements OnInit {
+    user:any;
+    constructor(private userService:userService){}
     public menuItems: any[];
     ngOnInit() {
+        this.getUser();
         this.menuItems = ROUTES.filter(menuItem => menuItem);
 
 
@@ -62,6 +66,18 @@ export class SidebarComponent implements OnInit {
       }
          }
     
+
+         async getUser(){
+            try{
+                var res = await this.userService.getUser()
+                if (res) this.user=res;
+
+            }catch(err){console.log(err)}
+            finally{console.log("success");}
+          
+
+
+         }
 
 
 }

@@ -15,7 +15,7 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class EmployeeService {
 
-  private employeeUrl= 'https://yaalexflask.onrender.com';  // URL to REST API
+  private employeeUrl= 'http://127.0.0.1:5000';  // URL to REST API
 
   constructor(private http: HttpClient,private router:Router) { }
 
