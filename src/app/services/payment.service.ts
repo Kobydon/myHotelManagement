@@ -69,6 +69,10 @@ getroom_number():Observable<any[]>{
       return  lastValueFrom( this.http.get<any>(url));
     }
 
+    searchDates(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/searchdates', d, httpOptions));
+    }
+
   postroom_type(ad:any) {
     //console.log(user);
       return this.http.post(this.paymentUrl + '/room/add_room_type', ad, httpOptions);

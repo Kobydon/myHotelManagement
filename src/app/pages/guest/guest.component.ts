@@ -152,7 +152,7 @@ pageSize: number = 10;
 
 
   myFunction() {
-    this.loading.start();
+
     var input, filter, table, tr, td, i, txtValue;
     input = document.getElementById("myInput");
     filter = input.value.toUpperCase();
@@ -167,7 +167,7 @@ pageSize: number = 10;
         } else {
           tr[i].style.display = "none";
         }
-        this.loading.stop();
+       
       }       
     }
   }

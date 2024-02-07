@@ -46,8 +46,8 @@ export class CustomReservationComponent implements OnInit {
        room_type:['',Validators.required],
         description :['',Validators.required],
 
-        // image_one :['',Validators.required], 
-        // image_two :['',Validators.required],
+        email :['',Validators.required], 
+        phone :['',Validators.required],
         country :['',Validators.required],
         price :['',Validators.required],
         name :['',Validators.required]
@@ -133,7 +133,8 @@ async addReservation(record){
       purpose:record.purpose,
       room_type:record.room_type,
       name:record.name,
-     
+      email: record.email,
+      phone: record.phone,
    
 
       // image_one :['',Validators.required], 

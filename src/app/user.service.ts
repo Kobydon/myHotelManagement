@@ -146,7 +146,7 @@ getExpiration() {
 
 getUser(){
   return lastValueFrom( this.http.get<any[]>(this.userUrl + '/user/get_info'));
-}
+}n
 
 getUsers(){
 return lastValueFrom(this.http.get<any[]>(this.userUrl + '/user/get_users'));

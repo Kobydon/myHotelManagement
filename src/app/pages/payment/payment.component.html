@@ -21,15 +21,21 @@
                     </form>
                             </div>
                             <div class="w-100">
+                              <form  [formGroup]="paymentForm">
+                              <input type="date" class="form-control" style="width:20%;"
+                               formControlName="dates" (ngModelChange)="searchDates()"></form>
                                 <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
                                   New Payment</button>
-                                  <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="download()" >
-                                   <i class="fa fa-file-excel-o" ></i> Export Excel</button>
+                                  <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">
+                                   <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
+
+                                   <button type="button" class="btn btn-sm btn-warning " style="float: right;"  (click)="exportexcel()">
+                                    <i class="fa fa-money"   ></i>Refund</button>
                             </div>
                         </div>
                     </div>
                     <div class="table-responsive">
-                      <table class="table m-0" id="table">
+                      <table class="table m-0" id="excel-table">
 
                    <thead class="table-light">
                       <tr class="bg-secondary">

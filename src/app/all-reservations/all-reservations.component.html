@@ -28,6 +28,9 @@
 
     
       <th scope="col">Name</th>
+        
+      <th scope="col">Email</th>  
+      <th scope="col">Phone</th>
       <th scope="col">Number of Children</th>
       <th scope="col">Number of Adults</th>
       <th>Arrival</th>
@@ -49,6 +52,8 @@
  
 
       <td>{{reserve.name}}</td>
+      <td>{{reserve.email}}</td>
+      <td>{{reserve.phone}}</td>
       <td>{{reserve.children}}</td>
       <td>{{reserve.adult}}</td>
       <td>{{reserve.arrival}}</td>
@@ -143,6 +148,24 @@
                     <div class="form-group">
                       <label>Guest's NAME</label>
                     <input type="text" class="form-control" formControlName="name">
+
+                  
+                    </div>
+                  </div>
+
+                  <div class="col-md-5 pr-1">
+                    <div class="form-group">
+                      <label>Guest's Email</label>
+                    <input type="text" class="form-control" formControlName="email">
+
+                  
+                    </div>
+                  </div>
+
+                  <div class="col-md-5 pr-1">
+                    <div class="form-group">
+                      <label>Guest's Phone No.</label>
+                    <input type="text" class="form-control" formControlName="phone">
 
                   
                     </div>

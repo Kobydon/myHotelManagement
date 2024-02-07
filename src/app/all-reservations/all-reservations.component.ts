@@ -43,8 +43,8 @@ export class AllReservationsComponent implements OnInit {
    room_type:['',Validators.required],
     description :['',Validators.required],
 
-    // image_one :['',Validators.required], 
-    // image_two :['',Validators.required],
+     email :['',Validators.required], 
+    phone :['',Validators.required],
     country :['',Validators.required],
     price :['',Validators.required],
     name :['',Validators.required],
@@ -118,6 +118,7 @@ async openPopup(id) {
     if (res) this.createForm.patchValue({
       id:this.reserveList[0].id,
       adult:this.reserveList[0].adult,
+      phone:this.reserveList[0].phone,
       arrival :this.reserveList[0].arrival,
       departure:this.reserveList[0].departure,
       children :this.reserveList[0].children,
@@ -131,6 +132,7 @@ async openPopup(id) {
       country :this.reserveList[0].country,
       price :this.reserveList[0].price,
       name :this.reserveList[0].name,
+      email :this.reserveList[0].email,
       status :this.reserveList[0].status,
       payment_status :this.reserveList[0].Payment_status,
       room_number :this.reserveList[0].room_nmber,
@@ -168,7 +170,9 @@ async UpdateReservation(record){
     status :record.status,
     payment_status :record.payment_status,
     room_number :record.room_number,
-    id:record.id
+    id:record.id,
+    email:record.email,
+    phone:record.phone
 
 
   }

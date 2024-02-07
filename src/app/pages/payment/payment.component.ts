@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ToastrService } from 'ngx-toastr';
+import * as XLSX from 'xlsx';
 
 import { FormBuilder,FormControlName,FormGroup, Validators } from '@angular/forms';
 import { RoomService } from 'app/services/rooms.service';
@@ -22,6 +23,7 @@ import { userService } from 'app/user.service';
 })
 export class PaymentComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI
+  fileName= 'Booking_Payments.xlsx';
   paymentForm:FormGroup
   page = 1;
   pageSize: number = 10;
@@ -71,6 +73,7 @@ export class PaymentComponent implements OnInit {
     filter: ['',Validators.required],
     balance: ['',Validators.required],
     topay: ['',Validators.required],
+    dates: ['',Validators.required],
 
     
    
@@ -152,11 +155,11 @@ export class PaymentComponent implements OnInit {
 
 
 myFunction() {
-  this.loading.start();
+
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("myInput");
   filter = input.value.toUpperCase();
-  table = document.getElementById("myTable");
+  table = document.getElementById("excel-table");
   tr = table.getElementsByTagName("tr");
   for (i = 0; i < tr.length; i++) {
     td = tr[i].getElementsByTagName("td")[0];
@@ -168,7 +171,7 @@ myFunction() {
       } else {
         tr[i].style.display = "none";
       }
-      this.loading.stop();
+      
     }       
   }
 }
@@ -474,7 +477,21 @@ public downloadAsPDF() {
 
 }
 
+async searchDates(){
 
+  const d = {
+    date: this.paymentForm.value.dates
+  }
+    try{
+      this.loading.start();
+      var res = await this.paymentService.searchDates(d);
+      if(res) this.paymentList =res;
+
+    }
+    catch(err){this.toastr.error(null,err.message)}
+
+    finally{this.loading.stop();}
+}
   
 download(){
   var element = document.getElementById('table');
@@ -490,5 +507,20 @@ jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
 html2pdf().from(element).set(opt).save();
 }
 
+
+exportexcel()
+{
+  /* pass here the table id */
+  let element = document.getElementById('excel-table');
+  const ws: XLSX.WorkSheet =XLSX.utils.table_to_sheet(element);
+
+  /* generate workbook and add the worksheet */
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+  /* save to file */  
+  XLSX.writeFile(wb, this.fileName);
+
+}
 
 }
