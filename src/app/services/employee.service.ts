@@ -15,7 +15,7 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class EmployeeService {
 
-  private employeeUrl= 'https://renderdemo-w1s0.onrender.com  '  // URL to REST API
+  private employeeUrl= 'https://renderdemo-w1s0.onrender.com'  // URL to REST API
 
   constructor(private http: HttpClient,private router:Router) { }
 
