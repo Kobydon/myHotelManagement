@@ -1,0 +1,129 @@
+<div class="page"  >
+
+
+    <div class="row" *blockUI="'loading'">
+      <!-- <img src="/assets/img/loading.gif"> -->
+        <div class="col-md-16">
+            <div class="card shadow-sm">
+                <div class="card-body p-2">
+                    <!-- <h5 class="card-title m-3"><small><i class="fa-solid fa-file-lines me-2"></i></small></h5> -->
+                    <div class="menus">
+                        <div class="d-flex">
+                            <div class="w-200">
+                           
+                                <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
+                                <form  [formGroup]="paymentForm">
+                      <!-- <select class="form-control" formControlName="name"  (ngModelChange)="applyFilter()">
+                        <option value=""  hidden selected>Select Guest</option>
+                        <option value="daily">  Daily</option>
+                           <option value="Weekly"> Weekly</option>
+                      </select> -->
+                    </form>
+                            </div>
+                            <div class="w-100">
+                              <form  [formGroup]="refundForm">
+                              <input type="date" class="form-control" style="width:20%;"
+                               formControlName="dates" (ngModelChange)="searchDates()"></form>
+                                <button type="button" class="btn btn-sm btn-info " style="float: right;" routerLink="payment" >
+                                  New Refund</button>
+                                  <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">
+                                   <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table m-0" id="excel-table" style="width:100%">
+
+                   <thead class="table-light">
+                      <tr class="bg-secondary">
+
+    
+      <th scope="col">Name</th>
+      <th scope="col">Amount</th>
+      <th scope="col">authorized_by</th>
+      <th scope="col">Reason</th>
+      <th scope="col">Date | Time</th>
+      <th>Status</th>
+      
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>  Total Payments: GH₵{{totalAmount|number}}</td>
+  </tr>
+    <tr *ngFor="let refund of refundList| slice: (page-1) * pageSize : page * pageSize">
+ 
+
+      <td>{{refund.name}}</td>
+      <td>{{refund.refund_amount}}.00</td>
+      <td>{{refund.authorized_by}}</td>
+      <td>{{refund.reason}}</td>
+      <td>{{refund.refund_time}}</td>
+
+
+      <td *ngIf="refund.status=='pending'" class="text-danger">{{refund.status}}</td>
+      <td *ngIf="refund.status=='success'" class="text-success">{{refund.status}}</td>
+
+
+      <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
+  <td>
+            
+            <button *ngIf="user[0].roles=='admin' && refundList[0].status=='pending'" (click)="approveRefund(refundForm.value)"   type="button" class="btn btn-sm btn-success " style="float: right;"  >
+              <i class="fa fa-check"   ></i>Approve</button>
+
+                
+            <button *ngIf="user[0].roles=='admin' && refundList[0].status=='success'" disabled=""  type="button" class="btn btn-sm btn-success " style="float: right;"  >
+                <i class="fa fa-check-circle"    ></i> Approved</button></td>
+         
+      <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
+      <!-- <i class="fa fa-trash"></i></button></td>  -->
+    </tr>
+
+  </tbody>
+
+</table>
+</div>
+
+<div class="row pt-3">
+  <div class="col-md-9">
+      <ngb-pagination [collectionSize]="refundList.length" [pageSize]="pageSize " [(page)]="page"
+          (pageChange)="pageClick()" [maxSize]="5" [rotate]="true" [ellipses]="false"
+          [boundaryLinks]="true">
+          <ng-template ngbPaginationFirst>First</ng-template>
+          <ng-template ngbPaginationLast>Last</ng-template>
+          <ng-template ngbPaginationPrevious>Prev</ng-template>
+          <ng-template ngbPaginationNext>Next</ng-template>
+          <ng-template ngbPaginationEllipsis>...</ng-template>
+          <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+      </ngb-pagination>
+
+      </div>
+  </div>
+
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+</div>
+    
+    
+</div>
+</div>
+</div>
+
+
+
+
+
+
+

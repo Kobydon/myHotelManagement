@@ -109,8 +109,20 @@ getroom_number():Observable<any[]>{
     //console.log(user);
       return  lastValueFrom(this.http.post(this.roomUrl + '/guest/add_booking', ad, httpOptions));
     }
+    
 
+    searchYesterdayRoomDates(ad:any){
+      return lastValueFrom(this.http.post(this.roomUrl + '/room/search_yesterday_date', ad, httpOptions)) ;
+    }
 
+    searchRoomDates(ad:any){
+      return lastValueFrom(this.http.post(this.roomUrl + '/room/search_room_date', ad, httpOptions)) ;
+    }
+
+    searchHouse(ad:any) {
+      //console.log(user);
+        return lastValueFrom(this.http.post(this.roomUrl + '/room/search_house', ad, httpOptions)) ;
+      }
  
     post_room(ad:any) {
       //console.log(user);
@@ -118,7 +130,7 @@ getroom_number():Observable<any[]>{
       }
   /** PUT: update the user on the server */
   updateHouse(house: any) {
-    return this.http.put(this.roomUrl + '/room/update_house', house, httpOptions)
+    return lastValueFrom( this.http.put(this.roomUrl + '/room/update_house', house, httpOptions));
   }
   
   /** DELETE: delete the user from the server */

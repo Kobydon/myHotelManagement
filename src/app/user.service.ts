@@ -28,6 +28,7 @@ user:any;
  
   isUserLoggedIn: boolean = false;
   redirectUrl?: string;
+  isAdmin: boolean = false;
 
   constructor(private http: HttpClient,private router:Router,private toastr:ToastrService) { }
 
@@ -68,7 +69,7 @@ user:any;
       
     this.isUserLoggedIn = username == user.username && password == user.password;
     localStorage.setItem('isUserLoggedIn', this.isUserLoggedIn ? "true" : "false");
-
+    localStorage.setItem('is_Admin', this.isAdmin ? "true" : "false");
  
   
     return lastValueFrom (  this.http.post(this.userUrl + '/user/get_signin_client', user, httpOptions));
@@ -115,6 +116,7 @@ user:any;
     localStorage.removeItem("expires_at");
   
     localStorage.removeItem('isUserLoggedIn');
+    localStorage.removeItem('isAdmin');
     return this.router.navigate(['/account/signin']) 
   }
 public isLoggedIn() {

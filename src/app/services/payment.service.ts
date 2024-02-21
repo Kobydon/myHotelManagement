@@ -35,6 +35,10 @@ getAvailable_rooms():Observable<any[]>{
 getroom_number():Observable<any[]>{
   return this.http.get<any[]>(this.paymentUrl + '/room/get_room_number');
 }
+
+getRefund(){
+  return lastValueFrom( this.http.get<any[]>(this.paymentUrl + '/guest/get_refund'));
+}
 /** GET user by id. Will 404 if id not found */
   getEmployee(id: number): Observable<any> {
     const url = `${this.paymentUrl}/users/${id}`;
@@ -68,15 +72,33 @@ getroom_number():Observable<any[]>{
       const url = `${this.paymentUrl}/guest/get_payment_for/${id}`;
       return  lastValueFrom( this.http.get<any>(url));
     }
+    updateRefund(ad)  {
+       return lastValueFrom(this.http.put(this.paymentUrl +'/guest/update_refund',ad,httpOptions));
+     
+    }
+    
 
     searchDates(d){
       return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/searchdates', d, httpOptions));
     }
+    
+    searchRefundDates(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_refund_dates', d, httpOptions));
+    }
+
+    
 
   postroom_type(ad:any) {
     //console.log(user);
       return this.http.post(this.paymentUrl + '/room/add_room_type', ad, httpOptions);
     }
+
+    
+  addRefund(ad:any) {
+    //console.log(user);
+      return lastValueFrom(this.http.post(this.paymentUrl + '/guest/add_refund', ad, httpOptions));
+    }
+
 
  
     postroom_room(ad:any) {

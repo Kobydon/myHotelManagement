@@ -9,7 +9,7 @@ import { userService } from './user.service';
   styleUrls: ['./app.component.css']
 })
 
-export class AppComponent{ isUserLoggedIn = false;
+export class AppComponent{ isUserLoggedIn = false; isAdmin = false;
    constructor(private toastr:ToastrService,private router:Router,private userService:userService){
 
    }
@@ -17,20 +17,34 @@ export class AppComponent{ isUserLoggedIn = false;
   
     ngOnInit() {
       let storeData = localStorage.getItem("isUserLoggedIn");
-      console.log("StoreData: " + storeData);
+      let adminData = localStorage.getItem("isAdmin");
+  
+
+      // if( adminData != null && adminData == "true")
+      // this.isAdmin = true;
+      // console.log("adminData: " + adminData);
+
+    if(adminData == null )
+  
+{
+   this.router.navigate(['home/features'])
+      // this.isUserLoggedIn = false;
+      // this.toastr.error(null,"session expired,kindly login again");
+      // this.userService.logout();
+   }
 
       if( storeData != null && storeData == "true")
          this.isUserLoggedIn = true;
       else if(storeData == null )
 {
 
-         this.isUserLoggedIn = false;
+
          this.toastr.error(null,"session expired,kindly login again");
          this.userService.logout();
       }
 
          let checkData = localStorage.getItem("checking");
-      console.log("checkData: " + checkData);
+      console.log("admin: " + adminData);
 
       if( checkData != null && checkData == "true")
          this.checking = true;

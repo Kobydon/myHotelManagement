@@ -13,10 +13,11 @@ import {
 import { RouterOutlet } from '@angular/router';
 
 
+
 @Component({
-  selector: 'app-admin-layout',
-  templateUrl: './admin-layout.component.html',
-  styleUrls: ['./admin-layout.component.scss'],
+  selector: 'res-layout',
+  templateUrl: './res-layout.component.html',
+  styleUrls: ['./res-layout.component.css'],
   animations: [
     trigger('routeAnim', [
       transition('* <=> *', [    
@@ -26,22 +27,26 @@ import { RouterOutlet } from '@angular/router';
         group([ 
           query(':enter', [
             style({ transform: 'translateX(100%)' }),
-            animate('0.8s ease-in-out', style({ transform: 'translateX(0%)' }))
+            animate('0.10s ease-in-out', style({ transform: 'translateX(0%)' }))
           ]),
           query(':leave', [
             style({ transform: 'translateX(0%)' }),
-            animate('0.8s ease-in-out', style({ transform: 'translateX(-100%)' }))]),
+            animate('0.10s ease-in-out', style({ transform: 'translateX(-100%)' }))]),
         ])
       ])
     ])
    ],
 
 })
-export class AdminLayoutComponent implements OnInit {
+export class ResLayoutComponent implements OnInit {
 
-  ngOnInit() { }
+  constructor() { }
+
+  ngOnInit(): void {
+  }
 
   prepareRoute(outlet:RouterOutlet){
     return outlet.activatedRoute.snapshot.url
   }
+
 }

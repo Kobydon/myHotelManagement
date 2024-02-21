@@ -20,12 +20,12 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                      <table class="table m-0" id="myTable">
+                      <table class="table m-0" id="myTable" style="width:100%">
 
                    <thead class="table-light">
                       <tr class="bg-secondary">
                   
-          <th scope="col">#</th>
+          <!-- <th scope="col">#</th> -->
     
       <th scope="col">Name</th>
       <th scope="col">Gender</th>
@@ -35,8 +35,8 @@
       <th scope="col">Check in</th>
 
 
-      <th scope="col">Checkout Date</th>
-      <th scope="col">Guest Checkout At</th>
+      <th scope="col">Checkout </th>
+      <th scope="col"> Checkout At</th>
       <th scope="col">Actions</th>
     </tr>
   </thead>
@@ -44,7 +44,7 @@
   
     <tr *ngFor="let guest of guestList | slice: (page-1) * pageSize : page * pageSize">
             
-        <th>#{{guest.id}}</th>
+        <!-- <th></th> -->
             <td> {{guest.first_name + ' ' + guest.last_name}}</td>
             <td>{{guest.gender}}</td>
             <td>{{guest.phone}}</td>

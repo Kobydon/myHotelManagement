@@ -33,6 +33,10 @@ import { AttendanceComponent } from 'app/pages/attendance/attendance.component';
 import { AllReservationsComponent } from 'app/all-reservations/all-reservations.component';
 import { TodoListComponent } from 'app/todo-list/todo-list.component';
 import { HouseKeepingComponent } from 'app/house-keeping/house-keeping.component';
+import { RefundComponent } from 'app/refund/refund.component';
+import { DetailedReportComponent } from 'app/detailed-report/detailed-report.component';
+import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.component';
+
 
     
 
@@ -78,7 +82,10 @@ import { HouseKeepingComponent } from 'app/house-keeping/house-keeping.component
     AttendanceComponent,
     AllReservationsComponent,
     TodoListComponent,
-    HouseKeepingComponent
+    HouseKeepingComponent,
+    RefundComponent,
+    DetailedReportComponent,
+    PurchaseRequestComponent
 
 
 

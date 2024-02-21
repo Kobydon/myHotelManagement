@@ -4,7 +4,7 @@
     </div>
     <div class="main-panel">
         <navbar-cmp></navbar-cmp>
-        <div class="content"  [@routeAnimations]="outlet.isActivated ? outlet.activatedRoute  : ''" >
+        <div class="content" [@routeAnim]="prepareRoute(outlet)">
             <router-outlet #outlet="outlet"></router-outlet>
         </div>
         <footer-cmp></footer-cmp>

@@ -5,6 +5,7 @@ import { BlankLayoutComponent } from './login/blank-layout/blank-layout.componen
 import { SignInComponent } from './login/sign-in/sign-in.component';
 import { AuthGuard } from './auth.guard';
 import { LayoutComponent } from './features/layout/layout.component';
+import { ResLayoutComponent } from './res-layout/res-layout.component';
 
 export const AppRoutes: Routes = [
   {
@@ -31,6 +32,14 @@ export const AppRoutes: Routes = [
   }]},
 
 
+  {
+    path: '',canActivate:[AuthGuard],
+    component: ResLayoutComponent,
+    children: [
+        {
+      path: '',
+      loadChildren: () => import('../app/restaurant/restaurant.module').then(x => x.RestaurantModule)
+  }]},
 
 
   {

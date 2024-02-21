@@ -23,6 +23,10 @@ import { AttendanceComponent } from 'app/pages/attendance/attendance.component';
 import { AllReservationsComponent } from 'app/all-reservations/all-reservations.component';
 import { TodoListComponent } from 'app/todo-list/todo-list.component';
 import { HouseKeepingComponent } from 'app/house-keeping/house-keeping.component';
+import { RefundComponent } from 'app/refund/refund.component';
+import { DetailedReportComponent } from 'app/detailed-report/detailed-report.component';
+import { CalenderComponent } from 'app/calender/calender.component';
+import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.component';
 
 
 
@@ -35,7 +39,9 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'maps',           component: MapsComponent },
     { path: 'notifications',  component: NotificationsComponent },
     { path: 'upgrade',        component: UpgradeComponent },
+    { path: 'purchase-request',        component: PurchaseRequestComponent },
     { path: 'order',        component: OrderComponent },
+    { path: 'calender',        component: CalenderComponent },
     {path:'all-users',component:AllUsersComponent},
     { path: 'room-types',        component: RoomTypesComponent },
     {path:'all-rooms' ,component:AllRoomsComponent   },
@@ -47,7 +53,9 @@ export const AdminLayoutRoutes: Routes = [
     {path:'attendance' ,component:AttendanceComponent   },
     {path:'all-reservations' ,component:AllReservationsComponent   },
     {path:'todo-list' ,component:TodoListComponent   },
-    {path:'house-keeping',component:HouseKeepingComponent}
+    {path:'house-keeping',component:HouseKeepingComponent},
+    {path:'refund-list',component:RefundComponent},
+    {path:'detailed-report',component:DetailedReportComponent}
 
 
 ]

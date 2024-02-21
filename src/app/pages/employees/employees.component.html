@@ -20,12 +20,12 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                      <table class="table m-0" id="myTable">
+                      <table class="table m-0" id="myTable" style="width:100%">
 
                    <thead class="table-light">
                       <tr class="bg-secondary">
                   
-          <th scope="col">#</th>
+          <!-- <th scope="col"></th> -->
     
       <th scope="col">Name</th>
       <th scope="col">Gender</th>
@@ -44,7 +44,7 @@
   
     <tr *ngFor="let employee of employeeList | slice: (page-1) * pageSize : page * pageSize">
             
-        <th>#{{employee.id}}</th>
+        <!-- <th><img [src]="employee.photo" style="width: 7%;"></th> -->
             <td> {{employee.first_name + ' ' + employee.last_name}}</td>
             <td>{{employee.gender}}</td>
             <td>{{employee.phone}}</td>

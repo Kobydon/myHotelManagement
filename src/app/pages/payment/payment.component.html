@@ -29,13 +29,11 @@
                                   <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">
                                    <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
 
-                                   <button type="button" class="btn btn-sm btn-warning " style="float: right;"  (click)="exportexcel()">
-                                    <i class="fa fa-money"   ></i>Refund</button>
                             </div>
                         </div>
                     </div>
                     <div class="table-responsive">
-                      <table class="table m-0" id="excel-table">
+                      <table class="table m-0" id="excel-table" style="width:100%">
 
                    <thead class="table-light">
                       <tr class="bg-secondary">
@@ -82,7 +80,10 @@
       <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
         <td ><i *ngIf="user[0].roles=='admin'" class="fa fa-edit fa-2x text-info"  (click)="editPayment(payment.id)"></i>
             <i  *ngIf="user[0].roles=='admin'" class="fa fa-close fa-2x text-danger" (click)="deletePayment(payment.id)" ></i>
-          <i class="fa fa-print fa-2x text-primary"  (click)="printReciept(payment.id)" ></i></td>
+            
+            <button *ngIf="user[0].roles=='receptionist'" (click)="openRefund(payment.id)"   type="button" class="btn btn-sm btn-warning " style="float: right;"  >
+              <i class="fa fa-money"   ></i>Refund</button>
+          <i  class="fa fa-print fa-2x text-primary"  (click)="printReciept(payment.id)" ></i></td>
       <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
       <!-- <i class="fa fa-trash"></i></button></td>  -->
     </tr>
@@ -379,6 +380,92 @@
   
           </div>
           <button class="btn btn-primary" (click)="downloadAsPDF()">Print</button>
+            </div>
+          </div>
+        </div>
+  
+      
+  
+      </div>
+      <!-- <div class="modal-footer">
+        <button type="button" class="btn btn-danger" 
+                >
+          Close
+        </button>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<div
+  class="modal"
+  tabindex="-1"
+  role="dialog"
+  [ngStyle]="{'display':displayRefundStyle}">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+     {{header}} <i class="fa fa-close" (click)="closePopup()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-16" style="width: 100%;">
+          <div class="card card-payment">
+            <div class="card-header">
+              <!-- <h5 class="card-title">Edit Profile</h5> -->
+            </div>
+            <div class="card-body">
+              
+              <form  [formGroup]="paymentForm" (ngSubmit)="addRefund(paymentForm.value)">
+                <div class="row">
+      
+                  <div class="col-md-5 pr-1">
+                    <div class="form-group">
+                      <label>Guest Name</label>
+                      <input type="text" formControlName="name"  class="form-control" >
+                     
+                 
+                    </div>
+                  </div>
+
+
+      
+                  <div class="col-md-3  px-1" >
+                    <div class="form-group">
+                      <label>Refund Amount</label>
+                      <input type="text"  formControlName="refund_amount" class="form-control">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+              
+                  <div class="col-md-6 pl-1">
+                    <div class="form-group">
+                      <label>Refund Reason</label>
+                     <textarea formControlName="reason" id="" cols="60" rows="10"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+
+                  <div class="col-md-6 pl-1">
+                    <div class="form-group">
+                      <label>Authorized By</label>
+                      <input type="text"
+                     style="width: 100%;" formControlName="authorized_by"  class="form-control" >
+                    </div>
+                  </div>
+         
+               
+                <button type="submit" class="btn btn-success" style="width:50%">Save</button>
+           
+
+              </form>
             </div>
           </div>
         </div>

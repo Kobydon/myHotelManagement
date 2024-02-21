@@ -1,4 +1,4 @@
-<div class="conatiner " >
+<div class="conatiner "  *blockUI="'loading'">
 
     <div class="col-md-15 " style="background-color:lightgray" >
         <div class="card card-house">
@@ -7,15 +7,15 @@
             </div>
 
             <div class="card-body">
-    <form role="form " >
+    <form type="multipart/form-data" [formGroup]="searchForm" (ngSubmit)="searchHouse(searchForm.value)" >
   
       <div class="row">
         <div class="col-sm-4">
       <div class="form-group " >
       
          
-        <label for="Username">Room Type </label>
-        <input type="text" class="form-control" placeholder="room type" ><button type ="button"><i class="fa fa-search "></i></button>
+        <label for="room_type">Room Type </label>
+        <input type="text" class="form-control" formControlName="room_type" placeholder="room type" >
       
       </div>
       </div>
@@ -24,7 +24,7 @@
         <div class="col-sm-4">
       <div class="form-group " >
          <label for="">Room Number</label>
-        <input type="number" class="form-control"  value="1" >
+        <input type="number" formControlName="room_number" class="form-control"  value="1" >
         </div>
       </div>
   
@@ -50,7 +50,7 @@
       
          
         <label for="Username">Room Status </label>
-        <select name="available" id="" class="form-control" >
+        <select name="available" formControlName="occupancy_state" id="" class="form-control" >
           <option value="available">Available</option>
           <option value="Occupupied">Occupied</option>
         </select>
@@ -62,7 +62,7 @@
         <div class="col-sm-4">
       <div class="form-group " >
         <label for="Username">House Keeping State </label>
-        <select name="available" id=""  class="form-control">
+        <select name="available" id=""  formControlName="status" class="form-control">
           <option value="clean">Clean</option>
           <option value="dirty">Dirty</option>
         </select>
@@ -110,25 +110,28 @@
             </div>
           <td>
             <div class="form-group">
-            <select name="room" id=""  class="form-control">
-              <option value="{{item.room_number}}">{{item.room_number}}</option>
+            <select name="room" id=""  class="form-control" formControlName="room_number">
+              <option value=""   hidden>{{item.room_number}}</option>
+              <option value="{{item.room_number}}"   selected>{{item.room_number}}</option>
             </select>
           </div>
           </td>
           <td> 
             <div class="form-group">
-            <select name="room-type" id=""   class="form-control">
-            <option value="{{item.room_type}}">{{item.room_type}}</option>
+            <select name="room-type" id="" formControlName="room_type"  class="form-control">
+              <option value="" hidden >{{item.room_type}}</option>
+            <option value="{{item.room_type}}"  selected>{{item.room_type}}</option>
           </select>
         </div>
         </td>
         
           <td>
             <div class="form-group">
-              <select name="form-0-house_keeping_state"  class="form-control"  id="id_form-0-house_keeping_state" >
+              <select name="form-0-house_keeping_state"  class="form-control" 
+              formControlName="status_r" id="id_form-0-house_keeping_state" >
                 
               
-                <option value="{{item.status}}"  class="form-contol" hidden selected>{{item.status}}</option>
+                <option value=""  class="form-contol" hidden selected>{{item.status}}</option>
               
              
                 <option value="clean" style="background-color: green; color: white;">clean</option>
@@ -148,10 +151,11 @@
             </select>
           </div></td> -->
           <td> <div class="form-group">
-            <select  class="form-control">
-              <option value="" style="background-color: green; color: white;" hidden selected>{{item.occupied_state}}</option>
+            <select  class="form-control"  formControlName="occupancy_state">
+              <option value="" style="background-color: green; color: white;"
+               hidden>{{item.occupied_state}}</option>
        
-              <option value="{{item.occupied_state}}" >{{item.occupied_state}}</option>
+              <option value="{{item.occupied_state}}" selected>{{item.occupied_state}}</option>
               <option value="occupied" >occupied</option>
               <option value="available" >available</option>
           
@@ -165,9 +169,9 @@
           <td>
             <div class="form-group">
               <select  id="" formControlName="assignee" class="form-control">
-                <option value="" style="background-color: green; color: white;" hidden selected >{{item.assignee}}</option>
+                <option value=""    selected >{{item.assignee}}</option>
               
-                <option *ngFor="let i of employeeList" value="{{i.firstname}}">{{i.firstname}}</option>
+                <option *ngFor="let i of employeeList" value="{i.first_name +' ' +i.last_name}}" selected>{{i.first_name +" "+i.last_name}}</option>
                
               </select></div>
           </td>
@@ -175,8 +179,14 @@
             <div class="form-group"  >
               <select   formControlName="task_get" class="form-control">
                 <option value="" hidden selected>{{item.task}}</option>
+                <option value="cleaning">Cleaning</option>
+                <option value="ironing">Ironing</option>
+                <option value="laundry">Laundry Service</option>
+                <option value="errand">Errand</option>
+               
+               
            
-              <option *ngFor="let t of taskList" value="{{t.name}}">{{t.name}}</option>
+              <!-- <option *ngFor="let t of taskList" value="{{t.name}}">{{t.name}}</option> -->
             </select>
             </div>
           </td>

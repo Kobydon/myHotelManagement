@@ -31,6 +31,12 @@ import { FeaturesModule } from "./features/features.module";
 import { AllReservationsComponent } from './all-reservations/all-reservations.component';
 import { TodoListComponent } from './todo-list/todo-list.component';
 import { HouseKeepingComponent } from './house-keeping/house-keeping.component';
+import { RefundComponent } from './refund/refund.component';
+import { DetailedReportComponent } from './detailed-report/detailed-report.component';
+import { ResLayoutComponent } from './res-layout/res-layout.component';
+import { RestaurantModule } from "./restaurant/restaurant.module";
+import { CalenderComponent } from './calender/calender.component';
+import { PurchaseRequestComponent } from './purchase-request/purchase-request.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -39,6 +45,11 @@ import { HouseKeepingComponent } from './house-keeping/house-keeping.component';
   declarations: [
     AppComponent,
     AdminLayoutComponent,
+    ResLayoutComponent,
+
+
+
+
 
 
   
@@ -59,6 +70,7 @@ import { HouseKeepingComponent } from './house-keeping/house-keeping.component';
   
     LoginModule,
     HttpClientModule,
+    RestaurantModule,
     
     RouterModule.forRoot(AppRoutes,{
       // useHash: true

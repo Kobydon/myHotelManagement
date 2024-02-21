@@ -12,10 +12,13 @@ export interface RouteInfo {
 
 export const ROUTES: RouteInfo[] = [
     { path: '/dashboard',     title: 'Dashboard',         icon:'nc-bank',       class: '' },
+    { path: '/refund-list',     title: 'Refund List',         icon:'nc-bank',       class: '' },
     { path: '/all-users',     title: 'Users',         icon:'nc-bank',       class: '' },
     { path: '/room-types',     title: 'Room Types',         icon:'nc-bank',       class: '' },
+    { path: '/purchase-request',     title: 'Purchase Request',         icon:'nc-bank',       class: '' },
     
     { path: '/icons',         title: 'Icons',             icon:'nc-diamond',    class: '' },
+    { path: '/calender',         title: 'Calender',             icon:'nc-diamond',    class: '' },
     { path: '/maps',          title: 'Maps',              icon:'nc-pin-3',      class: '' },
     { path: '/notifications', title: 'Notifications',     icon:'nc-bell-55',    class: '' },
     { path: '/user',          title: 'User Profile',      icon:'nc-single-02',  class: '' },
@@ -32,6 +35,7 @@ export const ROUTES: RouteInfo[] = [
     { path: '/all-reservations',    title: 'Reservation List',        icon:'nc-caps-small', class: '' },
     { path: '/todo-list',    title: 'Todo List',        icon:'nc-caps-small', class: '' },
     { path: '/house-keeping',    title: 'House Keeping List',        icon:'nc-caps-small', class: '' },
+    { path: '/detailed-report',    title: 'Detailed Sales and Business Activity Report',        icon:'nc-caps-small', class: '' }
 ];
 
 @Component({
@@ -79,5 +83,28 @@ export class SidebarComponent implements OnInit {
 
          }
 
+
+         myFunctionside() {
+
+            var input, filter, ul,li, a,i,  txtValue;
+            input = document.getElementById("myInputside");
+            filter = input.value.toUpperCase();
+            ul = document.getElementById("navlink");
+            li = ul.getElementsByTagName("li");
+            for (i = 0; i < li.length; i++) {
+              a = li[i].getElementsByTagName("a")[0];
+          
+              if (a) {
+                txtValue = a.textContent || a.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                  li[i].style.display = "";
+                } else {
+                  li[i].style.display = "none";
+                }
+                
+              }       
+            }
+          }
+          
 
 }

@@ -16,6 +16,7 @@ export class SignInComponent implements OnInit {
   id?:string|null;
   isUserLoggedIn = false;
   user:any;
+  isAdmin =false;
   constructor(private fb:FormBuilder,private router:Router,private userService:userService,private toastr:ToastrService) { 
 
 
@@ -86,10 +87,15 @@ export class SignInComponent implements OnInit {
    }
    finally{
     if(this.user[0].roles=="guest" )
+    
     this.router.navigate(["/home/features"]);
-    else{
+
+    else if(this.user[0].roles=="admin" || this.user[0].roles=="receptionist"  ){
+      localStorage.setItem('isAdmin','true');
+  
       this.router.navigate(["/dashboard"])
     }
+  
    }
 
 

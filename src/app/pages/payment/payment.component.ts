@@ -35,6 +35,7 @@ export class PaymentComponent implements OnInit {
   rooms:any;
   base64_string:any;
   displayStyle = "none";
+  displayRefundStyle="none";
   openStyle="none";
   roomtype:any;
   bookings:any;
@@ -74,6 +75,12 @@ export class PaymentComponent implements OnInit {
     balance: ['',Validators.required],
     topay: ['',Validators.required],
     dates: ['',Validators.required],
+    reason:['',Validators.required],
+    description:['',Validators.required],
+    authorized_by:['',Validators.required],
+    refund_amount:['',Validators.required]
+
+
 
     
    
@@ -108,7 +115,7 @@ export class PaymentComponent implements OnInit {
     try{
       this.loading.start();
      var res = await this.paymentService.getPayment()
-     if(res) {this.paymentList =res;}
+     if(res) {this.paymentList =res; this.paymentForm.patchValue({amount:this.paymentList[0].amount})}
      let sum :number= 0;
 
      for (let index = 0; index < this.paymentList.length; index++) {
@@ -329,11 +336,52 @@ try{
 
 }
 
+async openRefund(id){
+  
+  this.header ="Add Refund"
 
+  this.displayRefundStyle= "block"
+
+    try{
+      this.loading.start();
+      var res = await this.paymentService.get_payment_for(id);
+      if (res) this.payment=res;
+      this.paymentForm.patchValue({
+   id:this.payment[0].id,
+    name:this.payment[0].name,
+    amount:this.payment[0].amount,
+
+  
+    // reserved:['',Validators.required],
+    method:this.payment[0].method,
+    room_type :this.payment[0].room_type,
+    discount :this.payment[0].discount,
+    payment_date :this.payment[0].payment_date,
+
+    checkin_date :this.payment[0].checkin_date,
+    checkout_date :this.payment[0].checkout_date,
+    status :this.payment[0].status,
+
+    children :this.payment[0].children,
+    adult :this.payment[0].adult,
+    
+      })
+    }
+    catch(error){
+      this.toastr.error(null,error);
+    }
+    finally{
+      this.loading.stop();
+    }
+
+
+}
 
 async  editPayment(id:number){
+
   this.header ="Edit Payment"
   this.displayStyle ="block"
+
 
     try{
       this.loading.start();
@@ -444,7 +492,32 @@ try{
 
 }
 
+async addRefund(record){
+    const lst = {
+      id :record.id,
+      name: record.name,
+      refund_amount: record.refund_amount,
+      reason: record.reason,
+      authorized_by: record.authorized_by
+    }
+  try{
+    this.loading.start();
+    console.log(this.paymentForm.value.amount)
+    if(lst.refund_amount > this.paymentForm.value.amount){this.toastr.info(null,"Please check,Refund Amount is Greater than what Guest Paid")}
+    else{
+    var res = await this.paymentService.addRefund(lst);
+    if(res) this.toastr.success(null,"Refund process initiated"); this.closePopup(); 
+    this.getPaymentList();}
+  }catch(error){
+    this.toastr.error(null,error);
+  }
+  
+    finally{
+      this.loading.stop();
+    }
+  
 
+}
 
 async deletePayment(id:number){
   try{
@@ -485,7 +558,16 @@ async searchDates(){
     try{
       this.loading.start();
       var res = await this.paymentService.searchDates(d);
-      if(res) this.paymentList =res;
+      if(res) {this.paymentList =res;}
+      let sum :number= 0;
+
+      for (let index = 0; index < this.paymentList.length; index++) {
+       sum += parseInt(this.paymentList[index].amount);
+       this.totalAmount=sum;
+       console.log(sum);
+   }
+      
+    
 
     }
     catch(err){this.toastr.error(null,err.message)}
@@ -493,6 +575,9 @@ async searchDates(){
     finally{this.loading.stop();}
 }
   
+
+
+
 download(){
   var element = document.getElementById('table');
 var opt = {

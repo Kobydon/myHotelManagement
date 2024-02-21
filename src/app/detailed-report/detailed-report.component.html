@@ -1,0 +1,231 @@
+<div class="page"  >
+
+
+    <div class="row" *blockUI="'loading'">
+      <!-- <img src="/assets/img/loading.gif"> -->
+        <div class="col-md-16">
+            <div class="card shadow-sm">
+                <div class="card-body p-2">
+                    <!-- <h5 class="card-title m-3"><small><i class="fa-solid fa-file-lines me-2"></i></small></h5> -->
+                    <div class="menus">
+                        <div class="d-flex">
+                            <div class="w-200">
+                           
+                                <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
+                           
+                            </div>
+                            <div class="w-100">
+                              <form  [formGroup]="paymentForm">
+                              <input type="date" class="form-control" style="width:20%;"
+                               formControlName="dates" (ngModelChange)="searchDates()"></form>
+                             
+                                  <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">
+                                   <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" >
+                      <table class="table table-bordered m-0" id="excel-table" style="width:100%">
+                        <title>Room</title>
+                   <thead class="table-light">
+                    <tr>
+                    <td style="border:none;" ><h5 style="color: gray;">Rooms</h5></td></tr>
+                      <tr class="bg-secondary">
+     
+      <th scope="col">Name</th>
+      <th scope="col">Amount</th>
+      <th scope="col">Balance</th>
+      <th scope="col">Discount</th>
+      <th>Method</th>
+      <th>Room Type</th>
+
+      <th>Check In </th>
+      <th>Check Out</th>
+      <th>Payment Date| Time</th>
+   
+    
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr *ngFor="let payment of paymentList">
+ 
+    
+      <td>{{payment.name}}</td>
+      <td>{{payment.amount}}.00</td>
+      <td>{{payment.balance}}.00</td>
+      <td>{{payment.discount}}%</td>
+      <td>{{payment.method}}</td>
+
+      <td>{{payment.room_type}}</td>
+      
+ 
+      <td>{{payment.checkin_date}}</td>
+      <td>{{payment.checkout_date}}</td>
+      <td>{{payment.payment_date}}</td>
+
+
+
+      <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
+      
+      <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
+      <!-- <i class="fa fa-trash"></i></button></td>  -->
+    </tr>
+  <tr>
+    <td style="background-color: lightgray;">  Daily Totals : GH₵{{totalAmount|number}}</td>
+  </tr>
+  </tbody>
+  <br>
+
+
+
+
+    <title>Statistics</title>
+<thead class="table-light">
+  <td >  <h5 style="color: gray;">STATISTICS</h5></td>
+  <tr class="bg-secondary">
+
+<th scope="col">Number Of Rooms Occupied</th>
+<th scope="col">Number Of Rooms Available</th>
+<th scope="col">Total Number Of Guests</th>
+<th scope="col">Occupancy</th>
+
+
+
+
+
+</tr>
+</thead>
+<tbody>
+
+<tr >
+
+
+<td>{{totalOcccupiedRooms}}</td>
+<td>{{totalAvailableRooms}}</td>
+<td>{{ rooms.length}}</td>
+<td>{{ occupancy}}%</td>
+
+
+
+
+<!-- <td><button class="btn btn-info" style="width: 15%;"> -->
+
+<!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
+<!-- <i class="fa fa-trash"></i></button></td>  -->
+</tr>
+
+
+</tbody>
+
+  <br>
+
+  <thead class="table-light">
+    <tr>
+    <td style="border:none;" ><h5 style="color: gray;">Refunds</h5></td></tr>
+    <tr class="bg-secondary">
+
+
+<th scope="col">Name</th>
+<th scope="col">Amount</th>
+<th scope="col">authorized_by</th>
+<th scope="col">Reason</th>
+<th scope="col">Date | Time</th>
+
+
+
+</tr>
+</thead>
+<tbody>
+
+<tr *ngFor="let refund of refundList">
+
+
+<td>{{refund.name}}</td>
+<td>{{refund.refund_amount}}.00</td>
+<td>{{refund.authorized_by}}</td>
+<td>{{refund.reason}}</td>
+<td>{{refund.refund_time}}</td>
+
+
+
+<!-- <td><button class="btn btn-info" style="width: 15%;"> -->
+
+
+<!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
+<!-- <i class="fa fa-trash"></i></button></td>  -->
+</tr>
+<tr>
+<td style="background-color:lightgray;">  Daily Totals: GH₵{{totalRefundAmount|number}}</td>
+</tr>
+</tbody>
+<br>
+<tr>
+ <td style=" border:none;"> <h5 style="color: gray;">TOTALS</h5></td>
+</tr>
+<tr>
+  <th>Daily Sales</th>
+    <td>GH₵{{totalAmount|number }}</td>
+  </tr>
+  <tr>
+    <th>Budget And Variance</th>
+    <td></td>
+  </tr>
+<tr>
+    <th>Previous Day-To-Date</th>
+    <td>GH₵{{yester_daytodate|number}}</td>
+  </tr>
+  <tr>
+    <th>Previous Day</th>
+    <td>GH₵{{yesterday_total|number}}</td>
+  </tr>
+
+  
+</table>
+</div>
+<!-- 
+<div class="table-responsive">
+    <table class="table m-0" id="excel-table">
+        <title>Refund</title>
+
+</table>
+</div> -->
+
+
+<!-- <div class="row pt-3">
+  <div class="col-md-9">
+      <ngb-pagination [collectionSize]="paymentList.length" [pageSize]="pageSize " [(page)]="page"
+          (pageChange)="pageClick()" [maxSize]="5" [rotate]="true" [ellipses]="false"
+          [boundaryLinks]="true">
+          <ng-template ngbPaginationFirst>First</ng-template>
+          <ng-template ngbPaginationLast>Last</ng-template>
+          <ng-template ngbPaginationPrevious>Prev</ng-template>
+          <ng-template ngbPaginationNext>Next</ng-template>
+          <ng-template ngbPaginationEllipsis>...</ng-template>
+          <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+      </ngb-pagination>
+
+      </div>
+  </div>
+ -->
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+</div>
+    
+    
+</div>
+</div>
+</div>
+
