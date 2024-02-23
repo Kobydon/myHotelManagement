@@ -237,7 +237,7 @@ export class DashboardComponent implements OnInit{
   
       }
       catch(error:any){
-        this.toastr.error(null,error);
+        // this.toastr.error(null,error);
       }
        
     
@@ -254,7 +254,7 @@ export class DashboardComponent implements OnInit{
   
       }
       catch(error:any){
-        this.toastr.error(null,error);
+        // this.toastr.error(null,error);
       }
        
     
@@ -272,7 +272,7 @@ export class DashboardComponent implements OnInit{
 
     }
     catch(error:any){
-      this.toastr.error(null,error);
+      // this.toastr.error(null,error);
     }
      
   
@@ -290,7 +290,7 @@ async getGust(){
 
   }
   catch(error:any){
-    this.toastr.error(null,error);
+    // this.toastr.error(null,error);
   }
    
 
