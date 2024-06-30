@@ -277,9 +277,10 @@ async fetchRoomType(id:number){
     var res = await this.roomService.get_room_details(id);
     if (res) this.roomD =res;
     this.paymentForm.patchValue({
-      amount:this.roomD[0].base_price *  this.paymentForm.value.duration, 
-      topay:this.roomD[0].base_price *  this.paymentForm.value.duration
-     
+      // amount:this.roomD[0].base_price *  this.paymentForm.value.duration, 
+      // topay:this.roomD[0].base_price *  this.paymentForm.value.duration
+      amount:this.roomD[0].base_price  ,
+      topay:this.roomD[0].base_price
     })
   } catch (error){
     this.toastr.error(null,error)
