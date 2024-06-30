@@ -40,6 +40,7 @@ import { PurchaseRequestComponent } from './purchase-request/purchase-request.co
 import { AddPurchaseRequestComponent } from './add-purchase-request/add-purchase-request.component';
 import { VendorComponent } from './vendor/vendor.component';
 import { PushNotificationComponent } from './push-notification/push-notification.component';
+import { ExpensesComponent } from './expenses/expenses.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -50,6 +51,7 @@ import { PushNotificationComponent } from './push-notification/push-notification
     AdminLayoutComponent,
     ResLayoutComponent,
     VendorComponent,
+    
   
 
 

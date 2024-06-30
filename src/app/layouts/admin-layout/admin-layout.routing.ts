@@ -28,6 +28,7 @@ import { DetailedReportComponent } from 'app/detailed-report/detailed-report.com
 import { CalenderComponent } from 'app/calender/calender.component';
 import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.component';
 import { AddPurchaseRequestComponent } from 'app/add-purchase-request/add-purchase-request.component';
+import { ExpensesComponent } from 'app/expenses/expenses.component';
 
 
 
@@ -57,7 +58,8 @@ export const AdminLayoutRoutes: Routes = [
     {path:'house-keeping',component:HouseKeepingComponent},
     {path:'refund-list',component:RefundComponent},
     {path:'detailed-report',component:DetailedReportComponent},
-    {path:'add-purchase',component:AddPurchaseRequestComponent}
+    {path:'add-purchase',component:AddPurchaseRequestComponent},
+    {path:'expenses',component:ExpensesComponent},
 
 
 ]

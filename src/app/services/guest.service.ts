@@ -49,8 +49,38 @@ getmaleGuests(): Observable<any[]>{
 
     return  this.http.get<any[]>(this.guestUrl + '/guest/get_male_guest')
 
-}  
-
+}
+addExpense(dep:any) {
+  //console.log(guest);
+    return  lastValueFrom (  this.http.post(this.guestUrl + '/gust/add_expense', dep, httpOptions));
+  }  
+  deleteExpense(id:number) {
+    if (confirm("do you want to delete?")) {
+    // const id = typeof ad === 'number' ? ad : ad.id;
+    const url = `${this.guestUrl}/school/delete_expense/${id}`;
+    return  lastValueFrom(  this.http.delete(url, httpOptions))
+    }
+    return of({});
+  }
+   
+  getExpenseList() {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/school/get_expense_list'));
+    }
+    searchExpenseDate(d){
+      return 
+       lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates', d, httpOptions));
+    }
+    
+  updateExpense(dep:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_expense', dep, httpOptions));
+    }       
+  
+getExpense(id: number){
+  const url = `${this.guestUrl}/guest/get_expense/${id}`;
+  return   lastValueFrom( this.http.get<any>(url));
+}
 getfemaleGuest(): Observable<any[]>{
 
   return  this.http.get<any[]>(this.guestUrl + '/guest/get_female_guest')
