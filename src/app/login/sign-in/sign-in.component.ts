@@ -17,6 +17,7 @@ export class SignInComponent implements OnInit {
   isUserLoggedIn = false;
   user:any;
   isAdmin =false;
+  load=false;
   constructor(private fb:FormBuilder,private router:Router,private userService:userService,private toastr:ToastrService) { 
 
 
@@ -46,6 +47,7 @@ export class SignInComponent implements OnInit {
 
 
   async loginUser(){
+    this.load=true;
     this.submitted= true;
    
    

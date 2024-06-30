@@ -11,8 +11,6 @@ import {
   // ...
 } from '@angular/animations';
 import { RouterOutlet } from '@angular/router';
-
-
 @Component({
   selector: 'app-admin-layout',
   templateUrl: './admin-layout.component.html',
@@ -20,17 +18,15 @@ import { RouterOutlet } from '@angular/router';
   animations: [
     trigger('routeAnim', [
       transition('* <=> *', [    
-        query(':enter, :leave', style({ position: 'fixed', width:'100%' })),
-
-
-        group([ 
+        query(':enter, :leave', style({ position: 'fixed', width: '100%' })),
+        group([
           query(':enter', [
-            style({ transform: 'translateX(100%)' }),
-            animate('0.8s ease-in-out', style({ transform: 'translateX(0%)' }))
-          ]),
+            style({ transform: 'scale(0)' }),
+            animate('0.6s', style({ transform: 'scale(1)' }))
+          ], { optional: true }),
           query(':leave', [
-            style({ transform: 'translateX(0%)' }),
-            animate('0.8s ease-in-out', style({ transform: 'translateX(-100%)' }))]),
+            animate('0.1s', style({ opacity: 0 }))
+          ])
         ])
       ])
     ])

@@ -36,16 +36,20 @@ background-color: lightgrey;
 
 </style>
 <div class="sidebar-wrapper">
-  <div class="logo">
+  <div class="logo " style="text-align: left;" >
     <a href="" class="simple-text logo-mini">
-      <div class="logo-image-small">
-        <img src="assets/img/gold.jpeg">
+      <div class="logo-image-small" >
+       
       </div>
     </a>
-    <a  class="simple-text logo-normal" >
-    {{user[0].firstname +" " + user[0].lastname}}
+    <a  class="simple-text logo-normal "  style="text-align: left;">
+      <img src="../../../assets/img/washignton.jpg" style="width: 60%;">
     </a>
+    <!-- <h6 style="text-align: center;"> Washington International Hostel</h6> -->
   </div>
+
+
+
     <ul class="nav" id="navlink">
       <li >
         <input type="text"  (keyup)="myFunctionside()" id="myInputside" class="form-control" placeholder="search.." style="border:none;
