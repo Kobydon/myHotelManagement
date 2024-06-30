@@ -27,6 +27,7 @@ import { RefundComponent } from 'app/refund/refund.component';
 import { DetailedReportComponent } from 'app/detailed-report/detailed-report.component';
 import { CalenderComponent } from 'app/calender/calender.component';
 import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.component';
+import { AddPurchaseRequestComponent } from 'app/add-purchase-request/add-purchase-request.component';
 
 
 
@@ -55,7 +56,8 @@ export const AdminLayoutRoutes: Routes = [
     {path:'todo-list' ,component:TodoListComponent   },
     {path:'house-keeping',component:HouseKeepingComponent},
     {path:'refund-list',component:RefundComponent},
-    {path:'detailed-report',component:DetailedReportComponent}
+    {path:'detailed-report',component:DetailedReportComponent},
+    {path:'add-purchase',component:AddPurchaseRequestComponent}
 
 
 ]

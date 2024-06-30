@@ -15,8 +15,8 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
 
-  private paymentUrl = 'https://renderdemo-w1s0.onrender.com' // URL to REST API
-
+  // private paymentUrl = 'https://renderdemo-w1s0.onrender.com' // URL to REST API
+  private paymentUrl = ' http://127.0.0.1:5000';
   constructor(private http: HttpClient,private router:Router) { }
 
   /** GET users from the server */

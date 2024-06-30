@@ -15,7 +15,8 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class GuestService {
 
-  private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
+  // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
+  private guestUrl = ' http://127.0.0.1:5000';
 
   constructor(private http: HttpClient,private router:Router) { }
 

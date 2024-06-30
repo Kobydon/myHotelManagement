@@ -36,6 +36,7 @@ import { HouseKeepingComponent } from 'app/house-keeping/house-keeping.component
 import { RefundComponent } from 'app/refund/refund.component';
 import { DetailedReportComponent } from 'app/detailed-report/detailed-report.component';
 import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.component';
+import { AddPurchaseRequestComponent } from 'app/add-purchase-request/add-purchase-request.component';
 
 
     
@@ -85,7 +86,8 @@ import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.
     HouseKeepingComponent,
     RefundComponent,
     DetailedReportComponent,
-    PurchaseRequestComponent
+    PurchaseRequestComponent,
+    AddPurchaseRequestComponent
 
 
 

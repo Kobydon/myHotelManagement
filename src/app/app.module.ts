@@ -37,6 +37,9 @@ import { ResLayoutComponent } from './res-layout/res-layout.component';
 import { RestaurantModule } from "./restaurant/restaurant.module";
 import { CalenderComponent } from './calender/calender.component';
 import { PurchaseRequestComponent } from './purchase-request/purchase-request.component';
+import { AddPurchaseRequestComponent } from './add-purchase-request/add-purchase-request.component';
+import { VendorComponent } from './vendor/vendor.component';
+import { PushNotificationComponent } from './push-notification/push-notification.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -46,6 +49,9 @@ import { PurchaseRequestComponent } from './purchase-request/purchase-request.co
     AppComponent,
     AdminLayoutComponent,
     ResLayoutComponent,
+    VendorComponent,
+  
+
 
 
 
