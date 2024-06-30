@@ -2,11 +2,3 @@ body{
     background-color: gray;
 }
 
-.bg{
-    background-image:url("../../../assets/img/log.jpg");
-    background-size: cover;
-    background-repeat: no-repeat;
-    width: 100vh;
-    margin: 0;
-    background-position: center;
-}
