@@ -23,8 +23,8 @@ const httpOptions = {
 export class userService {
 message:any;
 user:any;
-  // private userUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private userUrl = ' http://127.0.0.1:5000';
+
+  private userUrl = 'https://renderdemo-zx6z.onrender.com';
  
   isUserLoggedIn: boolean = false;
   redirectUrl?: string;
