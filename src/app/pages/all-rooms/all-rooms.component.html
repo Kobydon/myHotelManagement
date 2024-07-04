@@ -41,9 +41,9 @@
   </thead>
   <tbody>
   
-    <tr *ngFor="let room of rooms| slice: (page-1) * pageSize : page * pageSize">
+    <tr *ngFor="let room of rooms| slice: (page-1) * pageSize : page * pageSize;index as i">
  
-      <th>#{{room.id}}</th>
+      <th>#{{i+1}}</th>
    
       <td>{{room.room_type}}</td>
       <td>{{room.room_number}}</td>
