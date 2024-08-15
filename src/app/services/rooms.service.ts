@@ -16,7 +16,7 @@ const httpOptions = {
 export class RoomService {
 
   // private roomUrl = 'https://renderdemo-w1s0.onrender.com'  // URL to REST API
-  private roomUrl = 'https://renderdemo-zx6z.onrender.com';
+  private roomUrl = 'https://renderdemo-hwz6.onrender.com';
 
   constructor(private http: HttpClient,private router:Router) { }
 

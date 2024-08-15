@@ -16,7 +16,7 @@ const httpOptions = {
 export class EmployeeService {
 
   // private employeeUrl= 'https://renderdemo-w1s0.onrender.com'  // URL to REST API
-  private employeeUrl = 'https://renderdemo-zx6z.onrender.com';
+  private employeeUrl = 'https://renderdemo-hwz6.onrender.com';
 
   constructor(private http: HttpClient,private router:Router) { }
 

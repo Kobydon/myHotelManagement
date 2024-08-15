@@ -24,7 +24,7 @@ export class userService {
 message:any;
 user:any;
 
-  private userUrl = 'https://renderdemo-zx6z.onrender.com';
+  private userUrl = 'https://renderdemo-hwz6.onrender.com';
  
   isUserLoggedIn: boolean = false;
   redirectUrl?: string;
