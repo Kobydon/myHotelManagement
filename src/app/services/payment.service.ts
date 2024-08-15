@@ -16,7 +16,7 @@ const httpOptions = {
 export class PaymentService {
 
   // private paymentUrl = 'https://renderdemo-w1s0.onrender.com' // URL to REST API
-  private paymentUrl = 'https://renderdemo-zx6z.onrender.com';
+  private paymentUrl = 'https://renderdemo-hwz6.onrender.com';
   constructor(private http: HttpClient,private router:Router) { }
 
   /** GET users from the server */
