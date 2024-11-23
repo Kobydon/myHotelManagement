@@ -22,7 +22,7 @@
                             </div>
                             <div class="w-100">
                               <form  [formGroup]="paymentForm">
-                              <input type="date" class="form-control" style="width:20%;"
+                              <input type="date" class="form-control" style="width:auto;"
                                formControlName="dates" (ngModelChange)="searchDates()"></form>
                               
 
@@ -82,14 +82,15 @@
         <td ><i *ngIf="user[0].roles=='admin'" class="fa fa-edit fa-lg text-info"  (click)="editPayment(payment.id)"></i>
             <i  *ngIf="user[0].roles=='admin'" class="fa fa-close fa-lg text-danger" (click)="deletePayment(payment.id)" ></i>
             
-            <span *ngIf="user[0].roles == 'receptionist'" 
+            <span *ngIf="payment.status=='success'" 
             (click)="openRefund(payment.id)" 
             class="badge badge-warning" 
             style="cursor: pointer; ">
         <i class="fa fa-money"></i> Refund
       </span>
-      
-          <span  class="badge badge-info"   style="cursor: pointer; " (click)="printReciept(payment.id)" >Print</span></td>
+      <span  class="badge badge-info"   style="cursor: pointer; " (click)="printReciept(payment.id)" *ngIf="payment.status=='success'">Receipt</span>
+      <span  class="badge badge-info"   style="cursor: pointer; " (click)="generateInvoice(payment.id)" *ngIf="payment.status=='pending'">Invoice</span>
+    </td>
       <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
       <!-- <i class="fa fa-trash"></i></button></td>  -->
     </tr>
@@ -274,10 +275,10 @@
                   <div class="col-md-6 pr-1">
                     <div class="form-group">
                       <label>Status</label>
-                      <select class="form-control" formControlName="status" disabled="">
+                      <select class="form-control" formControlName="status" >
                         <option value=""  hidden selected>Select payment Status</option>
                         <option  value="pending">Pending</option>
-                        <option  value="success" selected>Success</option>
+                        <option  value="success" >Success</option>
                         <option  value="cancelled">Cancelled</option>
                       </select>
                        
@@ -327,6 +328,9 @@
 
 
 
+
+
+
 <div
   class="modal"
   tabindex="-1"
@@ -349,34 +353,33 @@
                 <h3 style="font-smooth: bold;">Yaalex Executive Lodge</h3>
                -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  -   
                <br> 
-            <tr  *ngFor="let item of payList"  > 
-             <p><Label >Name:</Label> &emsp; <strong> {{item.name}}</strong></p>
-            
-            
-             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
-             <br>
-             <p> <Label>Payment Method :</Label> &emsp; <strong> {{item.method}}</strong></p>
-             <p> <Label>Amount:</Label> &emsp; <strong>GH₵{{item.amount +".00"}}</strong></p>
-             <p> <Label>Discount:</Label> &emsp; <strong> {{item.discount +"%"}}</strong></p>
-             <p> <Label>Total:</Label> &emsp; <strong>{{item.amount +".00"}}</strong></p>
-             <br>
-  
-             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
-             <br>
-             <p> <Label>Room :</Label> &emsp; <strong> {{item.room_type}}</strong></p>
-            
-            
-             <br>
-             <!-- <p> <Label>Address:</Label> &emsp; <strong> Teshie</strong></p>
-            
-             <br>
-            -->
-   
-             <p> <Label>Status:</Label> &emsp; <strong> {{item.status}}</strong></p>
-             -  -  -  -  -  -  -  -   -  -  -  -  -  -  -  -  -  -  -  -  - - - -  -  - 
-             <br>
-           
-             <p> <Label>PaymentDate :</Label> &emsp;  <strong> {{item.payment_date}}</strong></p>
+            <tr  *ngFor="let payment of payList"  > 
+              <div id="receipt" style="width: 58mm; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; border: 1px solid #000; padding: 10px; margin: 0 auto;">
+                <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px;">
+                  <h2 style="margin: 0; font-size: 14px;">West End Arena Hotel & Restaurant</h2>
+                  <p style="margin: 5px 0;">P.O BOX K 46, Kumasi</p>
+                  <p style="margin: 5px 0;">Tel: 0558384564 / 0244462935</p>
+                  <p style="margin: 5px 0;">Location: Denkyemuoso New Historic Adventist Church</p>
+                </div>
+              
+                <div style="margin: 10px 0;">
+                  <p><strong>Received From:</strong> {{payment.name}}</p>
+                  <p><strong>The Sum:</strong> GH₵{{payment.amount}}.00</p>
+                  <p><strong>Payment Method:</strong> {{payment.method}}</p>
+                  <p><strong>Balance:</strong> GH₵{{payment.balance}}.00</p>
+                  <p><strong>Discount:</strong> {{payment.discount}}%</p>
+                  <p><strong>Room Type:</strong> {{payment.room_type}}</p>
+                  <p><strong>Check-in Date:</strong> {{payment.checkin_date}}</p>
+                  <p><strong>Check-out Date:</strong> {{payment.checkout_date}}</p>
+                  <p><strong>Payment Date:</strong> {{payment.payment_date}}</p>
+                </div>
+              
+                <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px;">
+                  <p>Thank you for choosing West End Arena Hotel & Restaurant!</p>
+                  <p>We hope to serve you again soon.</p>
+                </div>
+              </div>
+              
   <!--        
           <br>
              <p > <Label>Checkout Date :</Label> &emsp; <strong> Jan 22,2022</strong></p>

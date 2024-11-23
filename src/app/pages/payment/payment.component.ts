@@ -217,6 +217,7 @@ openPopup(): void {
 }
 closePopup() {
   this.displayStyle = "none";
+  this.displayRefundStyle ="none";
   this.openStyle = "none";
 }
 
@@ -224,7 +225,7 @@ closePopup() {
 
 async getRoomType(){
   try{
-    this.loading.start();
+    // this.loading.start();
    var res = await this.roomService.getroomType()
    if(res) this.rooms =res;
 
@@ -235,14 +236,14 @@ async getRoomType(){
    
 
 finally{
-  this.loading.stop();
+  // this.loading.stop();
 }
 }
 
 
 async fetchBookings(id:number){
   try{
-    this.loading.start();
+    // this.loading.start();
     var res = await this.roomService.get_booking_details(id);
     if (res) this.bookingDetail =res;
     this.paymentForm.patchValue({
@@ -262,7 +263,7 @@ async fetchBookings(id:number){
     this.toastr.error(null,error)
   }
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 }
 
@@ -273,7 +274,7 @@ async fetchBookings(id:number){
 
 async fetchRoomType(id:number){
   try{
-    this.loading.start();
+    // this.loading.start();
     var res = await this.roomService.get_room_details(id);
     if (res) this.roomD =res;
     this.paymentForm.patchValue({
@@ -286,7 +287,7 @@ async fetchRoomType(id:number){
     this.toastr.error(null,error)
   }
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 }
 
@@ -436,29 +437,153 @@ async getUser(){
 
 
 }
+async printReciept(id: number) {
+  try {
+    // Fetch payment details for the given ID
+    const response = await this.paymentService.get_payment_for(id);
 
+    // Ensure we have data and access the first element
+    if (response && response.length > 0) {
+      const payment = response[0]; // Access the first (and likely only) object
 
+      // Helper function to format date to words
+      const formatDateToWords = (dateString: string): string => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+      };
 
-async printReciept(id:number){
-  this.header ="Receipt"
-  this.openStyle ="block"
+      // Format dates
+      const checkinDate = formatDateToWords(payment.checkin_date);
+      const checkoutDate = formatDateToWords(payment.checkout_date);
+      const paymentDate = formatDateToWords(payment.payment_date);
 
-    try{
-      this.loading.start();
-      var res = await this.paymentService.get_payment_for(id);
-      if (res) this.payList=res;
+      // Dynamically create receipt content
+      const receiptContent = `
+        <div style="width: 58mm; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; border: 1px solid #000; padding: 10px; margin: 0 auto;">
+          <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px;">
+            <h2 style="margin: 0; font-size: 14px;">West End Arena Hotel & Restaurant</h2>
+            <p style="margin: 5px 0;">P.O BOX K 46, Kumasi</p>
+            <p style="margin: 5px 0;">Tel: 0558384564 / 0244462935</p>
+            <p style="margin: 5px 0;">Location: Denkyemuoso New Historic Adventist Church</p>
+          </div>
+
+          <div style="margin: 10px 0;">
+            <p><strong>Receipt :</strong> #${payment.id || 'N/A'}</p>
+            <p><strong>Received From:</strong> ${payment.name || 'N/A'}</p>
+            <p><strong>The Sum:</strong> GH₵${payment.amount || '0'}.00</p>
+            <p><strong>Payment Method:</strong> ${payment.method || 'N/A'}</p>
+            <p><strong>Balance:</strong> GH₵${payment.balance || '0'}.00</p>
+            <p><strong>Discount:</strong> ${payment.discount || '0'}%</p>
+            <p><strong>Room Type:</strong> ${payment.room_type || 'N/A'}</p>
+            <p><strong>Check-in Date:</strong> ${checkinDate}</p>
+            <p><strong>Check-out Date:</strong> ${checkoutDate}</p>
+            <p><strong>Payment Date:</strong> ${paymentDate}</p>
+          </div>
+
+          <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px;">
+            <p>Thank you for choosing West End Arena Hotel & Restaurant!</p>
+            <p>We hope to serve you again soon.</p>
+          </div>
+        </div>
+      `;
+
+      // Open a new print window
+      const printWindow = window.open('', '_blank', 'width=300,height=600');
+      if (printWindow) {
+        printWindow.document.write(receiptContent);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      } else {
+        console.error('Unable to open print window.');
+      }
+    } else {
+      this.toastr.error('No payment details found.');
     }
-    catch(error){
-      this.toastr.error(null,error);
-    }
-    finally{
-      this.loading.stop();
-    }
-
-
-
+  } catch (error) {
+    // Show error message if something goes wrong
+    this.toastr.error('Failed to fetch payment details or print receipt.');
+    console.error('Error:', error);
+  }
 }
 
+
+
+async generateInvoice(id: number) {
+  try {
+    // Fetch payment details for the given ID
+    const response = await this.paymentService.get_payment_for(id);
+
+    // Ensure we have data and access the first element
+    if (response && response.length > 0) {
+      const payment = response[0]; // Access the first (and likely only) object
+
+      // Helper function to format date to words
+      const formatDateToWords = (dateString: string): string => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+      };
+
+      // Format dates
+      const checkinDate = formatDateToWords(payment.checkin_date);
+      const checkoutDate = formatDateToWords(payment.checkout_date);
+      const paymentDate = formatDateToWords(payment.payment_date);
+
+      // Dynamically create invoice content
+      const invoiceContent = `
+        <div style="width: 58mm; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; border: 1px solid #000; padding: 10px; margin: 0 auto;">
+          <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px;">
+            <h2 style="margin: 0; font-size: 14px;">West End Arena Hotel & Restaurant</h2>
+            <p style="margin: 5px 0;">P.O BOX K 46, Kumasi</p>
+            <p style="margin: 5px 0;">Tel: 0558384564 / 0244462935</p>
+            <p style="margin: 5px 0;">Location: Denkyemuoso New Historic Adventist Church</p>
+          </div>
+
+          <div style="margin: 10px 0;">
+            <p><strong>Invoice ID:</strong> #${payment.id || 'N/A'}</p>
+            <p><strong>Guest Name:</strong> ${payment.name || 'N/A'}</p>
+            <p><strong>Total Amount:</strong> GH₵${payment.amount || '0'}.00</p>
+            <p><strong>Payment Method:</strong> ${payment.method || 'N/A'}</p>
+            <p><strong>Balance:</strong> GH₵${payment.balance || '0'}.00</p>
+            <p><strong>Discount:</strong> ${payment.discount || '0'}%</p>
+            <p><strong>Room Type:</strong> ${payment.room_type || 'N/A'}</p>
+            <p><strong>Check-in Date:</strong> ${checkinDate}</p>
+            <p><strong>Check-out Date:</strong> ${checkoutDate}</p>
+            <p><strong>Invoice Date:</strong> ${paymentDate}</p>
+          </div>
+
+          <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px;">
+            <p>Thank you for staying with us at West End Arena Hotel & Restaurant!</p>
+            <p>We look forward to hosting you again soon.</p>
+          </div>
+        </div>
+      `;
+
+      // Open a new print window
+      const printWindow = window.open('', '_blank', 'width=300,height=600');
+      if (printWindow) {
+        printWindow.document.write(invoiceContent);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      } else {
+        console.error('Unable to open print window.');
+      }
+    } else {
+      this.toastr.error('No payment details found.');
+    }
+  } catch (error) {
+    // Show error message if something goes wrong
+    this.toastr.error('Failed to fetch payment details or generate invoice.');
+    console.error('Error:', error);
+  }
+}
 
 
 async updatePayment(record){

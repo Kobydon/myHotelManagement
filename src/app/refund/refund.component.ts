@@ -197,21 +197,30 @@ myFunction() {
     }       
   }
 }
-
-
-async approveRefund(id){
+async approveRefund(id: string) {
   const lst = {
-    id :id,
-  
-  }
-   try{
-    this.loading.start();
-    var res = await this.paymentService.updateRefund(lst);
-    if(res)  this.getRefund();
-   }catch(error){
-        this.toastr.error(null,error.message)
-   }
-finally{this.loading.stop();}
+    id: id
+  };
 
+  try {
+    this.loading.start();  // Show loading indicator
+
+    // Await the response from the updateRefund service
+    const res = await this.paymentService.updateRefund(lst);
+    
+    // If the response is successful, get the updated refund data
+    if (res) {
+      this.getRefund();
+    }
+  } catch (error) {
+    // Handle the error and display the error message using Toastr
+    // Ensure the error.message exists or display a generic error message
+    const errorMessage = error?.message || 'An unexpected error occurred. Please try again later.';
+    this.toastr.error(errorMessage, 'Refund Approval Failed');
+  } finally {
+    // Stop the loading indicator whether success or failure
+    this.loading.stop();
+  }
 }
+
 }

@@ -67,11 +67,11 @@ getRefund(){
       return lastValueFrom(this.http.get<any[]>(this.paymentUrl + '/guest/get_payment'));
     }
   
-  
-    get_payment_for(id)  {
+    get_payment_for(id: number): Promise<any> {
       const url = `${this.paymentUrl}/guest/get_payment_for/${id}`;
-      return  lastValueFrom( this.http.get<any>(url));
+      return lastValueFrom(this.http.get<any>(url)); // Ensure `lastValueFrom` is imported
     }
+    
     updateRefund(ad)  {
        return lastValueFrom(this.http.put(this.paymentUrl +'/guest/update_refund',ad,httpOptions));
      

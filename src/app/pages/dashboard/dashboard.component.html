@@ -1,33 +1,52 @@
 <div class="row">
+  <!-- USD -->
   <div class="col-md-3">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">USD</h5>
-        <span class="badge bg-primary">{{ usdRate ? usdRate : 'Loading...' }}</span>
+        <div class="d-flex align-items-center">
+          <span class="fi fi-us me-2"></span> <!-- Flag for the USA -->
+          <h5 class="card-title m-0">USD</h5>
+        </div>
+        <span class="badge bg-primary mt-2">{{ usdRate ? usdRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>
+  
+  <!-- GBP -->
   <div class="col-md-3">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">GBP</h5>
-        <span class="badge bg-success">{{ gbpRate ? gbpRate : 'Loading...' }}</span>
+        <div class="d-flex align-items-center">
+          <span class="fi fi-gb me-2"></span> <!-- Flag for the UK -->
+          <h5 class="card-title m-0">GBP</h5>
+        </div>
+        <span class="badge bg-success mt-2">{{ gbpRate ? gbpRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>
+
+  <!-- EUR -->
   <div class="col-md-3">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">EUR</h5>
-        <span class="badge bg-warning">{{ eurRate ? eurRate : 'Loading...' }}</span>
+        <div class="d-flex align-items-center">
+          <span class="fi fi-eu me-2"></span> <!-- Flag for the European Union -->
+          <h5 class="card-title m-0">EUR</h5>
+        </div>
+        <span class="badge bg-warning mt-2">{{ eurRate ? eurRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>
+
+  <!-- GHS -->
   <div class="col-md-3">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">GHS</h5>
-        <span class="badge bg-info">{{ ghsRate ? ghsRate : 'Loading...' }}</span>
+        <div class="d-flex align-items-center">
+          <span class="fi fi-gh me-2"></span> <!-- Flag for Ghana -->
+          <h5 class="card-title m-0">GHS</h5>
+        </div>
+        <span class="badge bg-info mt-2">{{ ghsRate ? ghsRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>

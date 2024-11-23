@@ -35,7 +35,7 @@
                             <button type="button" class="btn btn-sm btn-success "  (click)="exportexcel()">
                              <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
 </div>
-                      <table class="table m-0" id="excel-table" style="width:100%">
+                      <table class="table table-striped" id="excel-table" style="width:100%">
 
                    <thead class="table-light">
                       <tr class="bg-secondary">
@@ -52,9 +52,9 @@
     </tr>
   </thead>
   <tbody>
-  <tr>
+  <!-- <tr>
     <td>  Total Payments: GH₵{{totalAmount|number}}</td>
-  </tr>
+  </tr> -->
     <tr *ngFor="let refund of refundList| slice: (page-1) * pageSize : page * pageSize">
  
 
@@ -65,19 +65,19 @@
       <td>{{refund.refund_time}}</td>
 
 
-      <td *ngIf="refund.status=='pending'" class="text-danger">{{refund.status}}</td>
-      <td *ngIf="refund.status=='success'" class="text-success">{{refund.status}}</td>
+      <td *ngIf="refund.status=='pending'" > <span class="badge badge-primary">{{refund.status}}</span> </td>
+      <td *ngIf="refund.status=='success'" > <span class="badge badge-success">{{refund.status}}</span></td>
 
 
       <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
   <td>
             
-            <button *ngIf="user[0].roles=='admin' && refundList[0].status=='pending'" (click)="approveRefund(refund.id)"   type="button" class="btn btn-sm btn-success " style="float: right;"  >
-              <i class="fa fa-check"   ></i>Approve</button>
+            <span *ngIf="user[0].roles=='admin' && refundList[0].status=='pending'" (click)="approveRefund(refund.id)"   class="badge badge-success " style="cursor: pointer;"  >
+              <i class="fa fa-check"   ></i>Approve</span>
 
                 
-            <button *ngIf="user[0].roles=='admin' && refundList[0].status=='success'" disabled=""  type="button" class="btn btn-sm btn-success " style="float: right;"  >
-                <i class="fa fa-check-circle"    ></i> Approved</button></td>
+            <span *ngIf="user[0].roles=='admin' && refundList[0].status=='success'" disabled=""  type="button" class="badge badge-success " style="cursor: pointer;"  >
+                <i class="fa fa-check-circle"    ></i> Approved</span></td>
          
       <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
       <!-- <i class="fa fa-trash"></i></button></td>  -->
