@@ -24,16 +24,17 @@
                               <form  [formGroup]="paymentForm">
                               <input type="date" class="form-control" style="width:20%;"
                                formControlName="dates" (ngModelChange)="searchDates()"></form>
-                                <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
-                                  New Payment</button>
-                                  <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">
-                                   <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
+                              
 
                             </div>
                         </div>
                     </div>
                     <div class="table-responsive">
-                      <table class="table m-0" id="excel-table" style="width:100%">
+                      <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
+                        New Payment</button>
+                        <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">
+                         <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
+                      <table class="table table-striped" id="excel-table" style="width:100%">
 
                    <thead class="table-light">
                       <tr class="bg-secondary">
@@ -55,9 +56,9 @@
     </tr>
   </thead>
   <tbody>
-  <tr>
+  <!-- <tr>
     <td>  Total Payments: GH₵{{totalAmount|number}}</td>
-  </tr>
+  </tr> -->
     <tr *ngFor="let payment of paymentList| slice: (page-1) * pageSize : page * pageSize">
  
 
@@ -78,12 +79,17 @@
 
 
       <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-        <td ><i *ngIf="user[0].roles=='admin'" class="fa fa-edit fa-2x text-info"  (click)="editPayment(payment.id)"></i>
-            <i  *ngIf="user[0].roles=='admin'" class="fa fa-close fa-2x text-danger" (click)="deletePayment(payment.id)" ></i>
+        <td ><i *ngIf="user[0].roles=='admin'" class="fa fa-edit fa-lg text-info"  (click)="editPayment(payment.id)"></i>
+            <i  *ngIf="user[0].roles=='admin'" class="fa fa-close fa-lg text-danger" (click)="deletePayment(payment.id)" ></i>
             
-            <button *ngIf="user[0].roles=='receptionist'" (click)="openRefund(payment.id)"   type="button" class="btn btn-sm btn-warning " style="float: right;"  >
-              <i class="fa fa-money"   ></i>Refund</button>
-          <i  class="fa fa-print fa-2x text-primary"  (click)="printReciept(payment.id)" ></i></td>
+            <span *ngIf="user[0].roles == 'receptionist'" 
+            (click)="openRefund(payment.id)" 
+            class="badge badge-warning" 
+            style="cursor: pointer; float: right; font-size: 10px; padding: 2px 4px;">
+        <i class="fa fa-money"></i> Refund
+      </span>
+      
+          <i  class="fa fa-print fa-lg text-primary"  (click)="printReciept(payment.id)" ></i></td>
       <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
       <!-- <i class="fa fa-trash"></i></button></td>  -->
     </tr>

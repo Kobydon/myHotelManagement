@@ -1,114 +1,44 @@
 <div class="row">
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="fa fa-users text-warning"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Guests</p>
-              <p class="card-title" style="font-size: small;">{{guestList.length}}
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <!-- <i class="fa fa-refresh"></i> Update Now -->
-        </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">USD</h5>
+        <span class="badge bg-primary">{{ usdRate ? usdRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="fa fa-bed text-success"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Rooms</p>
-              <p class="card-title" style="font-size: small;">{{rooms.length}}
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <!-- <i class="fa fa-calendar-o"></i> Last day -->
-        </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">GBP</h5>
+        <span class="badge bg-success">{{ gbpRate ? gbpRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="fa fa-list text-danger"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Reservation</p>
-              <p class="card-title" style="font-size: small;">1
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <!-- <i class="fa fa-clock-o"></i> In the last hour -->
-        </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">EUR</h5>
+        <span class="badge bg-warning">{{ eurRate ? eurRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="fa fa-check text-success"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Account Status</p>
-              <p class="card-title" style="font-size: small;">Active
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <!-- <i class="fa fa-refresh"></i> Update now -->
-        </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">GHS</h5>
+        <span class="badge bg-info">{{ ghsRate ? ghsRate : 'Loading...' }}</span>
       </div>
     </div>
   </div>
 </div>
+
+
 <div class="row">
   <div class="col-md-12">
     <div class="card ">
       <div class="card-header ">
-        <p class="card-title">Recent Bookings <i class="fa fa-file text-info"></i></p>
+        <p class="card-title"><i class="fa fa-file text-info"></i></p>
         
       </div>
       <div class="card-body ">
@@ -121,20 +51,28 @@
              <th>Room type</th>
              
              <th>Country</th>
+             <th></th>
             </tr>
           </thead>
           
           <tbody>
-            <tr  *ngFor="let booking of bookings| slice: (page-1) * pageSize : page * pageSize">
-              <td>{{booking.name}}</td>
-              <td>{{booking.arrival_date}}</td>
-            <td>{{booking.departure_date}}</td>
-            <td>{{booking.room_type}}</td>
-              <td>{{booking.country}}</td>
-             
-              
-            </tr>
-            
+            <ng-container *ngFor="let booking of bookings | slice: (page - 1) * pageSize : page * pageSize">
+              <tr>
+                <td>{{ booking.name }}</td>
+                <td>{{ booking.arrival_date }}</td>
+                <td>{{ booking.departure_date }}</td>
+                <td>{{ booking.room_type }}</td>
+                <td>{{ booking.country }}</td>
+                <td>
+                  <button 
+                    class="btn btn-sm"
+                    [class.glow]="canGlow(booking.departure_date)" 
+                    (click)="checkout(booking.id)">
+                    Checkout
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
           </tbody>
           
           </table>

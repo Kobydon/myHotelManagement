@@ -15,12 +15,13 @@
                                 <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
                             </div>
                             <div class="w-100">
-                                <button type="button" class="btn btn-sm btn-info " style="float: right;"  routerLink="/home/custom-reserve">
-                                  New reserve</button>
+                               
                             </div>
                         </div>
                     </div>
                     <div class="table-responsive">
+                      <button type="button" class="btn btn-sm btn-info " style="float: right;"  routerLink="/home/custom-reserve">
+                        New reserve</button>
                       <table class="table m-0" id="myTable" style="width :100%;">
 
                    <thead class="table-light">
@@ -73,9 +74,9 @@
 
 
       <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-        <!-- <i class="fa fa-edit fa-2x text-info"  (click)="editreserve(reserve.id)"></i> -->
-        <td>   <i   class="fa fa-edit fa-2x text-primary"  (click)="openPopup(reserve.id)" ></i>  
-             <i class="fa fa-close fa-2x text-danger" (click)="cancelReservation(reserve.id)" ></i>
+        <!-- <i class="fa fa-edit fa-lg text-info"  (click)="editreserve(reserve.id)"></i> -->
+        <td>   <i   class="fa fa-edit fa-lg text-primary"  (click)="openPopup(reserve.id)" ></i>  
+             <i class="fa fa-close fa-lg text-danger" (click)="cancelReservation(reserve.id)" ></i>
        </td>
       <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
       <!-- <i class="fa fa-trash"></i></button></td>  -->

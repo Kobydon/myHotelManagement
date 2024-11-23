@@ -3,6 +3,8 @@
 
     <div class="row" *blockUI="'loading'">
       <!-- <img src="/assets/img/loading.gif"> -->
+
+      
         <div class="col-md-12" style="width: 100%;"> 
             <div class="card shadow-sm">
                 <div class="card-body p-2">
@@ -14,13 +16,14 @@
                                 <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
                             </div>
                             <div class="w-100">
-                                <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
-                                  New booking</button>
+                                
                             </div>
                         </div>
                     </div>
                     <div class="table-responsive">
-                      <table class="table m-0" id="myTable" style="width:100%">
+                      <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
+                        New booking</button>
+                      <table class="table table-striped" id="myTable" style="width:100%">
 
                    <thead class="table-light">
                       <tr class="bg-secondary">
@@ -43,32 +46,38 @@
     </tr>
   </thead>
   <tbody>
-  
-    <tr *ngFor="let booking of bookings| slice: (page-1) * pageSize : page * pageSize">
- 
- 
-   
-      <td>{{booking.name}}</td>
-      <td>{{booking.room_type}}</td>
-      <td>{{booking.room_number}}</td>
-      <td>{{booking.arrival_date}}</td>
-      <td>{{booking.departure_date}}</td>
-
-      <td>{{booking.country}}</td>
-      
- 
-      <td>{{booking.adult}}</td>
-      <td>{{booking.children}}</td>
-      <td *ngIf="booking.status=='pending'" class="text-danger">{{booking.status}}</td>
-      <td *ngIf="booking.status=='success'" class="text-danger">{{booking.status}}</td>
-
-      <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-        <td><i class="fa fa-edit fa-2x text-info"  (click)="editBooking(booking.id)"></i>
-            <i class="fa fa-close fa-2x text-danger"
-             (click)="deletebooking(booking.id)" *ngIf="user[0].user=='admin '" ></i></td>
-      <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
-      <!-- <i class="fa fa-trash"></i></button></td>  -->
+    <tr *ngFor="let booking of bookings | slice: (page - 1) * pageSize : page * pageSize">
+      <td>{{ booking.name }}</td>
+      <td>{{ booking.room_type }}</td>
+      <td>{{ booking.room_number }}</td>
+      <td>{{ booking.arrival_date }}</td>
+      <td>{{ booking.departure_date }}</td>
+      <td>{{ booking.country }}</td>
+      <td>{{ booking.adult }}</td>
+      <td>{{ booking.children }}</td>
+    
+      <!-- Status with Conditional Styling -->
+      <td [ngClass]="{'text-danger': booking.status === 'pending', 'text-success': booking.status === 'success'}">
+        {{ booking.status }}
+      </td>
+    
+      <!-- Action Buttons -->
+      <td>
+        <i 
+          class="fa fa-edit fa-lg text-info" 
+          (click)="editBooking(booking.id)" 
+          title="Edit Booking">
+        </i>
+    
+        <i 
+          class="fa fa-close fa-lg text-danger" 
+          *ngIf="user[0].user === 'admin'" 
+          (click)="deleteBooking(booking.id)" 
+          title="Delete Booking">
+        </i>
+      </td>
     </tr>
+    
 
   </tbody>
 

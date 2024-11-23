@@ -31,6 +31,10 @@ export class RoomService {
   }
 
 
+
+  getBookingListNew(){
+    return lastValueFrom( this.http.get<any[]>(this.roomUrl + '/room/get_new_bookings'));
+  }
   
   updateRoom(ad: any) {
     return lastValueFrom( this.http.put(this.roomUrl + '/room/update_room_type', ad, httpOptions));

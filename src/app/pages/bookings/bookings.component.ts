@@ -54,6 +54,7 @@ export class BookingsComponent implements OnInit {
       adult :['',Validators.required],
       children:['',Validators.required],
       day:['',Validators.required],
+      guest_id:['',Validators.required],
 
 
 
@@ -204,7 +205,7 @@ async fetchGuest(id:number){
     if (res) this.guestDetails =res;
     this.bookingForm.patchValue({
       arrival_date: this.guestDetails[0].arrival_date, departure_date: this.guestDetails[0].checkout_date,
-      country:this.guestDetails[0].country
+      country:this.guestDetails[0].country,guest_id:this.guestDetails[0].id
     })
   } catch (error){
     this.toastr.error(null,error)
@@ -222,6 +223,7 @@ async fetchGuest(id:number){
   const book ={
 
     name:record.name,
+    guest_id:record.guest_id,
     room_type:record.room_type,
     country: record.country,
     // Language:['',Validators.required],

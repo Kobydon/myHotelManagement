@@ -78,10 +78,10 @@ export class PaymentComponent implements OnInit {
     reason:['',Validators.required],
     description:['',Validators.required],
     authorized_by:['',Validators.required],
-    refund_amount:['',Validators.required]
+    refund_amount:['',Validators.required],
+    guest_id:['',Validators.required],
 
-
-
+    room_number :['',Validators.required]
     
    
   })
@@ -246,7 +246,7 @@ async fetchBookings(id:number){
     var res = await this.roomService.get_booking_details(id);
     if (res) this.bookingDetail =res;
     this.paymentForm.patchValue({
-      id:id,
+      id:id,    guest_id:this.bookingDetail[0].guest_id, room_number:this.bookingDetail[0].room_number,
       checkin_date: this.bookingDetail[0].arrival_date, checkout_date: this.bookingDetail[0].departure_date,
       room_type: this.bookingDetail[0].room_type, children:this.bookingDetail[0].children,adult:this.bookingDetail[0].adult
      
@@ -305,6 +305,7 @@ calDiscount(record){
   const payment:any = {
    amount:record.amount,    
     name: record.name,
+    guest_id:record.guest_id,
 
      discount : record.discount,
       // reserved:['',Validators.required],
@@ -318,6 +319,7 @@ calDiscount(record){
     status :record.status,
 
     children :record.children,
+    room_number:record.room_number,
     adult :record.adult,
     balance: this.paymentForm.value.topay - record.amount
 }
@@ -351,6 +353,8 @@ async openRefund(id){
    id:this.payment[0].id,
     name:this.payment[0].name,
     amount:this.payment[0].amount,
+
+    
 
   
     // reserved:['',Validators.required],

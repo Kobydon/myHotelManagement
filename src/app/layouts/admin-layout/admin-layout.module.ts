@@ -46,7 +46,7 @@ import { ExpensesComponent } from 'app/expenses/expenses.component';
   imports: [
     
     RouterModule.forChild(AdminLayoutRoutes),
-    
+    HttpClientModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,

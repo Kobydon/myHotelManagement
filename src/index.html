@@ -39,6 +39,13 @@
 
       <!-- <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script> -->
 <style>
+  .form-kev {
+        font-style: italic; /* Make the text italic */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Shadow effect */
+        color: #333; /* Text color for better contrast */
+        font-size: 24px; /* Adjust size as needed */
+        font-family: 'Arial', sans-serif; /* Use a clean, modern font */
+      }
   .sidenav {
     width: 600px;
    
@@ -99,6 +106,23 @@
   .router-container > * {
     display: block;
   }
+  button.glow {
+  animation: glow-animation 1s infinite alternate;
+  border: 2px solid #ff9800;
+  color: #ffffff;
+  background-color: #ff5722;
+  font-weight: bold;
+}
+
+@keyframes glow-animation {
+  from {
+    box-shadow: 0 0 5px #ff9800;
+  }
+  to {
+    box-shadow: 0 0 20px #ff9800;
+  }
+}
+
   
 </style>
   </head>

@@ -8,6 +8,7 @@ import { RoomService } from 'app/services/rooms.service';
 import { GuestService } from 'app/services/guest.service';
 import { error } from 'console';
 import { PaymentService } from 'app/services/payment.service';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -17,10 +18,10 @@ import { PaymentService } from 'app/services/payment.service';
 })
 
 export class DashboardComponent implements OnInit{
-  constructor(private toastr:ToastrService,private fb: FormBuilder,
+  constructor(private toastr:ToastrService,private fb: FormBuilder,private http:HttpClient,
     private roomService:RoomService,private guestService:GuestService,private paymentService:PaymentService) { }
   page = 1;
-  pageSize: number = 4;
+  pageSize: number = 16;
   rooms:any;
   @BlockUI('loading') loading!: NgBlockUI
   public canvas : any;
@@ -31,13 +32,30 @@ export class DashboardComponent implements OnInit{
   bookings:any;
   paymentList:any;
   guestList:any;
-
+  interval:any;
+  usdRate: number;
+  gbpRate: number;
+  eurRate: number;
+  ghsRate: number;
+  exchangeInterval:any;
     ngOnInit(){
+   
+      
+      this.exchangeInterval= setInterval(()=>{
+        this.getExchangeRates();
+
+      },1000);
       this.getGust();
-    this.getBookingList();
+
+    
+      this.interval= setInterval(()=>{
+        this.getBookingList();
+
+      },1000);
+    
     this.getRoom();
     this.getPaymentList();
-    this.getBookingList();
+    // this.getBookingList();
       this.chartColor = "#FFFFFF";
 
       this.canvas = document.getElementById("chartHours");
@@ -231,7 +249,7 @@ export class DashboardComponent implements OnInit{
 
     async getPaymentList(){
       try{
-        this.loading.start();
+        // this.loading.start();
        var res = await this.paymentService.getPayment()
        if(res) this.paymentList =res;
   
@@ -242,14 +260,52 @@ export class DashboardComponent implements OnInit{
        
     
     finally{
-      this.loading.stop();
+      // this.loading.stop();
     }
   }
 
+
+  canGlow(departureDate: string): boolean {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentHours = now.getHours();
+
+    return departureDate === today && currentHours >= 12;
+  }
+
+  checkout(itemId: number): void {
+    console.log(`Checked out booking with ID: ${itemId}`);
+    // Add your checkout logic here
+  }
+
+  getExchangeRates() {
+    const apiUrl = 'https://api.exchangerate-api.com/v4/latest/USD'; // Alternative API
+  
+    this.http.get<any>(apiUrl).subscribe(
+      data => {
+        if (data && data.rates) {
+          this.usdRate = data.rates.USD || 1;
+          this.gbpRate = data.rates.GBP;
+          this.eurRate = data.rates.EUR;
+          this.ghsRate = data.rates.GHS;
+          console.log("Exchange Rates:", data.rates);
+        } else {
+          console.warn("Unexpected API response:", data);
+        }
+      },
+      (error: HttpErrorResponse) => {
+        console.error("Failed to fetch exchange rates:", error);
+        if (error.status === 0) {
+          console.error("Network or CORS issue. Ensure the API endpoint is accessible.");
+        }
+      }
+    );
+  }
+  
     async getBookingList(){
       try{
-        this.loading.start();
-       var res = await this.roomService.getBookingList()
+        // this.loading.start();
+       var res = await this.roomService.getBookingListNew()
        if(res) this.bookings =res;
   
       }
@@ -259,14 +315,39 @@ export class DashboardComponent implements OnInit{
        
     
     finally{
-      this.loading.stop();
+      // this.loading.stop();
     }
   }
 
 
-  async getRoom(){
+  async checkOut(id:any){
+
+
     try{
       this.loading.start();
+       
+  
+  
+       var res= await this.guestService.checkout(id)
+            // this.toastr.success(null,"successfully updated profile
+            if(res)  this.getBookingList();
+  
+    }
+    catch(error:any){
+      this.toastr.info(null,"kindly pay all pending bills  before checkout")
+    }
+   finally{
+    this.loading.stop();
+  
+   }
+  
+  }
+         
+
+
+  async getRoom(){
+    try{
+      // this.loading.start();
      var res = await this.roomService.getrooms()
      if(res) this.rooms =res;
 
@@ -277,14 +358,14 @@ export class DashboardComponent implements OnInit{
      
   
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 }
 
 
 async getGust(){
   try{
-    this.loading.start();
+    // this.loading.start();
    var res = await this.guestService.getGuests()
    if(res) this.guestList =res;
 
@@ -295,7 +376,7 @@ async getGust(){
    
 
 finally{
-  this.loading.stop();
+  // this.loading.stop();
 }
 }
 
