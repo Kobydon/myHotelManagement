@@ -16,6 +16,7 @@ import htmlToPdfmake from 'html-to-pdfmake';
 import {  ViewChild, ElementRef  } from '@angular/core';
 import * as html2pdf from 'html2pdf.js'
 import { userService } from 'app/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'refund',
@@ -42,7 +43,7 @@ export class RefundComponent implements OnInit {
   
   totalAmount:any;
   user:any;
-  constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
+  constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,private router:Router,
     private paymentService:PaymentService,private guestService:GuestService,private userService:userService) {
       this.refundForm = this.fb.group({
         id:['',Validators.required],
@@ -93,8 +94,7 @@ export class RefundComponent implements OnInit {
     try{
       this.loading.start();
      var res = await this.paymentService.getRefund()
-     if(res) {this.refundList =res; this.refundForm.patchValue({id:this.refundList[0].id,
-          payment_id:this.refundList[0].payment_id})}
+     if(res) { this.refundList =res;}
      let sum :number= 0;
 
      for (let index = 0; index < this.refundList.length; index++) {
@@ -172,6 +172,10 @@ async searchDates(){
     finally{this.loading.stop();}
 }
 
+navigate(){
+  this.router.navigate(['/payment'])
+}
+
 myFunction() {
 
   var input, filter, table, tr, td, i, txtValue;
@@ -195,10 +199,10 @@ myFunction() {
 }
 
 
-async approveRefund(record){
+async approveRefund(id){
   const lst = {
-    id :record.id,
-    payment_id :record.payment_id
+    id :id,
+  
   }
    try{
     this.loading.start();

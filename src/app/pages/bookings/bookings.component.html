@@ -21,8 +21,10 @@
                         </div>
                     </div>
                     <div class="table-responsive">
+                      <div class="btn-group" role="group" aria-label="Basic example">
                       <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
                         New booking</button>
+                      </div>
                       <table class="table table-striped" id="myTable" style="width:100%">
 
                    <thead class="table-light">
@@ -41,6 +43,7 @@
       <th>Adult </th>
       <th>Children </th>
       <th>Status</th>
+      <th></th>
       
       <th scope="col">Actions</th>
     </tr>
@@ -60,7 +63,16 @@
       <td [ngClass]="{'text-danger': booking.status === 'pending', 'text-success': booking.status === 'success'}">
         {{ booking.status }}
       </td>
-    
+      <td>
+        <span
+        [disabled]="booking.has_checkout === 'true'"
+        class="badge" style="cursor: pointer;  "
+        [class.glow]="canGlow(booking.departure_date)"
+        (click)="checkOut(booking.guest_id)">
+        Checkout
+        
+      </span>
+      </td>
       <!-- Action Buttons -->
       <td>
         <i 

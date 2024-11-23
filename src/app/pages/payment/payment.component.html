@@ -85,11 +85,11 @@
             <span *ngIf="user[0].roles == 'receptionist'" 
             (click)="openRefund(payment.id)" 
             class="badge badge-warning" 
-            style="cursor: pointer; float: right; font-size: 10px; padding: 2px 4px;">
+            style="cursor: pointer; ">
         <i class="fa fa-money"></i> Refund
       </span>
       
-          <i  class="fa fa-print fa-lg text-primary"  (click)="printReciept(payment.id)" ></i></td>
+          <span  class="badge badge-info"   style="cursor: pointer; " (click)="printReciept(payment.id)" >Print</span></td>
       <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
       <!-- <i class="fa fa-trash"></i></button></td>  -->
     </tr>

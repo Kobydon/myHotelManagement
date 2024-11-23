@@ -28,7 +28,7 @@ export class BookingsComponent implements OnInit {
   guestList:any;
   roomList:any;
   guestDetails:any;
-  
+  load=false;
   page = 1;
   pageSize: number = 10;
   @BlockUI('loading') loading!: NgBlockUI
@@ -77,6 +77,39 @@ export class BookingsComponent implements OnInit {
  
 
   }
+
+  canGlow(departureDate: string): boolean {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const currentHours = now.getHours();
+
+    return departureDate === today && currentHours >= 12;
+  }
+
+  
+  async checkOut(id:any){
+
+
+    try{
+      this.loading.start();
+      // this.load=true;
+  
+  
+       var res= await this.guestService.checkout(id)
+            // this.toastr.success(null,"successfully updated profile
+            if(res)  this.getBookingList();
+  
+    }
+    catch(error:any){
+      this.toastr.info(null,"kindly pay all pending bills  before checkout")
+    }
+   finally{
+   this.loading.stop();
+  
+   }
+  
+  }
+         
 
 
 

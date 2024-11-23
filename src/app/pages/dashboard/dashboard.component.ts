@@ -265,18 +265,8 @@ export class DashboardComponent implements OnInit{
   }
 
 
-  canGlow(departureDate: string): boolean {
-    const now = new Date();
-    const today = now.toISOString().split('T')[0];
-    const currentHours = now.getHours();
+ 
 
-    return departureDate === today && currentHours >= 12;
-  }
-
-  checkout(itemId: number): void {
-    console.log(`Checked out booking with ID: ${itemId}`);
-    // Add your checkout logic here
-  }
 
   getExchangeRates() {
     const apiUrl = 'https://api.exchangerate-api.com/v4/latest/USD'; // Alternative API
