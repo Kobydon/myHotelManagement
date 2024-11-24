@@ -3,7 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { BlankLayoutComponent } from './blank-layout/blank-layout.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import {shareReplay } from 'rxjs/operators'
-import { SignupComponent } from 'app/features/signup/signup.component';
+import { SignupComponent } from './signup/signup.component';
+
 const routes: Routes = [
 
 

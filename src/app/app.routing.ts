@@ -6,6 +6,7 @@ import { SignInComponent } from './login/sign-in/sign-in.component';
 import { AuthGuard } from './auth.guard';
 import { LayoutComponent } from './features/layout/layout.component';
 import { ResLayoutComponent } from './res-layout/res-layout.component';
+import { SignupComponent } from './login/signup/signup.component';
 
 export const AppRoutes: Routes = [
   {
@@ -49,5 +50,7 @@ export const AppRoutes: Routes = [
         {
       path: '',
       loadChildren: () => import('../app/features/features.module').then(x => x.FeaturesModule)
-  }]}
+  }]},
+
+
 ]

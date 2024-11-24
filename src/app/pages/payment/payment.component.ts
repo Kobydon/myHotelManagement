@@ -300,44 +300,39 @@ calDiscount(record){
 
 }
 
-
-
- async addpayment(record){
-  const payment:any = {
-   amount:record.amount,    
+async addPayment(record) {
+  const payment: any = {
+    amount: record.amount,    
     name: record.name,
-    guest_id:record.guest_id,
-
-     discount : record.discount,
-      // reserved:['',Validators.required],
+    guest_id: record.guest_id,
+    discount: record.discount,
     method: record.method,
-    room_type : record.room_type,
-   
-    payment_date : record.payment_date,
+    room_type: record.room_type,
+    payment_date: record.payment_date,
+    checkin_date: record.checkin_date,
+    checkout_date: record.checkout_date,
+    status: record.status,
+    children: record.children,
+    room_number: record.room_number,
+    adult: record.adult,
+    
+    // Adjusted balance calculation: Add the amount and discount
+    balance: this.paymentForm.value.topay - (record.amount + record.discount)
+  };
 
-    checkin_date : record.checkin_date,
-    checkout_date :record.checkout_date,
-    status :record.status,
-
-    children :record.children,
-    room_number:record.room_number,
-    adult :record.adult,
-    balance: this.paymentForm.value.topay - record.amount
-}
-
-
-try{
-  this.loading.start();
-  var res = await this.paymentService.addPayment(payment);
-  if(res) this.toastr.success(null,"Payment successfully added"); this.closePopup();this.getPaymentList();
-}catch(error){
-  this.toastr.error(null,error);
-}
-
-  finally{
+  try {
+    this.loading.start();
+    const res = await this.paymentService.addPayment(payment);
+    if (res) {
+      this.toastr.success(null, "Payment successfully added");
+      this.closePopup();
+      this.getPaymentList();
+    }
+  } catch (error) {
+    this.toastr.error(null, error);
+  } finally {
     this.loading.stop();
   }
-
 }
 
 async openRefund(id){

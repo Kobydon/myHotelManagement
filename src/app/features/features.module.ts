@@ -13,7 +13,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BlockUI, BlockUIModule } from 'ng-block-ui';
 import { LoadingTemplate } from 'app/loading-template';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { SignupComponent } from './signup/signup.component';
+import { SignupComponent } from '../login/signup/signup.component';
 import { TrackReservationComponent } from './track-reservation/track-reservation.component';
 import { TodoListComponent } from 'app/todo-list/todo-list.component';
 

@@ -75,32 +75,31 @@ myFunction() {
 }
 
 
+async printReciept(id: number) {
+  this.openStyle = "block";  // Open the modal
 
-async printReciept(id:number){
+  try {
+    this.loading.start();  // Start loading indicator
 
-  this.openStyle ="block"
+    // Fetch reservation data using the provided ID
+    const res = await this.guestService.get_reserve_for(id);
 
-    try{
-      this.loading.start();
-      var res = await this.guestService.get_reserve_for(id);
-      if (res) {this.reserveList=res;}
-      if(this.reserveList[0].payment_status=="Pending"){
-        this.header ="Invoice";
-      }
-      else{
-        this.header ="Receipt";
-      }
-    }
-    catch(error){
-      this.toastr.error(null,error);
-    }
-    finally{
-      this.loading.stop();
+    if (res) {
+      this.reserveList = res;  // Assign the reservation list
     }
 
+    // Set the header based on the payment status
+    this.header = this.reserveList[0]?.Payment_status === "Not Yet" ? "Invoice" : "Receipt";
 
-
+  } catch (error) {
+    // Handle errors and show a toast notification
+    console.error(error);  // Log error for debugging purposes
+    this.toastr.error('An error occurred while fetching the reservation data.', error);
+  } finally {
+    this.loading.stop();  // Stop loading indicator
+  }
 }
+
 
 
   async cancelReservation(id){

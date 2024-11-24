@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { FormBuilder,FormControlName,FormGroup, Validators } from '@angular/forms';
 import { RoomService } from 'app/services/rooms.service';
 import { GuestService } from 'app/services/guest.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -31,7 +32,7 @@ export class CustomReservationComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI;
   
   constructor(private userService:userService,private toastr:ToastrService,private fb: FormBuilder,
-    private roomService:RoomService,private guestService:GuestService) { 
+    private roomService:RoomService,private guestService:GuestService,private router:Router) { 
     this.createForm =  
       
       this.fb.group({
@@ -148,13 +149,15 @@ async addReservation(record){
       this.loading.start();
       var res = this.guestService.addReservation(reserve);
       
-      if(res) this.toastr.success(null,"Successfull,kindly check track room section for payment and updates");
+      if(res) this.toastr.success(null,"Successfull");
       this.closePopup();
     }catch(error){
       this.toastr.error(error.message)
     }
    finally{
     this.loading.stop();
+    this.router.navigate(['/home/track-reservation']);
+
    }
 }
 

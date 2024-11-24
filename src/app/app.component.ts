@@ -24,7 +24,7 @@ export class AppComponent{ isUserLoggedIn = false; isAdmin = false;
       // this.isAdmin = true;
       // console.log("adminData: " + adminData);
 
-    if(adminData == null )
+    if(adminData == null && storeData == "true" )
   
 {
    this.router.navigate(['home/features'])
@@ -35,13 +35,13 @@ export class AppComponent{ isUserLoggedIn = false; isAdmin = false;
 
       if( storeData != null && storeData == "true")
          this.isUserLoggedIn = true;
-      else if(storeData == null )
-{
+//       else if(storeData == null )
+// {
 
 
-         this.toastr.error(null,"session expired,kindly login again");
-         this.userService.logout();
-      }
+//          this.toastr.error(null,"session expired,kindly login again");
+//          this.userService.logout();
+//       }
 
          let checkData = localStorage.getItem("checking");
       console.log("admin: " + adminData);
