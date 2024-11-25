@@ -310,7 +310,7 @@ export class DashboardComponent implements OnInit{
   }
 
 
-  async checkOut(id:any){
+  async checkOut(id){
 
 
     try{
@@ -320,7 +320,7 @@ export class DashboardComponent implements OnInit{
   
        var res= await this.guestService.checkout(id)
             // this.toastr.success(null,"successfully updated profile
-            if(res)  this.getBookingList();
+            if(res)  this.getBookingList(); this.getRoom();
   
     }
     catch(error:any){
@@ -368,6 +368,23 @@ async getGust(){
 finally{
   // this.loading.stop();
 }
+}
+
+
+canGlow(departureDate: string): boolean {
+  const currentDate = new Date();
+  const departure = new Date(departureDate);
+
+  // Ensure the date comparison focuses on the date part only
+  const isToday =
+    departure.getFullYear() === currentDate.getFullYear() &&
+    departure.getMonth() === currentDate.getMonth() &&
+    departure.getDate() === currentDate.getDate();
+
+  // Check if the departure time is >= 12 PM
+  const isAfterNoon = departure.getHours() >= 12;
+
+  return isToday && isAfterNoon;
 }
 
 

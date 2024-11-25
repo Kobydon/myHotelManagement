@@ -37,7 +37,15 @@ export const ROUTES: RouteInfo[] = [
     { path: '/all-reservations',    title: 'Reservation List',        icon:'nc-caps-small', class: '' },
     { path: '/todo-list',    title: 'Todo List',        icon:'nc-caps-small', class: '' },
     { path: '/house-keeping',    title: 'House Keeping List',        icon:'nc-caps-small', class: '' },
-    { path: '/detailed-report',    title: 'Detailed Sales and Business Activity Report',        icon:'nc-caps-small', class: '' }
+    { path: '/detailed-report',    title: 'Detailed Sales and Business Activity Report',        icon:'nc-caps-small', class: '' },
+    { path: '/budget-report',    title: 'Budget Report',        icon:'nc-caps-small', class: '' },
+    { path: '/expenses',    title: ' Expenses ',        icon:'nc-caps-small', class: '' },
+    { path: '/income',    title: ' Income ',        icon:'nc-caps-small', class: '' },
+    { path: '/add-budget',    title: ' Budget ',        icon:'nc-caps-small', class: '' },
+    { path: '/daily-income',    title: ' Daily Income - Expenditure Report  ',        icon:'nc-caps-small', class: '' },
+    { path: '/daily-income-dates',    title: ' Daily Income - Expenditure Report  ',        icon:'nc-caps-small', class: '' },
+
+
 ];
 
 @Component({

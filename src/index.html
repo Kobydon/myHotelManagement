@@ -114,23 +114,29 @@
 
   .router-container > * {
     display: block;
+  }@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0); /* Default position */
   }
-  button.glow {
-  animation: glow-animation 1s infinite alternate;
-  border: 2px solid #ff9800;
-  color: #ffffff;
-  background-color: #ff5722;
-  font-weight: bold;
+  50% {
+    transform: translateY(-10px); /* Move upward */
+  }
 }
 
-@keyframes glow-animation {
-  from {
-    box-shadow: 0 0 5px #ff9800;
-  }
-  to {
-    box-shadow: 0 0 20px #ff9800;
-  }
+/* .glow {
+  animation: bounce 2s infinite; 
+} */
+
+#glower {
+  color: #00ff00; /* Bright green text color */
+  background-color: transparent; /* No background */
+  font-weight: bold; /* Make the text more prominent */
+  text-transform: uppercase; /* Convert text to uppercase */
+  display: inline-block; /* Ensures the transform applies correctly */
 }
+
+
+
 
   
 </style>

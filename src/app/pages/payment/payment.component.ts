@@ -145,7 +145,7 @@ export class PaymentComponent implements OnInit {
 
   async getBookingList(){
     try{
-      this.loading.start();
+      // this.loading.start();
      var res = await this.roomService.getBookingList()
      if(res) this.bookings =res;
 
@@ -156,7 +156,7 @@ export class PaymentComponent implements OnInit {
      
   
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 }
 
@@ -301,6 +301,10 @@ calDiscount(record){
 }
 
 async addPayment(record) {
+  const amountToPay = Number(this.paymentForm.value.topay); // Convert to number
+  const totalAmount = Number(record.amount) + Number(record.discount); // Convert to number
+  const balance = amountToPay - totalAmount; // Result will be a number
+  
   const payment: any = {
     amount: record.amount,    
     name: record.name,
@@ -315,9 +319,11 @@ async addPayment(record) {
     children: record.children,
     room_number: record.room_number,
     adult: record.adult,
+    balace:"0"
     
     // Adjusted balance calculation: Add the amount and discount
-    balance: this.paymentForm.value.topay - (record.amount + record.discount)
+
+    
   };
 
   try {

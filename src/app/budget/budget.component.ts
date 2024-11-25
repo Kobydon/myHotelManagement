@@ -1,29 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControlName,FormGroup,FormBuilder, Validators} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as XLSX from 'xlsx';
-import { GuestService } from 'app/services/guest.service';
+import { FormControlName,FormGroup,FormBuilder, Validators} from '@angular/forms';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 
 import { ToastrService } from 'ngx-toastr';
 import { RoomService } from 'app/services/rooms.service';
 // import { guestService } from 'app/school.service';
-
 import { userService } from 'app/user.service';
+import { GuestService } from 'app/services/guest.service';
 @Component({
-  selector: 'expenses',
-  templateUrl: './expenses.component.html',
-  styleUrls: ['./expenses.component.css']
+  selector: 'budget',
+  templateUrl: './budget.component.html',
+  styleUrls: ['./budget.component.css']
 })
-export class ExpensesComponent implements OnInit {
-
-
+export class BudgetComponent implements OnInit {
 
   @BlockUI('loading') loading!: NgBlockUI
   base64_string:any;
   header:any;
   displayStyle ="none";
-  fileName= 'expense.xlsx';
+  fileName= 'budget.xlsx';
   // @Input() ad: Adds ={brand:'',category:'',condition:'',price:'',description:'',
   //                     phone:'',negotiable:'',city:'',image:'',post_by_id:''};
   //  login:Login[]=[];
@@ -40,41 +37,44 @@ export class ExpensesComponent implements OnInit {
   departmentList:any;
   expense_info:any;
   page = 1;
-  pageSize: number = 100;
+  pageSize: number = 200;
   feestypeList:any;
 expenseList:any;
-classList:any;
+incomeList:any
+totalAmount:any;
 user:any;
-  constructor(private fb:FormBuilder,private toastr:ToastrService,private guestService:GuestService,
-    private userService:userService) {
+constructor(private fb:FormBuilder,private toastr:ToastrService,private guestService:GuestService,
+  private userService:userService) {
 
-      this.createForm = this.fb.group({
-  
-        id:['',Validators.required],
-      
-        name:['',Validators.required],
-        amount:['',Validators.required],
-      
-       
-        
-        date:['',Validators.required],
-      
-        note:['',Validators.required],
-       dates:['',Validators.required]
-       
-    })  
-     }
+    this.createForm = this.fb.group({
 
-  ngOnInit(): void {
+      id:['',Validators.required],
+    
+      name:['',Validators.required],
+      amount:['',Validators.required],
+    
+     
+      
+      date:['',Validators.required],
+    
+      note:['',Validators.required],
+     dates:['',Validators.required],
+     type:['',Validators.required]
+
+     
+  })  
+   }
+
+   ngOnInit(): void {
     this.getUser();
-    this.getExpenseLIst();
+    this.getIncomeList();
   }
 
 
 
 
 
-  async  adExpense(record){
+  async  addIncome(record){
 
     const d ={
    
@@ -82,7 +82,8 @@ user:any;
      amount:record.amount,
      note:record.note,
      
-     date:record.date,
+ 
+     type:record.type
     
      
    
@@ -95,8 +96,8 @@ user:any;
      // guest.image_three= this.base64_string
      try{
        this.loading.start();
-      var res  = await this.guestService.addExpense(d);
-      if(res)this.toastr.success(null,"record successfully added ");this.getExpenseLIst();
+      var res  = await this.guestService.addBudgetList(d);
+      if(res)this.toastr.success(null,"record successfully added ");this.getIncomeList();
    
      
      } catch(error){
@@ -117,12 +118,16 @@ user:any;
   
    
   
-   async getExpenseLIst(){
+   async getIncomeList(){
     try{
       this.loading.start();
-      var res = await this.guestService.getExpenseList();
-      if(res) this.expenseList=res; 
-  
+      var res = await this.guestService.getBudgetList();
+      if(res) this.incomeList=res; 
+      let sum :number= 0;
+      for (let index = 0; index < this.incomeList.length; index++) {
+        sum += parseInt(this.incomeList[index].amount);
+        this.totalAmount=sum;
+        console.log(sum);}
     } catch(error){
       this.toastr.error(null,error)
     }
@@ -171,14 +176,14 @@ user:any;
   
   
    
-  async editExpense(id:any) {
+  async editIncome(id:any) {
       
     this.header ="Edit";
   
     this.displayStyle = "block";
     try{
       this.loading.start();
-      this.expense_info =  await this.guestService.getExpense(id);
+      this.expense_info =  await this.guestService.getBudget(id);
     
       if ( this.expense_info)  
       this.createForm.patchValue({
@@ -187,7 +192,7 @@ user:any;
        
         amount:this.expense_info[0].amount,
         note:this.expense_info[0].note,
-    
+        type: this.expense_info[0].type,
         date:this.expense_info[0].date,
        
       
@@ -196,7 +201,7 @@ user:any;
       })
     }
   catch (error:any) {
-    this.toastr.error(null,error)
+    // this.toastr.error(null,error)
   } finally {
     this.loading.stop();
   
@@ -206,16 +211,16 @@ user:any;
   
   
   
-  async updateExpense(record){
+  async updateIncome(record){
    
     const d ={
 
-   
-        name:record.fees_type,
+        id:record.id,
+        name:record.name,
         amount:record.amount,
-        note:record.student,
+        note:record.note,
         
-        date:record.method,
+        type:record.type,
        
         
       
@@ -223,9 +228,10 @@ user:any;
         }
     try{
       this.loading.start();
-       var res= await this.guestService.updateExpense(d);
+       var res= await this.guestService.updateBudget(d);
             // this.toastr.success(null,"successfully updated profile
-this.getExpenseLIst  
+    if(res)
+    this.getIncomeList();
     }
     catch(error:any){
       this.toastr.error(null,error)
@@ -236,13 +242,13 @@ this.getExpenseLIst
    }
   }
   
-  async deleteExpense(id:number){
+  async deleteIncome(id:number){
   
     try{
       this.loading.start();
-       var res= await this.guestService.deleteExpense(id)
+       var res= await this.guestService.deleteBudget(id)
             // this.toastr.success(null,"successfully updated profile
-            if(res)  this.getExpenseLIst();
+            if(res)  this.getIncomeList();
   
     }
     catch(error:any){
@@ -304,7 +310,7 @@ this.getExpenseLIst
     }
       try{
         this.loading.start();
-        var res = await this.guestService.searchExpenseDate
+        var res = await this.guestService.searchBudgetDates
         
         
       
@@ -314,7 +320,5 @@ this.getExpenseLIst
   
       finally{this.loading.stop();}
   }
-    
-
 
 }

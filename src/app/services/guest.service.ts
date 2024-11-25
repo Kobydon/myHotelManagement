@@ -52,12 +52,12 @@ getmaleGuests(): Observable<any[]>{
 }
 addExpense(dep:any) {
   //console.log(guest);
-    return  lastValueFrom (  this.http.post(this.guestUrl + '/gust/add_expense', dep, httpOptions));
+    return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_expense', dep, httpOptions));
   }  
   deleteExpense(id:number) {
     if (confirm("do you want to delete?")) {
     // const id = typeof ad === 'number' ? ad : ad.id;
-    const url = `${this.guestUrl}/school/delete_expense/${id}`;
+    const url = `${this.guestUrl}/guest/delete_expense/${id}`;
     return  lastValueFrom(  this.http.delete(url, httpOptions))
     }
     return of({});
@@ -65,12 +65,9 @@ addExpense(dep:any) {
    
   getExpenseList() {
     //console.log(guest);
-      return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/school/get_expense_list'));
+      return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_expense_list'));
     }
-    searchExpenseDate(d){
-      return 
-       lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates', d, httpOptions));
-    }
+
     
   updateExpense(dep:any) {
     //console.log(guest);
@@ -200,5 +197,119 @@ getcheckOut(): Observable<any[]>{
     const url = `${this.guestUrl}/guest/checkout/${id}`;
     return  lastValueFrom( this.http.put(url ,  httpOptions));
   }
+
+
+  deleteIncome(id:number) {
+    if (confirm("do you want to delete?")) {
+    // const id = typeof ad === 'number' ? ad : ad.id;
+    const url = `${this.guestUrl}/guest/delete_income/${id}`;
+    return  lastValueFrom(  this.http.delete(url, httpOptions))
+    }
+    return of({});
+  }
+
+
+
+
+  deleteBudget(id:number) {
+    if (confirm("do you want to delete?")) {
+    // const id = typeof ad === 'number' ? ad : ad.id;
+    const url = `${this.guestUrl}/guest/delete_budget/${id}`;
+    return  lastValueFrom(  this.http.delete(url, httpOptions))
+    }
+    return of({});
+  }
+
+  updateIncome(sch:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_income', sch, httpOptions));
+    }
+
+
+  
+
+    
+       
+    searchIncomeBudgetDates(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_budget_dates', d, httpOptions));
+    }
+
+          
+    searchExpenseDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates', d, httpOptions));
+    }
+
+    searchattendanceDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_attendance_date', d, httpOptions));
+    }
+
+
+
+    
+    searchBudgetDates(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_budget_dates', d, httpOptions));
+    }
+        
+    searchIncomeDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_dates_two', d, httpOptions));
+    }
+
+    // searchExpenseDate(d){
+    //   return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates', d, httpOptions));
+    // }
+
+    searchExpenseBudgetDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_budget_dates', d, httpOptions));
+    }
+
+
+    searchIncomeDates(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_dates', d, httpOptions));
+    }
+
+
+    searchExpenseDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates_two', d, httpOptions));
+    }
+    
+    addBudgetList(sch:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_budget', sch, httpOptions));
+      }      
+  updateBudget(sch:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_budget', sch, httpOptions));
+    }
+   
+  getIncome(id: number){
+    const url = `${this.guestUrl}/guest/get_income/${id}`;
+    return   lastValueFrom( this.http.get<any>(url));
+  }
+    
+  getBudget(id: number){
+    const url = `${this.guestUrl}/guest/get_budget/${id}`;
+    return   lastValueFrom( this.http.get<any>(url));
+  }
+
+  addIncomeList(sch:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_income', sch, httpOptions));
+    }
+
+       
+  getIncomeList() {
+    //console.log(guest);get
+      return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_income_list'));
+    }
+
+
+    getBudgetList() {
+      //console.log(guest);get
+        return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_budget_list'));
+      }
+
+
 }
+
+
 

@@ -6,3 +6,8 @@
     height: 80vh;
     overflow-y: auto;
 }
+
+
+#rsv{
+    cursor: pointer;
+}

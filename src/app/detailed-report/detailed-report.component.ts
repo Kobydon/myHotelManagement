@@ -51,7 +51,13 @@ export class DetailedReportComponent implements OnInit {
   totalAvailableRooms:any;
   totalOcccupiedRooms:any;
   occupancy:any;
+  incomeList:any;
+  attendaceList:any;
+  expenseList:any;
   
+  totalAttendance:any;
+  totalExpenses:any;
+  totalIncome:any;
   totalAmount:any;
   user:any;
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
@@ -87,7 +93,7 @@ export class DetailedReportComponent implements OnInit {
 
   async getPaymentList(){
     try{
-      this.loading.start();
+      // this.loading.start();
      var res = await this.paymentService.getPayment()
      if(res) {this.paymentList =res; this.paymentForm.patchValue({amount:this.paymentList[0].amount})}
      let sum :number= 0;
@@ -108,14 +114,14 @@ export class DetailedReportComponent implements OnInit {
      
   
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 
   
 }
 async getRoom(){
   try{
-    this.loading.start();
+    // this.loading.start();
    var res = await this.roomService.getrooms()
    if(res) this.roomList =res;
 
@@ -126,77 +132,69 @@ async getRoom(){
    
 
 finally{
-  this.loading.stop();
+  // this.loading.stop();
 }
 }
+async searchDates() {
+  try {
+    this.loading.start();
 
-async searchDates(){
-
-  const d = {
-    date: this.paymentForm.value.dates
-  }
-    try{
-      this.loading.start();
-      var res = await this.paymentService.searchDates(d);
-      if(res) {this.paymentList =res;}
-      let sum :number= 0;
-
-      for (let index = 0; index < this.paymentList.length; index++) {
-       sum += parseInt(this.paymentList[index].amount);
-       this.totalAmount=sum;
-       console.log(sum);
-   }
-   var resp = await this.paymentService.searchRefundDates(d);
-   if(res) {this.refundList =resp;}
-   let summ :number= 0;
-
-   for (let index = 0; index < this.refundList.length; index++) {
-    summ += parseInt(this.refundList[index].refund_amount);
-    this.totalRefundAmount=summ;
-    console.log(sum);
-}
-   
-
-var rep = await this.roomService.searchRoomDates(d)
-if(res) this.rooms =res;
- 
-   this.totalAvailableRooms =this.roomList.length - this.rooms.length;
-   this.totalOcccupiedRooms = this.rooms.length;
-  this.occupancy = this.totalOcccupiedRooms / this.roomList.length * 100
-
-  var date1:any = new Date ( this.paymentForm.value.dates);
-  var yesterday_date =date1.getDate()-1;  
-  
-  const z ={
-       date: yesterday_date
-  }
-var ress = await this.roomService.searchYesterdayRoomDates(z);
-if(ress) this.yesterdayList =ress;
- let summm :number= 0;
-
-for (let index = 0; index < this.yesterdayList.length; index++) {
-
-  summm += parseInt(this.yesterdayList[index].amount);
-  this.yesterday_total=summm;
-  console.log(summm);
-}
-
-this.yester_daytodate =this.yesterday_total + this.totalAmount;
- 
-
-
+    const selectedDate = this.paymentForm.value.dates;
+    if (!selectedDate) {
+      throw new Error("Please select a valid date.");
     }
 
-    
-    
-    catch(err){}
+    const d = { date: selectedDate };
 
-    finally{this.loading.stop();}
+    // Fetch payments
+    const paymentRes = await this.paymentService.searchDates(d);
+    this.paymentList = paymentRes || [];
+    this.totalAmount = this.paymentList.reduce((sum, item) => sum + parseInt(item.amount), 0);
 
+    // Fetch refunds
+    const refundRes = await this.paymentService.searchRefundDates(d);
+    this.refundList = refundRes || [];
+    this.totalRefundAmount = this.refundList.reduce((sum, item) => sum + parseInt(item.refund_amount), 0);
 
+    // Fetch room data
+    const roomRes = await this.roomService.searchRoomDates(d);
+    this.rooms = roomRes || [];
+    this.totalAvailableRooms = this.roomList.length - this.rooms.length;
+    this.totalOcccupiedRooms = this.rooms.length;
+    this.occupancy = (this.totalOcccupiedRooms / this.roomList.length) * 100;
 
+    // Prepare yesterday's data
+    const yesterday = new Date(selectedDate);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const z = { date: yesterday.toISOString().split("T")[0] };
 
+    // Fetch income, expenses, and attendance
+    const incomeRes = await this.guestService.searchIncomeDates(d);
+    const expenseRes = await this.guestService.searchExpenseDate(d);
+    const attendanceRes = await this.guestService.searchattendanceDate(d);
+    this.incomeList = incomeRes || [];
+    this.expenseList = expenseRes || [];
+    this.attendaceList = attendanceRes || [];
+
+    this.totalIncome = this.incomeList.reduce((sum, item) => sum + parseInt(item.amount), 0);
+    this.totalExpenses = this.expenseList.reduce((sum, item) => sum + parseInt(item.amount), 0);
+    this.totalAttendance = this.attendaceList.length;
+
+    // Fetch yesterday's room data
+    const yesterdayRoomRes = await this.roomService.searchYesterdayRoomDates(z);
+    this.yesterdayList = yesterdayRoomRes || [];
+    this.yesterday_total = this.yesterdayList.reduce((sum, item) => sum + parseInt(item.amount), 0);
+
+    // Calculate cumulative totals
+    this.yester_daytodate = this.yesterday_total + this.totalAmount;
+
+  } catch (err) {
+    console.error("Error fetching data:", err.message || err);
+  } finally {
+    this.loading.stop();
+  }
 }
+
 
 
   async getBookingList(){
@@ -290,6 +288,48 @@ exportexcel()
   XLSX.writeFile(wb, this.fileName);
 
 }
+
+
+printReport() {
+  const printContents = document.querySelector('.page')?.innerHTML;
+  if (printContents) {
+    const printWindow = window.open('', '_blank');
+    printWindow?.document.write('<html><head><title>Report</title></head><body>');
+    printWindow?.document.write(printContents);
+    printWindow?.document.write('</body></html>');
+    printWindow?.document.close();
+    printWindow?.focus();
+    printWindow?.print();
+    printWindow?.close();
+  } else {
+    console.error("No content found to print.");
+  }
+}
+
+exportToExcel() {
+  const table = document.getElementById('excel-table');
+  if (table) {
+    const workbook = XLSX.utils.table_to_book(table);
+    XLSX.writeFile(workbook, 'Hotel_Report.xlsx');
+  } else {
+    console.error("Table not found for exporting to Excel.");
+  }
+}
+
+// async downloadPDF() {
+//   const element = document.querySelector('.page');
+//   if (element) {
+//     const canvas = await html2(element);
+//     const imgData = canvas.toDataURL('image/png');
+//     const pdf = new jsPDF('p', 'mm', 'a4');
+//     const imgWidth = 190;
+//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+//     pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+//     pdf.save('Hotel_Report.pdf');
+//   } else {
+//     console.error("No content found to generate PDF.");
+//   }
+// }
 
 
 }

@@ -15,20 +15,24 @@
                                 style="width: 350px;height: 40px;" >
                             </div>
                             <div class="w-100">
-                              
+                            
+                                  <!-- <p style="float: left;color:gray;">Total Payments: GH₵{{totalAmount|number}}</p>  -->
+                            </div>
                         </div>
                     </div>
                     <div class="table-responsive">
                       <form  [formGroup]="createForm">
                         <input type="date" class="form-control" style="width:auto;"
                          formControlName="dates" (ngModelChange)="searchDates()"></form>
+              
+                      <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
+                          Add New</button>
+                          <button type="button" class="btn btn-sm btn-warning " style="float: right;"  (click)="exportexcel()">
+                            <i class="fa fa-file-excel-o"   ></i> Export </button>
+
                          
-          <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
-                      Add New</button>
-                      <button type="button" class="btn btn-sm btn-warning " style="float: right;"  (click)="exportexcel()">
-                        <i class="fa fa-file-excel-o"   ></i> Export </button></div>
-                </div>
+                            </div>
                       <table class="table table-striped" id="excel-table" >
 
                    <thead class="table-light">
@@ -38,31 +42,41 @@
     
           <th scope="col">#</th>
      <th scope="col"> Name</th>
-   <th scope="col">Date</th>
+
      <!-- <th scope="col">Total Number Of Teachers</th>
 
       <th scope="col"> Created Date | Time</th>  -->
-      <th scope="col">User</th>
+     
       <th scope="col">Amount</th>
       <th scope="col">Note</th>
+      <th scope="col">Type</th>
+      <!-- <th scope="col">Term</th>
+      <th scope="col">Year</th> -->
+      <th scope="col">Date</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
   
-    <tr *ngFor="let item of expenseList | slice: (page-1) * pageSize : page * pageSize;index as i">
-            
+  
+    <tr *ngFor="let item of incomeList | slice: (page-1) * pageSize : page * pageSize;index as i">
+    
+
             <th> {{i+1 }}</th>
             <td> {{item.name }}</td>
-            <td> {{item.date }}</td>
-         <td> {{item.user }}</td>
+            
+         <!-- <td> {{item.user }}</td> -->
 
             <td>{{item.amount}}</td>
             <td>{{item.note}}</td>
-      
+            <td>{{item.type}}</td>
+            <!-- <td>{{item.term}}</td>
+            <td>{{item.year}}</td> -->
+
+            <td> {{item.created_date }}</td>
  
-            <td ><i class="fa fa-edit fa-lg text-info" (click)="editExpense(item.id)"></i><i
-                *ngIf="user[0].roles=='admin'"  class="fa fa-close fa-lg text-danger" (click)="deleteExpense(item.id)"></i></td>
+            <td ><i class="fa fa-edit fa-lg text-info" (click)="editIncome(item.id)"></i><i
+                *ngIf="user[0].roles=='admin'"  class="fa fa-close fa-lg text-danger" (click)="deleteIncome(item.id)"></i></td>
           </tr>
 
        
@@ -75,7 +89,7 @@
 
 <div class="row pt-3">
   <div class="col-md-9">
-      <ngb-pagination [collectionSize]="expenseList.length" [pageSize]="pageSize " [(page)]="page"
+      <ngb-pagination [collectionSize]="incomeList.length" [pageSize]="pageSize " [(page)]="page"
           (pageChange)="pageClick()" [maxSize]="5" [rotate]="true" [ellipses]="false"
           [boundaryLinks]="true">
           <ng-template ngbPaginationFirst>First</ng-template>
@@ -131,7 +145,7 @@
               <!-- <h5 class="card-title">Edit Profile</h5> -->
             </div>
             <div class="card-body">
-              <form  [formGroup]="createForm" (ngSubmit)="adExpense(createForm.value)">
+              <form  [formGroup]="createForm" (ngSubmit)="addIncome(createForm.value)">
                 <div class="row">
       
                   <div class="col-md-5 pr-1">
@@ -143,15 +157,7 @@
                   </div>
 
 
-                  <div class="col-md-5 pr-1"  >
-                    <div class="form-group">
-                      <label>  Date</label>
-                       <input type="date" class="form-control" formControlName="date">
-                    </div>
-                  </div>
-
-
-
+                
                   
                   <div class="col-md-5 pr-1"  >
                     <div class="form-group">
@@ -160,6 +166,17 @@
                     </div>
                   </div>
 
+                        
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label>  Type</label>
+                       <select formControlName="type" id="" class="form-control">
+                        <option value="" hidden selected>----------</option>
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                       </select>
+                    </div>
+                  </div>
 
                   
                   <div class="col-md-5 pr-1"  >
@@ -181,7 +198,7 @@
                   </div>
 
                   <div class="update ml-auto mr-auto" *ngIf="header =='Edit'">
-                    <button type="button" class="btn btn-primary btn-round"  (click)="updateExpense(createForm.value)">
+                    <button type="button" class="btn btn-primary btn-round"  (click)="updateIncome(createForm.value)">
                       Update</button>
                   </div>
 

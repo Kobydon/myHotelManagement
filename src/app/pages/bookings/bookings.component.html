@@ -65,14 +65,15 @@
       </td>
       <td>
         <span
-        [disabled]="booking.has_checkout === 'true'"
-        class="badge" style="cursor: pointer;  "
-        [class.glow]="canGlow(booking.departure_date)"
-        (click)="checkOut(booking.guest_id)">
-        Checkout
-        
-      </span>
+          [class.badge]="true"
+          [class.glow]="canGlow(booking.departure_date)"
+          [style.cursor]="'pointer'"
+          [class.disabled]="booking.has_checkout"
+          (click)="!booking.has_checkout && checkOut(booking.id)">
+          Checkout
+        </span>
       </td>
+      
       <!-- Action Buttons -->
       <td>
         <i 

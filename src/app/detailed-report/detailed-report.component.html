@@ -1,232 +1,200 @@
-<div class="page"  >
+<div class="page">
+  <div class="row" *blockUI="'loading'">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h4 class="text-center mb-4">Hotel Summary Report</h4>
 
+          <!-- Filters -->
+          <div class="d-flex mb-3">
+            <div class="flex-grow-1">
+              <!-- <input
+                type="text"
+                class="form-control"
+                placeholder="Search by Guest Name"
+                id="myInput"
+                (keyup)="myFunction()"
+              /> -->
+            </div>
+            <div class="ms-3">
+              <form [formGroup]="paymentForm">
+                <input
+                  type="date"
+                  class="form-control"
+                  formControlName="dates"
+                  (ngModelChange)="searchDates()"
+                />
+              </form>
+            </div>
+            <div class="ms-3">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                (click)="exportexcel()"
+              >
+                <i class="fa fa-file-excel-o"></i> Export to Excel
+              </button>
+            </div>
+            <div class="ms-3">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                onclick="window.print()"
+              >
+                <i class="fa fa-print"></i> Print
+              </button>
+            </div>
+          </div>
 
-    <div class="row" *blockUI="'loading'">
-      <!-- <img src="/assets/img/loading.gif"> -->
-        <div class="col-md-12" style="width: 100%;">
-            <div class="card shadow-sm">
-                <div class="card-body p-2">
-                    <!-- <h5 class="card-title m-3"><small><i class="fa-solid fa-file-lines me-2"></i></small></h5> -->
-                    <div class="menus">
-                        <div class="d-flex">
-                            <div class="w-200">
-                           
-                                <input class="form-control" type="text"  id="myInput" (keyup)="myFunction()"  style="width: 350px;" >
-                           
-                            </div>
-                            <div class="w-100">
-                              <form  [formGroup]="paymentForm">
-                              <input type="date" class="form-control" style="width:20%;"
-                               formControlName="dates" (ngModelChange)="searchDates()"></form>
-                             
-                                  <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">
-                                   <i class="fa fa-file-excel-o"   ></i> Export Excel</button>
+          <!-- Show Reports Only When Date is Selected -->
+          <div *ngIf="paymentForm.value.dates">
 
-                            </div>
-                        </div>
-                    </div>
+            <!-- Room Payments Table -->
+            <h5 class="text-gray-500">Rooms</h5>
+            <table class="table table-bordered" id="excel-table">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th>Name</th>
+                  <th>Amount</th>
+                  <th>Balance</th>
+                  <th>Discount</th>
+                  <th>Method</th>
+                  <th>Room Type</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Payment Date | Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payment of paymentList">
+                  <td>{{ payment.name }}</td>
+                  <td>GH₵{{ payment.amount }}</td>
+                  <td>GH₵{{ payment.balance }}</td>
+                  <td>{{ payment.discount }}%</td>
+                  <td>{{ payment.method }}</td>
+                  <td>{{ payment.room_type }}</td>
+                  <td>{{ payment.checkin_date }}</td>
+                  <td>{{ payment.checkout_date }}</td>
+                  <td>{{ payment.payment_date }}</td>
+                </tr>
+                <tr>
+                  <td colspan="9" class="text-end bg-light">
+                    <strong>Daily Total: GH₵{{ totalAmount | number }}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-                    <div class="table-responsive" >
-                      <table class="table table-bordered" id="excel-table" style="width: 100%;" >
-                        <title>Room</title>
-                   <thead class="table-light">
-                    <tr>
-                    <td style="border:none;" ><h5 style="color: gray;">Rooms</h5></td></tr>
-                      <tr class="bg-secondary">
-     
-      <th scope="col">Name</th>
-      <th scope="col">Amount</th>
-      <th scope="col">Balance</th>
-      <th scope="col">Discount</th>
-      <th>Method</th>
-      <th>Room Type</th>
+            <!-- Statistics -->
+            <h5 class="text-gray-500 mt-4">Statistics</h5>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th>Number of Rooms Occupied</th>
+                  <th>Number of Rooms Available</th>
+                  <th>Total Number of Guests</th>
+                  <th>Occupancy (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ totalOcccupiedRooms }}</td>
+                  <td>{{ totalAvailableRooms }}</td>
+                  <td>{{ rooms.length }}</td>
+                  <td>{{ occupancy | number: '1.2-2' }}%</td>
+                </tr>
+              </tbody>
+            </table>
 
-      <th>Check In </th>
-      <th>Check Out</th>
-      <th>Payment Date| Time</th>
-   
-    
-    </tr>
-  </thead>
-  <tbody>
+            <!-- Refunds -->
+            <h5 class="text-gray-500 mt-4">Refunds</h5>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th>Name</th>
+                  <th>Amount</th>
+                  <th>Authorized By</th>
+                  <th>Reason</th>
+                  <th>Date | Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let refund of refundList">
+                  <td>{{ refund.name }}</td>
+                  <td>GH₵{{ refund.refund_amount }}</td>
+                  <td>{{ refund.authorized_by }}</td>
+                  <td>{{ refund.reason }}</td>
+                  <td>{{ refund.refund_time }}</td>
+                </tr>
+                <tr>
+                  <td colspan="5" class="text-end bg-light">
+                    <strong>Daily Refunds Total: GH₵{{ totalRefundAmount | number }}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
 
-    <tr *ngFor="let payment of paymentList">
- 
-    
-      <td>{{payment.name}}</td>
-      <td>{{payment.amount}}.00</td>
-      <td>{{payment.balance}}.00</td>
-      <td>{{payment.discount}}%</td>
-      <td>{{payment.method}}</td>
+            <!-- Income Report -->
+            <h5 class="text-gray-500 mt-4">Income Report</h5>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th>Source</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let income of incomeList">
+                  <td>{{ income.name }}</td>
+                  <td>GH₵{{ income.amount }}</td>
+                  <td>{{ income.date }}</td>
+                </tr>
+              </tbody>
+            </table>
 
-      <td>{{payment.room_type}}</td>
-      
- 
-      <td>{{payment.checkin_date}}</td>
-      <td>{{payment.checkout_date}}</td>
-      <td>{{payment.payment_date}}</td>
+            <!-- Expense Report -->
+            <h5 class="text-gray-500 mt-4">Expense Report</h5>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th>Category</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let expense of expenseList">
+                  <td>{{ expense.name }}</td>
+                  <td>GH₵{{ expense.amount }}</td>
+                  <td>{{ expense.date }}</td>
+                </tr>
+              </tbody>
+            </table>
 
-
-
-      <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-      
-      <!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
-      <!-- <i class="fa fa-trash"></i></button></td>  -->
-    </tr>
-  <tr>
-    <td style="background-color: lightgray;">  Daily Totals : GH₵{{totalAmount|number}}</td>
-  </tr>
-  </tbody>
-  <br>
-
-
-
-
-    <title>Statistics</title>
-    
-<thead class="table-light">
-  <td >  <h5 style="color: gray;">STATISTICS</h5></td>
-  <tr class="bg-secondary">
-
-<th scope="col">Number Of Rooms Occupied</th>
-<th scope="col">Number Of Rooms Available</th>
-<th scope="col">Total Number Of Guests</th>
-<th scope="col">Occupancy</th>
-
-
-
-
-
-</tr>
-</thead>
-<tbody>
-
-<tr >
-
-
-<td>{{totalOcccupiedRooms}}</td>
-<td>{{totalAvailableRooms}}</td>
-<td>{{ rooms.length}}</td>
-<td>{{ occupancy}}%</td>
-
-
-
-
-<!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-
-<!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
-<!-- <i class="fa fa-trash"></i></button></td>  -->
-</tr>
-
-
-</tbody>
-
-  <br>
-
-  <thead class="table-light">
-    <tr>
-    <td style="border:none;" ><h5 style="color: gray;">Refunds</h5></td></tr>
-    <tr class="bg-secondary">
-
-
-<th scope="col">Name</th>
-<th scope="col">Amount</th>
-<th scope="col">authorized_by</th>
-<th scope="col">Reason</th>
-<th scope="col">Date | Time</th>
-
-
-
-</tr>
-</thead>
-<tbody>
-
-<tr *ngFor="let refund of refundList">
-
-
-<td>{{refund.name}}</td>
-<td>{{refund.refund_amount}}.00</td>
-<td>{{refund.authorized_by}}</td>
-<td>{{refund.reason}}</td>
-<td>{{refund.refund_time}}</td>
-
-
-
-<!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-
-
-<!-- </button><button   style="width: 15%;"class="btn btn-danger"> -->
-<!-- <i class="fa fa-trash"></i></button></td>  -->
-</tr>
-<tr>
-<td style="background-color:lightgray;">  Daily Totals: GH₵{{totalRefundAmount|number}}</td>
-</tr>
-</tbody>
-<br>
-<tr>
- <td style=" border:none;"> <h5 style="color: gray;">TOTALS</h5></td>
-</tr>
-<tr>
-  <th>Daily Sales</th>
-    <td>GH₵{{totalAmount|number }}</td>
-  </tr>
-  <tr>
-    <th>Budget And Variance</th>
-    <td></td>
-  </tr>
-<tr>
-    <th>Previous Day-To-Date</th>
-    <td>GH₵{{yester_daytodate|number}}</td>
-  </tr>
-  <tr>
-    <th>Previous Day</th>
-    <td>GH₵{{yesterday_total|number}}</td>
-  </tr>
-
-  
-</table>
-</div>
-<!-- 
-<div class="table-responsive">
-    <table class="table m-0" id="excel-table">
-        <title>Refund</title>
-
-</table>
-</div> -->
-
-
-<!-- <div class="row pt-3">
-  <div class="col-md-9">
-      <ngb-pagination [collectionSize]="paymentList.length" [pageSize]="pageSize " [(page)]="page"
-          (pageChange)="pageClick()" [maxSize]="5" [rotate]="true" [ellipses]="false"
-          [boundaryLinks]="true">
-          <ng-template ngbPaginationFirst>First</ng-template>
-          <ng-template ngbPaginationLast>Last</ng-template>
-          <ng-template ngbPaginationPrevious>Prev</ng-template>
-          <ng-template ngbPaginationNext>Next</ng-template>
-          <ng-template ngbPaginationEllipsis>...</ng-template>
-          <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
-      </ngb-pagination>
-
+            <!-- Attendance Report -->
+            <h5 class="text-gray-500 mt-4">Attendance Report</h5>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th>Name</th>
+                  <th>Time In</th>
+                  <th>Time Out</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let attendance of attendanceList">
+                  <td>{{ attendance.name }}</td>
+                  <td>{{ attendance.time_in }}</td>
+                  <td>{{ attendance.time_out }}</td>
+                  <td>{{ attendance.date }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+    </div>
   </div>
- -->
-
-
-
-
-  </div>
-
-
-
-
-
-
-
 </div>
-    
-    
-</div>
-</div>
-</div>
-

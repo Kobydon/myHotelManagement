@@ -57,7 +57,7 @@
   <div class="col-md-12">
     <div class="card ">
       <div class="card-header ">
-        <p class="card-title"><i class="fa fa-file text-info"></i></p>
+        <!-- <p class="card-title">Active Bookings</p> -->
         
       </div>
       <div class="card-body ">
@@ -78,18 +78,19 @@
             <ng-container *ngFor="let booking of bookings | slice: (page - 1) * pageSize : page * pageSize">
               <tr>
                 <td>{{ booking.name }}</td>
-                <td>{{ booking.arrival_date }}</td>
-                <td>{{ booking.departure_date }}</td>
+                <td>{{ booking.arrival_date | date:'MMMM d, yyyy'}}</td>
+                <td>{{ booking.departure_date  | date:'MMMM d, yyyy'}}</td>
                 <td>{{ booking.room_type }}</td>
                 <td>{{ booking.country }}</td>
                 <td>
                   <span 
-                  class="badge" style="cursor: pointer; "
-                    [class.glow]="canGlow(booking.departure_date)" 
-                    (click)="checkOut(booking.guest_id)">
+                    class="badge glow"  style="cursor: pointer;"
+                    id="glower"
+                    (click)="checkOut(booking.id)">
                     Checkout
-                </span>
+                  </span>
                 </td>
+                
               </tr>
             </ng-container>
           </tbody>

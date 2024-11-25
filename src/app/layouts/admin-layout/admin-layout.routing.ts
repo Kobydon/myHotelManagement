@@ -29,6 +29,11 @@ import { CalenderComponent } from 'app/calender/calender.component';
 import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.component';
 import { AddPurchaseRequestComponent } from 'app/add-purchase-request/add-purchase-request.component';
 import { ExpensesComponent } from 'app/expenses/expenses.component';
+import { BudgetComponent } from 'app/budget/budget.component';
+import { IncomeComponent } from 'app/income/income.component';
+import { BudgetReportComponent } from 'app/budget-report/budget-report.component';
+import { DailyIncomeReportComponent } from 'app/daily-income-report/daily-income-report.component';
+import { DailyIncomeReportDatesBetweenComponent } from 'app/daily-income-report-dates-between/daily-income-report-dates-between.component';
 
 
 
@@ -60,6 +65,11 @@ export const AdminLayoutRoutes: Routes = [
     {path:'detailed-report',component:DetailedReportComponent},
     {path:'add-purchase',component:AddPurchaseRequestComponent},
     {path:'expenses',component:ExpensesComponent},
+    {path:'add-budget',component:BudgetComponent},
+    {path:'income',component:IncomeComponent},
+    {path:'budget-report',component:BudgetReportComponent},
+    {path:'daily-income',component:DailyIncomeReportComponent},
+    {path:'daily-income-dates',component:DailyIncomeReportDatesBetweenComponent},
 
 
 ]

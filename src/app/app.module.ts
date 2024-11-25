@@ -41,6 +41,10 @@ import { AddPurchaseRequestComponent } from './add-purchase-request/add-purchase
 import { VendorComponent } from './vendor/vendor.component';
 import { PushNotificationComponent } from './push-notification/push-notification.component';
 import { ExpensesComponent } from './expenses/expenses.component';
+import { BudgetComponent } from './budget/budget.component';
+import { IncomeComponent } from './income/income.component';
+import { DailyIncomeReportDatesBetweenComponent } from './daily-income-report-dates-between/daily-income-report-dates-between.component';
+import { DailyIncomeReportComponent } from './daily-income-report/daily-income-report.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -51,7 +55,8 @@ import { ExpensesComponent } from './expenses/expenses.component';
     AdminLayoutComponent,
     ResLayoutComponent,
     VendorComponent,
-    
+
+
   
 
 

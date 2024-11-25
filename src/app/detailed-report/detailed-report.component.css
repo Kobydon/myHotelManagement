@@ -1,0 +1,25 @@
+.card {
+    border-radius: 10px;
+  }
+  
+  .table-bordered th, .table-bordered td {
+    text-align: center;
+  }
+  
+  .text-gray-500 {
+    color: #6c757d !important;
+  }
+  
+  .btn {
+    font-size: 14px;
+  }
+  
+  thead.table-light {
+    background-color: #f8f9fa;
+  }
+  
+  .bg-secondary {
+    background-color: #343a40 !important;
+    color: #fff;
+  }
+  

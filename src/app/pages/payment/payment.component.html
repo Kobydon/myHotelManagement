@@ -56,11 +56,11 @@
     </tr>
   </thead>
   <tbody>
-  <!-- <tr>
-    <td>  Total Payments: GH₵{{totalAmount|number}}</td>
-  </tr> -->
+   
+    <tr>
+      <td>  Total Payments: GH₵{{totalAmount|number}}</td>
+    </tr>
     <tr *ngFor="let payment of paymentList| slice: (page-1) * pageSize : page * pageSize">
- 
 
       <td>{{payment.name}}</td>
       <td>{{payment.amount}}.00</td>

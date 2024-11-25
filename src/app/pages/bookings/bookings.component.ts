@@ -169,7 +169,7 @@ myFunction() {
 
 async getGuest(){
   try{
-    this.loading.start();
+    // this.loading.start();
     var res = await this.guestService.getGuests();
     if(res) this.guestList=res; 
 
@@ -183,25 +183,25 @@ finally{
 }
   async getRoomType(){
     try{
-      this.loading.start();
+      // this.loading.start();
      var res = await this.roomService.getroomType()
      if(res) this.roomtype =res;
 
     }
     catch(error:any){
-      this.toastr.error(null,error);
+      // this.toastr.error(null,error);
     }
      
   
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 }
 
 
   async getRoom(){
     try{
-      this.loading.start();
+      // this.loading.start();
      var res = await this.roomService.getrooms()
      if(res) this.rooms =res;
 
@@ -212,28 +212,28 @@ finally{
      
   
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 }
 
 
 async fetchRooms(record){
       try{
-        this.loading.start();
+        // this.loading.start();
         var res = await this.roomService.fetchRoomsByType(record.room_type);
         if (res) this.roomList =res;
       } catch (error){
         console.log(error)
       }
       finally{
-        this.loading.stop();
+        // this.loading.stop();
       }
 }
 
 
 async fetchGuest(id:number){
   try{
-    this.loading.start();
+    // this.loading.start();
     var res = await this.guestService.getGuest_info(id);
     if (res) this.guestDetails =res;
     this.bookingForm.patchValue({
@@ -244,7 +244,7 @@ async fetchGuest(id:number){
     this.toastr.error(null,error)
   }
   finally{
-    this.loading.stop();
+    // this.loading.stop();
   }
 }
 

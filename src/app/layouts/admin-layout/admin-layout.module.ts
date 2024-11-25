@@ -38,6 +38,11 @@ import { DetailedReportComponent } from 'app/detailed-report/detailed-report.com
 import { PurchaseRequestComponent } from 'app/purchase-request/purchase-request.component';
 import { AddPurchaseRequestComponent } from 'app/add-purchase-request/add-purchase-request.component';
 import { ExpensesComponent } from 'app/expenses/expenses.component';
+import { IncomeComponent } from '../../income/income.component';
+import { BudgetComponent } from 'app/budget/budget.component';
+import { BudgetReportComponent } from 'app/budget-report/budget-report.component';
+import { DailyIncomeReportComponent } from 'app/daily-income-report/daily-income-report.component';
+import { DailyIncomeReportDatesBetweenComponent } from 'app/daily-income-report-dates-between/daily-income-report-dates-between.component';
 
 
     
@@ -89,7 +94,13 @@ import { ExpensesComponent } from 'app/expenses/expenses.component';
     RefundComponent,
     DetailedReportComponent,
     PurchaseRequestComponent,
-    AddPurchaseRequestComponent
+    AddPurchaseRequestComponent,
+    IncomeComponent,
+    BudgetComponent,
+    BudgetReportComponent,
+    DailyIncomeReportComponent,
+
+    DailyIncomeReportDatesBetweenComponent
 
 
 
