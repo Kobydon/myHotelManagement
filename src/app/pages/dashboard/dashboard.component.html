@@ -1,4 +1,16 @@
-<div class="row">
+<style>
+  .card-header {
+  background-color: #333;
+  color: white;
+}
+
+.card-title i {
+  margin-right: 10px;
+}
+
+</style>
+
+<div class="row" *ngIf="user[0]?.roles!='admin'" >
   <!-- USD -->
   <div class="col-md-3">
     <div class="card">
@@ -52,55 +64,61 @@
   </div>
 </div>
 
+<div class="row" *ngIf="user[0]?.roles == 'admin'">
+  <!-- Payment Chart (Now in place of Active Bookings) -->
+  <div class="col-md-12">
+    <div class="card card-chart">
+      <div class="card-header" style="background-color: #333; color: white;">
+        <p class="card-title">
+          <i class="fa fa-line-chart me-2 text-danger"></i> TRENDS
+        </p>
+      </div>
+      <div class="card-body">
+        <canvas id="paymentChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="row">
+  <!-- Active Bookings moved to col-md-12 -->
   <div class="col-md-12">
-    <div class="card ">
-      <div class="card-header ">
-        <!-- <p class="card-title">Active Bookings</p> -->
-        
+    <div class="card">
+      <div class="card-header">
+        <p class="card-title">Active Bookings</p>
       </div>
-      <div class="card-body ">
-        <table class="table " style="width:80%; " id="myTable" >
+      <div class="card-body">
+        <table class="table" style="width:80%;" id="myTable">
           <thead>
             <tr>
-             <th>Name</th>
-             <th>Check-in</th>
-             <th>Check-out</th>
-             <th>Room type</th>
-             
-             <th>Country</th>
-             <th></th>
+              <th>Name</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Room type</th>
+              <th>Country</th>
+              <th></th>
             </tr>
           </thead>
-          
           <tbody>
             <ng-container *ngFor="let booking of bookings | slice: (page - 1) * pageSize : page * pageSize">
               <tr>
                 <td>{{ booking.name }}</td>
                 <td>{{ booking.arrival_date | date:'MMMM d, yyyy'}}</td>
-                <td>{{ booking.departure_date  | date:'MMMM d, yyyy'}}</td>
+                <td>{{ booking.departure_date | date:'MMMM d, yyyy'}}</td>
                 <td>{{ booking.room_type }}</td>
                 <td>{{ booking.country }}</td>
                 <td>
-                  <span 
-                    class="badge glow"  style="cursor: pointer;"
-                    id="glower"
-                    (click)="checkOut(booking.id)">
+                  <span class="badge glow" style="cursor: pointer;" id="glower" (click)="checkOut(booking.id)">
                     Checkout
                   </span>
                 </td>
-                
               </tr>
             </ng-container>
           </tbody>
-          
-          </table>
-          
-          
-          
+        </table>
       </div>
-      <div class="card-footer ">
+      <div class="card-footer">
         <hr>
         <div class="stats">
           <!-- <i class="fa fa-history"></i> Updated 3 minutes ago -->
@@ -109,48 +127,34 @@
     </div>
   </div>
 </div>
+
 <div class="row">
   <div class="col-md-4">
-    <div class="card ">
-      <div class="card-header ">
+    <div class="card">
+      <div class="card-header">
         <p class="card-title">Rooms Status</p>
-        <!-- <p class="card-category">Lastes</p> -->
+        <!-- <p class="card-category">Latest</p> -->
       </div>
-      <div class="card-body ">
-        <table class="table " style="width:80%; " id="myTable" >
+      <div class="card-body">
+        <table class="table" style="width:80%;" id="myTable">
           <thead>
-            <tr >
-             <th> Number</th>
-             <th>Category</th>
-             <th>Status</th>
-             <!-- <th>Available</th> -->
-             
-             <!-- <th>Action</th> -->
+            <tr>
+              <th>Number</th>
+              <th>Category</th>
+              <th>Status</th>
             </tr>
           </thead>
-          
           <tbody>
-            <tr  *ngFor="let room of rooms| slice: (page-1) * pageSize : page * pageSize" >
-              <td>{{room.room_number}} </td>
-              <td>{{room.room_type}}</td>
-              <td  *ngIf="room.occupied_state!='occupied'" class="text-success">Available</td>
-              <td  *ngIf="room.occupied_state!='available'" class="text-info">occupied</td>
-             
-             
-              <!-- <td><i class="fa fa-eye text-danger"></i></td> -->
+            <tr *ngFor="let room of rooms | slice: (page - 1) * pageSize : page * pageSize">
+              <td>{{ room.room_number }}</td>
+              <td>{{ room.room_type }}</td>
+              <td *ngIf="room.occupied_state != 'occupied'" class="text-success">Available</td>
+              <td *ngIf="room.occupied_state != 'available'" class="text-info">Occupied</td>
             </tr>
-            
           </tbody>
-          
-          </table>
+        </table>
       </div>
-      <div class="card-footer ">
-        <!-- <div class="legend">
-          <i class="fa fa-circle text-primary"></i> Opened
-          <i class="fa fa-circle text-warning"></i> Read
-          <i class="fa fa-circle text-danger"></i> Deleted
-          <i class="fa fa-circle text-gray"></i> Unopened
-        </div> -->
+      <div class="card-footer">
         <hr>
         <div class="stats">
           <!-- <i class="fa fa-calendar"></i> Number of emails sent -->
@@ -158,7 +162,12 @@
       </div>
     </div>
   </div>
-  <div class="col-md-8">
+
+
+
+
+
+  <div class="col-md-8" *ngIf="user[0]?.roles!='admin'">
     <div class="card card-chart">
       <div class="card-header">
         <p class="card-title">Recent Pamyments</p>
@@ -202,3 +211,7 @@
     </div>
   </div>
 </div>
+
+
+
+

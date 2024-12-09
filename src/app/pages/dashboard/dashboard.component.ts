@@ -1,36 +1,42 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,AfterViewInit, OnChanges, SimpleChanges } from '@angular/core';
 import Chart from 'chart.js';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ToastrService } from 'ngx-toastr';
-
-import { FormBuilder,FormControlName,FormGroup, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { RoomService } from 'app/services/rooms.service';
 import { GuestService } from 'app/services/guest.service';
-import { error } from 'console';
 import { PaymentService } from 'app/services/payment.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-
+import { userService } from 'app/user.service';
 
 @Component({
-    selector: 'dashboard-cmp',
-    moduleId: module.id,
-    templateUrl: 'dashboard.component.html'
+  selector: 'dashboard-cmp',
+  moduleId: module.id,
+  templateUrl: 'dashboard.component.html',
 })
+export class DashboardComponent implements OnInit {
+  constructor(
+    private toastr: ToastrService,
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private roomService: RoomService,
+    private guestService: GuestService,
+    private paymentService: PaymentService,
+    private userService:userService
+  ) {}
 
-export class DashboardComponent implements OnInit{
-  constructor(private toastr:ToastrService,private fb: FormBuilder,private http:HttpClient,
-    private roomService:RoomService,private guestService:GuestService,private paymentService:PaymentService) { }
   page = 1;
   pageSize: number = 16;
-  rooms:any;
-  @BlockUI('loading') loading!: NgBlockUI
-  public canvas : any;
+  rooms: any;
+  @BlockUI('loading') loading!: NgBlockUI;
+  public canvas: any;
   public ctx;
-  public chartColor;
-  public chartEmail;
-  public chartHours;
+  public paymentChart: any;
+  paymentList: any;
+  monthlyPayments: { [month: string]: number } = {};
+  months: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   bookings:any;
-  paymentList:any;
+  // paymentList:any;
   guestList:any;
   interval:any;
   usdRate: number;
@@ -38,235 +44,138 @@ export class DashboardComponent implements OnInit{
   eurRate: number;
   ghsRate: number;
   exchangeInterval:any;
-    ngOnInit(){
-   
-      
-      this.exchangeInterval= setInterval(()=>{
-        this.getExchangeRates();
+  user:any;
 
-      },1000);
-      this.getGust();
-
-    
-      this.interval= setInterval(()=>{
-        this.getBookingList();
-
-      },1000);
-    
-    this.getRoom();
+  ngOnInit() {
     this.getPaymentList();
-    // this.getBookingList();
-      this.chartColor = "#FFFFFF";
+    this.exchangeInterval= setInterval(()=>{
+      this.getExchangeRates();
 
-      this.canvas = document.getElementById("chartHours");
-      this.ctx = this.canvas.getContext("2d");
+    },1000);
+    this.getGust();
 
-      this.chartHours = new Chart(this.ctx, {
-        type: 'line',
-
-        data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
-          datasets: [{
-              borderColor: "#6bd098",
-              backgroundColor: "#6bd098",
-              pointRadius: 0,
-              pointHoverRadius: 0,
-              borderWidth: 3,
-              data: [300, 310, 316, 322, 330, 326, 333, 345, 338, 354]
-            },
-            {
-              borderColor: "#f17e5d",
-              backgroundColor: "#f17e5d",
-              pointRadius: 0,
-              pointHoverRadius: 0,
-              borderWidth: 3,
-              data: [320, 340, 365, 360, 370, 385, 390, 384, 408, 420]
-            },
-            {
-              borderColor: "#fcc468",
-              backgroundColor: "#fcc468",
-              pointRadius: 0,
-              pointHoverRadius: 0,
-              borderWidth: 3,
-              data: [370, 394, 415, 409, 425, 445, 460, 450, 478, 484]
-            }
-          ]
-        },
-        options: {
-          legend: {
-            display: false
-          },
-
-          tooltips: {
-            enabled: false
-          },
-
-          scales: {
-            yAxes: [{
-
-              ticks: {
-                fontColor: "#9f9f9f",
-                beginAtZero: false,
-                maxTicksLimit: 5,
-                //padding: 20
-              },
-              gridLines: {
-                drawBorder: false,
-                zeroLineColor: "#ccc",
-                color: 'rgba(255,255,255,0.05)'
-              }
-
-            }],
-
-            xAxes: [{
-              barPercentage: 1.6,
-              gridLines: {
-                drawBorder: false,
-                color: 'rgba(255,255,255,0.1)',
-                zeroLineColor: "transparent",
-                display: false,
-              },
-              ticks: {
-                padding: 20,
-                fontColor: "#9f9f9f"
-              }
-            }]
-          },
-        }
-      });
-
-
-      this.canvas = document.getElementById("chartEmail");
-      this.ctx = this.canvas.getContext("2d");
-      this.chartEmail = new Chart(this.ctx, {
-        type: 'pie',
-        data: {
-          labels: [1, 2, 3],
-          datasets: [{
-            label: "Emails",
-            pointRadius: 0,
-            pointHoverRadius: 0,
-            backgroundColor: [
-              '#e3e3e3',
-              '#4acccd',
-              '#fcc468',
-              '#ef8157'
-            ],
-            borderWidth: 0,
-            data: [342, 480, 530, 120]
-          }]
-        },
-
-        options: {
-
-          legend: {
-            display: false
-          },
-
-          pieceLabel: {
-            render: 'percentage',
-            fontColor: ['white'],
-            precision: 2
-          },
-
-          tooltips: {
-            enabled: false
-          },
-
-          scales: {
-            yAxes: [{
-
-              ticks: {
-                display: false
-              },
-              gridLines: {
-                drawBorder: false,
-                zeroLineColor: "transparent",
-                color: 'rgba(255,255,255,0.05)'
-              }
-
-            }],
-
-            xAxes: [{
-              barPercentage: 1.6,
-              gridLines: {
-                drawBorder: false,
-                color: 'rgba(255,255,255,0.1)',
-                zeroLineColor: "transparent"
-              },
-              ticks: {
-                display: false,
-              }
-            }]
-          },
-        }
-      });
-
-      var speedCanvas = document.getElementById("speedChart");
-
-      var dataFirst = {
-        data: [0, 19, 15, 20, 30, 40, 40, 50, 25, 30, 50, 70],
-        fill: false,
-        borderColor: '#fbc658',
-        backgroundColor: 'transparent',
-        pointBorderColor: '#fbc658',
-        pointRadius: 4,
-        pointHoverRadius: 4,
-        pointBorderWidth: 8,
-      };
-
-      var dataSecond = {
-        data: [0, 5, 10, 12, 20, 27, 30, 34, 42, 45, 55, 63],
-        fill: false,
-        borderColor: '#51CACF',
-        backgroundColor: 'transparent',
-        pointBorderColor: '#51CACF',
-        pointRadius: 4,
-        pointHoverRadius: 4,
-        pointBorderWidth: 8
-      };
-
-      var speedData = {
-        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        datasets: [dataFirst, dataSecond]
-      };
-
-      var chartOptions = {
-        legend: {
-          display: false,
-          position: 'top'
-        }
-      };
-
-      var lineChart = new Chart(speedCanvas, {
-        type: 'line',
-        hover: false,
-        data: speedData,
-        options: chartOptions
-      });
-    }
-
-
-    async getPaymentList(){
-      try{
-        // this.loading.start();
-       var res = await this.paymentService.getPayment()
-       if(res) this.paymentList =res;
   
+    this.interval= setInterval(()=>{
+      this.getBookingList();
+
+    },1000);
+    this.getRoom();
+    this.getUser();
+  
+  }
+  async getUser() {
+    try {
+      var res = await this.userService.getUser();
+      if (res) {
+        this.user = res;
+        // If roles are loaded, initialize chart
+        if (this.user[0]?.roles === 'admin') {
+          this.initializePaymentChart();
+        }
       }
-      catch(error:any){
-        // this.toastr.error(null,error);
-      }
-       
-    
-    finally{
-      // this.loading.stop();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      console.log("success");
     }
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    // Make sure the chart initializes when the roles change and conditions are satisfied.
+    if (changes.user && this.user[0]?.roles === 'admin') {
+      this.initializePaymentChart();
+    }
+  }
 
- 
+  ngAfterViewInit() {
+    // If the user data is already available, trigger chart initialization after the view has loaded
+    if (this.user[0]?.roles === 'admin') {
+      this.initializePaymentChart();
+    }
+  }
+  async getPaymentList() {
+    try {
+      const res = await this.paymentService.getPayment();
+      if (res) {
+        this.paymentList = res;
+        this.processMonthlyPayments();
+        this.initializePaymentChart();
+      }
+    } catch (error: any) {
+      console.error('Error fetching payments:', error);
+    }
+  }
 
+  processMonthlyPayments() {
+    this.monthlyPayments = this.months.reduce((acc, month) => {
+      acc[month] = 0;
+      return acc;
+    }, {});
+
+    this.paymentList.forEach((payment: any) => {
+      const paymentDate = new Date(payment.payment_date);
+      const monthName = this.months[paymentDate.getMonth()];
+      this.monthlyPayments[monthName] += payment.amount;
+    });
+  }
+
+  initializePaymentChart() {
+    const canvas = document.getElementById('paymentChart') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    if (this.paymentChart) {
+      this.paymentChart.destroy();
+    }
+
+    this.paymentChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: this.months,
+        datasets: [
+          {
+            label: 'Monthly Payments (GHS)',
+            data: Object.values(this.monthlyPayments),
+            borderColor: '#6bd098',
+            backgroundColor: 'rgba(107, 208, 152, 0.2)',
+            borderWidth: 2,
+            pointRadius: 1,
+            pointHoverRadius: 1,
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+          },
+          tooltip: {
+            enabled: true,
+          },
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Month',
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Amount (GHS)',
+            },
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+
+
+
+  
 
   getExchangeRates() {
     const apiUrl = 'https://api.exchangerate-api.com/v4/latest/USD'; // Alternative API
@@ -386,7 +295,6 @@ canGlow(departureDate: string): boolean {
 
   return isToday && isAfterNoon;
 }
-
 
 
 }

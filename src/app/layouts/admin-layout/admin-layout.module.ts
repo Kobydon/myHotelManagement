@@ -43,6 +43,12 @@ import { BudgetComponent } from 'app/budget/budget.component';
 import { BudgetReportComponent } from 'app/budget-report/budget-report.component';
 import { DailyIncomeReportComponent } from 'app/daily-income-report/daily-income-report.component';
 import { DailyIncomeReportDatesBetweenComponent } from 'app/daily-income-report-dates-between/daily-income-report-dates-between.component';
+import { ItemComponent } from 'app/item/item.component';
+import { ItemCategoryComponent } from 'app/item-category/item-category.component';
+import { ItemGroupComponent } from 'app/item-group/item-group.component';
+import { ItemFamilyComponent } from 'app/item-family/item-family.component';
+import { StoreComponent } from 'app/store/store.component';
+import { StockComponent } from 'app/stock/stock.component';
 
 
     
@@ -100,7 +106,9 @@ import { DailyIncomeReportDatesBetweenComponent } from 'app/daily-income-report-
     BudgetReportComponent,
     DailyIncomeReportComponent,
 
-    DailyIncomeReportDatesBetweenComponent
+    DailyIncomeReportDatesBetweenComponent,
+    ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,
+    StoreComponent,StockComponent
 
 
 

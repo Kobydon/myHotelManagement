@@ -54,6 +54,51 @@ addExpense(dep:any) {
   //console.log(guest);
     return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_expense', dep, httpOptions));
   }  
+
+
+ 
+
+  addItem(dep:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_item', dep, httpOptions));
+    } 
+
+
+
+
+    deleteItem(id:number) {
+      if (confirm("do you want to delete?")) {
+      // const id = typeof ad === 'number' ? ad : ad.id;
+      const url = `${this.guestUrl}/guest/delete_item/${id}`;
+      return  lastValueFrom(  this.http.delete(url, httpOptions))
+      }
+      return of({});
+    }
+
+
+
+    
+    deleteStock(id:number) {
+      if (confirm("do you want to delete?")) {
+      // const id = typeof ad === 'number' ? ad : ad.id;
+      const url = `${this.guestUrl}/guest/delete_stock/${id}`;
+      return  lastValueFrom(  this.http.delete(url, httpOptions))
+      }
+      return of({});
+    }
+
+
+    deleteUnit(id:number) {
+      if (confirm("do you want to delete?")) {
+      // const id = typeof ad === 'number' ? ad : ad.id;
+      const url = `${this.guestUrl}/guest/delete_unit/${id}`;
+      return  lastValueFrom(  this.http.delete(url, httpOptions))
+      }
+      return of({});
+    }
+
+
+
   deleteExpense(id:number) {
     if (confirm("do you want to delete?")) {
     // const id = typeof ad === 'number' ? ad : ad.id;
@@ -68,11 +113,87 @@ addExpense(dep:any) {
       return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_expense_list'));
     }
 
+    getCategoryList() {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_category_list'));
+      }
+
+      getUnitList() {
+        //console.log(guest);
+          return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_unit_list'));
+        }
+
+        getStockList() {
+          //console.log(guest);
+            return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_stock_list'));
+          }
+        getFamilyList() {
+          //console.log(guest);
+            return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_family_list'));
+          }
+
+
+        
+        
+  
+      
+
+          getGroupList() {
+            //console.log(guest);
+              return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_group_list'));
+            }
+        
+  
+
+            updateUnit(dep:any) {
+              //console.log(guest);
+                return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_unit', dep, httpOptions));
+              }   
+
+
+              updateStock(dep:any) {
+                //console.log(guest);
+                  return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_stock', dep, httpOptions));
+                }   
+  
+
+                updateStore(dep:any) {
+                  //console.log(guest);
+                    return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_store', dep, httpOptions));
+                  }   
+    
+
+              updateGroup(dep:any) {
+                //console.log(guest);
+                  return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_group', dep, httpOptions));
+                }   
+  
+  
+
+              
+            updateFamily(dep:any) {
+              //console.log(guest);
+                return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_family', dep, httpOptions));
+              }   
+              
     
   updateExpense(dep:any) {
     //console.log(guest);
       return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_expense', dep, httpOptions));
-    }       
+    }   
+    
+      
+    
+  updateCategory(dep:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_category', dep, httpOptions));
+    }   
+    
+
+    updateItem(dep:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_item', dep, httpOptions));
+      }       
   
 getExpense(id: number){
   const url = `${this.guestUrl}/guest/get_expense/${id}`;
@@ -96,6 +217,9 @@ getcheckOut(): Observable<any[]>{
     const url = `${this.guestUrl}/guests/${id}`;
     return this.http.get<any>(url);
   }
+
+
+
 
   get_reserve_for(id: any){
     const url = `${this.guestUrl}/guest/get_reserve_for/${id}`;
@@ -138,6 +262,17 @@ getcheckOut(): Observable<any[]>{
     //console.log(guest);
       return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_guest', guest, httpOptions));
     }
+
+    addGroup(guest:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_itm', guest, httpOptions));
+      }
+
+
+    addFamily(guest:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_family', guest, httpOptions));
+      }
 
     getTask():Observable<any[]>{
       return this.http.get<any[]>(this.guestUrl + '/room/get_task');
@@ -187,6 +322,38 @@ getcheckOut(): Observable<any[]>{
   
 
 
+  deleteStore(id:number) {
+	  if (confirm("Are you sure to delete?")) {
+		// const id = typeof ad === 'number' ? ad : ad.id;
+		const url = `${this.guestUrl}/guest/delete_store/${id}`;
+		return  lastValueFrom(  this.http.delete(url, httpOptions))
+	  }
+	  return of({});
+  }
+  
+
+
+  deleteFamily(id:number) {
+	  if (confirm("Are you sure to delete?")) {
+		// const id = typeof ad === 'number' ? ad : ad.id;
+		const url = `${this.guestUrl}/guest/delete_family/${id}`;
+		return  lastValueFrom(  this.http.delete(url, httpOptions))
+	  }
+	  return of({});
+  }
+  
+
+
+  deleteCategory(id:number) {
+	  if (confirm("Are you sure to delete?")) {
+		// const id = typeof ad === 'number' ? ad : ad.id;
+		const url = `${this.guestUrl}/guest/delete_category/${id}`;
+		return  lastValueFrom(  this.http.delete(url, httpOptions))
+	  }
+	  return of({});
+  }
+  
+
   fetchBookings(id:number){
     const url = `${this.guestUrl}/room/get_booking_details/${id}`;
     return  lastValueFrom(this.http.get<any[]>(url));
@@ -227,6 +394,8 @@ getcheckOut(): Observable<any[]>{
 
 
   
+
+    
 
     
        
@@ -275,7 +444,21 @@ getcheckOut(): Observable<any[]>{
     addBudgetList(sch:any) {
       //console.log(guest);
         return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_budget', sch, httpOptions));
-      }      
+      }     
+      
+
+      addUnit(sch:any) {
+        //console.log(guest);
+          return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_unit', sch, httpOptions));
+        }  
+
+      
+   
+      addCategory(sch:any) {
+        //console.log(guest);
+          return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_category', sch, httpOptions));
+        }  
+
   updateBudget(sch:any) {
     //console.log(guest);
       return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_budget', sch, httpOptions));
@@ -297,10 +480,30 @@ getcheckOut(): Observable<any[]>{
     }
 
        
+    addStock(sch:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_stock', sch, httpOptions));
+      }
+  
+
+
+           
+    addStore(sch:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_store', sch, httpOptions));
+      }
+
   getIncomeList() {
     //console.log(guest);get
       return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_income_list'));
     }
+
+
+    getStoreList() {
+      //console.log(guest);get
+        return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_store_list'));
+      }
+
 
 
     getBudgetList() {
@@ -308,6 +511,13 @@ getcheckOut(): Observable<any[]>{
         return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_budget_list'));
       }
 
+
+
+      getItemsList() {
+        //console.log(guest);get
+          return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_item_list'));
+        }
+  
 
 }
 

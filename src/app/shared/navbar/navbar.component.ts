@@ -16,6 +16,7 @@ export class NavbarComponent implements OnInit{
     private nativeElement: Node;
     private toggleButton;
     private sidebarVisible: boolean;
+    searchTerm: string = '';
 
     public isCollapsed = true;
     @ViewChild("navbar-cmp", {static: false}) button;
@@ -92,6 +93,14 @@ export class NavbarComponent implements OnInit{
           navbar.classList.remove('bg-white');
         }
 
+      }
+
+      navigate() {
+        if (this.searchTerm) {
+          // Use the searchTerm as a direct path in the URL
+          const targetUrl = `/${this.searchTerm}`;
+          this.router.navigate([targetUrl]);
+        }
       }
 
       logout(){

@@ -45,6 +45,12 @@ import { BudgetComponent } from './budget/budget.component';
 import { IncomeComponent } from './income/income.component';
 import { DailyIncomeReportDatesBetweenComponent } from './daily-income-report-dates-between/daily-income-report-dates-between.component';
 import { DailyIncomeReportComponent } from './daily-income-report/daily-income-report.component';
+import { ItemComponent } from './item/item.component';
+import { StockComponent } from './stock/stock.component';
+import { ItemCategoryComponent } from './item-category/item-category.component';
+import { ItemFamilyComponent } from './item-family/item-family.component';
+import { ItemGroupComponent } from './item-group/item-group.component';
+import { StoreComponent } from './store/store.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -55,7 +61,8 @@ import { DailyIncomeReportComponent } from './daily-income-report/daily-income-r
     AdminLayoutComponent,
     ResLayoutComponent,
     VendorComponent,
-
+   
+ 
 
   
 

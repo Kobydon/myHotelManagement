@@ -44,6 +44,16 @@ export const ROUTES: RouteInfo[] = [
     { path: '/add-budget',    title: ' Budget ',        icon:'nc-caps-small', class: '' },
     { path: '/daily-income',    title: ' Daily Income - Expenditure Report  ',        icon:'nc-caps-small', class: '' },
     { path: '/daily-income-dates',    title: ' Daily Income - Expenditure Report  ',        icon:'nc-caps-small', class: '' },
+    { path: '/item',    title: ' Items ',        icon:'nc-caps-small', class: '' },
+
+    { path: '/item-unit',    title: ' Item Unit',        icon:'nc-caps-small', class: '' },
+    { path: '/item-family',    title: ' Item  Family ',        icon:'nc-caps-small', class: '' },
+    { path: '/item-category',    title: ' Item Category ',        icon:'nc-caps-small', class: '' },
+
+
+    { path: '/item-store',    title: ' Item  Store ',        icon:'nc-caps-small', class: '' },
+    { path: '/item-stock',    title: ' Item Stock ',        icon:'nc-caps-small', class: '' },
+
 
 
 ];

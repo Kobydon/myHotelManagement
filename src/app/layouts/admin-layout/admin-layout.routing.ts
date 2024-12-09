@@ -34,6 +34,12 @@ import { IncomeComponent } from 'app/income/income.component';
 import { BudgetReportComponent } from 'app/budget-report/budget-report.component';
 import { DailyIncomeReportComponent } from 'app/daily-income-report/daily-income-report.component';
 import { DailyIncomeReportDatesBetweenComponent } from 'app/daily-income-report-dates-between/daily-income-report-dates-between.component';
+import { ItemComponent } from 'app/item/item.component';
+import { ItemGroupComponent } from 'app/item-group/item-group.component';
+import { ItemFamilyComponent } from 'app/item-family/item-family.component';
+import { ItemCategoryComponent } from 'app/item-category/item-category.component';
+import { StoreComponent } from 'app/store/store.component';
+import { StockComponent } from 'app/stock/stock.component';
 
 
 
@@ -70,6 +76,15 @@ export const AdminLayoutRoutes: Routes = [
     {path:'budget-report',component:BudgetReportComponent},
     {path:'daily-income',component:DailyIncomeReportComponent},
     {path:'daily-income-dates',component:DailyIncomeReportDatesBetweenComponent},
+    {path:'item',component:ItemComponent},
+
+    {path:'item-unit',component:ItemGroupComponent},
+    {path:'item-family',component:ItemFamilyComponent},
+    {path:'item-category',component:ItemCategoryComponent},
+    {path:'item-store',component:StoreComponent},
+    {path:'item-stock',component:StockComponent},
+
+
 
 
 ]

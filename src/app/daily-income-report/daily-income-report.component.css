@@ -1,0 +1,51 @@
+/* General Container Styling */
+.container {
+    padding: 20px;
+  }
+  
+  /* Header Styling */
+  .header h2 {
+    margin-bottom: 0;
+    color: #333;
+  }
+  
+  .header p {
+    margin-top: 5px;
+    color: #666;
+  }
+  
+  /* Table Styling */
+  .table th, .table td {
+    vertical-align: middle;
+  }
+  
+  .table tfoot tr {
+    background-color: #f8f9fa;
+  }
+  
+  /* Footer Styling */
+  .footer {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  /* Buttons Styling */
+  .buttons .btn {
+    min-width: 120px;
+  }
+  
+  /* Adjust for Small Screens */
+  @media (max-width: 576px) {
+    .form-group input[type="date"] {
+      width: 100%;
+    }
+  
+    .buttons {
+      flex-direction: column;
+    }
+  
+    .buttons .btn {
+      margin-bottom: 10px;
+    }
+  }
+  

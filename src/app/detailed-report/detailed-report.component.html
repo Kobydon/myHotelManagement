@@ -5,16 +5,20 @@
         <div class="card-body p-4">
           <h4 class="text-center mb-4">Hotel Summary Report</h4>
 
-          <!-- Filters -->
+          <!-- Filters Section -->
           <div class="d-flex mb-3">
             <div class="flex-grow-1">
-              <!-- <input
+              <!-- Optional Search Bar -->
+              <!-- Uncomment if needed -->
+              <!-- 
+              <input
                 type="text"
                 class="form-control"
                 placeholder="Search by Guest Name"
                 id="myInput"
                 (keyup)="myFunction()"
-              /> -->
+              /> 
+              -->
             </div>
             <div class="ms-3">
               <form [formGroup]="paymentForm">
@@ -27,11 +31,7 @@
               </form>
             </div>
             <div class="ms-3">
-              <button
-                type="button"
-                class="btn btn-success btn-sm"
-                (click)="exportexcel()"
-              >
+              <button class="btn btn-success btn-sm" (click)="exportexcel()">
                 <i class="fa fa-file-excel-o"></i> Export to Excel
               </button>
             </div>
@@ -46,10 +46,10 @@
             </div>
           </div>
 
-          <!-- Show Reports Only When Date is Selected -->
+          <!-- Reports Section -->
           <div *ngIf="paymentForm.value.dates">
 
-            <!-- Room Payments Table -->
+            <!-- Room Payments -->
             <h5 class="text-gray-500">Rooms</h5>
             <table class="table table-bordered" id="excel-table">
               <thead class="table-light">
@@ -90,9 +90,9 @@
             <table class="table table-bordered">
               <thead class="table-light">
                 <tr class="bg-secondary text-white">
-                  <th>Number of Rooms Occupied</th>
-                  <th>Number of Rooms Available</th>
-                  <th>Total Number of Guests</th>
+                  <th>Rooms Occupied</th>
+                  <th>Rooms Available</th>
+                  <th>Total Guests</th>
                   <th>Occupancy (%)</th>
                 </tr>
               </thead>

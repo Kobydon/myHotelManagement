@@ -8,79 +8,114 @@
 
     padding-left: 5px;
 
-    background-color: lightgrey;
+    background-color: #ffff;
     display:none;
+    color: black;
     
   }
 
-  .dropdown-container :hover{
+  /* .dropdown-container :hover{
   background-color: burlywood;
   color: white;
 
 
 
-}
+} */
   .dropdown-container-child {
 
 padding-left: 5px;
 display:none;
-background-color: lightgrey;
+background-color: #fff;
+color: black;
 
 }
 
-.dropdown-container-child :hover{
+.dropdown-container-child {
+  padding-left: 5px;
+  display: none;
+  background-color: #fff;
+  color: black;
+}
+
+/* To target an element with ID "fina" inside .dropdown-container-child */
+.dropdown-container-child #fina {
+  color: black;
+}
+
+
+.dropdown-container #fina {
+  color: black;
+}
+
+.dropdown-container li {
+  border-bottom: none;
+}
+
+
+/* .dropdown-container-child :hover{
 
   background-color: burlywood;
   color: white;
+} */
+
+li{
+  border-bottom:1px solid white;
+
+
 }
 
+#fina{
+  color: white;
+}
+#fina:hover{
+  background-color: transparent;
+
+}
 </style>
-<div class="sidebar-wrapper">
-  <div class="logo " style="text-align: left; background-color:lightcyan"  >
+<div class="sidebar-wrapper" style="background-color: black;">
+  <div class="logo " style="text-align: left; background-color:#722F37"  >
     <a href="" class="simple-text logo-mini">
       <div class="logo-image-small" >
        
       </div>
     </a>
-    <!-- <a  class="simple-text logo-normal "  style="text-align: left;">
-      <img src="../../../assets/img/washignton.jpg" style="width: 90%;">
-    </a> -->
-    <h6 style="text-align: center;" class="form-kev" > West end Arena Hotel</h6>
+  
+    <h6 style="text-align: center; color: white;" class="form-side" > West end Arena Hotel</h6>
   </div>
 
 
 
     <ul class="nav" id="navlink">
-      <li >
+      <!-- <li >
         <input type="text"  (keyup)="myFunctionside()" id="myInputside" class="form-control" placeholder="search.." style="border:none;
          padding:8px;">
-      </li>
+      </li> -->
       <li >
-      <a  routerLink="dashboard"><i class="fa fa-tachometer text-primar">&nbsp;</i><span>Dashboard</span></a>
+      <a id="fina" routerLink="dashboard"><i id="fina" class="fa fa-tachometer text-primar">&nbsp;</i><span>Dashboard</span></a>
     </li>
      <li  *ngIf="user[0].roles=='admin'" >
-        <a  routerLink="all-users"><i class="fa fa-users "  >&nbsp;</i><span>User&nbsp;</span>
-          <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+        <a id="fina" routerLink="all-users"><i id="fina" class="fa fa-users "  >&nbsp;</i><span>User&nbsp;</span>
+          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
         </a>
       </li>
 
       <li  >
-        <a  routerLink="all-guest"><i class="fa fa-user "  >&nbsp;</i><span>Guest&nbsp;</span>
-          <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+        <a id="fina" routerLink="all-guest"><i id="fina" class="fa fa-user "  >&nbsp;</i><span>Guest&nbsp;</span>
+          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
         </a>
       </li>
       <li>
-        <a  style="font-size: small;"  routerLink="refund-list"><i class="fa fa-money " >&nbsp;</i>Refund</a>
+        <a id="fina" style="font-size: small;"  routerLink="refund-list"><i id="fina" class="fa fa-money " >&nbsp;</i>Refund</a>
       </li>
 <!-- 
 
 
     
         <div class="dropdown-container">
-        <li>  <a style="font-size: small;" routerLink="all-users"><i class="fa fa-list " >&nbsp;</i>All</a>
+        <li>  <a id="fina"style="font-size: small;" routerLink="all-users"><i id="fina" class="fa fa-list " >&nbsp;</i>All</a>
         </li>
         <li>
-          <a  style="font-size: small;"  routerLink="add-user"><i class="fa fa-plus " >&nbsp;</i>New User</a>
+          <a id="fina" style="font-size: small;"  routerLink="add-user"><i id="fina" class="fa fa-plus " >&nbsp;</i>New User</a>
         </li>
         </div> -->
 
@@ -89,38 +124,38 @@ background-color: lightgrey;
 
 
         <li   class="transparent" >
-          <a  ><i class="fa fa-bed " >&nbsp;</i><span>Room &nbsp;</span>
-            <!-- <i style="float: right;" class="fa fa-angle-down"></i> -->
-            <!-- <i class="fa fa-caret-down"   ></i> -->
-            <i class="fa fa-caret-down"  style="float:right;" ></i>
+          <a id="fina" ><i id="fina" class="fa fa-bed " >&nbsp;</i><span>Room &nbsp;</span>
+            <!-- <i id="fina" style="float: right;" class="fa fa-angle-down"></i> -->
+            <!-- <i id="fina" class="fa fa-caret-down"   ></i> -->
+            <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
           </a>
         </li>
   
           <div class="dropdown-container">
-          <li  *ngIf="user[0].roles=='admin'">  <a style="font-size: small;" routerLink="all-rooms"><i class="fa fa-list " >&nbsp;</i>All</a>
+          <li  *ngIf="user[0].roles=='admin'">  <a id="fina"style="font-size: small;" routerLink="all-rooms"><i id="fina" class="fa fa-list " >&nbsp;</i>All</a>
           </li>
 
           <li>
-            <a  *ngIf="user[0].roles=='admin'" style="font-size: small;"  routerLink="room-types"><i class="fa fa-bed  " >&nbsp;</i>Room Types</a>
+            <a id="fina" *ngIf="user[0].roles=='admin'" style="font-size: small;"  routerLink="room-types"><i id="fina" class="fa fa-bed  " >&nbsp;</i>Room Types</a>
           </li>
 
           <li>
-            <a  style="font-size: small;"  routerLink="all-bookings"><i class="fa fa-book " >&nbsp;</i>Booking</a>
+            <a id="fina" style="font-size: small;"  routerLink="all-bookings"><i id="fina" class="fa fa-book " >&nbsp;</i>Booking</a>
           </li>
           <li>
-            <a  style="font-size: small;"  routerLink="payment"><i class="fa fa-dollar " >&nbsp;</i>Payment</a>
+            <a id="fina" style="font-size: small;"  routerLink="payment"><i id="fina" class="fa fa-dollar " >&nbsp;</i>Payment</a>
           </li>
 
-          <!-- <li>  <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Add New Room</a></li> -->
-            <!-- <li class="transparent">  <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-tasks " >&nbsp;</i>Reservations</a>
+          <!-- <li>  <a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-list " >&nbsp;</i>Add New Room</a></li> -->
+            <!-- <li class="transparent">  <a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-tasks " >&nbsp;</i>Reservations</a>
 
               
             </li> -->
           
          
             <!-- <div class="dropdown-container-child"> -->
-              <li><a style="font-size: small;" routerLink="all-reservations"><i class="fa fa-pencil " >&nbsp;</i>Reservation List</a></li>
-              <!-- <li> <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-list " >&nbsp;</i>Add New </a></li> -->
+              <li><a id="fina"style="font-size: small;" routerLink="all-reservations"><i id="fina" class="fa fa-pencil " >&nbsp;</i>Reservation List</a></li>
+              <!-- <li> <a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-list " >&nbsp;</i>Add New </a></li> -->
              <!-- </div> -->
 
 
@@ -128,15 +163,15 @@ background-color: lightgrey;
 
 
              <li >  
-              <a style="font-size: small;" routerLink="room-status"><i class="fa fa-info-circle " >&nbsp;</i>Room Status</a>
+              <a id="fina"style="font-size: small;" routerLink="room-status"><i id="fina" class="fa fa-info-circle " >&nbsp;</i>Room Status</a>
 
               
              </li>
            
           
              <div class="dropdown-container-child">
-               <li><a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-check " >&nbsp;</i>Available</a></li>
-               <li> <a style="font-size: small;" routerLink="pages/user-list"><i class="fa fa-cancel " >&nbsp;</i>Occupied</a></li>
+               <li><a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-check " >&nbsp;</i>Available</a></li>
+               <li> <a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-cancel " >&nbsp;</i>Occupied</a></li>
               </div>
               
  
@@ -149,23 +184,23 @@ background-color: lightgrey;
  
 
           <li  class="transparent" >
-            <a   *ngIf="user[0].roles=='admin'"  ><i class="fa fa-users " >&nbsp;</i><span>Employee&nbsp;</span>
-              <!-- <i class="fa fa-caret-down"   ></i> -->
-              <i class="fa fa-caret-down"  style="float:right;" ></i>
+            <a id="fina"  *ngIf="user[0].roles=='admin'"  ><i id="fina" class="fa fa-users " >&nbsp;</i><span>Employee&nbsp;</span>
+              <!-- <i id="fina" class="fa fa-caret-down"   ></i> -->
+              <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
             </a>
           </li>
     
             <div class="dropdown-container"  >
-            <li>  <a style="font-size: small;" routerLink="employees"><i class="fa fa-list " >&nbsp;</i>All</a>
+            <li>  <a id="fina"style="font-size: small;" routerLink="employees"><i id="fina" class="fa fa-list " >&nbsp;</i>All</a>
             </li>
         
             <li class="transparent"  >
-              <a  style="font-size: small;" ><i class="fa fa-calendar-o " >&nbsp;</i>Attendance</a>
+              <a id="fina" style="font-size: small;" ><i id="fina" class="fa fa-calendar-o " >&nbsp;</i>Attendance</a>
             </li>
 
             
             <div class="dropdown-container-child">
-              <li><a style="font-size: small;" routerLink="attendance"><i class="fa fa-list " >&nbsp;</i>Attendance List</a></li>
+              <li><a id="fina"style="font-size: small;" routerLink="attendance"><i id="fina" class="fa fa-list " >&nbsp;</i>Attendance List</a></li>
              
              </div>
 
@@ -180,49 +215,49 @@ background-color: lightgrey;
 
   
         <li   class="transparent">
-        <a  ><i class="fa fa-handshake-o fa-fw " style="color: lih;">&nbsp;</i><span>Todo &nbsp;</span>
-        <!-- <i class="fa fa fa-caret-down"></i> -->
-        <i class="fa fa-caret-down"  style="float:right;" ></i>
+        <a id="fina" ><i id="fina" class="fa fa-handshake-o fa-fw " style="color: lih;">&nbsp;</i><span>Todo &nbsp;</span>
+        <!-- <i id="fina" class="fa fa fa-caret-down"></i> -->
+        <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
         </a>
         </li>
         <div class="dropdown-container">
-        <li> <a style="font-size: small;"  routerLink="/todo-list"><i class="fa fa-list " >&nbsp;</i>Todo List</a></li> 
+        <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="fa fa-list " >&nbsp;</i>Todo List</a></li> 
       <!-- <li>
-          <a  style="font-size: small;"  routerLink="pages/add-todo"><i class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>New todo</a>
+          <a id="fina" style="font-size: small;"  routerLink="pages/add-todo"><i id="fina" class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>New todo</a>
         </li> -->
 
         <li>
-          <a  style="font-size: small;"  routerLink="/house-keeping"><i class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>House Keeping</a>
+          <a id="fina" style="font-size: small;"  routerLink="/house-keeping"><i id="fina" class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>House Keeping</a>
         </li>
         </div>
 
               
       <li   class ="transparent">
-        <a *ngIf="user[0].roles=='accountant' || user[0].roles=='admin' "  ><i class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
-          <i class="fa fa-caret-down"  style="float:right;" ></i>
+        <a id="fina"*ngIf="user[0].roles=='accountant' || user[0].roles=='admin' "  ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
+          <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
         </a>
       </li>
 
       
 
       <div class="dropdown-container">
-        <!-- <li> <a style="font-size: small;"  routerLink="/detailed-report"><i class=" fa fa-list" >&nbsp;</i>Manage Student </a></li> -->
+        <!-- <li> <a id="fina"style="font-size: small;"  routerLink="/detailed-report"><i id="fina" class=" fa fa-list" >&nbsp;</i>Manage Student </a></li> -->
      
 
         <li   >
-          <a  routerLink="add-budget" ><i class="fa fa-money"  >&nbsp;</i><span>Budget&nbsp;</span>
-            <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+          <a id="fina" routerLink="add-budget" ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Budget&nbsp;</span>
+            <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
           </a>
         </li>
         <li   >
         <li   >
-          <a  routerLink="expenses" ><i class="fa fa-balance-scale"  >&nbsp;</i><span>Expenses&nbsp;</span>
-            <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+          <a id="fina" routerLink="expenses" ><i id="fina" class="fa fa-balance-scale"  >&nbsp;</i><span>Expenses&nbsp;</span>
+            <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
           </a>
         </li>
         <li   >
-          <a  routerLink="income" ><i class="fa fa-handshake-o"  >&nbsp;</i><span>Income&nbsp;</span>
-            <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+          <a id="fina" routerLink="income" ><i id="fina" class="fa fa-handshake-o"  >&nbsp;</i><span>Income&nbsp;</span>
+            <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
           </a></li>
        
           
@@ -233,172 +268,166 @@ background-color: lightgrey;
 
         
         <li   class="transparent">
-          <a *ngIf="user[0].roles=='admin'" ><i class="fa fa-file fa-fw " style="color: lih;">&nbsp;</i><span>Reports &nbsp;</span>
-          <!-- <i class="fa fa fa-caret-down"></i> -->
-          <i class="fa fa-caret-down"  style="float:right;" ></i>
+          <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-file fa-fw " style="color: lih;">&nbsp;</i><span>Reports &nbsp;</span>
+          <!-- <i id="fina" class="fa fa fa-caret-down"></i> -->
+          <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
           </a>
           </li>
           <div class="dropdown-container">
-           <li> <a style="font-size: small;"  routerLink="/budget-report"><i class=" fa fa-calendar" >&nbsp;</i>Badget </a></li>
-          <li> <a style="font-size: small;"  routerLink="/detailed-report"><i class=" fa fa-calendar" >&nbsp;</i>Detailed Summary </a></li>
+           <li> <a id="fina"style="font-size: small;"  routerLink="/budget-report"><i id="fina" class=" fa fa-calendar" >&nbsp;</i>Badget </a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/detailed-report"><i id="fina" class=" fa fa-calendar" >&nbsp;</i>Detailed Summary </a></li>
          
-            <li> <a style="font-size: small;"  routerLink="/daily-income"><i class="fa fa-calendar ">&nbsp;</i> Daily Income</a></li>
-            <!-- <i class=""></i> Icon for PDF Download -->
+            <li> <a id="fina"style="font-size: small;"  routerLink="/daily-income"><i id="fina" class="fa fa-calendar ">&nbsp;</i> Daily Income</a></li>
+            <!-- <i id="fina" class=""></i> Icon for PDF Download -->
     
             <li   >
-              <a  routerLink="daily-income-dates" ><i class="fa fa-calendar"  >&nbsp;</i><span>Income Dates&nbsp;</span>
-                <!-- <i class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+              <a id="fina" routerLink="daily-income-dates" ><i id="fina" class="fa fa-calendar"  >&nbsp;</i><span>Income Dates&nbsp;</span>
+                <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
               </a>
             </li>
             
-          <!-- <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-print" >&nbsp;</i> Stock</a></li>
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-print " >&nbsp;</i>Top Sales Item </a></li> 
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class="  fa fa-print" >&nbsp;</i>VAT/Tax </a></li> 
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-print " >&nbsp;</i>Bar  </a></li> 
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-print " >&nbsp;</i>Expenses </a></li> 
+          <!-- <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-print" >&nbsp;</i> Stock</a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-print " >&nbsp;</i>Top Sales Item </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="  fa fa-print" >&nbsp;</i>VAT/Tax </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-print " >&nbsp;</i>Bar  </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-print " >&nbsp;</i>Expenses </a></li> 
            -->
         <!-- <li>
-            <a  style="font-size: small;"  routerLink="pages/add-todo"><i class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>New todo</a>
+            <a id="fina" style="font-size: small;"  routerLink="pages/add-todo"><i id="fina" class="fa fa-plus " style="color: lightgreen;">&nbsp;</i>New todo</a>
           </li> -->
   
       
           </div>
 
             
-        <!-- <li   class="transparent">
-          <a *ngIf="user[0].roles=='admin'" ><i class="fa fa-building fa-fw " style="color: lih;">&nbsp;</i><span>Inventory &nbsp;</span>
+       <li   class="transparent">
+          <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-building fa-fw " style="color: lih;">&nbsp;</i><span>Inventory &nbsp;</span>
+            <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
        
           </a>
           </li>
           <div class="dropdown-container">
-          <li> <a style="font-size: small;"  routerLink="/purchase-request"><i class=" fa fa-dollar" >&nbsp;</i>Purchase Request </a></li>
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-shopping-basket" >&nbsp;</i> Purchase Order</a></li>
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-money " >&nbsp;</i>Accounts Receiv. </a></li> 
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class="  fa fa-book" >&nbsp;</i>General Ledger </a></li> 
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-list " >&nbsp;</i>Recieved Items  </a></li> 
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class="  fa fa-arrow-back" >&nbsp;</i>Return Request </a></li> 
-          <li> <a style="font-size: small;"  routerLink="/todo-list"><i class=" fa fa-tachnometer " >&nbsp;</i>Stock Usage  </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/purchase-request"><i id="fina" class=" fa fa-dollar" >&nbsp;</i>Purchase Request </a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-shopping-basket" >&nbsp;</i> Purchase Order</a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-money " >&nbsp;</i>Accounts Receiv. </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="  fa fa-book" >&nbsp;</i>General Ledger </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-list " >&nbsp;</i>Recieved Items  </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="  fa fa-arrow-back" >&nbsp;</i>Return Request </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-tachnometer " >&nbsp;</i>Stock Usage  </a></li> 
         
   
            
-          </div> -->
-          <!-- <li   class="transparent">
-            <a *ngIf="user[0].roles=='admin'" ><i class="fa fa-cog fa-fw " style="color: lih;">&nbsp;</i><span>Settings &nbsp;</span>
-        
+          </div> 
+           <li   class="transparent">
+            <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-cog fa-fw " style="color: lih;">&nbsp;</i><span>Settings &nbsp;</span>
+              <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
             </a>
             </li>
             <div class="dropdown-container">
-
-          <li class="transparent"> <a   ><i class="fa fa-calculator fa-fw">&nbsp;</i>  <span>Accounts &nbsp;</span>
-            <i class="fa fa-caret-down"  ></i>
-          </a></li>
+              <li   class="transparent">
+              <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-calculator fa-fw " style="color: lih;">&nbsp;</i><span>Accounts &nbsp;</span>
+                <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
+              </a>
+              </li>
           <div class="dropdown-container-child" id="dropdown">
-            <a style="font-size: small;" routerLink="/pages/room-list" class="btn "  >Account Families
+            <a id="fina"style="font-size: small;" routerLink="/pages/room-list" class="btn "  >Account Families
               
             </a>
-          <li> <a style="font-size: small;" class="btn " routerLink="/pages/add-room-type" >Account Groups</a></li> 
-          <li> <a  style="font-size: small;"  routerLink="/pages/add-room"  >Account</a></li> 
-           <li> <a  style="font-size: small;"  routerLink="/pages/add-room"  >Journal Voucher Codes</a></li>
-           <li><a  style="font-size: small;"  routerLink="/pages/add-room"  >Import Chart of Accounts</a></li> 
+          <li> <a id="fina"style="font-size: small;" class="btn " routerLink="/pages/add-room-type" >Account Groups</a></li> 
+          <li> <a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Account</a></li> 
+           <li> <a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Journal Voucher Codes</a></li>
+           <li><a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Import Chart of Accounts</a></li> 
   
-           <li><a  style="font-size: small;"  routerLink="/pages/add-room"  >JV code assignment</a></li> 
-           <li> <a  style="font-size: small;"  routerLink="/pages/add-room"  >Recalculate Account  Balance</a></li>
+           <li><a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >JV code assignment</a></li> 
+           <li> <a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Recalculate Account  Balance</a></li>
            </div>
   
-           -->
-          
-         <!-- <li class="transparent">
-          <a class="" ><i class="fa fa-building" >&nbsp;</i><span>Inventory &nbsp;</span>
            
+          
+          <li class="transparent">
+          <a id="fina"class="" ><i id="fina" class="fa fa-building" >&nbsp;</i><span>Inventory &nbsp;</span>
+            <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
           </a></li>
-   -->
-          <!-- <div class="dropdown-container">
-          <li>  <a style="font-size: small;"  routerLink="/pages/guest-list"> Units</a></li>
-           <li> <a  style="font-size: small;"   routerLink="/pages/add-guest"> Item Families</a></li>
+   
+           <div class="dropdown-container">
+          
+           
             
-           <li> <a  style="font-size: small;"> Item </a></li>
-            <li><a  style="font-size: small;"> Item Categories</a></li>
-            <li><a style="font-size: small;"> Item Groups</a></li>
-           <li><a style="font-size: small;"> Stores</a></li> 
-           <li> <a style="font-size: small;"> Candiments</a></li>
+           <li> <a id="fina" style="font-size: small;" routerLink="item"><i id="fina" class="fa fa-shopping-cart" >&nbsp;</i> Item </a></li>
+            <li><a id="fina" style="font-size: small;"  routerLink="item-category"><i id="fina" class="fa fa-mars-double" >&nbsp;</i> Item Categories </a></li>
   
-           <li> <a style="font-size: small;"> Import Items</a></li>
+           <li> <a id="fina"style="font-size: small;" routerLink="item-unit"><i id="fina" class="fa fa-balance-scale" >&nbsp;</i> Item Unit</a></li>
+           <li> <a id="fina"style="font-size: small;"routerLink="item-family"><i id="fina" class="fa fa-cubes" >&nbsp;</i> Item Family</a></li>
+
+           <li> <a id="fina"style="font-size: small;" routerLink="item-stock"><i id="fina" class="	fa fa-hourglass-3" >&nbsp;</i>Stock</a></li>
+           <li> <a id="fina"style="font-size: small;"routerLink="item-store"><i id="fina" class="	fa fa-building-o" >&nbsp;</i> Store</a></li>
   
           </div>
           <li class="transparent">
-          <a class=""  *ngIf="user[0].roles=='admin'" ><i class="fa fa-male fa-fw " style="color: lih;">&nbsp;</i><span>Vendors &nbsp;</span>
+          <a id="fina"class=""  *ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-male fa-fw " style="color: lih;">&nbsp;</i><span>Vendors &nbsp;</span>
             
           </a></li>
    
           <div class="dropdown-container">
-           <li> <a style="font-size: small;"  routerLink="/pages/payment-list">Vendors</a></li>
-           <li><a style="font-size: small;"  routerLink="/pages/payment-list">Vendor Tax Code</a></li> 
+           <li> <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Vendors</a></li>
+           <li><a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Vendor Tax Code</a></li> 
            
           </div>
          
-   -->
-         <!-- <li class="transparent"></li>
-        <li>  <a class=""  ><i class="fa fa-dollar fa-fw " style="color: lih;">&nbsp;</i><span>Finance  &nbsp;</span>
+   
+              <!-- <li ></li> -->
+        <li class="transparent">  <a id="fina"class=""  ><i id="fina" class="fa fa-dollar fa-fw " style="color: lih;">&nbsp;</i><span>Finance  &nbsp;</span>
           
           </a></li>
    
           <div class="dropdown-container">
-          <li> <a style="font-size: small;"  routerLink="/pages/payment-list">Financial Setu</a></li> 
-         <li>  <a style="font-size: small;"  routerLink="/pages/payment-list">GOP deductions</a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Financial Setu</a></li> 
+         <li>  <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">GOP deductions</a></li> 
            
           </div>
   
          <li class="transparent">
-          <a class=""  ><i class="fa fa-users fa-fw " style="color: lih;">&nbsp;</i><span>Staff  &nbsp;</span>
+          <a id="fina"class=""  ><i id="fina" class="fa fa-users fa-fw " style="color: lih;">&nbsp;</i><span>Staff  &nbsp;</span>
        
           </a></li>
    
           <div class="dropdown-container">
-          <li><a style="font-size: small;"  routerLink="/pages/payment-list">Staff levels</a></li>  
-           <li><a style="font-size: small;"  routerLink="/pages/payment-list">Staff nights</a></li> 
+          <li><a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Staff levels</a></li>  
+           <li><a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Staff nights</a></li> 
            
           </div>
   
   
           <li class="transparent">
-          <a class=""  ><i class="fa fa-tag fa-fw " style="color: lih;">&nbsp;</i><span>Food Cost  &nbsp;</span>
+          <a id="fina"class=""  ><i id="fina" class="fa fa-tag fa-fw " style="color: lih;">&nbsp;</i><span>Food Cost  &nbsp;</span>
          
           </a></li>
    
           <div class="dropdown-container">
-          <li> <a style="font-size: small;"  routerLink="/pages/payment-list">Extral meals</a></li> 
-           <li><a style="font-size: small;"  routerLink="/pages/payment-list">Staff food  cost</a></li> 
-           <li> <a style="font-size: small;"  routerLink="/pages/payment-list">Expense  accounts</a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Extral meals</a></li> 
+           <li><a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Staff food  cost</a></li> 
+           <li> <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Expense  accounts</a></li>
            
           </div>
     <li class="transparent">
-          <a class=""  ><i class="fa fa-file fa-fw " style="color: lih;">&nbsp;</i><span>Invoice Reminders  &nbsp;</span>
+          <a id="fina"class=""  ><i id="fina" class="fa fa-file fa-fw " style="color: lih;">&nbsp;</i><span>Invoice Reminders  &nbsp;</span>
          
           </a></li>
    
           <div class="dropdown-container">
-         <li>   <a style="font-size: small;"  routerLink="/pages/payment-list">Accounts Receivable</a></li>
+         <li>   <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Accounts Receivable</a></li>
             
            
           </div>
   
             </div>
- -->
+ 
 
-            <!-- <li   >
-              <a  routerLink="expenses" ><i class="fa fa-balance-scale"  >&nbsp;</i><span>Expenses&nbsp;</span>
-          
-              </a>
-            </li> -->
-<!-- 
-          <li> <a style="font-size: small;"  routerLink="/restaurant"><i class=" fa fa-cutlery " >&nbsp;</i>Restaurant </a></li>
 
-          <li> 
-
-            <li> <a style="font-size: small;"  routerLink="/calender"><i class=" fa fa-calender-o " >&nbsp;</i>Calender </a></li> -->
+ 
 
             <li> 
-        <a routerLink="user"><i class="fa fa-user fa-fw " style="color: lih;">&nbsp;</i><span>Profile</span></a>
+        <a id="fina"routerLink="user"><i id="fina" class="fa fa-user fa-fw " style="color: lih;">&nbsp;</i><span>Profile</span></a>
       </li>  
        
         
