@@ -208,11 +208,8 @@ li{
 
 
 
-
-            
-
-
-
+            <li><a id="fina"style="font-size: small;" routerLink="department"><i id="fina" class="fa fa-building " >&nbsp;</i>Department</a></li>
+             
   
         <li   class="transparent">
         <a id="fina" ><i id="fina" class="fa fa-handshake-o fa-fw " style="color: lih;">&nbsp;</i><span>Todo &nbsp;</span>
@@ -308,7 +305,7 @@ li{
           </li>
           <div class="dropdown-container">
           <li> <a id="fina"style="font-size: small;"  routerLink="/purchase-request"><i id="fina" class=" fa fa-dollar" >&nbsp;</i>Purchase Request </a></li>
-          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-shopping-basket" >&nbsp;</i> Purchase Order</a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/purchase-order"><i id="fina" class=" fa fa-shopping-basket" >&nbsp;</i> Purchase Order</a></li>
           <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-money " >&nbsp;</i>Accounts Receiv. </a></li> 
           <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="  fa fa-book" >&nbsp;</i>General Ledger </a></li> 
           <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-list " >&nbsp;</i>Recieved Items  </a></li> 
@@ -330,10 +327,11 @@ li{
               </a>
               </li>
           <div class="dropdown-container-child" id="dropdown">
-            <a id="fina"style="font-size: small;" routerLink="/pages/room-list" class="btn "  >Account Families
+            <li>
+            <a id="fina"style="font-size: small;" routerLink="/pages/room-list"  >Account Families
               
-            </a>
-          <li> <a id="fina"style="font-size: small;" class="btn " routerLink="/pages/add-room-type" >Account Groups</a></li> 
+            </a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/pages/add-room-type" >Account Groups</a></li> 
           <li> <a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Account</a></li> 
            <li> <a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Journal Voucher Codes</a></li>
            <li><a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Import Chart of Accounts</a></li> 
@@ -358,18 +356,28 @@ li{
   
            <li> <a id="fina"style="font-size: small;" routerLink="item-unit"><i id="fina" class="fa fa-balance-scale" >&nbsp;</i> Item Unit</a></li>
            <li> <a id="fina"style="font-size: small;"routerLink="item-family"><i id="fina" class="fa fa-cubes" >&nbsp;</i> Item Family</a></li>
+           <li class="transparent">
+            <a id="fina"class="" ><i id="fina" class="fa fa-hourglass-3" >&nbsp;</i><span>Stock &nbsp;</span>
+              <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
+            </a></li>
+            <div class="dropdown-container">
+              <li> <a id="fina"style="font-size: small;" routerLink="item-stock"><i id="fina" class="	fa fa-pencil" >&nbsp;</i>Manage Stock</a></li>
+              <li> <a id="fina"style="font-size: small;" routerLink="item-transfer"><i id="fina" class="	fa fa-exchange" >&nbsp;</i>Transfer Stock</a></li>  
+            
+            </div>
 
-           <li> <a id="fina"style="font-size: small;" routerLink="item-stock"><i id="fina" class="	fa fa-hourglass-3" >&nbsp;</i>Stock</a></li>
+     
+          
            <li> <a id="fina"style="font-size: small;"routerLink="item-store"><i id="fina" class="	fa fa-building-o" >&nbsp;</i> Store</a></li>
   
           </div>
           <li class="transparent">
-          <a id="fina"class=""  *ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-male fa-fw " style="color: lih;">&nbsp;</i><span>Vendors &nbsp;</span>
+          <a id="fina"class=""  *ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-group fa-fw " style="color: lih;">&nbsp;</i><span>Vendors &nbsp;</span>
             
           </a></li>
    
           <div class="dropdown-container">
-           <li> <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Vendors</a></li>
+           <li> <a id="fina"style="font-size: small;"  routerLink="vendor"><i class="fa fa-users"></i>Vendors</a></li>
            <li><a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Vendor Tax Code</a></li> 
            
           </div>

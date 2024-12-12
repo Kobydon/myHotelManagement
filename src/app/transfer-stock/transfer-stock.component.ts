@@ -1,31 +1,31 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators,FormControlName } from '@angular/forms';
+
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import * as XLSX from 'xlsx';
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
 @Component({
-  selector: 'purchase-request',
-  templateUrl: './purchase-request.component.html',
-  styleUrls: ['./purchase-request.component.css']
+  selector: 'transfer-stock',
+  templateUrl: './transfer-stock.component.html',
+  styleUrls: ['./transfer-stock.component.css']
 })
-export class PurchaseRequestComponent implements OnInit {
+export class TransferStockComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI;
-  @ViewChild('invoiceContent') invoiceContent!: ElementRef;
   itemsList: any[] = [];
-  stockList: any[] = [];
+  departmentList: any[] = [];
+  transferList: any[] = [];
   storeList: any[] = [];
-  purchaseList: any[] = [];
- departmentList: any[] = [];
+unitList: any[] = [];
   displayStyle = "none";
   header = '';
   page = 1;
-  
   pageSize: number = 10; // Change to whatever page size you need
   totalAmount: number = 0;
   itemForm!: FormGroup;
   user:any[]=[];
+ 
   constructor(
     private fb: FormBuilder,private userService:userService,
     private toastr: ToastrService,
@@ -34,27 +34,23 @@ export class PurchaseRequestComponent implements OnInit {
     // Initialize the form
     this.itemForm = this.fb.group({
       id: ['', Validators.required],
-      item: ['', Validators.required],
-      quantity: ['', Validators.required],
-      unit_price: ['', Validators.required],
-      total_cost: ['', Validators.required],
+      name: ['', Validators.required],
+      description: ['', Validators.required],
       department: ['', Validators.required],
-
-      store: ['', Validators.required],
-    
+      quantity: ['', Validators.required],
     
     });
   }
+
   ngOnInit(): void {
     this.getDepartmentList();
-    this.getPurchaseList();
-   
-    this.getItemsList()
-    this.getUser();
-    this.getVendorList();
+    this.getItemsList();
+    this.getTransferList()
+    this.getUser()
   }
 
   
+    
   async getUser(){
     try{
         var res = await this.userService.getUser()
@@ -67,12 +63,13 @@ export class PurchaseRequestComponent implements OnInit {
 
  }
 
- async getVendorList() {
+  
+ async getItemsList() {
   try {
     // this.loading.start();
-    const res = await this.guestService.getVendorList(); // Assuming getItemsList() fetches the items from the API
+    const res = await this.guestService.getItemsList(); // Assuming getItemsList() fetches the items from the API
     if (res) {
-      this.storeList = res;
+      this.itemsList = res;
     }
   } catch (error) {
     this.toastr.error('Error fetching items list');
@@ -82,12 +79,12 @@ export class PurchaseRequestComponent implements OnInit {
 }
 
 
-  async getItemsList() {
+  async getTransferList() {
     try {
       // this.loading.start();
-      const res = await this.guestService.getItemsList(); // Assuming getItemsList() fetches the items from the API
+      const res = await this.guestService.getStockTransferList(); // Assuming getItemsList() fetches the items from the API
       if (res) {
-        this.itemsList = res;
+        this.transferList = res;
       }
     } catch (error) {
       this.toastr.error('Error fetching items list');
@@ -95,7 +92,7 @@ export class PurchaseRequestComponent implements OnInit {
       // this.loading.stop();
     }
   }
-
+  
   async getDepartmentList() {
     try {
       // this.loading.start();
@@ -111,19 +108,6 @@ export class PurchaseRequestComponent implements OnInit {
   }
 
 
-  async getPurchaseList() {
-    try {
-      // this.loading.start();
-      const res = await this.guestService.getPurchaseList(); // Assuming getItemsList() fetches the items from the API
-      if (res) {
-        this.purchaseList = res;
-      }
-    } catch (error) {
-      this.toastr.error('Error fetching department list');
-    } finally {
-      // this.loading.stop();
-    }
-  }
 
 
   
@@ -144,43 +128,19 @@ export class PurchaseRequestComponent implements OnInit {
   }
 
   // Save new or updated item
-  async savePurchase(itemData: any) {
+  async saveTransfer(itemData: any) {
     try {
       this.loading.start();
       let res;
       if (this.header === 'Add New') {
-        res = await this.guestService.addPurchase(itemData); // Assuming addItem() adds a new item
+        res = await this.guestService.addStockTransfer(itemData); // Assuming addItem() adds a new item
         this.toastr.success('Item successfully added');
       } else if (this.header === 'Edit') {
-        res = await this.guestService.updatePurchase(itemData); // Assuming updateItem() updates an existing item
+        res = await this.guestService.updateStockTransfer(itemData); // Assuming updateItem() updates an existing item
         this.toastr.success('Item successfully updated');
       }
       if (res) {
-        this.getPurchaseList(); // Refresh the item list
-        this.closePopup(); // Close the modal
-      }
-    } catch (error) {
-      this.toastr.error('Error saving item');
-    } finally {
-      this.loading.stop();
-    }
-  }
-
-
-
-  async approvePurchase(itemData: any) {
-    this.itemForm.patchValue(itemData)
-    const ad ={
-      id:itemData
-    }
-    try {
-      this.loading.start();
-      let res;
-     
-
-      res = await this.guestService.approvePurchase(ad);
-      if (res) {
-        this.getPurchaseList(); // Refresh the item list
+        this.getTransferList(); // Refresh the item list
         this.closePopup(); // Close the modal
       }
     } catch (error) {
@@ -191,13 +151,13 @@ export class PurchaseRequestComponent implements OnInit {
   }
 
   // Delete item
-  async deletePurchase(itemId: number) {
+  async deleteTransfer(itemId: number) {
     try {
       this.loading.start();
-      const res = await this.guestService.deletePurchase(itemId); // Assuming deleteItem() deletes an item
+      const res = await this.guestService.deleteDepartment(itemId); // Assuming deleteItem() deletes an item
       if (res) {
         this.toastr.success('Item successfully deleted');
-        this.getPurchaseList(); // Refresh the item list
+        this.getTransferList(); // Refresh the item list
       }
     } catch (error) {
       this.toastr.error('Error deleting item');
@@ -212,7 +172,7 @@ export class PurchaseRequestComponent implements OnInit {
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, 'items_list.xlsx');
+    XLSX.writeFile(wb, 'stock_transfer.xlsx');
   }
 
   // Search items (filter based on input)
@@ -239,31 +199,7 @@ export class PurchaseRequestComponent implements OnInit {
     // Logic for handling page change, if necessary
   }
 
-  printInvoice() {
-    const printContents = this.invoiceContent.nativeElement.innerHTML;
-    const printWindow = window.open('', '', 'height=800,width=600');
 
-    if (printWindow) {
-      printWindow.document.write('<html><head><title>Invoice</title>');
-      printWindow.document.write(
-        `<style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          h1, h3 { text-align: center; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          table, th, td { border: 1px solid #ddd; padding: 8px; }
-          th { background-color: #f4f4f4; }
-          .text-right { text-align: right; }
-          .text-center { text-align: center; }
-          .invoice-footer { margin-top: 20px; text-align: center; }
-        </style>`
-      );
-      printWindow.document.write('</head><body>');
-      printWindow.document.write(printContents);
-      printWindow.document.write('</body></html>');
-      printWindow.document.close();
-      printWindow.print();
-    }
-  }
+
+
 }
-
-

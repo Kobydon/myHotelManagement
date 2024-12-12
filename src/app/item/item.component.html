@@ -133,7 +133,7 @@
                         <div class="form-group">
                           <label>Category</label>
                           <select    formControlName="category" class="form-control">
-                            <option value="" hidden selected>------</option>
+                            <option value=""  disabled>Select</option>
                             <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
                           </select>
                         </div>
@@ -155,7 +155,7 @@
                         <div class="form-group">
                           <label>Family</label>
                           <select    formControlName="family" class="form-control">
-                            <option value="" hidden selected>------</option>
+                            <option value="" hidden selected>Select</option>
                             <option *ngFor="let item of familyList" value="{{item.name}}">{{item.name}}</option>
                           </select>
                         </div>
@@ -167,7 +167,7 @@
                         <div class="form-group">
                           <label>Unit</label>
                           <select    formControlName="unit" class="form-control">
-                            <option value="" hidden selected>------</option>
+                            <option value="" hidden selected>Select</option>
                             <option *ngFor="let item of unitList" value="{{item.name}}">{{item.name}}</option>
                           </select>
                         </div>

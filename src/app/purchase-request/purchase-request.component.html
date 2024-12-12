@@ -1,147 +1,218 @@
-<div class="col-md-15 " style="background-color:lightgray" >
-    <div class="card card-house">
-        <div class="card-header">
-          <!-- <h5 class="card-title">Edit Profile</h5> -->
-      
-  
-    <button class="btn btn-success"  ><i class="fa fa-plus" routerLink="/add-purchase" > Add New</i></button>
-</div>
-  
+<div class="page">
+  <div class="row" *blockUI="'loading'">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-body p-2">
+          <div class="menus mb-3">
+            <div class="d-flex">
+              <div class="me-auto">
+                <input
+                  class="form-control"
+                  placeholder="Search for items..."
+                  type="text"
+                  id="myInput"
+                  (keyup)="searchItems()"
+                  style="width: 350px; height: 40px;"
+                />
+              </div>
+              <div>
+                <div aria-label="Basic example" class="btn-group">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-info me-2"
+                  (click)="openPopup('Add New')"
+                >
+                  Add New
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-warning"
+                  (click)="exportExcel()"
+                >
+                  <i class="fa fa-file-excel-o"></i> Export
+                </button>
+              </div>
+              </div>
+            </div>
+          </div>
 
-    <div class="card-body">
-  
-  <form role="form " >
+          <!-- Item table -->
+          <div class="table-responsive">
+            <table class="table table-striped" id="excel-table">
+              <thead class="table-light">
+                <tr class="bg-secondary">
+                  <th scope="col">Request Number</th>
+                  <th scope="col">Item</th>
+                  <th scope="col">Requested By</th>
+                  <th scope="col">Department</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col">Unit Price</th>
+                  <th scope="col">Total Cost</th>
+                  <th scope="col">Request Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Approved By</th>
+                  <th scope="col">Approved Date</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of purchaseList | slice: (page - 1) * pageSize : page * pageSize; index as i">
+                  <td>{{ item.id }}</td>
+                  <td>{{ item.item }}</td>
+                  <td>{{ item.requested_by }}</td>
+                  <td>{{ item.Department }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.unit_price | currency }}</td>
+                  <td>{{ item.total_cost | currency }}</td>
+                  <td>{{ item.created_date | date }}</td>
+                  <td>{{ item.status }}</td>
+                  <td>{{ item.approved_by }}</td>
+                  <td>{{ item.approved_date | date }}</td>
+                  <td>
+                    <button
+                      class="btn btn-info btn-sm"
+                      (click)="openPopup('Edit', item)"
+                      [disabled]="item.status=='Success'"
+                    >
+                      <i class="fa fa-edit"></i>
+                    </button>
+                    <button
+                      class="btn btn-danger btn-sm"
+                      *ngIf="user[0].roles === 'admin'"
+                      (click)="deletePurchase(item.id)" [disabled]="item.status=='Success'"
+                    >
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <button
+                      class="btn btn-success btn-sm"
+                      *ngIf="user[0].roles === 'admin'" [disabled]="item.status=='Success'"
+                      (click)="approvePurchase(item.id)"
+                    >
+                      <i class="fa fa-check-circle"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-    <div class="row">
-      <div class="col-sm-4">
-    <div class="form-group " >
-    
-       
-      <label for="Username">File number </label>
-      
-      <input type="text" class="form-control" placeholder="room type" ><button type ="button"><i class="fa fa-search "></i></button>
-    
-    </div>
-    </div>
-    
-    
-      <div class="col-sm-4">
-    <div class="form-group " >
-       <label for="">Description</label>
-      <input type="text" class="form-control"  >
-      </div>
-    </div>
-
-
-    <div class="col-sm-4">
-      <div class="form-group " >
-         <label for="">Buyer</label>
-        <select name="buyer" id="" class="form-control">
-          <option value="inhouse">k@gmail.com</option>
-          <option value="vacant">kofi@gmail.com</option>
-        </select>
+          <!-- Pagination -->
+          <div class="row pt-3">
+            <div class="col-md-9">
+              <ngb-pagination
+                [collectionSize]="purchaseList.length"
+                [pageSize]="pageSize"
+                [(page)]="page"
+                (pageChange)="pageClick()"
+                [maxSize]="5"
+                [rotate]="true"
+                [ellipses]="false"
+                [boundaryLinks]="true"
+              >
+                <ng-template ngbPaginationFirst>First</ng-template>
+                <ng-template ngbPaginationLast>Last</ng-template>
+                <ng-template ngbPaginationPrevious>Prev</ng-template>
+                <ng-template ngbPaginationNext>Next</ng-template>
+                <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+              </ngb-pagination>
+            </div>
+          </div>
         </div>
       </div>
-    
     </div>
+  </div>
 
+  <!-- Modal for adding/editing items -->
+  <div
+    class="modal"
+    tabindex="-1"
+    role="dialog"
+    [ngStyle]="{ display: displayStyle }"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ header }}</h5>
+          <button type="button" class="btn-close" (click)="closePopup()">x</button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="itemForm" (ngSubmit)="savePurchase(itemForm.value)">
+            <div class="mb-3">
+              <label for="item" class="form-label">Item</label>
+              <select id="item" formControlName="item" class="form-control">
+                <option value="" hidden>------</option>
+                <option *ngFor="let item of itemsList" [value]="item.name">{{ item.name }}</option>
+              </select>
+            </div>
 
+            <div class="mb-3">
+              <label for="department" class="form-label">Department</label>
+              <select id="department" formControlName="department" class="form-control">
+                <!-- <option value="" disabled>------</option> -->
+                <option *ngFor="let dept of departmentList" [value]="dept.name">{{ dept.name }}</option>
+              </select>
+            </div>
 
-    <!--status-->
-    <div class="row">
-      <div class="col-sm-4">
-    <div class="form-group " >
-    
-       
-      <label for="Username">Number </label>
-      <input type="text" class="form-control"  >
-    
-    </div>
-    </div>
-    
-    
-      <div class="col-sm-4">
-    <div class="form-group " >
-      <label for="from">From Date </label>
-      <input type="date" class="form-control"  >
-        
-      </div>
-    </div>
+            <div class="mb-3">
+              <label for="quantity" class="form-label">Quantity</label>
+              <input
+                type="number"
+                id="quantity"
+                formControlName="quantity"
+                class="form-control"
+              />
+            </div>
 
-    <div class="col-sm-4">
-      <div class="form-group " >
-        <label for="from">To Date </label>
-        <input type="date" class="form-control"  >
-          
+            <div class="mb-3">
+              <label for="unitPrice" class="form-label">Unit Price</label>
+              <input
+                type="number"
+                id="unitPrice"
+                formControlName="unit_price"
+                class="form-control"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="totalCost" class="form-label">Total Cost</label>
+              <input
+                type="number"
+                id="totalCost"
+                value="{{itemForm.value.unit_price * itemForm.value.quantity}}"
+                formControlName="total_cost"
+                class="form-control"
+              />
+            </div>
+
+            <div class="mb-3">
+              <label for="store" class="form-label">Vendor</label>
+              <select id="store" formControlName="store" class="form-control">
+                <!-- <option value="" disabled>------</option>\ -->
+                <option *ngFor="let store of storeList" [value]="store.name">{{ store.name }}</option>
+              </select>
+            </div>
+
+            <div class="text-end">
+              <div class="btn-group">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                *ngIf="header === 'Add New'"
+              >
+                Save
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                *ngIf="header === 'Edit'"
+              >
+                Update
+              </button>
+            </div>
+            </div>
+          </form>
         </div>
       </div>
-</div>
-
-  
-
-
-   <button type="submit" class="btn btn-info" >Search</button>
- 
-
-
-  
-
-
-    </form>
-</div>
     </div>
-
-    <div class="card card-house">
-        <div class="card-header">
-          <!-- <h5 class="card-title">Edit Profile</h5> -->
-        </div>
-
-        <div class="card-body">
-
-  <form role="form " >
-    <table class="table table-responsive"  style="width:100%">
-      <thead >
-        <tr>
-          <th> #</th>
-          <th>Item</th>
-          <th>Quantity</th>
-          <th>Description</th>
-          <th>Date*</th>
-          <th>Buyer</th>
-
-          <th>Status</th>
-         
-          <!-- <th>Comments</th> -->
-         
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-        <td style="font-weight: bold;">
-          1
-        </td>
-        <td style="font-weight: bold;"> 
-         order
-      </td>
-      
-        <td style="font-weight: bold;">
-            2020-09-01
-        </td >
-        <td style="font-weight: bold;">  
-          
-        </td >
-        <td style="font-weight: bold;"> 
-          Pending approval
-        </td >
-      </tr>
- 
-      </tbody>
-      
-    </table>
-
-
- 
-    </form></div></div>
-
-
+  </div>
 </div>

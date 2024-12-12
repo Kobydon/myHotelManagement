@@ -51,6 +51,10 @@ import { ItemCategoryComponent } from './item-category/item-category.component';
 import { ItemFamilyComponent } from './item-family/item-family.component';
 import { ItemGroupComponent } from './item-group/item-group.component';
 import { StoreComponent } from './store/store.component';
+import { TransferStockComponent } from './transfer-stock/transfer-stock.component';
+import { DepartmentsComponent } from './departments/departments.component';
+import { VendorsComponent } from './vendors/vendors.component';
+import { PurchaseOrderComponent } from './purchase-order/purchase-order.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -60,7 +64,10 @@ import { StoreComponent } from './store/store.component';
     AppComponent,
     AdminLayoutComponent,
     ResLayoutComponent,
-    VendorComponent,
+  
+    VendorsComponent,
+     
+  
    
  
 

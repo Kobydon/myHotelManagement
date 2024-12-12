@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import * as XLSX from 'xlsx';
 import { GuestService } from 'app/services/guest.service';
+import { userService } from 'app/user.service';
 
 @Component({
   selector: 'item-family',
@@ -14,6 +15,7 @@ export class ItemFamilyComponent implements OnInit {
   itemsList: any[] = [];
   categoryList: any[] = [];
   familyList: any[] = [];
+  user:any[]=[];
   
   
 unitList: any[] = [];
@@ -25,7 +27,7 @@ unitList: any[] = [];
   itemForm!: FormGroup;
   @BlockUI('loading') loading!: NgBlockUI;
   constructor(
-    private fb: FormBuilder,
+    private fb: FormBuilder,private userService:userService,
     private toastr: ToastrService,
     private guestService:GuestService // AssumingGuestService handles your items
   
@@ -42,11 +44,25 @@ unitList: any[] = [];
   ngOnInit(): void {
    
     this.getFamilyList();
+    this.getUser();
   
   }
 
 
   
+  
+  async getUser(){
+    try{
+        var res = await this.userService.getUser()
+        if (res) this.user=res;
+
+    }catch(err){console.log(err)}
+    finally{console.log("success");}
+  
+
+
+ }
+
   
 
   async getFamilyList() {
@@ -110,7 +126,7 @@ unitList: any[] = [];
       this.loading.start();
       const res = await this.guestService.deleteFamily(itemId); // Assuming deleteItem() deletes an item
       if (res) {
-        this.toastr.success('Item successfully deleted');
+        // this.toastr.success('Item successfully deleted');
         this.getFamilyList(); // Refresh the item list
       }
     } catch (error) {

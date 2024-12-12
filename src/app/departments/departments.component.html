@@ -27,7 +27,7 @@
                 style="float: right;"
                 (click)="openPopup('Add New')"
               >
-                Add New Store
+                Add New Department
               </button>
               <button
                 type="button"
@@ -45,19 +45,19 @@
                 <thead class="table-light">
                   <tr class="bg-secondary">
                     <th scope="col">#</th>
-                    <th scope="col">Store Name</th>
-                    <th scope="col">Category</th>
+                    <th scope="col">Department Name</th>
                     <th scope="col">Description</th>
+                    <th scope="col">HOD</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of storeList | slice: (page-1) * pageSize : page * pageSize; index as i">
+                  <tr *ngFor="let item of departmentList | slice: (page-1) * pageSize : page * pageSize; index as i">
                     <th>{{ i + 1 }}</th>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.Category }}</td>
-                    <!-- <td>{{ item.price | currency }}</td> -->
                     <td>{{ item.description }}</td>
+                    <!-- <td>{{ item.price | currency }}</td> -->
+                    <td>{{ item.hod }}</td>
                     <td>
                       <i
                         class="fa fa-edit fa-lg text-info"
@@ -66,7 +66,7 @@
                       <i
                         *ngIf="user[0].roles === 'admin'"
                         class="fa fa-close fa-lg text-danger"
-                        (click)="deleteStore(item.id)"
+                        (click)="deleteDepartment(item.id)"
                       ></i>
                     </td>
                   </tr>
@@ -78,7 +78,7 @@
             <div class="row pt-3">
               <div class="col-md-9">
                 <ngb-pagination
-                  [collectionSize]="storeList.length"
+                  [collectionSize]="departmentList.length"
                   [pageSize]="pageSize"
                   [(page)]="page"
                   (pageChange)="pageClick()"
@@ -114,26 +114,26 @@
               <div class="card card-room">
                 <div class="card-header"></div>
                 <div class="card-body">
-                  <form [formGroup]="itemForm" (ngSubmit)="saveStore(itemForm.value)">
+                  <form [formGroup]="itemForm" (ngSubmit)="saveDepartment(itemForm.value)">
                     <div class="row">
                       <div class="col-md-5 pr-1">
                         <div class="form-group">
-                          <label>Store Name</label>
+                          <label>Department Name</label>
                           <input
                             type="text"
                             formControlName="name"
                             class="form-control"
-                            placeholder="Enter store name"
+                            placeholder="Enter department name"
                           />
                         </div>
                       </div>
   
                       <div class="col-md-5 pr-1">
                         <div class="form-group">
-                          <label>Category</label>
-                          <select    formControlName="category" class="form-control">
-                            <option value="" hidden selected>------</option>
-                            <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
+                          <label>HOD</label>
+                          <select    formControlName="hod" class="form-control">
+                            <option value=""  disabled>Select</option>
+                            <option *ngFor="let item of employeeList" value="{{item.first_name +' '+item.last_name}}">{{item.first_name +' '+item.last_name}}</option>
                           </select>
                         </div>
                       </div>
@@ -157,7 +157,7 @@
                           <textarea
                             formControlName="description"
                             class="form-control"
-                            placeholder="Enter store description"
+                            placeholder="Enter department description"
                             rows="4"
                           ></textarea>
                         </div>

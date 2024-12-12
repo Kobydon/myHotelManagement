@@ -5,6 +5,7 @@ import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import * as XLSX from 'xlsx';
 
 import { GuestService } from 'app/services/guest.service';
+import { userService } from 'app/user.service';
 
 @Component({
   selector: 'item',
@@ -19,6 +20,7 @@ export class ItemComponent implements OnInit {
   groupList: any[] = [];
   familyList: any[] = [];
 unitList: any[] = [];
+ user:any[]=[]
   displayStyle = "none";
   header = '';
   page = 1;
@@ -28,7 +30,7 @@ unitList: any[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private toastr: ToastrService,
+    private toastr: ToastrService,private userService:userService,
     private guestService:GuestService // AssumingGuestService handles your items
   ) {
     // Initialize the form
@@ -49,7 +51,21 @@ unitList: any[] = [];
     this.getCategoryList();
     this.getUnitList();
     this.getFamilyList();
+    this.getUser();
   }
+
+  
+  async getUser(){
+    try{
+        var res = await this.userService.getUser()
+        if (res) this.user=res;
+
+    }catch(err){console.log(err)}
+    finally{console.log("success");}
+  
+
+
+ }
 
   // Fetch items list
   async getItemsList() {
@@ -177,7 +193,7 @@ unitList: any[] = [];
         this.getItemsList(); // Refresh the item list
       }
     } catch (error) {
-      this.toastr.error('Error deleting item');
+      // this.toastr.error('Error deleting item');
     } finally {
       this.loading.stop();
     }

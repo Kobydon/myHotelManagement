@@ -40,6 +40,10 @@ import { ItemFamilyComponent } from 'app/item-family/item-family.component';
 import { ItemCategoryComponent } from 'app/item-category/item-category.component';
 import { StoreComponent } from 'app/store/store.component';
 import { StockComponent } from 'app/stock/stock.component';
+import { DepartmentsComponent } from 'app/departments/departments.component';
+import { TransferStockComponent } from 'app/transfer-stock/transfer-stock.component';
+import { VendorComponent } from 'app/vendor/vendor.component';
+import { PurchaseOrderComponent } from 'app/purchase-order/purchase-order.component';
 
 
 
@@ -53,6 +57,7 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'notifications',  component: NotificationsComponent },
     { path: 'upgrade',        component: UpgradeComponent },
     { path: 'purchase-request',        component: PurchaseRequestComponent },
+    { path: 'purchase-order',        component: PurchaseOrderComponent },
     { path: 'order',        component: OrderComponent },
     { path: 'calender',        component: CalenderComponent },
     {path:'all-users',component:AllUsersComponent},
@@ -84,6 +89,9 @@ export const AdminLayoutRoutes: Routes = [
     {path:'item-store',component:StoreComponent},
     {path:'item-stock',component:StockComponent},
 
+    {path:'department',component:DepartmentsComponent},
+    {path:'item-transfer',component:TransferStockComponent},
+    {path:'vendor',component:VendorComponent},
 
 
 

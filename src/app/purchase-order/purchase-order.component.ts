@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators,FormControlName } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
@@ -6,18 +6,18 @@ import * as XLSX from 'xlsx';
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
 @Component({
-  selector: 'purchase-request',
-  templateUrl: './purchase-request.component.html',
-  styleUrls: ['./purchase-request.component.css']
+  selector: 'purchase-order',
+  templateUrl: './purchase-order.component.html',
+  styleUrls: ['./purchase-order.component.css']
 })
-export class PurchaseRequestComponent implements OnInit {
+export class PurchaseOrderComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI;
-  @ViewChild('invoiceContent') invoiceContent!: ElementRef;
+  // @ViewChild('invoiceContent') invoiceContent!: ElementRef;
   itemsList: any[] = [];
   stockList: any[] = [];
   storeList: any[] = [];
   purchaseList: any[] = [];
- departmentList: any[] = [];
+ orderList: any[] = [];
   displayStyle = "none";
   header = '';
   page = 1;
@@ -29,7 +29,7 @@ export class PurchaseRequestComponent implements OnInit {
   constructor(
     private fb: FormBuilder,private userService:userService,
     private toastr: ToastrService,
-    private guestService:GuestService // AssumingGuestService handles your items
+    private guestService:GuestService // AssumingGuestService handles your itemps
   ) {
     // Initialize the form
     this.itemForm = this.fb.group({
@@ -46,15 +46,11 @@ export class PurchaseRequestComponent implements OnInit {
     });
   }
   ngOnInit(): void {
-    this.getDepartmentList();
-    this.getPurchaseList();
-   
-    this.getItemsList()
+    this.getOrderList();
     this.getUser();
-    this.getVendorList();
+ 
   }
 
-  
   async getUser(){
     try{
         var res = await this.userService.getUser()
@@ -67,27 +63,12 @@ export class PurchaseRequestComponent implements OnInit {
 
  }
 
- async getVendorList() {
-  try {
-    // this.loading.start();
-    const res = await this.guestService.getVendorList(); // Assuming getItemsList() fetches the items from the API
-    if (res) {
-      this.storeList = res;
-    }
-  } catch (error) {
-    this.toastr.error('Error fetching items list');
-  } finally {
-    // this.loading.stop();
-  }
-}
-
-
-  async getItemsList() {
+  async getOrderList() {
     try {
       // this.loading.start();
-      const res = await this.guestService.getItemsList(); // Assuming getItemsList() fetches the items from the API
+      const res = await this.guestService.getOrderList(); // Assuming getItemsList() fetches the items from the API
       if (res) {
-        this.itemsList = res;
+        this.orderList = res;
       }
     } catch (error) {
       this.toastr.error('Error fetching items list');
@@ -96,37 +77,7 @@ export class PurchaseRequestComponent implements OnInit {
     }
   }
 
-  async getDepartmentList() {
-    try {
-      // this.loading.start();
-      const res = await this.guestService.getDepartmentList(); // Assuming getItemsList() fetches the items from the API
-      if (res) {
-        this.departmentList = res;
-      }
-    } catch (error) {
-      this.toastr.error('Error fetching department list');
-    } finally {
-      // this.loading.stop();
-    }
-  }
 
-
-  async getPurchaseList() {
-    try {
-      // this.loading.start();
-      const res = await this.guestService.getPurchaseList(); // Assuming getItemsList() fetches the items from the API
-      if (res) {
-        this.purchaseList = res;
-      }
-    } catch (error) {
-      this.toastr.error('Error fetching department list');
-    } finally {
-      // this.loading.stop();
-    }
-  }
-
-
-  
 
   openPopup(action: string, item: any = null) {
     this.header = action;
@@ -144,7 +95,7 @@ export class PurchaseRequestComponent implements OnInit {
   }
 
   // Save new or updated item
-  async savePurchase(itemData: any) {
+  async savePurchae(itemData: any) {
     try {
       this.loading.start();
       let res;
@@ -156,7 +107,7 @@ export class PurchaseRequestComponent implements OnInit {
         this.toastr.success('Item successfully updated');
       }
       if (res) {
-        this.getPurchaseList(); // Refresh the item list
+        this.getOrderList(); // Refresh the item list
         this.closePopup(); // Close the modal
       }
     } catch (error) {
@@ -169,18 +120,12 @@ export class PurchaseRequestComponent implements OnInit {
 
 
   async approvePurchase(itemData: any) {
-    this.itemForm.patchValue(itemData)
-    const ad ={
-      id:itemData
-    }
     try {
       this.loading.start();
       let res;
-     
-
-      res = await this.guestService.approvePurchase(ad);
+      res = await this.guestService.approvePurchase(itemData);
       if (res) {
-        this.getPurchaseList(); // Refresh the item list
+        this.getOrderList(); // Refresh the item list
         this.closePopup(); // Close the modal
       }
     } catch (error) {
@@ -191,20 +136,20 @@ export class PurchaseRequestComponent implements OnInit {
   }
 
   // Delete item
-  async deletePurchase(itemId: number) {
-    try {
-      this.loading.start();
-      const res = await this.guestService.deletePurchase(itemId); // Assuming deleteItem() deletes an item
-      if (res) {
-        this.toastr.success('Item successfully deleted');
-        this.getPurchaseList(); // Refresh the item list
-      }
-    } catch (error) {
-      this.toastr.error('Error deleting item');
-    } finally {
-      this.loading.stop();
-    }
-  }
+  // async deletePurchase(itemId: number) {
+  //   try {
+  //     this.loading.start();
+  //     const res = await this.guestService.deletePurchase(itemId); // Assuming deleteItem() deletes an item
+  //     if (res) {
+  //       this.toastr.success('Item successfully deleted');
+  //       this.getOrderList(); // Refresh the item list
+  //     }
+  //   } catch (error) {
+  //     this.toastr.error('Error deleting item');
+  //   } finally {
+  //     this.loading.stop();
+  //   }
+  // }
 
   // Export to Excel
   exportExcel() {
@@ -239,31 +184,29 @@ export class PurchaseRequestComponent implements OnInit {
     // Logic for handling page change, if necessary
   }
 
-  printInvoice() {
-    const printContents = this.invoiceContent.nativeElement.innerHTML;
-    const printWindow = window.open('', '', 'height=800,width=600');
+  // printInvoice() {
+  //   const printContents = this.invoiceContent.nativeElement.innerHTML;
+  //   const printWindow = window.open('', '', 'height=800,width=600');
 
-    if (printWindow) {
-      printWindow.document.write('<html><head><title>Invoice</title>');
-      printWindow.document.write(
-        `<style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          h1, h3 { text-align: center; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          table, th, td { border: 1px solid #ddd; padding: 8px; }
-          th { background-color: #f4f4f4; }
-          .text-right { text-align: right; }
-          .text-center { text-align: center; }
-          .invoice-footer { margin-top: 20px; text-align: center; }
-        </style>`
-      );
-      printWindow.document.write('</head><body>');
-      printWindow.document.write(printContents);
-      printWindow.document.write('</body></html>');
-      printWindow.document.close();
-      printWindow.print();
-    }
-  }
+  //   if (printWindow) {
+  //     printWindow.document.write('<html><head><title>Invoice</title>');
+  //     printWindow.document.write(
+  //       `<style>
+  //         body { font-family: Arial, sans-serif; padding: 20px; }
+  //         h1, h3 { text-align: center; }
+  //         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  //         table, th, td { border: 1px solid #ddd; padding: 8px; }
+  //         th { background-color: #f4f4f4; }
+  //         .text-right { text-align: right; }
+  //         .text-center { text-align: center; }
+  //         .invoice-footer { margin-top: 20px; text-align: center; }
+  //       </style>`
+  //     );
+  //     printWindow.document.write('</head><body>');
+  //     printWindow.document.write(printContents);
+  //     printWindow.document.write('</body></html>');
+  //     printWindow.document.close();
+  //     printWindow.print();
+  //   }
+  // }
 }
-
-

@@ -3,53 +3,52 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import * as XLSX from 'xlsx';
-
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
+import { EmployeeService } from 'app/services/employee.service';
 @Component({
-  selector: 'item-category',
-  templateUrl: './item-category.component.html',
-  styleUrls: ['./item-category.component.css']
+  selector: 'departments',
+  templateUrl: './departments.component.html',
+  styleUrls: ['./departments.component.css']
 })
-export class ItemCategoryComponent implements OnInit {
-
-  
+export class DepartmentsComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI;
-  itemsList: any[] = [];
-  categoryList: any[] = [];
-  groupList: any[] = [];
-  familyList: any[] = [];
-unitList: any[] = [];
+  departmentList: any[] = [];
+  stockList: any[] = [];
+  employeeList: any[] = [];
+  storeList: any[] = [];
+  unitList: any[] = [];
   displayStyle = "none";
   header = '';
   page = 1;
   pageSize: number = 10; // Change to whatever page size you need
   totalAmount: number = 0;
   itemForm!: FormGroup;
- user:any[]=[]
+  user:any[]=[];
+ 
   constructor(
     private fb: FormBuilder,private userService:userService,
-    private toastr: ToastrService,
+    private toastr: ToastrService,private employeeService:EmployeeService,
     private guestService:GuestService // AssumingGuestService handles your items
-  
   ) {
     // Initialize the form
     this.itemForm = this.fb.group({
       id: ['', Validators.required],
       name: ['', Validators.required],
       description: ['', Validators.required],
-
+      hod: ['', Validators.required],
+    
     });
   }
 
   ngOnInit(): void {
-   
-    this.getCategoryList();
-    this.getUser();
-  
+    this.getDepartmentList();
+    this.getEmployeeList();
+    this.getUser()
   }
 
 
+  
   
   async getUser(){
     try{
@@ -64,16 +63,28 @@ unitList: any[] = [];
  }
 
   
+async getEmployeeList(){
+  try{
+    this.loading.start();
+    var res = await this.employeeService.getemployees();
+    if(res) this.employeeList=res; 
 
-  async getCategoryList() {
+  } catch(error){
+    this.toastr.error(null,error)
+  }
+finally{
+  this.loading.stop();
+}}
+
+  async getDepartmentList() {
     try {
       // this.loading.start();
-      const res = await this.guestService.getCategoryList(); // Assuming getItemsList() fetches the items from the API
+      const res = await this.guestService.getDepartmentList(); // Assuming getItemsList() fetches the items from the API
       if (res) {
-        this.categoryList = res;
+        this.departmentList = res;
       }
     } catch (error) {
-      this.toastr.error('Error fetching category list');
+      this.toastr.error('Error fetching department list');
     } finally {
       // this.loading.stop();
     }
@@ -81,7 +92,10 @@ unitList: any[] = [];
 
 
 
-  // Open the modal for adding or editing
+
+
+
+
   openPopup(action: string, item: any = null) {
     this.header = action;
     if (action === 'Add New') {
@@ -98,19 +112,19 @@ unitList: any[] = [];
   }
 
   // Save new or updated item
-  async saveCategory(itemData: any) {
+  async saveDepartment(itemData: any) {
     try {
       this.loading.start();
       let res;
       if (this.header === 'Add New') {
-        res = await this.guestService.addCategory(itemData); // Assuming addItem() adds a new item
-        this.toastr.success('Category successfully added');
+        res = await this.guestService.addDepartment(itemData); // Assuming addItem() adds a new item
+        this.toastr.success('Item successfully added');
       } else if (this.header === 'Edit') {
-        res = await this.guestService.updateCategory(itemData); // Assuming updateItem() updates an existing item
-        this.toastr.success('Category successfully updated');
+        res = await this.guestService.updateDepartment(itemData); // Assuming updateItem() updates an existing item
+        this.toastr.success('Item successfully updated');
       }
       if (res) {
-        this.getCategoryList(); // Refresh the item list
+        this.getDepartmentList(); // Refresh the item list
         this.closePopup(); // Close the modal
       }
     } catch (error) {
@@ -121,13 +135,13 @@ unitList: any[] = [];
   }
 
   // Delete item
-  async deleteCategory(itemId: number) {
+  async deleteDepartment(itemId: number) {
     try {
       this.loading.start();
-      const res = await this.guestService.deleteCategory(itemId); // Assuming deleteItem() deletes an item
+      const res = await this.guestService.deleteDepartment(itemId); // Assuming deleteItem() deletes an item
       if (res) {
         this.toastr.success('Item successfully deleted');
-        this.getCategoryList(); // Refresh the item list
+        this.getDepartmentList(); // Refresh the item list
       }
     } catch (error) {
       this.toastr.error('Error deleting item');
@@ -142,7 +156,7 @@ unitList: any[] = [];
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, 'category_list.xlsx');
+    XLSX.writeFile(wb, 'department.xlsx');
   }
 
   // Search items (filter based on input)
@@ -168,6 +182,8 @@ unitList: any[] = [];
   pageClick() {
     // Logic for handling page change, if necessary
   }
+
+
 
 
 }

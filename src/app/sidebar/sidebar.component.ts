@@ -18,7 +18,7 @@ export const ROUTES: RouteInfo[] = [
     { path: '/all-users',     title: 'Users',         icon:'nc-bank',       class: '' },
     { path: '/room-types',     title: 'Room Types',         icon:'nc-bank',       class: '' },
     { path: '/purchase-request',     title: 'Purchase Request',         icon:'nc-bank',       class: '' },
-    
+    { path: '/purchase-order',     title: 'Purchase Request',         icon:'nc-bank',       class: '' },
     { path: '/icons',         title: 'Icons',             icon:'nc-diamond',    class: '' },
     { path: '/calender',         title: 'Calender',             icon:'nc-diamond',    class: '' },
     { path: '/maps',          title: 'Maps',              icon:'nc-pin-3',      class: '' },
@@ -55,6 +55,10 @@ export const ROUTES: RouteInfo[] = [
     { path: '/item-stock',    title: ' Item Stock ',        icon:'nc-caps-small', class: '' },
 
 
+    { path: '/item-transfer',    title: ' Item  Transfer ',        icon:'nc-caps-small', class: '' },
+    { path: '/department',    title: ' Item Stock ',        icon:'nc-caps-small', class: '' },
+
+    { path: '/vendor',    title: ' Vendor  ',        icon:'nc-caps-small', class: '' },
 
 ];
 

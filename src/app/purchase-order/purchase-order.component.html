@@ -12,7 +12,7 @@
                     type="text"
                     id="myInput"
                     (keyup)="searchItems()"
-                    style="width: 350px;height: 40px;"
+                    style="width: 350px; height: 40px;"
                   />
                 </div>
                 <div class="w-100"></div>
@@ -27,7 +27,7 @@
                 style="float: right;"
                 (click)="openPopup('Add New')"
               >
-                Add New Store
+                Add New
               </button>
               <button
                 type="button"
@@ -44,31 +44,40 @@
               <table class="table table-striped" id="excel-table">
                 <thead class="table-light">
                   <tr class="bg-secondary">
-                    <th scope="col">#</th>
-                    <th scope="col">Store Name</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Action</th>
+                    <th scope="col">Order Number</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Supplier</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Order Date</th>
+                    <!-- <th scope="col">Action</th> -->
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of storeList | slice: (page-1) * pageSize : page * pageSize; index as i">
-                    <th>{{ i + 1 }}</th>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.Category }}</td>
-                    <!-- <td>{{ item.price | currency }}</td> -->
-                    <td>{{ item.description }}</td>
-                    <td>
-                      <i
-                        class="fa fa-edit fa-lg text-info"
-                        (click)="openPopup('Edit', item)"
-                      ></i>
-                      <i
+                  <tr *ngFor="let item of orderList | slice: (page - 1) * pageSize : page * pageSize; index as i">
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.item }}</td>
+                    <td>{{ item.supplier }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.created_date }}</td>
+                    <!-- <td> -->
+                      <!-- <button class="btn btn-info btn-sm" (click)="openPopup('Edit', item)">
+                        <i class="fa fa-edit fa-lg"></i>
+                      </button> -->
+                      <!-- <button
+                        class="btn btn-danger btn-sm"
                         *ngIf="user[0].roles === 'admin'"
-                        class="fa fa-close fa-lg text-danger"
-                        (click)="deleteStore(item.id)"
-                      ></i>
-                    </td>
+                        (click)="deletePurchase(item.id)"
+                      >
+                        <i class="fa fa-close fa-lg"></i>
+                      </button> -->
+                      <!-- <button
+                        class="btn btn-success btn-sm"
+                        *ngIf="user[0].roles === 'admin'"
+                        (click)="approvePurchase(item.id)"
+                      >
+                        <i class="fa fa-check-circle fa-lg"></i>
+                      </button> -->
+                    <!-- </td> -->
                   </tr>
                 </tbody>
               </table>
@@ -78,7 +87,7 @@
             <div class="row pt-3">
               <div class="col-md-9">
                 <ngb-pagination
-                  [collectionSize]="storeList.length"
+                  [collectionSize]="orderList.length"
                   [pageSize]="pageSize"
                   [(page)]="page"
                   (pageChange)="pageClick()"
@@ -107,59 +116,53 @@
         <div class="modal-content">
           <div class="modal-header">
             {{ header }}
-            <i class="fa fa-close" (click)="closePopup()"></i>
+            <button type="button" class="btn-close" (click)="closePopup()">x</button>
           </div>
           <div class="modal-body">
             <div class="col-md-12" style="width: 100%;">
               <div class="card card-room">
                 <div class="card-header"></div>
                 <div class="card-body">
-                  <form [formGroup]="itemForm" (ngSubmit)="saveStore(itemForm.value)">
+                  <form [formGroup]="itemForm">
                     <div class="row">
+                      <!-- <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Item</label>
+                          <select formControlName="item" class="form-control">
+                            <option value="" hidden selected>------</option>
+                            <option *ngFor="let item of itemList" value="{{ item.name }}">{{ item.name }}</option>
+                          </select>
+                        </div>
+                      </div>
+   -->
+                      <!-- <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Department</label>
+                          <select formControlName="department" class="form-control">
+                            <option value="" hidden selected>------</option>
+                            <option *ngFor="let item of departmentList" value="{{ item.name }}">{{ item.name }}</option>
+                          </select>
+                        </div>
+                      </div> -->
+  
                       <div class="col-md-5 pr-1">
                         <div class="form-group">
-                          <label>Store Name</label>
-                          <input
-                            type="text"
-                            formControlName="name"
-                            class="form-control"
-                            placeholder="Enter store name"
-                          />
+                          <label>Unit Price</label>
+                          <input type="text" class="form-control" formControlName="unit_price" />
                         </div>
                       </div>
   
                       <div class="col-md-5 pr-1">
                         <div class="form-group">
-                          <label>Category</label>
-                          <select    formControlName="category" class="form-control">
-                            <option value="" hidden selected>------</option>
-                            <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
-                          </select>
+                          <label>Total Cost</label>
+                          <input type="text" class="form-control" formControlName="total_cost" />
                         </div>
                       </div>
-
-<!-- 
+  
                       <div class="col-md-5 pr-1">
                         <div class="form-group">
-                          <label>Group</label>
-                          <select    formControlName="group">
-                            <option *ngFor="let item of groupList" value="{{item.name}}">{{item.name}}</option>
-                          </select>
-                        </div>
-                      </div> -->
-
-
-                      
-
-                      <div class="col-md-5 pr-1">
-                        <div class="form-group">
-                          <label>Description</label>
-                          <textarea
-                            formControlName="description"
-                            class="form-control"
-                            placeholder="Enter store description"
-                            rows="4"
-                          ></textarea>
+                          <label>Quantity</label>
+                          <input type="text" class="form-control" formControlName="quantity" />
                         </div>
                       </div>
                     </div>
@@ -180,8 +183,5 @@
         </div>
       </div>
     </div>
-  
-    <!-- Hidden button for opening the modal -->
-    <!-- <button style="margin: 50px; padding: 10px; display: none;" type="button" class="btn btn-primary" (click)="openPopup()"></button> -->
   </div>
   

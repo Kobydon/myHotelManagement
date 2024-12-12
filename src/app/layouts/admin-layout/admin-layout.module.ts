@@ -49,6 +49,10 @@ import { ItemGroupComponent } from 'app/item-group/item-group.component';
 import { ItemFamilyComponent } from 'app/item-family/item-family.component';
 import { StoreComponent } from 'app/store/store.component';
 import { StockComponent } from 'app/stock/stock.component';
+import { DepartmentsComponent } from 'app/departments/departments.component';
+import { TransferStockComponent } from 'app/transfer-stock/transfer-stock.component';
+import { VendorComponent } from 'app/vendor/vendor.component';
+import { PurchaseOrderComponent } from 'app/purchase-order/purchase-order.component';
 
 
     
@@ -108,7 +112,7 @@ import { StockComponent } from 'app/stock/stock.component';
 
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,
-    StoreComponent,StockComponent
+    StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent
 
 
 

@@ -62,7 +62,7 @@
 
                         <td>
                           <span [ngClass]="item.quantity > 0 ? 'text-success' : 'text-danger'">
-                            {{ item.quantity > 0 ? item.status : 'Out of Stock' }}
+                            {{ item.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
                           </span>
                         </td>
                         <td>
@@ -127,8 +127,8 @@
                         <div class="col-md-5 pr-1">
                             <div class="form-group">
                               <label>Item </label>
-                              <select    formControlName="item" class="form-control">
-                                <option value="" hidden selected>------</option>
+                              <select    formControlName="name" class="form-control">
+                                <option value="" hidden selected>Select</option>
                                 <option *ngFor="let item of itemsList" value="{{item.name}}">{{item.name}}</option>
                               </select>
                             </div>
@@ -152,7 +152,7 @@
                         <div class="form-group">
                           <label>Store</label>
                           <select    formControlName="store" class="form-control">
-                            <option value="" hidden selected>------</option>
+                            <option value="" hidden selected>Select</option>
                             <option *ngFor="let item of storeList" value="{{item.name}}">{{item.name}}</option>
                           </select>
                         </div>

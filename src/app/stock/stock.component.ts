@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators ,FormControlName} from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import * as XLSX from 'xlsx';
 import { GuestService } from 'app/services/guest.service';
+import { userService } from 'app/user.service';
 
 @Component({
   selector: 'stock',
@@ -25,10 +26,11 @@ unitList: any[] = [];
   pageSize: number = 10; // Change to whatever page size you need
   totalAmount: number = 0;
   itemForm!: FormGroup;
+  user:any[]=[];
   
   constructor(
     private fb: FormBuilder,
-    private toastr: ToastrService,
+    private toastr: ToastrService,private userService:userService,
     private guestService:GuestService // AssumingGuestService handles your items
   ) {
     // Initialize the form
@@ -48,9 +50,22 @@ unitList: any[] = [];
     this.getItemsList();
     this.getStockList();
     this.getStoreList()
+    this.getUser();
   }
 
   
+  async getUser(){
+    try{
+        var res = await this.userService.getUser()
+        if (res) this.user=res;
+
+    }catch(err){console.log(err)}
+    finally{console.log("success");}
+  
+
+
+ }
+
 
 
   async getStoreList() {
@@ -159,7 +174,7 @@ unitList: any[] = [];
     const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, 'items_list.xlsx');
+    XLSX.writeFile(wb, 'stock_list.xlsx');
   }
 
   // Search items (filter based on input)

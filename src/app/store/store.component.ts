@@ -4,6 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import * as XLSX from 'xlsx';
 import { GuestService } from 'app/services/guest.service';
+import { userService } from 'app/user.service';
 @Component({
   selector: 'store',
   templateUrl: './store.component.html',
@@ -22,9 +23,10 @@ unitList: any[] = [];
   pageSize: number = 10; // Change to whatever page size you need
   totalAmount: number = 0;
   itemForm!: FormGroup;
+  user:any[]=[];
  
   constructor(
-    private fb: FormBuilder,
+    private fb: FormBuilder,private userService:userService,
     private toastr: ToastrService,
     private guestService:GuestService // AssumingGuestService handles your items
   ) {
@@ -41,7 +43,22 @@ unitList: any[] = [];
   ngOnInit(): void {
     this.getCategoryList();
     this.getStoreList();
+    this.getUser()
   }
+
+  
+  
+  async getUser(){
+    try{
+        var res = await this.userService.getUser()
+        if (res) this.user=res;
+
+    }catch(err){console.log(err)}
+    finally{console.log("success");}
+  
+
+
+ }
 
   
 
@@ -120,7 +137,7 @@ unitList: any[] = [];
       this.loading.start();
       const res = await this.guestService.deleteStock(itemId); // Assuming deleteItem() deletes an item
       if (res) {
-        this.toastr.success('Item successfully deleted');
+        // this.toastr.success('Item successfully deleted');
         this.getStoreList(); // Refresh the item list
       }
     } catch (error) {

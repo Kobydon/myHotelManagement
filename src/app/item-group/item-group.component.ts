@@ -111,11 +111,11 @@ unitList: any[] = [];
       this.loading.start();
       const res = await this.guestService.deleteUnit(itemId); // Assuming deleteItem() deletes an item
       if (res) {
-        this.toastr.success('Item successfully deleted');
+        // this.toastr.success('Item successfully deleted');
         this.getGroupList(); // Refresh the item list
       }
     } catch (error) {
-      this.toastr.error('Error deleting item');
+      // this.toastr.error('Error deleting item');
     } finally {
       this.loading.stop();
     }
