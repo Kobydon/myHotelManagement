@@ -16,7 +16,8 @@ const httpOptions = {
 export class GuestService {
 
   // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private guestUrl = 'https://renderdemo-hwz6.onrender.com';
+  private guestUrl = ' http://127.0.0.1:5000';
+ 
 
   constructor(private http: HttpClient,private router:Router) { }
 
@@ -201,6 +202,12 @@ addExpense(dep:any) {
               //console.log(guest);
                 return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_vendor', dep, httpOptions));
               }   
+
+
+              updateRecievedItem(dep:any) {
+                //console.log(guest);
+                  return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_received_item', dep, httpOptions));
+                }  
 
             updateUnit(dep:any) {
               //console.log(guest);
@@ -400,6 +407,15 @@ getcheckOut(): Observable<any[]>{
 	  return of({});
   }
   
+
+  deleteReceivedItem(id:number) {
+	  if (confirm("Are you sure to delete?")) {
+		// const id = typeof ad === 'number' ? ad : ad.id;
+		const url = `${this.guestUrl}/guest/delete_received_item/${id}`;
+		return  lastValueFrom(  this.http.delete(url, httpOptions))
+	  }
+	  return of({});
+  }
   
   
   deleteVendor(id:number) {
@@ -508,12 +524,27 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates', d, httpOptions));
     }
 
+    searchStockDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_stock_dates', d, httpOptions));
+    }
+    
+    
+
+    searchReceivedDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_received_dates', d, httpOptions));
+    }
+
     searchattendanceDate(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_attendance_date', d, httpOptions));
     }
 
+    searchPurchaseDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_purchase_date', d, httpOptions));
+    }
 
-
+    searchOrderDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_order_date', d, httpOptions));
+    }
     
     searchBudgetDates(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_budget_dates', d, httpOptions));
@@ -545,6 +576,13 @@ getcheckOut(): Observable<any[]>{
       //console.log(guest);
         return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_budget', sch, httpOptions));
       }     
+
+      addRecievedItem(sch:any) {
+        //console.log(guest);
+          return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_received_item', sch, httpOptions));
+        }     
+        
+      
       
 
       addUnit(sch:any) {
@@ -632,6 +670,11 @@ getcheckOut(): Observable<any[]>{
           return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_item_list'));
         }
   
+        
+      getItemList() {
+        //console.log(guest);get
+          return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_received'));
+        }
 
 }
 

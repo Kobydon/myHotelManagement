@@ -132,7 +132,7 @@ li{
         </li>
   
           <div class="dropdown-container">
-          <li  *ngIf="user[0].roles=='admin'">  <a id="fina"style="font-size: small;" routerLink="all-rooms"><i id="fina" class="fa fa-list " >&nbsp;</i>All</a>
+          <li  *ngIf="user[0].roles=='admin'">  <a id="fina"style="font-size: small;" routerLink="all-rooms"><i id="fina" class="fa fa-list " >&nbsp;</i>Manage Room</a>
           </li>
 
           <li>
@@ -308,9 +308,18 @@ li{
           <li> <a id="fina"style="font-size: small;"  routerLink="/purchase-order"><i id="fina" class=" fa fa-shopping-basket" >&nbsp;</i> Purchase Order</a></li>
           <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-money " >&nbsp;</i>Accounts Receiv. </a></li> 
           <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="  fa fa-book" >&nbsp;</i>General Ledger </a></li> 
-          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-list " >&nbsp;</i>Recieved Items  </a></li> 
-          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="  fa fa-arrow-back" >&nbsp;</i>Return Request </a></li> 
-          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-tachnometer " >&nbsp;</i>Stock Usage  </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/item-receieved"><i id="fina" class=" fa fa-list " >&nbsp;</i>Received Items  </a></li> 
+          <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class="  fa fa-arrow-back" >&nbsp;</i>Return Request </a></li>
+          <li class="transparent">
+            <a id="fina"class="" ><i id="fina" class="fa fa-hourglass-3" >&nbsp;</i><span>Stock &nbsp;</span>
+              <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
+            </a></li>
+            <div class="dropdown-container">
+              <li> <a id="fina"style="font-size: small;" routerLink="item-stock"><i id="fina" class="	fa fa-pencil" >&nbsp;</i>Manage Stock</a></li>
+              <li> <a id="fina"style="font-size: small;" routerLink="item-transfer"><i id="fina" class="	fa fa-exchange" >&nbsp;</i>Transfer Stock</a></li>  
+              <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-tachnometer " >&nbsp;</i>Stock Usage  </a></li> 
+        
+            </div> 
         
   
            
@@ -356,15 +365,7 @@ li{
   
            <li> <a id="fina"style="font-size: small;" routerLink="item-unit"><i id="fina" class="fa fa-balance-scale" >&nbsp;</i> Item Unit</a></li>
            <li> <a id="fina"style="font-size: small;"routerLink="item-family"><i id="fina" class="fa fa-cubes" >&nbsp;</i> Item Family</a></li>
-           <li class="transparent">
-            <a id="fina"class="" ><i id="fina" class="fa fa-hourglass-3" >&nbsp;</i><span>Stock &nbsp;</span>
-              <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
-            </a></li>
-            <div class="dropdown-container">
-              <li> <a id="fina"style="font-size: small;" routerLink="item-stock"><i id="fina" class="	fa fa-pencil" >&nbsp;</i>Manage Stock</a></li>
-              <li> <a id="fina"style="font-size: small;" routerLink="item-transfer"><i id="fina" class="	fa fa-exchange" >&nbsp;</i>Transfer Stock</a></li>  
-            
-            </div>
+         
 
      
           

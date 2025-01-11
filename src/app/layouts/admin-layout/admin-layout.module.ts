@@ -53,6 +53,7 @@ import { DepartmentsComponent } from 'app/departments/departments.component';
 import { TransferStockComponent } from 'app/transfer-stock/transfer-stock.component';
 import { VendorComponent } from 'app/vendor/vendor.component';
 import { PurchaseOrderComponent } from 'app/purchase-order/purchase-order.component';
+import { ReceivedItemsComponent } from 'app/received-items/received-items.component';
 
 
     
@@ -108,7 +109,7 @@ import { PurchaseOrderComponent } from 'app/purchase-order/purchase-order.compon
     IncomeComponent,
     BudgetComponent,
     BudgetReportComponent,
-    DailyIncomeReportComponent,
+    DailyIncomeReportComponent,ReceivedItemsComponent,
 
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,

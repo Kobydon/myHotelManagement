@@ -44,6 +44,7 @@ import { DepartmentsComponent } from 'app/departments/departments.component';
 import { TransferStockComponent } from 'app/transfer-stock/transfer-stock.component';
 import { VendorComponent } from 'app/vendor/vendor.component';
 import { PurchaseOrderComponent } from 'app/purchase-order/purchase-order.component';
+import { ReceivedItemsComponent } from 'app/received-items/received-items.component';
 
 
 
@@ -84,6 +85,7 @@ export const AdminLayoutRoutes: Routes = [
     {path:'item',component:ItemComponent},
 
     {path:'item-unit',component:ItemGroupComponent},
+    {path:'item-receieved',component:ReceivedItemsComponent},
     {path:'item-family',component:ItemFamilyComponent},
     {path:'item-category',component:ItemCategoryComponent},
     {path:'item-store',component:StoreComponent},

@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { EmployeeService } from 'app/services/employee.service';
 
 import * as html2pdf from 'html2pdf.js'
+import { GuestService } from 'app/services/guest.service';
 
 @Component({
   selector: 'attendance',
@@ -36,11 +37,11 @@ export class AttendanceComponent implements OnInit {
   employeeList:any;
   emmp_info:any;
 page = 1;
-pageSize: number = 10;
+pageSize: number = 200;
 attendanceList:any;
 constructor(
 private router:Router,
-    private fb:FormBuilder, private toastr:ToastrService, private employeeService:EmployeeService
+    private fb:FormBuilder, private toastr:ToastrService, private employeeService:EmployeeService,private guestService:GuestService
    ) {
 
     this.createForm = this.fb.group({
@@ -50,8 +51,7 @@ private router:Router,
       name:['',Validators.required],
       attendance:['',Validators.required],
       position:['',Validators.required],
-
-   
+      dates:['',Validators.required],
 
         
         
@@ -171,6 +171,26 @@ async fetchEmployee(id:number){
 }
 
 
+async searchDates(){
+
+  const d = {
+    date: this.createForm.value.dates
+  }
+    try{
+      this.loading.start();
+      var res = await this.guestService.searchattendanceDate(d);
+      if(res) {this.attendanceList =res;}
+      
+      
+    
+
+    }
+    catch(err){this.toastr.error(null,err.message)}
+
+    finally{this.loading.stop();}
+}
+  
+
 
 
 
@@ -228,57 +248,40 @@ async fetchEmployee(id:number){
 
 
 
-// async updateemployee(record){
+async updateAttendance(id:any){
 
 
 
-// const emp : any ={
-//   id:record.id,
-//   first_name:record.first_name,
-//   last_name:record.last_name,
-//   email:record.email,
-//   session:record.session,
-//   position:record.position,
-//   dob:record.dob,
-//   employment_date:record.employment_date,
-//   phone :record.phone,
-//   gender :record.gender,
-
-//   address:record.address,
-
-
-
+const emp : any ={
+  id:id,
  
-//   remark:record.remark,
-
-//   city :record.city,
 
 
 
-// }
+}
 
-// // console.log(guest.confirm_password)
-// // guest.image_three= this.base64_string
-// try{
-//   this.loading.start();
-//  var res  = await this.employeeService.updateEmployee(emp);
-//  if(res) this.closePopup();this.getEmployee();
-
-
-// } catch(error){
-//   this.toastr.error(null,error);
-
-// }
+// console.log(guest.confirm_password)
+// guest.image_three= this.base64_string
+try{
+  this.loading.start();
+ var res  = await this.employeeService.updateAttendance(emp);
+ if(res) this.closePopup();this.getAttendance();
 
 
-//     finally{
-//       this.loading.stop();
-//     }
+} catch(error){
+  this.toastr.error(null,error);
+
+}
+
+
+    finally{
+      this.loading.stop();
+    }
 
 
 
 
-// }
+}
 
 
 

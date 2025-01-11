@@ -15,8 +15,10 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class EmployeeService {
 
-  // private employeeUrl= 'https://renderdemo-w1s0.onrender.com'  // URL to REST API
-  private employeeUrl = 'https://renderdemo-hwz6.onrender.com';
+
+  // private employeeUrl = 'https://renderdemo-hwz6.onrender.com';
+  private employeeUrl = 'http://127.0.0.1:5000';
+  
 
   constructor(private http: HttpClient,private router:Router) { }
 
@@ -112,6 +114,12 @@ getroom_number():Observable<any[]>{
   updateEmployee(user: any) {
     return  lastValueFrom( this.http.put(this.employeeUrl+ '/employee/update_employee', user, httpOptions));
   }
+
+  updateAttendance(employee: any) {
+    return  lastValueFrom( this.http.put(this.employeeUrl+ '/employee/update_attendance', employee, httpOptions));
+  }
+
+  
 
   updateTodo(todo: any) {
     return  lastValueFrom( this.http.put(this.employeeUrl+ '/employee/update_todo', todo, httpOptions));

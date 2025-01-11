@@ -39,6 +39,9 @@
                         </div>
                     </div>
                     <div class="table-responsive table-bordered">
+                      <form  [formGroup]="createForm">
+                        <input type="date" class="form-control" style="width:auto;"
+                         formControlName="dates" (ngModelChange)="searchDates()"></form>
                       <table class="table m-0" id="table" style="width:100%">
 
                    <thead class="table-light">
@@ -48,30 +51,42 @@
       
       <th scope="col">Name</th>
       <th>Position</th>
-      <th scope="col">Attendance Date | Time</th> 
+      <th scope="col">Time in</th>
+      <th scope="col">Time out</th>
+      <th scope="col">Attendance Date</th> 
+      <th scope="col">Action</th> 
 
-      <th scope="col">Status</th>
+      <!-- <th scope="col">Status</th> -->
     </tr>
   </thead>
   <tbody>
   
-    <tr *ngFor="let attendance of attendanceList | slice: (page-1) * pageSize : page * pageSize">
-
-            <td> {{attendance.name}}</td>
-            <td>{{attendance.position}}</td>
-            <td>{{attendance.created_date}}</td>
-            <td>{{attendance.attendance}}</td>
-            <!-- <td>{{attendance.address}}</td>
-            <td>{{attendance.email}}</td>
-            <td>{{attendance.session}}</td>
-            
-            <td>{{attendance.employment_date}} 
-                  
-            <td>{{attendance.position}}  -->
-            
-     
-            <!-- <td ><i class="fa fa-edit fa-2x text-info" (click)="Editattendance(attendance.id)"></i><i class="fa fa-close fa-2x text-danger" (click)="deletEattendance(attendance.id)"></i></td> -->
-          </tr>
+    <tr *ngFor="let attendance of attendanceList | slice: (page - 1) * pageSize : page * pageSize">
+      <td>{{ attendance.name }}</td>
+      <td>{{ attendance.position }}</td>
+      <td>{{ attendance.time_in }}</td>
+      <td>{{ attendance.time_out }}</td>
+      <td>{{ attendance.created_date }}</td>
+      <td>
+        <span *ngIf="attendance.time_out === '-'" class="badge bg-danger" (click)="updateAttendance(attendance.id)">Sign out</span>
+        <span *ngIf="attendance.time_out !== '-'" class="badge bg-success">Signed out</span>
+      </td>
+      
+    
+      <!-- Optional fields (commented out for now)
+      <td>{{ attendance.address }}</td>
+      <td>{{ attendance.email }}</td>
+      <td>{{ attendance.session }}</td>
+      <td>{{ attendance.employment_date }}</td>
+      -->
+    
+      <!-- Optional actions (commented out for now)
+      <td>
+        <i class="fa fa-edit fa-2x text-info" (click)="Editattendance(attendance.id)"></i>
+        <i class="fa fa-close fa-2x text-danger" (click)="deletEattendance(attendance.id)"></i>
+      </td>
+      -->
+    </tr>
 
        
         

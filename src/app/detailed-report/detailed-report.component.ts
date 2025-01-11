@@ -60,6 +60,10 @@ export class DetailedReportComponent implements OnInit {
   totalIncome:any;
   totalAmount:any;
   user:any;
+  purchaseList:any;
+  orderList:any;
+ receivedList:any;
+ stockList:any;
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
     private paymentService:PaymentService,private guestService:GuestService,private userService:userService) {
       this.paymentForm = this.fb.group({
@@ -150,7 +154,11 @@ async searchDates() {
     const paymentRes = await this.paymentService.searchDates(d);
     this.paymentList = paymentRes || [];
     this.totalAmount = this.paymentList.reduce((sum, item) => sum + parseInt(item.amount), 0);
+    const receivedRes = await this.guestService.searchReceivedDate(d);
+    this.receivedList = receivedRes || [];
 
+    const stockRes = await this.guestService.searchStockDate(d);
+    this.stockList = stockRes || [];
     // Fetch refunds
     const refundRes = await this.paymentService.searchRefundDates(d);
     this.refundList = refundRes || [];
@@ -172,9 +180,14 @@ async searchDates() {
     const incomeRes = await this.guestService.searchIncomeDates(d);
     const expenseRes = await this.guestService.searchExpenseDate(d);
     const attendanceRes = await this.guestService.searchattendanceDate(d);
+    const purchaseRes = await this.guestService.searchPurchaseDate(d);
+    const orderRes = await this.guestService.searchOrderDate(d);
     this.incomeList = incomeRes || [];
     this.expenseList = expenseRes || [];
     this.attendaceList = attendanceRes || [];
+
+    this.purchaseList = purchaseRes || [];
+    this.orderList = orderRes || [];
 
     this.totalIncome = this.incomeList.reduce((sum, item) => sum + parseInt(item.amount), 0);
     this.totalExpenses = this.expenseList.reduce((sum, item) => sum + parseInt(item.amount), 0);
@@ -194,6 +207,7 @@ async searchDates() {
     this.loading.stop();
   }
 }
+
 
 
 
@@ -330,6 +344,67 @@ exportToExcel() {
 //     console.error("No content found to generate PDF.");
 //   }
 // }
+
+
+printRepo(): void {
+  const printContent = document.getElementById('excel-table')?.outerHTML;
+
+  if (!printContent) {
+    console.error('No content found to print.');
+    return;
+  }
+
+  // Open a new window
+  const printWindow = window.open('', '', 'height=800, width=800');
+
+  if (printWindow) {
+    printWindow.document.write('<html><head><title>Report</title>');
+    
+    // Add some basic CSS for printing (you can customize further if needed)
+    printWindow.document.write(`
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 8px;
+          border: 1px solid #ddd;
+        }
+        th {
+          background-color: #f2f2f2;
+        }
+        .text-end {
+          text-align: end;
+        }
+        .bg-light {
+          background-color: #f8f9fa;
+        }
+      </style>
+    `);
+
+    // Add the content
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(printContent || '');
+    printWindow.document.write('</body></html>');
+
+    // Close the document to finish writing
+    printWindow.document.close();
+
+    // Wait for the content to load before triggering the print dialog
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close(); // Close the window after printing
+    };
+  } else {
+    console.error('Failed to open the print window.');
+  }
+}
 
 
 }

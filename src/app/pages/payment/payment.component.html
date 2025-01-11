@@ -21,15 +21,16 @@
                     </form>
                             </div>
                             <div class="w-100">
-                              <form  [formGroup]="paymentForm">
-                              <input type="date" class="form-control" style="width:auto;"
-                               formControlName="dates" (ngModelChange)="searchDates()"></form>
+                            
                               
 
                             </div>
                         </div>
                     </div>
                     <div class="table-responsive">
+                      <form  [formGroup]="paymentForm">
+                        <input type="date" class="form-control" style="width:auto;"
+                         formControlName="dates" (ngModelChange)="searchDates()"></form>
                       <button type="button" class="btn btn-sm btn-info " style="float: right;"  (click)="openPopup()" >
                         New Payment</button>
                         <button type="button" class="btn btn-sm btn-success " style="float: right;"  (click)="exportexcel()">

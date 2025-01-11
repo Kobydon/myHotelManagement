@@ -36,22 +36,23 @@
               </button>
             </div>
             <div class="ms-3">
-              <button
-                type="button"
+              <button type="button"
                 class="btn btn-primary btn-sm"
-                onclick="window.print()"
+                (click)="printRepo()"
               >
                 <i class="fa fa-print"></i> Print
               </button>
             </div>
+            
           </div>
 
           <!-- Reports Section -->
-          <div *ngIf="paymentForm.value.dates">
+          <div *ngIf="paymentForm.value.dates" id="excel-table">
 
             <!-- Room Payments -->
-            <h5 class="text-gray-500">Rooms</h5>
-            <table class="table table-bordered" id="excel-table">
+            <h5 class="text-gray-500">Room Report</h5>
+            <p>Bookings</p>
+            <table class="table table-bordered" >
               <thead class="table-light">
                 <tr class="bg-secondary text-white">
                   <th>Name</th>
@@ -62,7 +63,7 @@
                   <th>Room Type</th>
                   <th>Check In</th>
                   <th>Check Out</th>
-                  <th>Payment Date | Time</th>
+                  <!-- <th>Payment Date | Time</th> -->
                 </tr>
               </thead>
               <tbody>
@@ -73,9 +74,9 @@
                   <td>{{ payment.discount }}%</td>
                   <td>{{ payment.method }}</td>
                   <td>{{ payment.room_type }}</td>
-                  <td>{{ payment.checkin_date }}</td>
-                  <td>{{ payment.checkout_date }}</td>
-                  <td>{{ payment.payment_date }}</td>
+                  <td>{{ payment.checkin_date | date  }}</td>
+                  <td>{{ payment.checkout_date | date }}</td>
+                  <!-- <td>{{ payment.payment_date | date  }}</td> -->
                 </tr>
                 <tr>
                   <td colspan="9" class="text-end bg-light">
@@ -86,7 +87,7 @@
             </table>
 
             <!-- Statistics -->
-            <h5 class="text-gray-500 mt-4">Statistics</h5>
+            <p>Statistics</p>
             <table class="table table-bordered">
               <thead class="table-light">
                 <tr class="bg-secondary text-white">
@@ -107,7 +108,8 @@
             </table>
 
             <!-- Refunds -->
-            <h5 class="text-gray-500 mt-4">Refunds</h5>
+            <h5 class="text-gray-500 mt-4">Accounts Report</h5>
+            <p>Refunds</p>
             <table class="table table-bordered">
               <thead class="table-light">
                 <tr class="bg-secondary text-white">
@@ -115,7 +117,7 @@
                   <th>Amount</th>
                   <th>Authorized By</th>
                   <th>Reason</th>
-                  <th>Date | Time</th>
+                  <!-- <th>Date </th> -->
                 </tr>
               </thead>
               <tbody>
@@ -124,7 +126,7 @@
                   <td>GH₵{{ refund.refund_amount }}</td>
                   <td>{{ refund.authorized_by }}</td>
                   <td>{{ refund.reason }}</td>
-                  <td>{{ refund.refund_time }}</td>
+                  <!-- <td>{{ refund.refund_time | date }}</td> -->
                 </tr>
                 <tr>
                   <td colspan="5" class="text-end bg-light">
@@ -135,39 +137,39 @@
             </table>
 
             <!-- Income Report -->
-            <h5 class="text-gray-500 mt-4">Income Report</h5>
+            <p>Income</p>
             <table class="table table-bordered">
               <thead class="table-light">
                 <tr class="bg-secondary text-white">
                   <th>Source</th>
                   <th>Amount</th>
-                  <th>Date</th>
+                  <!-- <th>Date</th> -->
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let income of incomeList">
                   <td>{{ income.name }}</td>
                   <td>GH₵{{ income.amount }}</td>
-                  <td>{{ income.date }}</td>
+                  <!-- <td>{{ income.date | date  }}</td> -->
                 </tr>
               </tbody>
             </table>
 
             <!-- Expense Report -->
-            <h5 class="text-gray-500 mt-4">Expense Report</h5>
+            <p>Expenses</p>
             <table class="table table-bordered">
               <thead class="table-light">
                 <tr class="bg-secondary text-white">
                   <th>Category</th>
                   <th>Amount</th>
-                  <th>Date</th>
+                  <!-- <th>Date</th> -->
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let expense of expenseList">
                   <td>{{ expense.name }}</td>
                   <td>GH₵{{ expense.amount }}</td>
-                  <td>{{ expense.date }}</td>
+                  <!-- <td>{{ expense.date | date  }}</td> -->
                 </tr>
               </tbody>
             </table>
@@ -180,18 +182,138 @@
                   <th>Name</th>
                   <th>Time In</th>
                   <th>Time Out</th>
-                  <th>Date</th>
+                  <!-- <th>Date</th> -->
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let attendance of attendanceList">
+                <tr *ngFor="let attendance of attendaceList">
                   <td>{{ attendance.name }}</td>
                   <td>{{ attendance.time_in }}</td>
                   <td>{{ attendance.time_out }}</td>
-                  <td>{{ attendance.date }}</td>
+                  <!-- <td>{{ attendance.created_date | date }}</td> -->
                 </tr>
               </tbody>
             </table>
+
+
+
+            <h5 class="text-gray-500 mt-4">Inventory Report</h5>
+
+            <p>Purchase Request</p>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th >Item</th>
+                  <th >Requested By</th>
+                  <th >Department</th>
+                  <th >Quantity</th>
+                  <th >Unit Price</th>
+                  <th >Total Cost</th>
+                  <!-- <th >Request Date</th> -->
+                  <th >Status</th>
+               
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of purchaseList">
+                  <td>{{ item.item }}</td>
+                  <td>{{ item.requested_by }}</td>
+                  <td>{{ item.Department }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ item.unit_price | currency }}</td>
+                  <td>{{ item.total_cost | currency }}</td>
+                  <!-- <td>{{ item.created_date | date }}</td> -->
+                  <td>{{ item.status }}</td>
+                
+                </tr>
+              </tbody>
+            </table>
+
+
+
+            
+            <p>Purchase Order</p>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+  
+                  <th >Item</th>
+                  <th >Supplier</th>
+                  <th >Quantity</th>
+                  <!-- <th >Order Date</th> -->
+                  <!-- <th >Approved By</th> -->
+               
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of orderList">
+              
+                    <td>{{ item.item }}</td>
+                    <td>{{ item.store }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <!-- <td>{{ item.created_date | date }}</td> -->
+                    <!-- <td>{{ item.approved_by }}</td> -->
+                    <!-- <td> -->
+                  
+                </tr>
+              </tbody>
+            </table>
+
+
+            <p>Received Items</p>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+  
+                  <th >Item</th>
+                  <th >Quantity</th>
+                  <!-- <th >Date</th> -->
+                  <!-- <th >Approved By</th> -->
+               
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of receivedList">
+              
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <!-- <td>{{ item.created_date | date }}</td> -->
+                    <!-- <td>{{ item.approved_by }}</td> -->
+                    <!-- <td> -->
+                  
+                </tr>
+              </tbody>
+            </table>
+
+
+
+            <p>Stock</p>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+  
+                  <th >Item</th>
+                  <th >Quantity</th>
+                  <th >Store</th>
+                  <!-- <th>Date</th> -->
+                  <!-- <th >Approved By</th> -->
+               
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of stockList">
+              
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{item.store}}</td>
+                    <!-- <td>{{ item.created_date | date  }}</td> -->
+                    <!-- <td>{{ item.approved_by }}</td> -->
+                    <!-- <td> -->
+                  
+                </tr>
+              </tbody>
+            </table> 
+
           </div>
         </div>
       </div>

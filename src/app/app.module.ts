@@ -55,6 +55,8 @@ import { TransferStockComponent } from './transfer-stock/transfer-stock.componen
 import { DepartmentsComponent } from './departments/departments.component';
 import { VendorsComponent } from './vendors/vendors.component';
 import { PurchaseOrderComponent } from './purchase-order/purchase-order.component';
+import { ReceivedItemsComponent } from './received-items/received-items.component';
+import { ReturnRequestComponent } from './return-request/return-request.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -66,6 +68,8 @@ import { PurchaseOrderComponent } from './purchase-order/purchase-order.componen
     ResLayoutComponent,
   
     VendorsComponent,
+        ReturnRequestComponent,
+      
      
   
    

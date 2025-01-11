@@ -51,7 +51,7 @@ export class DashboardComponent implements OnInit {
     this.exchangeInterval= setInterval(()=>{
       this.getExchangeRates();
 
-    },1000);
+    },7000);
     this.getGust();
 
   

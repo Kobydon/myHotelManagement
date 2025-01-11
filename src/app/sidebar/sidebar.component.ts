@@ -45,6 +45,7 @@ export const ROUTES: RouteInfo[] = [
     { path: '/daily-income',    title: ' Daily Income - Expenditure Report  ',        icon:'nc-caps-small', class: '' },
     { path: '/daily-income-dates',    title: ' Daily Income - Expenditure Report  ',        icon:'nc-caps-small', class: '' },
     { path: '/item',    title: ' Items ',        icon:'nc-caps-small', class: '' },
+    { path: '/item-received',    title: ' Received Items ',        icon:'nc-caps-small', class: '' },
 
     { path: '/item-unit',    title: ' Item Unit',        icon:'nc-caps-small', class: '' },
     { path: '/item-family',    title: ' Item  Family ',        icon:'nc-caps-small', class: '' },
