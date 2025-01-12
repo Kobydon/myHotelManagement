@@ -21,6 +21,7 @@ export class PurchaseRequestComponent implements OnInit {
   displayStyle = "none";
   header = '';
   page = 1;
+  displayreturn="none"
   
   pageSize: number = 10; // Change to whatever page size you need
   totalAmount: number = 0;
@@ -138,9 +139,11 @@ export class PurchaseRequestComponent implements OnInit {
     this.displayStyle = "block";
   }
 
+
   // Close the modal
   closePopup() {
     this.displayStyle = "none";
+    this.displayreturn ="none"
   }
 
   // Save new or updated item

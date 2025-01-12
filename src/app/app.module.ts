@@ -57,6 +57,8 @@ import { VendorsComponent } from './vendors/vendors.component';
 import { PurchaseOrderComponent } from './purchase-order/purchase-order.component';
 import { ReceivedItemsComponent } from './received-items/received-items.component';
 import { ReturnRequestComponent } from './return-request/return-request.component';
+import { GeneralLedgerComponent } from './general-ledger/general-ledger.component';
+import { AccountReceivableComponent } from './account-receivable/account-receivable.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -68,7 +70,8 @@ import { ReturnRequestComponent } from './return-request/return-request.componen
     ResLayoutComponent,
   
     VendorsComponent,
-        ReturnRequestComponent,
+      
+       
       
      
   

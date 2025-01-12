@@ -50,7 +50,10 @@ export const ROUTES: RouteInfo[] = [
     { path: '/item-unit',    title: ' Item Unit',        icon:'nc-caps-small', class: '' },
     { path: '/item-family',    title: ' Item  Family ',        icon:'nc-caps-small', class: '' },
     { path: '/item-category',    title: ' Item Category ',        icon:'nc-caps-small', class: '' },
-
+    { path: '/return-request',    title: ' Item Category ',        icon:'nc-caps-small', class: '' },
+    { path: '/general-ledger',    title: ' General Ledger ',        icon:'nc-caps-small', class: '' },
+    { path: '/account-receivable',    title: ' Account Recievable ',        icon:'nc-caps-small', class: '' },
+  
 
     { path: '/item-store',    title: ' Item  Store ',        icon:'nc-caps-small', class: '' },
     { path: '/item-stock',    title: ' Item Stock ',        icon:'nc-caps-small', class: '' },

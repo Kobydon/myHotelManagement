@@ -45,6 +45,9 @@ import { TransferStockComponent } from 'app/transfer-stock/transfer-stock.compon
 import { VendorComponent } from 'app/vendor/vendor.component';
 import { PurchaseOrderComponent } from 'app/purchase-order/purchase-order.component';
 import { ReceivedItemsComponent } from 'app/received-items/received-items.component';
+import { ReturnRequestComponent } from 'app/return-request/return-request.component';
+import { GeneralLedgerComponent } from 'app/general-ledger/general-ledger.component';
+import { AccountReceivableComponent } from 'app/account-receivable/account-receivable.component';
 
 
 
@@ -94,7 +97,8 @@ export const AdminLayoutRoutes: Routes = [
     {path:'department',component:DepartmentsComponent},
     {path:'item-transfer',component:TransferStockComponent},
     {path:'vendor',component:VendorComponent},
-
-
+    {path:'return-request',component:ReturnRequestComponent},
+    {path:'general-ledger',component:GeneralLedgerComponent},
+    {path:'account-receivable',component:AccountReceivableComponent},
 
 ]

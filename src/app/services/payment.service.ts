@@ -82,6 +82,12 @@ getRefund(){
     searchDates(d){
       return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/searchdates', d, httpOptions));
     }
+
+    searchPaymentDates(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_payment_date', d, httpOptions));
+    }
+
+    
     
     searchRefundDates(d){
       return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_refund_dates', d, httpOptions));

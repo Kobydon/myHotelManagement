@@ -64,6 +64,7 @@ export class DetailedReportComponent implements OnInit {
   orderList:any;
  receivedList:any;
  stockList:any;
+ returnList:any;
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
     private paymentService:PaymentService,private guestService:GuestService,private userService:userService) {
       this.paymentForm = this.fb.group({
@@ -159,6 +160,9 @@ async searchDates() {
 
     const stockRes = await this.guestService.searchStockDate(d);
     this.stockList = stockRes || [];
+
+    const ReturnedRes = await this.guestService.searchReturnDate(d);
+    this.returnList = ReturnedRes || [];
     // Fetch refunds
     const refundRes = await this.paymentService.searchRefundDates(d);
     this.refundList = refundRes || [];

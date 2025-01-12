@@ -54,6 +54,9 @@ import { TransferStockComponent } from 'app/transfer-stock/transfer-stock.compon
 import { VendorComponent } from 'app/vendor/vendor.component';
 import { PurchaseOrderComponent } from 'app/purchase-order/purchase-order.component';
 import { ReceivedItemsComponent } from 'app/received-items/received-items.component';
+import { ReturnRequestComponent } from 'app/return-request/return-request.component';
+import { GeneralLedgerComponent } from 'app/general-ledger/general-ledger.component';
+import { AccountReceivableComponent } from 'app/account-receivable/account-receivable.component';
 
 
     
@@ -93,6 +96,8 @@ import { ReceivedItemsComponent } from 'app/received-items/received-items.compon
     AllRoomsComponent,
     RoomStatusComponent,
     ExpensesComponent,
+    GeneralLedgerComponent,
+    AccountReceivableComponent,
  
     BookingsComponent,
     PaymentComponent,
@@ -113,7 +118,7 @@ import { ReceivedItemsComponent } from 'app/received-items/received-items.compon
 
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,
-    StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent
+    StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent
 
 
 

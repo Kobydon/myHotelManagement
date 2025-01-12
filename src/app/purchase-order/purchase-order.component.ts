@@ -19,6 +19,7 @@ export class PurchaseOrderComponent implements OnInit {
   purchaseList: any[] = [];
  orderList: any[] = [];
   displayStyle = "none";
+  displayreturn="none"
   header = '';
   page = 1;
   
@@ -41,6 +42,7 @@ export class PurchaseOrderComponent implements OnInit {
       department: ['', Validators.required],
 
       store: ['', Validators.required],
+      reason: ['', Validators.required],
     
     
     });
@@ -89,10 +91,47 @@ export class PurchaseOrderComponent implements OnInit {
     this.displayStyle = "block";
   }
 
+  
+  openReturn(item: any = null) {
+    if(item){
+      this.itemForm.patchValue(item);
+
+    }
+    
+  
+    this.displayreturn = "block";
+  }
+
+
   // Close the modal
   closePopup() {
     this.displayStyle = "none";
+    this.displayreturn="none"
   }
+
+
+
+
+
+  async newReturn(itemData: any) {
+    try {
+      this.loading.start();
+      let res;
+
+        res = await this.guestService.addReturnRequest(itemData); // Assuming addItem() adds a new item
+        this.toastr.success('Item successfully added');
+      
+      if (res) {
+        this.getOrderList(); // Refresh the item list
+        this.closePopup(); // Close the modal
+      }
+    } catch (error) {
+      this.toastr.error('Error saving item');
+    } finally {
+      this.loading.stop();
+    }
+  }
+
 
   // Save new or updated item
   async savePurchae(itemData: any) {

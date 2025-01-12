@@ -1,0 +1,96 @@
+<div class="page">
+    <div class="row" *blockUI="'loading'">
+      <div class="col-md-12">
+        <div class="card shadow-lg rounded">
+          <div class="card-body p-4">
+            <h4 class="text-center mb-4">Hotel General Ledger Report</h4>
+  
+            <!-- Filters Section -->
+            <div class="d-flex mb-4 justify-content-between align-items-center">
+              <div class="d-flex">
+                <form [formGroup]="paymentForm" class="me-3">
+                  <label for="dates" class="me-2">Select Date:</label>
+                  <input type="date" class="form-control" formControlName="dates" (ngModelChange)="searchDates()" />
+                </form>
+                <button class="btn btn-success btn-sm" (click)="exportexcel()">
+                  <i class="fa fa-file-excel-o"></i> Export to Excel
+                </button>
+                <button type="button" class="btn btn-primary btn-sm ms-2" (click)="printRepo()">
+                  <i class="fa fa-print"></i> Print
+                </button>
+              </div>
+            </div>
+  
+            <!-- General Ledger Section -->
+            <div *ngIf="paymentForm.value.dates" id="ledger-table">
+              <h5 class="text-secondary">General Ledger</h5>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Debit (GH₵)</th>
+                    <th>Credit (GH₵)</th>
+                    <th>Balance (GH₵)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Payments (Credit) -->
+                  <tr *ngFor="let payment of paymentList">
+                    <td>{{ payment.payment_date | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ payment.name }} - Room Booking</td>
+                    <td></td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ totalAmount | number }}</td>
+                  </tr>
+                  
+                  <!-- Refunds (Debit) -->
+                  <tr *ngFor="let refund of refundList">
+                    <td>{{ refund.refund_date | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ refund.name }} - Refund</td>
+                    <td>{{ refund.refund_amount }}</td>
+                    <td></td>
+                    <td>{{ (totalAmount - totalRefundAmount) | number }}</td>
+                  </tr>
+                  
+                  <!-- Income (Credit) -->
+                  <tr *ngFor="let income of incomeList">
+                    <td>{{ income.date | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ income.name }} - Income</td>
+                    <td></td>
+                    <td>{{ income.amount }}</td>
+                    <td>{{ (totalAmount + totalIncome - totalRefundAmount) | number }}</td>
+                  </tr>
+                  
+                  <!-- Expenses (Debit) -->
+                  <tr *ngFor="let expense of expenseList">
+                    <td>{{ expense.date | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ expense.name }} - Expense</td>
+                    <td>{{ expense.amount }}</td>
+                    <td></td>
+                    <td>{{ (totalAmount + totalIncome - totalRefundAmount - totalExpenses) | number }}</td>
+                  </tr>
+                  
+                  <!-- Stock Purchases (Debit) -->
+                  <tr *ngFor="let purchase of purchaseList">
+                    <td>{{ purchase.request_date | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ purchase.item }} - Stock Purchase</td>
+                    <td>{{ purchase.total_cost }}</td>
+                    <td></td>
+                    <td>{{ (totalAmount + totalIncome - totalRefundAmount - totalExpenses - totalPurchases) | number }}</td>
+                  </tr>
+                  
+                  <!-- Closing Balance -->
+                  <tr class="bg-light">
+                    <td colspan="4" class="text-end"><strong>Closing Balance</strong></td>
+                    <td><strong>GH₵{{ (totalAmount + totalIncome - totalRefundAmount - totalExpenses - totalPurchases) | number }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

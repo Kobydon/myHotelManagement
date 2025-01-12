@@ -1,1 +1,259 @@
-<p>return-request works!</p>
+<div class="page">
+    <div class="row" *blockUI="'loading'">
+      <div class="col-md-12" style="width: 100%;">
+        <div class="card shadow-sm">
+          <div class="card-body p-2">
+            <div class="menus">
+              <div class="d-flex">
+                <div class="w-200">
+                  <input
+                    class="form-control"
+                    placeholder="Search for items..."
+                    type="text"
+                    id="myInput"
+                    (keyup)="searchItems()"
+                    style="width: 350px; height: 40px;"
+                  />
+                </div>
+                <div class="w-100"></div>
+              </div>
+            </div>
+  
+            <!-- Button group for adding and exporting -->
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <!-- <button
+                type="button"
+                class="btn btn-sm btn-info"
+                style="float: right;"
+                (click)="openPopup('Add New')"
+              >
+                Add New
+              </button> -->
+              <button
+                type="button"
+                class="btn btn-sm btn-warning"
+                style="float: right;"
+                (click)="exportExcel()"
+              >
+                <i class="fa fa-file-excel-o"></i> Export
+              </button>
+            </div>
+  
+            <!-- Item table -->
+            <div class="table-responsive">
+              <table class="table table-striped" id="excel-table">
+                <thead class="table-light">
+                  <tr class="bg-secondary">
+                    <th scope="col">Order Number</th>
+                    <th scope="col">Item</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Reason</th>
+                    <th scope="col">Request by</th>
+                    <th scope="col"> Date</th>
+                    <th scope="col">Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of returnList | slice: (page - 1) * pageSize : page * pageSize; index as i">
+                    <td>{{ item.item_id }}</td>
+                    <td>{{ item.item }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.reason }}</td>
+                    <td>{{ item.request_by }}</td>
+
+                    <td>{{ item.created_date }}</td>
+                    <td>{{item.status}}</td>
+                    <td *ngIf="item.status=='Pending'"><span class="badge badge-success badge-xs"  style="cursor: pointer;" (click)="approve(item)">Approve</span></td>
+                    <td *ngIf="item.status=='Success'"><span class="badge badge-success badge-xs"  style="cursor: pointer;">Returned</span></td>
+                   
+                    <!-- <td> -->
+                      <!-- <button class="btn btn-info btn-sm" (click)="openPopup('Edit', item)">
+                        <i class="fa fa-edit fa-lg"></i>
+                      </button> -->
+                      <!-- <button
+                        class="btn btn-danger btn-sm"
+                        *ngIf="user[0].roles === 'admin'"
+                        (click)="deletePurchase(item.id)"
+                      >
+                        <i class="fa fa-close fa-lg"></i>
+                      </button> -->
+                      <!-- <button
+                        class="btn btn-success btn-sm"
+                        *ngIf="user[0].roles === 'admin'"
+                        (click)="approvePurchase(item.id)"
+                      >
+                        <i class="fa fa-check-circle fa-lg"></i>
+                      </button> -->
+                    <!-- </td> -->
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+  
+            <!-- Pagination -->
+            <div class="row pt-3">
+              <div class="col-md-9">
+                <ngb-pagination
+                  [collectionSize]="returnList.length"
+                  [pageSize]="pageSize"
+                  [(page)]="page"
+                  (pageChange)="pageClick()"
+                  [maxSize]="5"
+                  [rotate]="true"
+                  [ellipses]="false"
+                  [boundaryLinks]="true"
+                >
+                  <ng-template ngbPaginationFirst>First</ng-template>
+                  <ng-template ngbPaginationLast>Last</ng-template>
+                  <ng-template ngbPaginationPrevious>Prev</ng-template>
+                  <ng-template ngbPaginationNext>Next</ng-template>
+                  <ng-template ngbPaginationEllipsis>...</ng-template>
+                  <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
+                </ngb-pagination>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Modal for adding/editing items -->
+    <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': displayStyle }">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            {{ header }}
+            <button type="button" class="btn-close" (click)="closePopup()">x</button>
+          </div>
+          <div class="modal-body">
+            <div class="col-md-12" style="width: 100%;">
+              <div class="card card-room">
+                <div class="card-header"></div>
+                <div class="card-body">
+                  <form [formGroup]="itemForm" >
+                    <div class="row">
+                      <!-- <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Item</label>
+                          <select formControlName="item" class="form-control">
+                            <option value="" hidden selected>------</option>
+                            <option *ngFor="let item of itemList" value="{{ item.name }}">{{ item.name }}</option>
+                          </select>
+                        </div>
+                      </div>
+   -->
+                      <!-- <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Department</label>
+                          <select formControlName="department" class="form-control">
+                            <option value="" hidden selected>------</option>
+                            <option *ngFor="let item of departmentList" value="{{ item.name }}">{{ item.name }}</option>
+                          </select>
+                        </div>
+                      </div> -->
+  
+                      <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Unit Price</label>
+                          <input type="text" class="form-control" formControlName="unit_price" />
+                        </div>
+                      </div>
+  
+                      <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Total Cost</label>
+                          <input type="text" class="form-control" formControlName="total_cost" />
+                        </div>
+                      </div>
+  
+                      <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Quantity</label>
+                          <input type="text" class="form-control" formControlName="quantity" />
+                        </div>
+                      </div>
+                    </div>
+  
+                    <div class="row">
+                      <div class="update ml-auto mr-auto" *ngIf="header === 'Add New'">
+                        <button type="submit" class="btn btn-primary btn-round">Save</button>
+                      </div>
+                      <div class="update ml-auto mr-auto" *ngIf="header === 'Edit'">
+                        <button type="submit" class="btn btn-primary btn-round">Update</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
+
+
+
+
+
+  <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': displayreturn }">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          {{ header }}
+          <button type="button" class="btn-close" (click)="closePopup()">x</button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-12" style="width: 100%;">
+            <div class="card card-room">
+              <div class="card-header"></div>
+              <div class="card-body">
+                <form [formGroup]="itemForm"  (ngSubmit)="newReturn(itemForm.value)">
+                  <div class="row">
+                 
+
+                    <div class="col-md-5 pr-1">
+                      <div class="form-group">
+                        <label>Item</label>
+                        <input type="text" class="form-control" formControlName="item" />
+                      </div>
+                    </div>
+
+                    <div class="col-md-5 pr-1">
+                      <div class="form-group">
+                        <label>Quantity</label>
+                        <input type="text" class="form-control" formControlName="quantity" />
+                      </div>
+                    </div>
+
+
+
+                    <div class="col-md-5 pr-1">
+                      <div class="form-group">
+                        <label>Reason</label>
+                        <textarea formControlName="reason" id="" rows="4" cols="50"></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="update ml-auto mr-auto" >
+                      <button type="submit" class="btn btn-primary btn-round">Save</button>
+                    </div>
+                    <!-- <div class="update ml-auto mr-auto" *ngIf="header === 'Edit'">
+                      <button type="submit" class="btn btn-primary btn-round">Update</button>
+                    </div> -->
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

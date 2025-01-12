@@ -223,6 +223,13 @@ addExpense(dep:any) {
                     return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/approve_purchase', dep, httpOptions));
                   } 
 
+                  approveReturnRequest(dep:any) {
+                    //console.log(guest);
+                      return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/approve_return_request', dep, httpOptions));
+                    } 
+
+                  
+
               updateDepartment(dep:any) {
                 //console.log(guest);
                   return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_department', dep, httpOptions));
@@ -519,6 +526,11 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_budget_dates', d, httpOptions));
     }
 
+    searchReturnDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_return_date', d, httpOptions));
+    }
+
+    
           
     searchExpenseDate(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates', d, httpOptions));
@@ -576,6 +588,16 @@ getcheckOut(): Observable<any[]>{
       //console.log(guest);
         return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_budget', sch, httpOptions));
       }     
+
+
+       
+      addReturnRequest(sch:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_return_request', sch, httpOptions));
+      }     
+
+
+      
 
       addRecievedItem(sch:any) {
         //console.log(guest);
@@ -676,6 +698,12 @@ getcheckOut(): Observable<any[]>{
           return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_received'));
         }
 
+
+        getReturnRequest() {
+          //console.log(guest);get
+            return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_return_request'));
+          }
+  
 }
 
 

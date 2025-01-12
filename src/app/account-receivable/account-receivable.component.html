@@ -1,0 +1,66 @@
+<div class="page">
+    <div class="row" *blockUI="'loading'">
+      <div class="col-md-12">
+        <div class="card shadow-lg rounded">
+          <div class="card-body p-4">
+            <h4 class="text-center mb-4">Account Receivable Report</h4>
+  
+            <!-- Filters Section -->
+            <div class="d-flex mb-4 justify-content-between align-items-center">
+              <div class="d-flex">
+                <form [formGroup]="paymentForm" class="me-3">
+                  <label for="dates" class="me-2">Select Date:</label>
+                  <input type="date" class="form-control" formControlName="dates" (ngModelChange)="searchDates()" />
+                </form>
+                <button class="btn btn-success btn-sm" (click)="exportexcel()">
+                  <i class="fa fa-file-excel-o"></i> Export to Excel
+                </button>
+                <button type="button" class="btn btn-primary btn-sm ms-2" (click)="printRepo()">
+                  <i class="fa fa-print"></i> Print
+                </button>
+              </div>
+            </div>
+  
+            <!-- Account Receivable Table Section -->
+            <div *ngIf="paymentForm.value.dates" id="receivable-table">
+              <h5 class="text-secondary">Account Receivable</h5>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Amount (GH₵)</th>
+                    <th>Balance (GH₵)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Room Charges (Amount) -->
+                  <tr *ngFor="let payment of paymentList">
+                    <td>{{ payment.payment_date | date: 'yyyy-MM-dd'}}</td>
+                    <td>{{ payment.name }} - Room Booking</td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ payment.balance }}</td> <!-- Balance (Amount Owed) -->
+                  </tr>
+  
+                  <!-- Purchases (Amount Owed) -->
+                  <!-- <tr *ngFor="let purchase of purchaseList">
+                    <td>{{ purchase.request_date | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ purchase.item }} - Purchase</td>
+                    <td>{{ purchase.total_cost }}</td>
+                    <td>{{ (totalAmount - totalPurchases) | number }}</td> 
+                  </tr>
+   -->
+                  <!-- Closing Balance -->
+                  <tr class="bg-light">
+                    <td colspan="3" class="text-end"><strong>Total Balance</strong></td>
+                    <td><strong>GH₵{{ balance| number }}</strong></td> <!-- Closing Balance -->
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
