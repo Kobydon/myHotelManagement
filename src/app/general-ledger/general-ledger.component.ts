@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,AfterViewInit ,NgZone} from '@angular/core';
 import { RoomService } from 'app/services/rooms.service';
 import { GuestService } from 'app/services/guest.service';
 import { error } from 'console';
@@ -22,7 +22,7 @@ import * as XLSX from 'xlsx';
 })
 export class GeneralLedgerComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI
-  fileName= 'detailed_sales_report.xlsx';
+  fileName= 'general_ledger.xlsx';
   paymentForm:FormGroup;
   page = 1;
   pageSize: number = 10;
@@ -65,8 +65,9 @@ export class GeneralLedgerComponent implements OnInit {
  receivedList:any;
  stockList:any;
  returnList:any;
+ 
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
-    private paymentService:PaymentService,private guestService:GuestService,private userService:userService) { 
+    private paymentService:PaymentService,private guestService:GuestService,private userService:userService,private ngZone: NgZone) { 
 
       this.paymentForm = this.fb.group({
         id:['',Validators.required],
@@ -335,31 +336,15 @@ export class GeneralLedgerComponent implements OnInit {
     if (printWindow) {
       printWindow.document.write('<html><head><title>Report</title>');
       
-      // Add some basic CSS for printing (you can customize further if needed)
+      // Add some basic CSS for printing
       printWindow.document.write(`
         <style>
-          body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          th, td {
-            padding: 8px;
-            border: 1px solid #ddd;
-          }
-          th {
-            background-color: #f2f2f2;
-          }
-          .text-end {
-            text-align: end;
-          }
-          .bg-light {
-            background-color: #f8f9fa;
-          }
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { padding: 8px; border: 1px solid #ddd; }
+          th { background-color: #f2f2f2; }
+          .text-end { text-align: end; }
+          .bg-light { background-color: #f8f9fa; }
         </style>
       `);
   
@@ -367,20 +352,18 @@ export class GeneralLedgerComponent implements OnInit {
       printWindow.document.write('</head><body>');
       printWindow.document.write(printContent || '');
       printWindow.document.write('</body></html>');
-  
-      // Close the document to finish writing
       printWindow.document.close();
   
       // Wait for the content to load before triggering the print dialog
-      printWindow.onload = () => {
-        printWindow.print();
-        printWindow.close(); // Close the window after printing
-      };
+      this.ngZone.run(() => {
+        printWindow.onload = () => {
+          printWindow.print();
+          printWindow.close(); // Close the window after printing
+        };
+      });
     } else {
       console.error('Failed to open the print window.');
     }
   }
-  
-  
 
 }

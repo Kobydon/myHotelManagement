@@ -81,7 +81,8 @@ export class PaymentComponent implements OnInit {
     refund_amount:['',Validators.required],
     guest_id:['',Validators.required],
 
-    room_number :['',Validators.required]
+    room_number :['',Validators.required],
+    default_amount :['',Validators.required]
     
    
   })
@@ -294,7 +295,8 @@ async fetchRoomType(id:number){
 
 calDiscount(record){
   this.paymentForm.patchValue({amount:this.paymentForm.value.amount - this.paymentForm.value.amount
-  * this.paymentForm.value.discount/100})
+  * this.paymentForm.value.discount/100,topay:this.paymentForm.value.amount - this.paymentForm.value.amount
+    * this.paymentForm.value.discount/100})
   // this.roomForList[0].base_price*this.createForm.value.duration - 
   //     this.roomForList[0].base_price *this.createForm.value.duration*this.createForm.value.discount/100
 
@@ -302,8 +304,9 @@ calDiscount(record){
 
 async addPayment(record) {
   const amountToPay = Number(this.paymentForm.value.topay); // Convert to number
-  const totalAmount = Number(record.amount) + Number(record.discount); // Convert to number
-  const balance = amountToPay - totalAmount; // Result will be a number
+  const totalAmount = Number(record.amount)  // Convert to number
+  const balance = amountToPay - totalAmount; // Calculate the balance
+  const b ="0"
   
   const payment: any = {
     amount: record.amount,    
@@ -319,12 +322,16 @@ async addPayment(record) {
     children: record.children,
     room_number: record.room_number,
     adult: record.adult,
-    balace:"0"
+    balance:balance
     
     // Adjusted balance calculation: Add the amount and discount
 
     
   };
+
+  // if (payment.discount !=="") {
+  //  payment.balace=b
+  // }
 
   try {
     this.loading.start();
@@ -398,6 +405,8 @@ async  editPayment(id:number){
    id:this.payment[0].id,
     name:this.payment[0].name,
     amount:this.payment[0].amount,
+    balance:this.payment[0].balance,
+    default_amount:this.payment[0].amount,
 
   
     // reserved:['',Validators.required],
@@ -587,42 +596,47 @@ async generateInvoice(id: number) {
 }
 
 
-async updatePayment(record){
-  const payment:any = {
-    id:record.id,
-   amount:record.amount,    
-    name: record.name,
-
-     discount : record.discount,
-      // reserved:['',Validators.required],
-    method: record.method,
-    room_type : record.room_type,
-   
-    payment_date : record.payment_date,
-
-    checkin_date : record.checkin_date,
-    checkout_date :record.checkout_date,
-    status :record.status,
-
-    children :record.children,
-    adult :record.adult,
-
-}
-
-try{
-  this.loading.start();
-  var res = await this.paymentService.updatePayment(payment);
-  if(res)  this.closePopup();this.getPaymentList();
-}catch(error){
-  this.toastr.error(null,error);
-}
-
-  finally{
-    this.loading.stop();
-  }
-
-}
-
+  // Calculate the new balance
+  async updatePayment(record: any) {
+    const payment = {
+      id: record.id,
+      amount: record.amount,
+      name: record.name,
+      discount: record.discount,
+      method: record.method,
+      room_type: record.room_type,
+      payment_date: record.payment_date,
+      checkin_date: record.checkin_date,
+      checkout_date: record.checkout_date,
+      status: record.status,
+      children: record.children,
+      adult: record.adult,
+      balance: record.balance || 0, // Ensure balance is initialized
+    };
+  
+    // Calculate the new balance
+  //  const balance = parseInt(payment.amount) + parseInt(payment.balance) - parseInt(this.paymentForm.value.default_amount);
+    // console.log(balance)
+  
+    try {
+      // Start loading indicator
+      this.loading.start();
+  
+      // Call the service to update payment
+      const res = await this.paymentService.updatePayment(payment);
+  
+      if (res) {
+        // Close popup and refresh the payment list
+        this.closePopup();
+        this.getPaymentList();
+      }
+    } catch (error) {
+      // Show error notification if something fails
+      this.toastr.error(null, error);
+    } finally {
+      // Stop loading indicator
+      this.loading.stop();
+    }}
 async addRefund(record){
     const lst = {
       id :record.id,

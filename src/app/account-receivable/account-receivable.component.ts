@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,NgZone } from '@angular/core';
 import { RoomService } from 'app/services/rooms.service';
 import { GuestService } from 'app/services/guest.service';
 import { error } from 'console';
@@ -22,7 +22,7 @@ import * as XLSX from 'xlsx';
 })
 export class AccountReceivableComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI
-  fileName= 'detailed_sales_report.xlsx';
+  fileName= 'account_receivable.xlsx';
   paymentForm:FormGroup;
   page = 1;
   pageSize: number = 10;
@@ -66,7 +66,8 @@ export class AccountReceivableComponent implements OnInit {
  stockList:any;
  returnList:any;
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
-    private paymentService:PaymentService,private guestService:GuestService,private userService:userService) {
+    private paymentService:PaymentService,private guestService:GuestService,private userService:userService,
+  private ngZone: NgZone) {
       this.paymentForm = this.fb.group({
         id:['',Validators.required],
         name:['',Validators.required],
@@ -255,21 +256,7 @@ export class AccountReceivableComponent implements OnInit {
     }
     
     
-    exportexcel()
-    {
-      /* pass here the table id */
-      let element = document.getElementById('receivable-table"');
-      const ws: XLSX.WorkSheet =XLSX.utils.table_to_sheet(element);
-    
-      /* generate workbook and add the worksheet */
-      const wb: XLSX.WorkBook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    
-      /* save to file */  
-      XLSX.writeFile(wb, this.fileName);
-    
-    }
-    
+  
     
     printReport() {
       const printContents = document.querySelector('.page')?.innerHTML;
@@ -288,7 +275,7 @@ export class AccountReceivableComponent implements OnInit {
     }
     
     exportToExcel() {
-      const table = document.getElementById('excel-table');
+      const table = document.getElementById('receivable-table');
       if (table) {
         const workbook = XLSX.utils.table_to_book(table);
         XLSX.writeFile(workbook, 'Hotel_Report.xlsx');
@@ -296,6 +283,21 @@ export class AccountReceivableComponent implements OnInit {
         console.error("Table not found for exporting to Excel.");
       }
     }
+
+      exportexcel()
+      {
+        /* pass here the table id */
+        let element = document.getElementById('receivable-table');
+        const ws: XLSX.WorkSheet =XLSX.utils.table_to_sheet(element);
+      
+        /* generate workbook and add the worksheet */
+        const wb: XLSX.WorkBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      
+        /* save to file */  
+        XLSX.writeFile(wb, this.fileName);
+      
+      }
     
     // async downloadPDF() {
     //   const element = document.querySelector('.page');
@@ -314,7 +316,7 @@ export class AccountReceivableComponent implements OnInit {
     
     
     printRepo(): void {
-      const printContent = document.getElementById('receivable-table"')?.outerHTML;
+      const printContent = document.getElementById('receivable-table')?.outerHTML;
     
       if (!printContent) {
         console.error('No content found to print.');
@@ -327,31 +329,15 @@ export class AccountReceivableComponent implements OnInit {
       if (printWindow) {
         printWindow.document.write('<html><head><title>Report</title>');
         
-        // Add some basic CSS for printing (you can customize further if needed)
+        // Add some basic CSS for printing
         printWindow.document.write(`
           <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-            }
-            table {
-              width: 100%;
-              border-collapse: collapse;
-            }
-            th, td {
-              padding: 8px;
-              border: 1px solid #ddd;
-            }
-            th {
-              background-color: #f2f2f2;
-            }
-            .text-end {
-              text-align: end;
-            }
-            .bg-light {
-              background-color: #f8f9fa;
-            }
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { padding: 8px; border: 1px solid #ddd; }
+            th { background-color: #f2f2f2; }
+            .text-end { text-align: end; }
+            .bg-light { background-color: #f8f9fa; }
           </style>
         `);
     
@@ -359,15 +345,15 @@ export class AccountReceivableComponent implements OnInit {
         printWindow.document.write('</head><body>');
         printWindow.document.write(printContent || '');
         printWindow.document.write('</body></html>');
-    
-        // Close the document to finish writing
         printWindow.document.close();
     
         // Wait for the content to load before triggering the print dialog
-        printWindow.onload = () => {
-          printWindow.print();
-          printWindow.close(); // Close the window after printing
-        };
+        this.ngZone.run(() => {
+          printWindow.onload = () => {
+            printWindow.print();
+            printWindow.close(); // Close the window after printing
+          };
+        });
       } else {
         console.error('Failed to open the print window.');
       }

@@ -80,7 +80,7 @@
 
 
       <!-- <td><button class="btn btn-info" style="width: 15%;"> -->
-        <td ><i *ngIf="user[0].roles=='admin'" class="fa fa-edit fa-lg text-info"  (click)="editPayment(payment.id)"></i>
+        <td ><i  class="fa fa-edit fa-lg text-info"  (click)="editPayment(payment.id)"></i>
             <i  *ngIf="user[0].roles=='admin'" class="fa fa-close fa-lg text-danger" (click)="deletePayment(payment.id)" ></i>
             
             <span *ngIf="payment.status=='success'" 
