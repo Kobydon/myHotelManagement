@@ -62,7 +62,12 @@ export const ROUTES: RouteInfo[] = [
     { path: '/item-transfer',    title: ' Item  Transfer ',        icon:'nc-caps-small', class: '' },
     { path: '/department',    title: ' Item Stock ',        icon:'nc-caps-small', class: '' },
 
+    { path: '/general-ledger-dates',    title: ' General Ledger  ',        icon:'nc-caps-small', class: '' },
+    { path: '/account-receivable-dates',    title: ' Account Recievable  Dates',        icon:'nc-caps-small', class: '' },
+    
+
     { path: '/vendor',    title: ' Vendor  ',        icon:'nc-caps-small', class: '' },
+    { path: '/gop-deduction',    title: ' Gop Dedutcion  ',        icon:'nc-caps-small', class: '' },
 
 ];
 

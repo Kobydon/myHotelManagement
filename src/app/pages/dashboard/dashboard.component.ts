@@ -115,7 +115,8 @@ export class DashboardComponent implements OnInit {
     this.paymentList.forEach((payment: any) => {
       const paymentDate = new Date(payment.payment_date);
       const monthName = this.months[paymentDate.getMonth()];
-      this.monthlyPayments[monthName] += payment.amount;
+      const amount = parseInt(payment.amount, 10);
+      this.monthlyPayments[monthName] += amount;
     });
   }
 

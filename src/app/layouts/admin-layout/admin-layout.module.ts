@@ -57,6 +57,10 @@ import { ReceivedItemsComponent } from 'app/received-items/received-items.compon
 import { ReturnRequestComponent } from 'app/return-request/return-request.component';
 import { GeneralLedgerComponent } from 'app/general-ledger/general-ledger.component';
 import { AccountReceivableComponent } from 'app/account-receivable/account-receivable.component';
+import { LedgerPagesComponent } from 'app/ledger-pages/ledger-pages.component';
+import { AccountReceivablePagesComponent } from 'app/account-receivable-pages/account-receivable-pages.component';
+import { GopDeductionComponent } from 'app/gop-deduction/gop-deduction.component';
+import { FinancialOverviewComponent } from 'app/financial-overview/financial-overview.component';
 
 
     
@@ -98,6 +102,9 @@ import { AccountReceivableComponent } from 'app/account-receivable/account-recei
     ExpensesComponent,
     GeneralLedgerComponent,
     AccountReceivableComponent,
+    LedgerPagesComponent,
+    AccountReceivablePagesComponent,
+    GopDeductionComponent,
  
     BookingsComponent,
     PaymentComponent,
@@ -117,7 +124,7 @@ import { AccountReceivableComponent } from 'app/account-receivable/account-recei
     DailyIncomeReportComponent,ReceivedItemsComponent,
 
     DailyIncomeReportDatesBetweenComponent,
-    ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,
+    ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,
     StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent
 
 

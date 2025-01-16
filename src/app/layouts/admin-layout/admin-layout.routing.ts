@@ -48,6 +48,10 @@ import { ReceivedItemsComponent } from 'app/received-items/received-items.compon
 import { ReturnRequestComponent } from 'app/return-request/return-request.component';
 import { GeneralLedgerComponent } from 'app/general-ledger/general-ledger.component';
 import { AccountReceivableComponent } from 'app/account-receivable/account-receivable.component';
+import { LedgerPagesComponent } from 'app/ledger-pages/ledger-pages.component';
+import { AccountReceivablePagesComponent } from 'app/account-receivable-pages/account-receivable-pages.component';
+import { GopDeductionComponent } from 'app/gop-deduction/gop-deduction.component';
+import { FinancialOverviewComponent } from 'app/financial-overview/financial-overview.component';
 
 
 
@@ -100,5 +104,10 @@ export const AdminLayoutRoutes: Routes = [
     {path:'return-request',component:ReturnRequestComponent},
     {path:'general-ledger',component:GeneralLedgerComponent},
     {path:'account-receivable',component:AccountReceivableComponent},
+
+    {path:'general-ledger-dates',component:LedgerPagesComponent},
+    {path:'account-receivable-dates',component:AccountReceivablePagesComponent},
+    {path:'gop-deduction',component:GopDeductionComponent},
+    {path:'financial-overview',component:FinancialOverviewComponent},
 
 ]

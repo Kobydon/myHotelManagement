@@ -11,7 +11,8 @@
                 <form [formGroup]="paymentForm" class="me-3">
                   <label for="dates" class="me-2">Select Date:</label>
                   <input type="date" class="form-control" formControlName="dates" (ngModelChange)="searchDates()" />
-                </form>
+                  <input type="date" class="form-control" formControlName="date_two" (ngModelChange)="searchDates()" />
+                </form><br><br><br>
                 <div class="button-group">
                 <button class="btn btn-success btn-sm" (click)="exportexcel()">
                   <i class="fa fa-file-excel-o"></i> Export to Excel
@@ -19,7 +20,7 @@
                 <button type="button" class="btn btn-primary btn-sm ms-2" (click)="printRepo()">
                   <i class="fa fa-print"></i> Print
                 </button>
-              </div>
+            </div>
               </div>
             </div>
   

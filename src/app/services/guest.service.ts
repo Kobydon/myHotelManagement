@@ -191,6 +191,10 @@ addExpense(dep:any) {
         
         
   
+          getgopList() {
+            //console.log(guest);
+              return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_gop_list'));
+            }
       
 
           getGroupList() {
@@ -352,6 +356,12 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_guest', guest, httpOptions));
     }
 
+    addGop(gop:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_gop', gop, httpOptions));
+      }
+  
+
     addPurchase(guest:any) {
       //console.log(guest);
         return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_purchase', guest, httpOptions));
@@ -409,6 +419,17 @@ getcheckOut(): Observable<any[]>{
 	  if (confirm("Are you sure to delete?")) {
 		// const id = typeof ad === 'number' ? ad : ad.id;
 		const url = `${this.guestUrl}/guest/delete_guest/${id}`;
+		return  lastValueFrom(  this.http.delete(url, httpOptions))
+	  }
+	  return of({});
+  }
+  
+
+
+  deleteGop(id:number) {
+	  if (confirm("Are you sure to delete?")) {
+		// const id = typeof ad === 'number' ? ad : ad.id;
+		const url = `${this.guestUrl}/guest/delete_gop/${id}`;
 		return  lastValueFrom(  this.http.delete(url, httpOptions))
 	  }
 	  return of({});
@@ -517,6 +538,10 @@ getcheckOut(): Observable<any[]>{
 
 
   
+    updateGop(sch:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_gop', sch, httpOptions));
+      }
 
     
 
@@ -524,6 +549,11 @@ getcheckOut(): Observable<any[]>{
        
     searchIncomeBudgetDates(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_budget_dates', d, httpOptions));
+    }
+
+        
+    searchGopDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_gop_dates', d, httpOptions));
     }
 
     searchReturnDate(d){
@@ -554,6 +584,11 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_purchase_date', d, httpOptions));
     }
 
+
+    searchPurchaseDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_purchase_date_two', d, httpOptions));
+    }
+
     searchOrderDate(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_order_date', d, httpOptions));
     }
@@ -561,6 +596,8 @@ getcheckOut(): Observable<any[]>{
     searchBudgetDates(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_budget_dates', d, httpOptions));
     }
+
+    
         
     searchIncomeDatesTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_dates_two', d, httpOptions));
@@ -628,6 +665,12 @@ getcheckOut(): Observable<any[]>{
     const url = `${this.guestUrl}/guest/get_income/${id}`;
     return   lastValueFrom( this.http.get<any>(url));
   }
+
+  getGop(id: number){
+    const url = `${this.guestUrl}/guest/get_gop/${id}`;
+    return   lastValueFrom( this.http.get<any>(url));
+  }
+  
     
   getBudget(id: number){
     const url = `${this.guestUrl}/guest/get_budget/${id}`;

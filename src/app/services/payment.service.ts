@@ -83,10 +83,20 @@ getRefund(){
       return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/searchdates', d, httpOptions));
     }
 
+
+    searchDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/searchdates_two', d, httpOptions));
+    }
+
     searchPaymentDates(d){
       return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_payment_date', d, httpOptions));
     }
 
+
+    
+    searchPaymentDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_payment_date_two', d, httpOptions));
+    }
     
     
     searchRefundDates(d){
@@ -94,6 +104,10 @@ getRefund(){
     }
 
     
+    searchRefundDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_refund_dates_two', d, httpOptions));
+    }
+
 
   postroom_type(ad:any) {
     //console.log(user);

@@ -1,103 +1,122 @@
 <div class="container" *blockUI="'loading'">
-  <!-- Report Selection Form -->
-  <form [formGroup]="createForm" class="mb-4">
-    <div class="form-group">
-      <label for="dates">Select Date:</label>
-      <input 
-        type="date" 
-        id="dates" 
-        class="form-control" 
-        formControlName="dates" 
-        (ngModelChange)="searchDates()" 
-        style="max-width: 300px;">
-    </div>
-  </form>
+  <!-- Entire Content in a Card -->
+  <div class="card bg-white shadow-sm">
+    <div class="card-body">
+      
+      <!-- Report Selection Form -->
+      <form [formGroup]="createForm" class="mb-4">
+        <div class="form-group">
+          <label for="dates">Select Date:</label>
+          <input 
+            type="date" 
+            id="dates" 
+            class="form-control" 
+            formControlName="dates" 
+            (ngModelChange)="searchDates()" 
+            style="max-width: 300px;">
+        </div>
+      </form>
 
-  <!-- Action Buttons -->
-  <div class="d-flex mb-4">
-    <button class="btn btn-primary mr-2" (click)="printToPdf()">Print</button>
-    <button id="pdfBtn" class="btn btn-secondary" (click)="downloadPdf()">Download PDF</button>
-  </div>
-
-  <!-- Daily Report Display -->
-  <div *ngIf="incomeReport.length > 0 || expenditureReport.length > 0; else noReport" id="pdf">
-    <header class="text-center mb-4">
-      <h2>West End Arena Hotel & Restaurant</h2>
-      <p>Daily Income and Expenditure Report</p>
-      <p>Date: {{ createForm.value.dates | date:'MMMM d, yyyy' }}</p>
-    </header>
-
-    <!-- Income Section -->
-    <section class="report-section mb-4">
-      <h3>Income</h3>
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-          <thead class="thead-dark">
-            <tr>
-              <th>Income Category</th>
-              <th>Amount (₵)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of incomeReport">
-              <td>{{ item.name }}</td>
-              <td>{{ item.amount | currency:'₵' }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr class="font-weight-bold">
-              <td>Total Income</td>
-              <td>{{ totalIncome | currency:'₵' }}</td>
-            </tr>
-          </tfoot>
-        </table>
+      <!-- Action Buttons -->
+      <div class="d-flex mb-4">
+        <button class="btn btn-primary mr-2" (click)="printToPdf()">Print</button>
+        <button id="pdfBtn" class="btn btn-secondary" (click)="downloadPdf()">Download PDF</button>
       </div>
-    </section>
 
-    <!-- Expenditure Section -->
-    <section class="report-section mb-4">
-      <h3>Expenditure</h3>
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-          <thead class="thead-dark">
-            <tr>
-              <th>Expenditure Category</th>
-              <th>Amount (₵)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of expenditureReport">
-              <td>{{ item.name }}</td>
-              <td>{{ item.amount | currency:'₵' }}</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr class="font-weight-bold">
-              <td>Total Expenditure</td>
-              <td>{{ totalExpenditure | currency:'₵' }}</td>
-            </tr>
-          </tfoot>
-        </table>
+      <!-- Daily Report Display -->
+      <div *ngIf="incomeReport.length > 0 || expenditureReport.length > 0; else noReport" id="pdf">
+        <header class="text-center mb-4">
+          <h2>West End Arena Hotel & Restaurant</h2>
+          <p>Daily Income and Expenditure Report</p>
+          <p>Date: {{ createForm.value.dates | date:'MMMM d, yyyy' }}</p>
+        </header>
+
+        <!-- Income Section in Card -->
+        <section class="report-section mb-4">
+          <h3>Income</h3>
+          <div class="card bg-white shadow-sm">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th>Income Category</th>
+                      <th>Amount (₵)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of incomeReport">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.amount | currency:'₵' }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="font-weight-bold">
+                      <td>Total Income</td>
+                      <td>{{ totalIncome | currency:'₵' }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Expenditure Section in Card -->
+        <section class="report-section mb-4">
+          <h3>Expenditure</h3>
+          <div class="card bg-white shadow-sm">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th>Expenditure Category</th>
+                      <th>Amount (₵)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of expenditureReport">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.amount | currency:'₵' }}</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr class="font-weight-bold">
+                      <td>Total Expenditure</td>
+                      <td>{{ totalExpenditure | currency:'₵' }}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cash at Hand Section in Card -->
+        <section class="report-section mb-4">
+          <h3>Cash at Hand</h3>
+          <div class="card bg-white shadow-sm">
+            <div class="card-body">
+              <p><strong>{{ totalIncome - totalExpenditure | currency:'₵' }}</strong></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer text-right mt-5">
+          <p>Generated by: <strong>{{ user[0].firstname + " " + user[0].lastname }}</strong></p>
+          <p>Signature: __________________________</p>
+        </footer>
       </div>
-    </section>
 
-    <!-- Cash at Hand Section -->
-    <section class="report-section mb-4">
-      <h3>Cash at Hand</h3>
-      <p><strong>{{ totalIncome - totalExpenditure | currency:'₵' }}</strong></p>
-    </section>
+      <!-- No Report Available Message -->
+      <ng-template #noReport>
+        <div class="alert alert-info text-center">
+          <p>No records found for the selected date.</p>
+        </div>
+      </ng-template>
 
-    <!-- Footer -->
-    <footer class="footer text-right mt-5">
-      <p>Generated by: <strong>{{ user[0].firstname + " " + user[0].lastname }}</strong></p>
-      <p>Signature: __________________________</p>
-    </footer>
-  </div>
-
-  <!-- No Report Available Message -->
-  <ng-template #noReport>
-    <div class="alert alert-info text-center">
-      <p>No records found for the selected date.</p>
     </div>
-  </ng-template>
+  </div>
 </div>

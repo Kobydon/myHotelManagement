@@ -59,6 +59,10 @@ import { ReceivedItemsComponent } from './received-items/received-items.componen
 import { ReturnRequestComponent } from './return-request/return-request.component';
 import { GeneralLedgerComponent } from './general-ledger/general-ledger.component';
 import { AccountReceivableComponent } from './account-receivable/account-receivable.component';
+import { LedgerPagesComponent } from './ledger-pages/ledger-pages.component';
+import { AccountReceivablePagesComponent } from './account-receivable-pages/account-receivable-pages.component';
+import { GopDeductionComponent } from './gop-deduction/gop-deduction.component';
+import { FinancialOverviewComponent } from './financial-overview/financial-overview.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -70,6 +74,9 @@ import { AccountReceivableComponent } from './account-receivable/account-receiva
     ResLayoutComponent,
   
     VendorsComponent,
+     
+      
+     
       
        
       

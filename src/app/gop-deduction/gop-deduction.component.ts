@@ -12,10 +12,10 @@ import { RoomService } from 'app/services/rooms.service';
 import { userService } from 'app/user.service';
 @Component({
   selector: 'expenses',
-  templateUrl: './expenses.component.html',
-  styleUrls: ['./expenses.component.css']
+  templateUrl: './gop-deduction.component.html',
+  styleUrls: ['./gop-deduction.component.css']
 })
-export class ExpensesComponent implements OnInit {
+export class GopDeductionComponent implements OnInit {
 
 
 
@@ -23,7 +23,7 @@ export class ExpensesComponent implements OnInit {
   base64_string:any;
   header:any;
   displayStyle ="none";
-  fileName= 'expense.xlsx';
+  fileName= 'Gop_deduction.xlsx';
   // @Input() ad: Adds ={brand:'',category:'',condition:'',price:'',description:'',
   //                     phone:'',negotiable:'',city:'',image:'',post_by_id:''};
   //  login:Login[]=[];
@@ -42,7 +42,7 @@ export class ExpensesComponent implements OnInit {
   page = 1;
   pageSize: number = 100;
   feestypeList:any;
-expenseList:any;
+gopList:any;
 classList:any;
 user:any;
   constructor(private fb:FormBuilder,private toastr:ToastrService,private guestService:GuestService,
@@ -67,14 +67,14 @@ user:any;
 
   ngOnInit(): void {
     this.getUser();
-    this.getExpenseLIst();
+    this.getgopList();
   }
 
 
 
 
 
-  async  adExpense(record){
+  async  addGop(record){
 
     const d ={
    
@@ -95,8 +95,8 @@ user:any;
      // guest.image_three= this.base64_string
      try{
        this.loading.start();
-      var res  = await this.guestService.addExpense(d);
-      if(res)this.toastr.success(null,"record successfully added ");this.getExpenseLIst();
+      var res  = await this.guestService.addGop(d);
+      if(res)this.toastr.success(null,"record successfully added ");this.getgopList();
    
      
      } catch(error){
@@ -117,11 +117,11 @@ user:any;
   
    
   
-   async getExpenseLIst(){
+   async getgopList(){
     try{
       this.loading.start();
-      var res = await this.guestService.getExpenseList();
-      if(res) this.expenseList=res; 
+      var res = await this.guestService.getgopList();
+      if(res) this.gopList=res; 
   
     } catch(error){
       this.toastr.error(null,error)
@@ -171,14 +171,14 @@ user:any;
   
   
    
-  async editExpense(id:any) {
+  async editGop(id:any) {
       
     this.header ="Edit";
   
     this.displayStyle = "block";
     try{
       this.loading.start();
-      this.expense_info =  await this.guestService.getExpense(id);
+      this.expense_info =  await this.guestService.getGop(id);
     
       if ( this.expense_info)  
       this.createForm.patchValue({
@@ -206,11 +206,11 @@ user:any;
   
   
   
-  async updateExpense(record){
+  async updateGOP(record){
    
     const d ={
 
-   
+        id:record.id,
         name:record.name,
         amount:record.amount,
         note:record.note,
@@ -223,9 +223,9 @@ user:any;
         }
     try{
       this.loading.start();
-       var res= await this.guestService.updateExpense(d);
+       var res= await this.guestService.updateGop(d);
             // this.toastr.success(null,"successfully updated profile
-this.getExpenseLIst  
+this.getgopList  
     }
     catch(error:any){
       this.toastr.error(null,error)
@@ -236,13 +236,13 @@ this.getExpenseLIst
    }
   }
   
-  async deleteExpense(id:number){
+  async deleteGop(id:number){
   
     try{
       this.loading.start();
-       var res= await this.guestService.deleteExpense(id)
+       var res= await this.guestService.deleteGop(id)
             // this.toastr.success(null,"successfully updated profile
-            if(res)  this.getExpenseLIst();
+            if(res)  this.getgopList();
   
     }
     catch(error:any){
@@ -304,8 +304,8 @@ this.getExpenseLIst
     }
       try{
         this.loading.start();
-        var res = await this.guestService.searchExpenseDate(d);
-      if(res) this.expenseList=res;
+        var res = await this.guestService.searchGopDate(d);
+        if (res) this.gopList=res;
         
         
       
