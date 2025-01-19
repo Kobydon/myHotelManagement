@@ -304,6 +304,11 @@
                       Update</button>
                   </div>
 
+                  <div class="update ml-auto mr-auto" *ngIf="header =='Edit Payment'">
+                    <button type="button" class="btn btn-danger btn-round"  (click)="updatePaymentCheckout(paymentForm.value)">
+                      Update & Checkout</button>
+                  </div>
+
                 </div>
               </form>
             </div>

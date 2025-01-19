@@ -82,8 +82,8 @@ export class PaymentComponent implements OnInit {
     guest_id:['',Validators.required],
 
     room_number :['',Validators.required],
-    default_amount :['',Validators.required]
-    
+    default_amount :['',Validators.required],
+    booking_id :['',Validators.required]    
    
   })
 }
@@ -309,6 +309,7 @@ async addPayment(record) {
   const b ="0"
   
   const payment: any = {
+    booking_id:record.id,
     amount: record.amount,    
     name: record.name,
     guest_id: record.guest_id,
@@ -421,6 +422,8 @@ async  editPayment(id:number){
 
     children :this.payment[0].children,
     adult :this.payment[0].adult,
+    booking_id:this.payment[0].booking_id,
+    guest_id: this.payment[0].guest_id
     
       })
     }
@@ -596,6 +599,51 @@ async generateInvoice(id: number) {
 }
 
 
+
+
+async updatePaymentCheckout(record: any) {
+  const payment = {
+    id: record.id,
+      amount: record.amount,
+      name: record.name,
+      discount: record.discount,
+      method: record.method,
+      room_type: record.room_type,
+      payment_date: record.payment_date,
+      checkin_date: record.checkin_date,
+      checkout_date: record.checkout_date,
+      status: record.status,
+      children: record.children,
+      adult: record.adult,
+      booking_id:record.booking_id,
+      balance: record.balance || 0,
+      guest_id:record.guest_id  
+    // Ensure balance is initialized
+  };
+
+  // Calculate the new balance
+//  const balance = parseInt(payment.amount) + parseInt(payment.balance) - parseInt(this.paymentForm.value.default_amount);
+  // console.log(balance)
+
+  try {
+    // Start loading indicator
+    this.loading.start();
+
+    // Call the service to update payment
+    const res = await this.paymentService.updatePaymentCheckout(payment);
+
+    if (res) {
+      // Close popup and refresh the payment list
+      this.closePopup();
+      this.getPaymentList();
+    }
+  } catch (error) {
+    // Show error notification if something fails
+    this.toastr.error(null, error);
+  } finally {
+    // Stop loading indicator
+    this.loading.stop();
+  }}
   // Calculate the new balance
   async updatePayment(record: any) {
     const payment = {

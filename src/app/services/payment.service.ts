@@ -147,6 +147,11 @@ getRefund(){
 }
 
 
+updatePaymentCheckout(ad: any) {
+  return lastValueFrom( this.http.put(this.paymentUrl + '/guest/update_payment_checkout', ad, httpOptions));
+}
+
+
 
 
 }
