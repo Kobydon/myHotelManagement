@@ -31,6 +31,7 @@ export class BookingsComponent implements OnInit {
   load=false;
   page = 1;
   pageSize: number = 10;
+
   @BlockUI('loading') loading!: NgBlockUI
   constructor(private toastr:ToastrService,private fb: FormBuilder,
     private roomService:RoomService,private guestService:GuestService,

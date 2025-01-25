@@ -57,6 +57,11 @@ addExpense(dep:any) {
   }  
 
 
+  startSession(dep:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_session', dep, httpOptions));
+    }  
+  
 
  
 
@@ -156,6 +161,10 @@ addExpense(dep:any) {
       return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_expense_list'));
     }
 
+    getCurrentSession(){
+      return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_current_session'));
+
+    }
 
     getVendorList() {
       //console.log(guest);
@@ -206,6 +215,13 @@ addExpense(dep:any) {
               //console.log(guest);
                 return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_vendor', dep, httpOptions));
               }   
+
+
+              closeSession(dep:any) {
+                //console.log(guest);
+                if (confirm("Are you sure to close session?")) {
+                  return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/close_session', dep, httpOptions));}
+                } 
 
 
               updateRecievedItem(dep:any) {

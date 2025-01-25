@@ -46,6 +46,7 @@ export class PaymentComponent implements OnInit {
   day_difference:any;
   payList:any;
   payment:any;
+  earlyCheckin:number =10;
   
   totalAmount:any;
   user:any;
@@ -270,31 +271,44 @@ async fetchBookings(id:number){
 
 
 
-
-
-
-async fetchRoomType(id:number){
-  try{
-    // this.loading.start();
+async fetchRoomType(id: number) {
+  try {
     var res = await this.roomService.get_room_details(id);
-    if (res) this.roomD =res;
+    if (res) this.roomD = res;
+
+    // Get the current time and check if it's before 1 PM
+    const currentTime = new Date();
+    const checkInTime = new Date(currentTime);
+    checkInTime.setHours(13, 0, 0, 0); // Set check-in time to 1 PM (13:00)
+
+    // Early check-in charge calculation
+    let earlyCheckinCharge = 0;
+    if (currentTime < checkInTime) {
+      // Apply early check-in charge
+      const earlyCheckinHours = (checkInTime.getTime() - currentTime.getTime()) / (1000 * 3600); // Difference in hours
+      earlyCheckinCharge = earlyCheckinHours * 0.5 * parseInt(this.roomD[0].base_price); // Charge per hour (you can adjust this rate)
+    }
+
+    // Round the values to two decimal places
+    const amount = (parseInt(this.roomD[0].base_price) + earlyCheckinCharge).toFixed(2);
+    const topay = (parseInt(this.roomD[0].base_price) + earlyCheckinCharge).toFixed(2);
+
+    // Update the form with the calculated amounts
     this.paymentForm.patchValue({
-      // amount:this.roomD[0].base_price *  this.paymentForm.value.duration, 
-      // topay:this.roomD[0].base_price *  this.paymentForm.value.duration
-      amount:this.roomD[0].base_price  ,
-      topay:this.roomD[0].base_price
-    })
-  } catch (error){
-    this.toastr.error(null,error)
-  }
-  finally{
+      amount: parseFloat(amount), // Convert back to float to remove trailing zeroes
+      topay: parseFloat(topay)   // Convert back to float to remove trailing zeroes
+    });
+
+  } catch (error) {
+    this.toastr.error(null, error);
+  } finally {
     // this.loading.stop();
   }
 }
 
 
 calDiscount(record){
-  this.paymentForm.patchValue({amount:this.paymentForm.value.amount - this.paymentForm.value.amount
+  this.paymentForm.patchValue({amount:this.paymentForm.value.amount +  this.earlyCheckin - this.paymentForm.value.amount
   * this.paymentForm.value.discount/100,topay:this.paymentForm.value.amount - this.paymentForm.value.amount
     * this.paymentForm.value.discount/100})
   // this.roomForList[0].base_price*this.createForm.value.duration - 
@@ -303,7 +317,7 @@ calDiscount(record){
 }
 
 async addPayment(record) {
-  const amountToPay = Number(this.paymentForm.value.topay); // Convert to number
+  const amountToPay = Number(this.paymentForm.value.topay) +this.earlyCheckin; // Convert to number
   const totalAmount = Number(record.amount)  // Convert to number
   const balance = amountToPay - totalAmount; // Calculate the balance
   const b ="0"

@@ -16,7 +16,7 @@
       <span class="navbar-toggler-bar navbar-kebab"></span>
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="collapseExample" [ngbCollapse]="isCollapsed">
-      <form>
+      <!-- <form>
         <div class="input-group no-border">
           <input type="text"  class="form-control" placeholder="Search..." id="mysearch">
           <div class="input-group-append">
@@ -25,7 +25,7 @@
             </div>
           </div>
         </div>
-      </form>
+      </form> -->
       
       <ul class="navbar-nav align-items-center">
         <!-- Notification Bell Icon -->
@@ -35,6 +35,8 @@
           <img src="../../../assets/img/default-avatar.png" style="border-radius: 50%; width: 2rem; height: 2rem; object-fit: cover;">
         </li> -->
         <!-- Logout Button -->
+         <button class="btn btn-success btn-sm" id="newSession" (click)="startSession()" *ngIf="status!=='current'">Start Session</button>
+         <button class="btn btn-warning btn-sm" id="closeSession" (click)="closeSession(sessionList[0].id)" *ngIf="status=='current'">Close Session</button>
         <li class="nav-item" style="float: right;">
           <button class="btn btn-danger btn-sm d-flex align-items-center" type="button" (click)="logout()" style="margin-left: 0.5rem;">
             <i class="fa fa-sign-out" style="font-size: 1.25rem;"></i>

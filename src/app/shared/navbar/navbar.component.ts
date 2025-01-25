@@ -3,6 +3,8 @@ import { ROUTES } from '../../sidebar/sidebar.component';
 import { Router } from '@angular/router';
 import { Location} from '@angular/common';
 import { userService } from 'app/user.service';
+import { GuestService } from 'app/services/guest.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     moduleId: module.id,
@@ -17,12 +19,14 @@ export class NavbarComponent implements OnInit{
     private toggleButton;
     private sidebarVisible: boolean;
     searchTerm: string = '';
+    sessionList:any;
+    status:any;
 
     public isCollapsed = true;
     @ViewChild("navbar-cmp", {static: false}) button;
 
-    constructor(location:Location, private renderer : Renderer2,
-      private userService:userService, private element : ElementRef, private router: Router) {
+    constructor(location:Location, private renderer : Renderer2,private guestService:GuestService,
+      private userService:userService, private element : ElementRef, private router: Router,private toatsr:ToastrService) {
         this.location = location;
         this.nativeElement = element.nativeElement;
         this.sidebarVisible = false;
@@ -35,6 +39,7 @@ export class NavbarComponent implements OnInit{
         this.router.events.subscribe((event) => {
           this.sidebarClose();
        });
+       this.getCurrentSession();
     }
     getTitle(){
       var titlee = this.location.prepareExternalUrl(this.location.path());
@@ -107,4 +112,36 @@ export class NavbarComponent implements OnInit{
         this.userService.logout();
       }
 
+     async  startSession(){
+        const s ={
+          date:""
+        }
+        try{
+          var res = await this.guestService.startSession(s);
+          if(res)  this.toatsr.success(null,"successful"); this.getCurrentSession();
+        }catch(err) {this.toatsr.error(err)}
+        
+      }
+
+      
+     async  closeSession(id){
+      const s ={
+        id:id
+      }
+      try{
+        var res = await this.guestService.closeSession(s);
+        if(res)   this.getCurrentSession()
+      }catch(err) {this.toatsr.error(err)}
+      
+    }
+
+
+      async  getCurrentSession(){
+      
+        try{
+          var res = await this.guestService.getCurrentSession();
+          if(res)  this.sessionList=res; this.status=res[0].status
+        }catch(err) {this.toatsr.error(err)}
+        
+      }
 }
