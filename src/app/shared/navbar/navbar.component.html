@@ -36,7 +36,7 @@
         </li> -->
         <!-- Logout Button -->
          <button class="btn btn-success btn-sm" id="newSession" (click)="startSession()" *ngIf="status!=='current'">Start Session</button>
-         <button class="btn btn-warning btn-sm" id="closeSession" (click)="closeSession(sessionList[0].id)" *ngIf="status=='current'">Close Session</button>
+         <button class="btn btn-warning btn-sm" id="closeSession" (click)="closeSession(id)" *ngIf="status=='current'">Close Session</button>
         <li class="nav-item" style="float: right;">
           <button class="btn btn-danger btn-sm d-flex align-items-center" type="button" (click)="logout()" style="margin-left: 0.5rem;">
             <i class="fa fa-sign-out" style="font-size: 1.25rem;"></i>

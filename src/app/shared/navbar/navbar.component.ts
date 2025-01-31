@@ -21,6 +21,7 @@ export class NavbarComponent implements OnInit{
     searchTerm: string = '';
     sessionList:any;
     status:any;
+    id:any;
 
     public isCollapsed = true;
     @ViewChild("navbar-cmp", {static: false}) button;
@@ -140,7 +141,7 @@ export class NavbarComponent implements OnInit{
       
         try{
           var res = await this.guestService.getCurrentSession();
-          if(res)  this.sessionList=res; this.status=res[0].status
+          if(res)  this.sessionList=res; this.status=res[0]?.status; this.id=res[0]?.id;
         }catch(err) {this.toatsr.error(err)}
         
       }

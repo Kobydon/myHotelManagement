@@ -14,7 +14,7 @@
     
   }
 
-  /* .dropdown-container :hover{
+  /* .dropdown-container :\{
   background-color: burlywood;
   color: white;
 
@@ -93,11 +93,24 @@ li{
       <li >
       <a id="fina" routerLink="dashboard"><i id="fina" class="fa fa-tachometer text-primar">&nbsp;</i><span>Dashboard</span></a>
     </li>
-     <li  *ngIf="user[0].roles=='admin'" >
+     <li  *ngIf="user[0].roles=='admin'"  class="transparent">
         <a id="fina" routerLink="all-users"><i id="fina" class="fa fa-users "  >&nbsp;</i><span>User&nbsp;</span>
+          <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
           <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
         </a>
       </li>
+
+      <div class="dropdown-container">
+        <a id="fina" routerLink="all-users"><i id="fina" class="fa fa-users "  >&nbsp;</i><span>Users&nbsp;</span>
+
+          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+        </a>
+
+        <a id="fina" routerLink="all-sessions"><i id="fina" class="fa fa-users "  >&nbsp;</i><span>Sessions&nbsp;</span>
+          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+        </a>
+
+      </div>
 
       <li  >
         <a id="fina" routerLink="all-guest"><i id="fina" class="fa fa-user "  >&nbsp;</i><span>Guest&nbsp;</span>

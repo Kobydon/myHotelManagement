@@ -63,6 +63,7 @@ import { LedgerPagesComponent } from './ledger-pages/ledger-pages.component';
 import { AccountReceivablePagesComponent } from './account-receivable-pages/account-receivable-pages.component';
 import { GopDeductionComponent } from './gop-deduction/gop-deduction.component';
 import { FinancialOverviewComponent } from './financial-overview/financial-overview.component';
+import { AllSessionsComponent } from './all-sessions/all-sessions.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -74,6 +75,7 @@ import { FinancialOverviewComponent } from './financial-overview/financial-overv
     ResLayoutComponent,
   
     VendorsComponent,
+   
      
       
      

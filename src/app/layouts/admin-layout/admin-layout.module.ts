@@ -61,6 +61,7 @@ import { LedgerPagesComponent } from 'app/ledger-pages/ledger-pages.component';
 import { AccountReceivablePagesComponent } from 'app/account-receivable-pages/account-receivable-pages.component';
 import { GopDeductionComponent } from 'app/gop-deduction/gop-deduction.component';
 import { FinancialOverviewComponent } from 'app/financial-overview/financial-overview.component';
+import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
 
 
     
@@ -124,7 +125,7 @@ import { FinancialOverviewComponent } from 'app/financial-overview/financial-ove
     DailyIncomeReportComponent,ReceivedItemsComponent,
 
     DailyIncomeReportDatesBetweenComponent,
-    ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,
+    ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,
     StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent
 
 

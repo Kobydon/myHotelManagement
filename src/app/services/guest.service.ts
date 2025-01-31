@@ -16,7 +16,7 @@ const httpOptions = {
 export class GuestService {
 
   // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private guestUrl = ' http://127.0.0.1:5000';
+  private guestUrl = ' http://172.20.10.3:5000';
  
 
   constructor(private http: HttpClient,private router:Router) { }
@@ -210,6 +210,11 @@ addExpense(dep:any) {
             //console.log(guest);
               return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_group_list'));
             }
+
+            getSessionList() {
+              //console.log(guest);
+                return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_all_session'));
+              }
         
             updateVendor(dep:any) {
               //console.log(guest);
@@ -221,6 +226,7 @@ addExpense(dep:any) {
                 //console.log(guest);
                 if (confirm("Are you sure to close session?")) {
                   return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/close_session', dep, httpOptions));}
+                 
                 } 
 
 
