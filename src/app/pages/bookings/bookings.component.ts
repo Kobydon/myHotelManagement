@@ -238,8 +238,8 @@ async fetchGuest(id:number){
     var res = await this.guestService.getGuest_info(id);
     if (res) this.guestDetails =res;
     this.bookingForm.patchValue({
-      arrival_date: this.guestDetails[0].arrival_date, departure_date: this.guestDetails[0].checkout_date,
-      country:this.guestDetails[0].country,guest_id:this.guestDetails[0].id
+      arrival_date: this.guestDetails[0]?.arrival_date, departure_date: this.guestDetails[0]?.checkout_date,
+      country:this.guestDetails[0]?.country,guest_id:this.guestDetails[0]?.id
     })
   } catch (error){
     this.toastr.error(null,error)

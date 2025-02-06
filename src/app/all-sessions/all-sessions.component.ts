@@ -16,7 +16,7 @@ export class AllSessionsComponent implements OnInit {
   stockList: any[] = [];
   groupList: any[] = [];
   familyList: any[] = [];
-  sessionLIst: any[] = [];
+  sessionList: any[] = [];
 unitList: any[] = [];
   displayStyle = "none";
   header = '';
@@ -45,7 +45,8 @@ unitList: any[] = [];
   }
 
   ngOnInit(): void {
-    this.getsessionList
+    this.getsessionList();
+    this.getUser();
   }
   async getUser(){
     try{
@@ -66,7 +67,7 @@ unitList: any[] = [];
       // this.loading.start();
       const res = await this.guestService.getSessionList(); // Assuming getItemsList() fetches the items from the API
       if (res) {
-        this.sessionLIst = res;
+        this.sessionList = res;
       }
     } catch (error) {
       this.toastr.error('Error fetching items list');
@@ -74,5 +75,32 @@ unitList: any[] = [];
       // this.loading.stop();
     }
   }
+
+    exportExcel() {
+      const element = document.getElementById('excel-table');
+      const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      XLSX.writeFile(wb, 'session_list.xlsx');
+    }
+  
+    // Search items (filter based on input)
+    searchItems() {
+      const input = document.getElementById('myInput') as HTMLInputElement;
+      const filter = input.value.toUpperCase();
+      const table = document.getElementById('excel-table') as HTMLTableElement;
+      const tr = table.getElementsByTagName('tr');
+      for (let i = 0; i < tr.length; i++) {
+        const td = tr[i].getElementsByTagName('td')[0]; // Search by item name
+        if (td) {
+          const txtValue = td.textContent || td.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            tr[i].style.display = "";
+          } else {
+            tr[i].style.display = "none";
+          }
+        }
+      }
+    }
 
 }

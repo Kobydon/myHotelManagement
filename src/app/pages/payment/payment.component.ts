@@ -117,7 +117,7 @@ export class PaymentComponent implements OnInit {
     try{
       this.loading.start();
      var res = await this.paymentService.getPayment()
-     if(res) {this.paymentList =res; this.paymentForm.patchValue({amount:this.paymentList[0].amount})}
+     if(res) {this.paymentList =res; this.paymentForm.patchValue({amount:this.paymentList[0]?.amount})}
      let sum :number= 0;
 
      for (let index = 0; index < this.paymentList.length; index++) {
@@ -317,7 +317,7 @@ calDiscount(record){
 }
 
 async addPayment(record) {
-  const amountToPay = Number(this.paymentForm.value.topay) +this.earlyCheckin; // Convert to number
+  const amountToPay = Number(this.paymentForm.value.topay)  // Convert to number
   const totalAmount = Number(record.amount)  // Convert to number
   const balance = amountToPay - totalAmount; // Calculate the balance
   const b ="0"
@@ -343,11 +343,36 @@ async addPayment(record) {
 
     
   };
+  const formatDateToWords = (dateString: string): string => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  };
 
+  // Helper function to calculate the number of days between two dates
+  const calculateDaysBetweenDates = (startDate: string, endDate: string): number => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = end.getTime() - start.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+  };
+
+  // Format dates
+  const checkinDate = formatDateToWords(record.checkin_date);
+  const checkoutDate = formatDateToWords(record.checkout_date);
+  const paymentDate = formatDateToWords(payment.payment_date);
+
+  // Calculate number of nights
+  const numberOfNights = calculateDaysBetweenDates(payment.checkin_date, payment.checkout_date);
+  const d = {
+    days:numberOfNights
+  }
   // if (payment.discount !=="") {
   //  payment.balace=b
   // }
-
+payment.days=d.days
   try {
     this.loading.start();
     const res = await this.paymentService.addPayment(payment);
@@ -468,6 +493,7 @@ async printReciept(id: number) {
   try {
     // Fetch payment details for the given ID
     const response = await this.paymentService.get_payment_for(id);
+   
 
     // Ensure we have data and access the first element
     if (response && response.length > 0) {
@@ -481,11 +507,29 @@ async printReciept(id: number) {
         return date.toLocaleDateString('en-US', options);
       };
 
+      // Helper function to calculate the number of days between two dates
+      const calculateDaysBetweenDates = (startDate: string, endDate: string): number => {
+        if (!startDate || !endDate) return 0;
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = end.getTime() - start.getTime();
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+      };
+
       // Format dates
       const checkinDate = formatDateToWords(payment.checkin_date);
       const checkoutDate = formatDateToWords(payment.checkout_date);
       const paymentDate = formatDateToWords(payment.payment_date);
 
+      // Calculate number of nights
+      const numberOfNights = calculateDaysBetweenDates(payment.checkin_date, payment.checkout_date);
+      const d = {
+        days:numberOfNights
+      }
+      // const wifi_code = await this.paymentService.getWifiCode(d);
+      // const code = wifi_code[0]?.id;
+
+    
       // Dynamically create receipt content
       const receiptContent = `
         <div style="width: 58mm; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; border: 1px solid #000; padding: 10px; margin: 0 auto;">
@@ -506,7 +550,9 @@ async printReciept(id: number) {
             <p><strong>Room Type:</strong> ${payment.room_type || 'N/A'}</p>
             <p><strong>Check-in Date:</strong> ${checkinDate}</p>
             <p><strong>Check-out Date:</strong> ${checkoutDate}</p>
+            <p><strong>Number of Nights:</strong> ${numberOfNights} Night(s)</p>
             <p><strong>Payment Date:</strong> ${paymentDate}</p>
+            <p><strong>Wi-Fi Code:</strong> ${payment.wifi_code}</p>
           </div>
 
           <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px;">

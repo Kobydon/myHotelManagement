@@ -40,6 +40,10 @@ getroom_number():Observable<any[]>{
 getRefund(){
   return lastValueFrom( this.http.get<any[]>(this.paymentUrl + '/guest/get_refund'));
 }
+getWifiCode(d){
+  return lastValueFrom( this.http.post(this.paymentUrl + '/guest/get_wifi_code',d,httpOptions));
+}
+
 /** GET user by id. Will 404 if id not found */
   getEmployee(id: number): Observable<any> {
     const url = `${this.paymentUrl}/users/${id}`;
