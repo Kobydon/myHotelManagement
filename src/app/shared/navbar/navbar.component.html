@@ -1,44 +1,39 @@
-<nav class="navbar navbar-expand-lg navbar-absolute fixed-top" style="background-color: #722F37;">
+<nav class="navbar navbar-default navbar-fixed-top" style="background-color: #722F37;">
   <div class="container-fluid">
-    <div class="navbar-wrapper">
-      <div class="navbar-toggle">
-        <button type="button" class="navbar-toggler" (click)="sidebarToggle()">
-          <span class="navbar-toggler-bar bar1"></span>
-          <span class="navbar-toggler-bar bar2"></span>
-          <span class="navbar-toggler-bar bar3"></span>
-        </button>
-      </div>
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false" aria-controls="navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
       <a class="navbar-brand" href="javascript:void(0)"></a>
     </div>
-    <button class="navbar-toggler" type="button" (click)="collapse()" [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
-      <span class="navbar-toggler-bar navbar-kebab"></span>
-      <span class="navbar-toggler-bar navbar-kebab"></span>
-      <span class="navbar-toggler-bar navbar-kebab"></span>
-    </button>
-    <div class="collapse navbar-collapse justify-content-end" id="collapseExample" [ngbCollapse]="isCollapsed">
+    <div class="collapse navbar-collapse" id="navbar-collapse">
       <!-- <form>
-        <div class="input-group no-border">
-          <input type="text"  class="form-control" placeholder="Search..." id="mysearch">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <i class="nc-icon nc-zoom-split" ></i>
-            </div>
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Search..." id="mysearch">
+          <div class="input-group-addon">
+            <i class="nc-icon nc-zoom-split"></i>
           </div>
         </div>
       </form> -->
-      
-      <ul class="navbar-nav align-items-center">
+      <ul class="nav navbar-nav navbar-right">
         <!-- Notification Bell Icon -->
        
         <!-- Avatar -->
-        <!-- <li class="nav-item btn-rotate" ngbDropdown placement="bottom-left">
+        <!-- <li class="dropdown">
           <img src="../../../assets/img/default-avatar.png" style="border-radius: 50%; width: 2rem; height: 2rem; object-fit: cover;">
         </li> -->
+        
+        <!-- Session Buttons -->
+        <li class="dropdown">
+          <button class="btn btn-success btn-sm" id="newSession" (click)="startSession()" *ngIf="status !== 'current'">Start Session</button>
+          <button class="btn btn-warning btn-sm" id="closeSession" (click)="closeSession(id)" *ngIf="status === 'current'">Close Session</button>
+        </li>
+        
         <!-- Logout Button -->
-         <button class="btn btn-success btn-sm" id="newSession" (click)="startSession()" *ngIf="status!=='current'">Start Session</button>
-         <button class="btn btn-warning btn-sm" id="closeSession" (click)="closeSession(id)" *ngIf="status=='current'">Close Session</button>
-        <li class="nav-item" style="float: right;">
-          <button class="btn btn-danger btn-sm d-flex align-items-center" type="button" (click)="logout()" style="margin-left: 0.5rem;">
+        <li>
+          <button class="btn btn-danger btn-sm" type="button" (click)="logout()" style="margin-left: 0.5rem;">
             <i class="fa fa-sign-out" style="font-size: 1.25rem;"></i>
           </button>
         </li>

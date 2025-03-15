@@ -25,7 +25,7 @@ message:any;
 user:any;
 
   // private userUrl = 'https://renderdemo-hwz6.onrender.com';
-  private userUrl = 'http://172.20.10.3:5000';
+  private userUrl = 'http://127.0.0.1:5000';
  
  
   isUserLoggedIn: boolean = false;

@@ -17,7 +17,7 @@ export class RoomService {
 
   
   // private roomUrl = 'https://renderdemo-hwz6.onrender.com';
-  private roomUrl = ' http://172.20.10.3:5000'
+  private roomUrl = 'http://127.0.0.1:5000';
 
 
   constructor(private http: HttpClient,private router:Router) { }
