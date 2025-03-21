@@ -88,6 +88,12 @@ getWifiCode(d){
     }
 
 
+    searchDatesPos(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/searchdates_pos', d, httpOptions));
+    }
+
+
+
     searchDatesTwo(d){
       return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/searchdates_two', d, httpOptions));
     }

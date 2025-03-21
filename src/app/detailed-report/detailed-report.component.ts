@@ -41,8 +41,9 @@ export class DetailedReportComponent implements OnInit {
   guestList:any;
   roomList:any;
   yesterdayList:any;
-  
+  posList:any;
   paymentList:any;
+  totalPosAmount:any;
   day_difference:any;
   payList:any;
   refundList:any;
@@ -54,7 +55,7 @@ export class DetailedReportComponent implements OnInit {
   incomeList:any;
   attendaceList:any;
   expenseList:any;
-  
+  stockUsuageList:any;
   totalAttendance:any;
   totalExpenses:any;
   totalIncome:any;
@@ -62,7 +63,9 @@ export class DetailedReportComponent implements OnInit {
   user:any;
   purchaseList:any;
   orderList:any;
+  mostAttendant:any;
  receivedList:any;
+ mostOrderedItems:any;
  stockList:any;
  returnList:any;
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
@@ -161,13 +164,30 @@ async searchDates() {
     const stockRes = await this.guestService.searchStockDate(d);
     this.stockList = stockRes || [];
 
+    const attendantRres = await this.guestService.searchMostAttendantDate(d);
+    this.mostAttendant = attendantRres || [];
+
+
+  const stockUsageRes = await this.guestService.searchStockUsuageDate(d);
+    this.stockUsuageList = stockUsageRes || [];
     const ReturnedRes = await this.guestService.searchReturnDate(d);
     this.returnList = ReturnedRes || [];
+
+
+    const most_ordere = await this.guestService.searchMostOrderedDate(d);
+    this.mostOrderedItems = most_ordere || [];
+
     // Fetch refunds
     const refundRes = await this.paymentService.searchRefundDates(d);
     this.refundList = refundRes || [];
     this.totalRefundAmount = this.refundList.reduce((sum, item) => sum + parseInt(item.refund_amount), 0);
 
+    const posRes = await this.paymentService.searchDatesPos(d);
+    this.posList = posRes || [];
+    this.totalPosAmount = this.posList.reduce((sum, item) => sum + parseInt(item.amount), 0);
+
+
+    
     // Fetch room data
     const roomRes = await this.roomService.searchRoomDates(d);
     this.rooms = roomRes || [];

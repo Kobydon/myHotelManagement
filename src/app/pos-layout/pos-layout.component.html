@@ -1,0 +1,26 @@
+<div class="container-fluid" style="height: 100vh;" >
+  <div class="row" style="height: 100%;">
+    <!-- Sidebar Menu -->
+    <div class="col-md-2 col-sm-3 bg-info text-white" style="padding: 15px; height: 100%;">
+      <h4 class="text-center">Categories</h4>
+      <category-list></category-list>
+    </div>
+
+    <!-- Product List & Routing Area -->
+    <div class="col-md-6 col-sm-6" style="padding: 15px; height: 100%;">
+      <div class="panel panel-default" style="height: 100%;background-color: aliceblue;">
+        <div class="panel-heading text-center"><strong>Items</strong></div>
+        <div class="panel-body" style="overflow-y: auto; max-height: 85vh;">
+          <router-outlet></router-outlet>
+          <!-- <item-list></item-list> -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Section -->
+    <div class="col-md-4 col-sm-3 bg-white" style="padding: 15px; height: 100%; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+      <h4 class="text-center">Checkout</h4>
+      <checkout-list></checkout-list>
+    </div>
+  </div>
+</div>

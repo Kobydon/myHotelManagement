@@ -64,18 +64,22 @@ import { AccountReceivablePagesComponent } from './account-receivable-pages/acco
 import { GopDeductionComponent } from './gop-deduction/gop-deduction.component';
 import { FinancialOverviewComponent } from './financial-overview/financial-overview.component';
 import { AllSessionsComponent } from './all-sessions/all-sessions.component';
+import { PosModule } from "./pos/pos.module";
+import { PosLayoutComponent } from "./pos-layout/pos-layout.component";
+import { ItemListCategoryComponent } from './item-list-category/item-list-category.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
 
 @NgModule({
   declarations: [
-    AppComponent,
+    AppComponent,PosLayoutComponent,
     AdminLayoutComponent,
     ResLayoutComponent,
   
     VendorsComponent,
-   
+      
+
      
       
      
@@ -114,6 +118,7 @@ import { AllSessionsComponent } from './all-sessions/all-sessions.component';
     LoginModule,
     HttpClientModule,
     RestaurantModule,
+    PosModule,
     
     RouterModule.forRoot(AppRoutes,{
       // useHash: true

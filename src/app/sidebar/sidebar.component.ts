@@ -69,6 +69,7 @@ export const ROUTES: RouteInfo[] = [
     { path: '/vendor',    title: ' Vendor  ',        icon:'nc-caps-small', class: '' },
     { path: '/gop-deduction',    title: ' Gop Dedutcion  ',        icon:'nc-caps-small', class: '' },
     { path: '/all-sessions',    title: ' Sessions   ',        icon:'nc-caps-small', class: '' },
+    { path: '/item-list',    title: ' Sessions   ',        icon:'nc-caps-small', class: '' },
 
 ];
 

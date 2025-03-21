@@ -56,7 +56,7 @@
                   <tr *ngFor="let item of itemsList | slice: (page-1) * pageSize : page * pageSize; index as i">
                     <th>{{ i + 1 }}</th>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.Category }}</td>
+                    <td>{{ item.category }}</td>
                     <td>{{ item.price | currency }}</td>
                     <td>{{ item.description }}</td>
                     <td>

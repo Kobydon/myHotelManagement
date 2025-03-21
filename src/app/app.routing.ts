@@ -7,6 +7,9 @@ import { AuthGuard } from './auth.guard';
 import { LayoutComponent } from './features/layout/layout.component';
 import { ResLayoutComponent } from './res-layout/res-layout.component';
 import { SignupComponent } from './login/signup/signup.component';
+import { PosLayoutComponent } from './pos-layout/pos-layout.component';
+import { ItemListComponent } from './item-list/item-list.component';
+import { ItemListCategoryComponent } from './item-list-category/item-list-category.component';
 
 export const AppRoutes: Routes = [
   {
@@ -51,6 +54,25 @@ export const AppRoutes: Routes = [
       path: '',
       loadChildren: () => import('../app/features/features.module').then(x => x.FeaturesModule)
   }]},
+
+
+
+  
+  {
+    path: '',canActivate:[AuthGuard],
+    component: PosLayoutComponent,
+    children: [
+        {
+      path: '',
+      loadChildren: () => import('../app/pos/pos.module').then(x => x.PosModule)
+  },
+
+  { path: 'item-list',      component: ItemListComponent },
+  { path: 'item-category-list/:id', component: ItemListCategoryComponent },
+
+
+]},
+
 
 
 ]

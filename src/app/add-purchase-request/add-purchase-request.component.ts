@@ -55,12 +55,12 @@ createForm:FormGroup
    }
 
   ngOnInit(): void {
-    this.cartService.getProducts().subscribe((res)=>{
+    // this.cartService.getProducts().subscribe((res)=>{
 
-      this.totalItem = res.length;
-      this.itemBulk = res;
+    //   this.totalItem = res.length;
+    //   this.itemBulk = res;
       
-    })
+    // })
     this.getItems();
   }
 
@@ -122,12 +122,12 @@ switchClicked(event:any,item:any){
  //  this.value=   this.cartService.addtoCart(item);
  //  let checkData = localStorage.getItem("checkData");
    if(this.checked!=null && this.checked ==true){
-     this.cartService.addtoCart(item);
+    //  this.cartService.addtoCart(item);
      console.log(item);
    }
 
 else{
- this.cartService.removeCartItem(item)
+//  this.cartService.removeCartItem(item)
 // this.cartService.gCetitemBulks();
 }}
 }

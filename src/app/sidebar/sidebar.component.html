@@ -367,10 +367,15 @@ li{
               <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-tachnometer " >&nbsp;</i>Stock Usage  </a></li> 
         
             </div> 
-        
-  
-           
-          </div> 
+      
+          </div>   <li >
+            <a id="fina"*ngIf="user[0].roles=='admin'" href="/item-list"><i id="fina" class="fa fa-cutlery fa-fw " style="color: lih;">&nbsp;</i><span>POS &nbsp;</span>
+              <!-- <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i> -->
+            </a>
+            </li>
+
+
+
            <li   class="transparent">
             <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-cog fa-fw " style="color: lih;">&nbsp;</i><span>Settings &nbsp;</span>
               <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
@@ -431,8 +436,8 @@ li{
           </div>
          
    
-              <!-- <li ></li> -->
-        <!-- <li class="transparent">  <a id="fina"class=""  ><i id="fina" class="fa fa-dollar fa-fw " style="color: lih;">&nbsp;</i><span>Finance  &nbsp;</span>
+              <!-- <li ></li>
+        <li class="transparent">  <a id="fina"class=""  ><i id="fina" class="fa fa-dollar fa-fw " style="color: lih;">&nbsp;</i><span>Finance  &nbsp;</span>
           
           </a></li>
    

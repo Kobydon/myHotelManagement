@@ -92,7 +92,15 @@ addExpense(dep:any) {
     } 
 
 
-
+    getFood(id: any) {
+      const url = `${this.guestUrl}/guest/get_food/${id}`;
+      return lastValueFrom(this.http.get<any>(url).pipe(
+        catchError((error) => {
+          console.error('Error fetching event:', error);
+          throw new Error('Failed to fetch event data');
+        })
+      ));
+    }
 
     deleteItem(id:number) {
       if (confirm("do you want to delete?")) {
@@ -592,6 +600,10 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_stock_dates', d, httpOptions));
     }
     
+    searchStockUsuageDate(d){
+
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_stock_usuage', d, httpOptions));
+    }
     
 
     searchReceivedDate(d){
@@ -606,6 +618,17 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_purchase_date', d, httpOptions));
     }
 
+
+    searchMostOrderedDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_item', d, httpOptions));
+    }
+
+    
+    searchMostAttendantDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_attendant', d, httpOptions));
+    }
+
+    
 
     searchPurchaseDateTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_purchase_date_two', d, httpOptions));
