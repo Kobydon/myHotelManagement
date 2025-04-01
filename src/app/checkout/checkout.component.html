@@ -48,12 +48,14 @@
 *ngIf="!isHeldOrder" 
  
 [disabled]="!(cashier || admin)">
+<form [formGroup]="createForm">
 <select formControlName="method" id="" style="color: black;">
-  <option value=""  hidden selected>----Select------</option>
+
   <option value="Cash">Cash</option>
   <option value="Mobile Money">Mobile Money</option>
   <option value="Credit Card">Credit CArd</option>
 </select>
+</form>
 </button>
 
 
