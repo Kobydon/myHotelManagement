@@ -71,6 +71,11 @@ getWifiCode(d){
     getPayment(){
       return lastValueFrom(this.http.get<any[]>(this.paymentUrl + '/guest/get_payment'));
     }
+
+
+    getPaymentPos(){
+      return lastValueFrom(this.http.get<any[]>(this.paymentUrl + '/guest/get_payment_pos'));
+    }
   
     get_payment_for(id: number): Promise<any> {
       const url = `${this.paymentUrl}/guest/get_payment_for/${id}`;
@@ -101,6 +106,12 @@ getWifiCode(d){
     searchPaymentDates(d){
       return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_payment_date', d, httpOptions));
     }
+
+    
+    searchPaymentHeldDates(d){
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_payment_held_date', d, httpOptions));
+    }
+
 
 
     

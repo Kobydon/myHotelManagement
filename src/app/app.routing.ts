@@ -10,13 +10,20 @@ import { SignupComponent } from './login/signup/signup.component';
 import { PosLayoutComponent } from './pos-layout/pos-layout.component';
 import { ItemListComponent } from './item-list/item-list.component';
 import { ItemListCategoryComponent } from './item-list-category/item-list-category.component';
+import { ViewOrderComponent } from './view-order/view-order.component';
+import { ViewDrinkOrderComponent } from './view-drink-order/view-drink-order.component';
+import { ItemListVipComponent } from './item-list-vip/item-list-vip.component';
 
 export const AppRoutes: Routes = [
   {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
-  }, {
+  },
+  {path:'view-order',component:ViewOrderComponent},
+  {path:'view-drink-order',component:ViewDrinkOrderComponent},
+  
+  {
     path: '',canActivate:[AuthGuard],
     component: AdminLayoutComponent,
     children: [
@@ -69,6 +76,7 @@ export const AppRoutes: Routes = [
 
   { path: 'item-list',      component: ItemListComponent },
   { path: 'item-category-list/:id', component: ItemListCategoryComponent },
+  { path: 'item-category-list-vip/:id', component: ItemListVipComponent },
 
 
 ]},

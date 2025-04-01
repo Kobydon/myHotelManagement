@@ -53,19 +53,20 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of itemsList | slice: (page-1) * pageSize : page * pageSize; index as i">
+                  <tr *ngFor="let item of itemsList; index as i">
                     <th>{{ i + 1 }}</th>
                     <td>{{ item.name }}</td>
                     <td>{{ item.category }}</td>
-                    <td>{{ item.price | currency }}</td>
+                    <td>₵{{ item.price}}</td>
                     <td>{{ item.description }}</td>
-                    <td>
-                      <i
+                    <td >
+                      <!-- Vegetable Sauce -->
+                      <i  
                         class="fa fa-edit fa-lg text-info"
                         (click)="openPopup('Edit', item)"
                       ></i>
                       <i
-                        *ngIf="user[0].roles === 'admin'"
+                       
                         class="fa fa-close fa-lg text-danger"
                         (click)="deleteItem(item.id)"
                       ></i>

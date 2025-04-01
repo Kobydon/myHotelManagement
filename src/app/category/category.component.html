@@ -1,8 +1,24 @@
-<div class="btn-group-vertical w-100" *ngFor="let item of categoryList">
-    <button class="btn btn-outline-success active" (click)="navigateToEvent(item.id)">{{item.name}}</button>
-    <!-- <button class="btn btn-outline-secondary">Beverages</button>
-    <button class="btn btn-outline-secondary">BBQ</button>
-    <button class="btn btn-outline-secondary">Snacks</button>
-    <button class="btn btn-outline-secondary">Desserts</button> -->
+<div class="btn-group mb-3">
+  <button class="btn btn-warning  btn-sm" (click)="showNormalView()">Normal</button>
+  <button class="btn btn-danger btn-sm " (click)="showVipView()">VIP</button>
+</div>
+
+<!-- Normal Category Section -->
+<div *ngIf="showNormal">
+  <!-- <h4 class="text-center text-success">Normal Category</h4> -->
+  <div class="btn-group-vertical w-100">
+    <button *ngFor="let item of categoryList" class="btn btn-outline-success active" (click)="navigateToEvent(item.id)" style="border-bottom: 1px solid white;">
+      {{ item.name }}
+    </button>
   </div>
-  
+</div>
+
+<!-- VIP Category Section -->
+<div *ngIf="showVip">
+  <!-- <h4 class="text-center text-danger">VIP Category</h4> -->
+  <div class="btn-group-vertical w-100">
+    <button *ngFor="let item of categoryList" class="btn btn-outline-danger active" (click)="navigateToEventVip(item.id)">
+      {{ item.name }}
+    </button>
+  </div>
+</div>

@@ -14,9 +14,10 @@ import { CheckoutComponent } from 'app/checkout/checkout.component';
 import { CategoryComponent } from 'app/category/category.component';
 import { PosLayoutComponent } from 'app/pos-layout/pos-layout.component';
 import { ItemListCategoryComponent } from 'app/item-list-category/item-list-category.component';
+import { ItemListVipComponent } from 'app/item-list-vip/item-list-vip.component';
 
 @NgModule({
-  declarations: [ItemListComponent,CheckoutComponent,CategoryComponent,ItemListCategoryComponent],
+  declarations: [ItemListComponent,CheckoutComponent,CategoryComponent,ItemListCategoryComponent,ItemListVipComponent],
   imports: [
     CommonModule,
      RouterModule.forChild(PosLayoutRoute),
@@ -39,7 +40,9 @@ import { ItemListCategoryComponent } from 'app/item-list-category/item-list-cate
     ItemListComponent,
     CheckoutComponent,
     CategoryComponent,
-    ItemListCategoryComponent
+    ItemListCategoryComponent,
+    ItemListVipComponent,
+   
   ]
 })
 export class PosModule { }

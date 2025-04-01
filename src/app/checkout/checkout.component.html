@@ -1,8 +1,12 @@
-<h4>Checkout</h4>
+<div class="btn-group">
+
+  <button class="btn btn-info btn-xs" (click)="openPopup()">Cashier</button><br><br>
+  <button class="btn btn- btn-xs" (click)="logOut()"><i class="fa fa-lock"></i> Lock Till</button><br><br>
+</div>
 
 <!-- Cart Table -->
-<table class="table">
-  <thead>
+<table class="table table-bordered">
+  <thead class="thead-light">
     <tr>
       <th>Name</th>
       <th>Qty</th>
@@ -14,48 +18,84 @@
     <tr *ngFor="let item of cartItems">
       <td>{{ item.name }}</td>
       <td>
-        <button class="btn btn-sm btn-light" (click)="decreaseQty(item)">-</button>
-        {{ item.qty }}
-        <button class="btn btn-sm btn-light" (click)="increaseQty(item)">+</button>
+        <!-- <button class="btn btn-sm btn-light" (click)="decreaseQty(item)">-</button> -->
+        <span class="px-2">{{ item.qty }}</span>
+        <!-- <button class="btn btn-sm btn-light" (click)="increaseQty(item)">+</button> -->
       </td>
-      <td>₵{{ item.price * item.qty }}</td>
+      <td>₵{{ (item.price * item.qty) | number: '1.2-2' }}</td>
       <td>
-        <button class="btn btn-danger btn-sm" (click)="removeItem(item)">🗑️</button>
+        <button class="btn btn-danger btn-sm" (click)="removeFromCart(item)">🗑️</button>
       </td>
     </tr>
   </tbody>
 </table>
 
 <!-- Total Amount -->
-<div class="d-flex justify-content-between">
-  <span>Total:</span>
-  <strong>₵{{ total }}</strong>
+<div class="d-flex justify-content-between mt-2">
+  <h5>Total:</h5>
+  <h5><strong>₵{{ total | number: '1.2-2' }}</strong></h5>
 </div>
 
 <!-- Payment & Order Actions -->
-<div class="mt-3">
-  <button class="btn btn-danger" (click)="clearCart()">Cancel Order</button>
-  <button class="btn btn-warning" (click)="holdOrder()">Hold Order</button>
-  <button class="btn btn-success" (click)="payOrder()">Pay (₵{{ total }})</button>
+<div class="mt-3 d-flex gap-2">
+  <button class="btn btn-danger" (click)="clearCart()" [disabled]="!(manager )">Cancel Order</button>
+  <button class="btn btn-warning" (click)="holdOrder()" [disabled]="cartItems.length === 0">
+    Hold Order
+  </button>
+
+   
+<button class="btn btn-info" 
+*ngIf="!isHeldOrder" 
+ 
+[disabled]="!(cashier || admin)">
+<select formControlName="method" id="" style="color: black;">
+  <option value=""  hidden selected>----Select------</option>
+  <option value="Cash">Cash</option>
+  <option value="Mobile Money">Mobile Money</option>
+  <option value="Credit Card">Credit CArd</option>
+</select>
+</button>
+
+
+  <button class="btn btn-success" 
+  *ngIf="isHeldOrder" 
+  (click)="payOrderTwo()" 
+  [disabled]="!(cashier || admin)">
+Pay (₵{{ total | number: '1.2-2' }})
+</button>
+
+<button class="btn btn-success" 
+  *ngIf="!isHeldOrder" 
+  (click)="payOrder()" 
+  [disabled]="!(cashier || admin)">
+Pay (₵{{ total | number: '1.2-2' }})
+</button>
+
+ 
 </div>
 
 <!-- Held Carts Section -->
 <h5 class="mt-4">Held Carts</h5>
 <ul class="list-group" *ngIf="heldCarts.length > 0; else noHeldCarts">
-  <li *ngFor="let cart of heldCarts" class="list-group-item d-flex justify-content-between">
+  <li *ngFor="let cart of heldCarts" class="list-group-item d-flex justify-content-between align-items-center">
     <div>
       <input type="checkbox" (change)="toggleSelection(cart.id)">
-      <span>Cart #{{ cart.id }} - ₵{{ cart.total }}</span>
+      <span class="ms-2">Cart #{{ cart.id }} - ₵{{ cart.total | number: '1.2-2' }}</span>
     </div>
-    <div>
+    <div class="btn-group">
+
+
+      
       <button class="btn btn-info btn-sm" (click)="loadHeldCart(cart.id)">Load</button>
-      <button class="btn btn-danger btn-sm" (click)="removeHeldCart(cart.id)">Remove</button>
+      <button class="btn btn-danger btn-sm" (click)="removeHeldCart(cart.id)"  *ngIf="admin">Remove</button>
     </div>
   </li>
 </ul>
 
 <!-- Merge Selected Orders Button -->
-<button class="btn btn-primary mt-3" (click)="mergeSelectedOrders()">Merge Selected Orders</button>
+<button class="btn btn-primary mt-3" (click)="mergeSelectedOrders()" [disabled]="selectedCartIds.length === 0"  *ngIf="admin" >
+  Merge Selected Orders
+</button>
 
 <!-- Message for No Held Carts -->
 <ng-template #noHeldCarts>
@@ -63,15 +103,14 @@
 </ng-template>
 
 <!-- Orders Section -->
-<h5 class="mt-4">Orders</h5>
+<!-- <h5 class="mt-4">Orders</h5>
 <button class="btn btn-secondary mb-3" (click)="toggleOrders()">
   {{ showOrders ? 'Hide Orders' : 'View Orders' }}
-</button>
+</button> -->
 
 <ul class="list-group" *ngIf="showOrders && orders.length > 0; else noOrders">
   <li *ngFor="let order of orders" class="list-group-item d-flex justify-content-between">
     <span>Order #{{ order.id }} - Status: <strong>{{ order.order_status }}</strong></span>
-    <!-- <button class="btn btn-info btn-sm" (click)="viewOrderDetails(order.id)">View</button> -->
   </li>
 </ul>
 
@@ -79,3 +118,56 @@
 <ng-template #noOrders>
   <!-- <p class="text-muted">No orders available.</p> -->
 </ng-template>
+
+
+
+
+
+
+
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': displayStyle }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- {{ header }} -->
+        <i class="fa fa-close" (click)="closePopup()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12" style="width: 100%;">
+          <div class="card card-room">
+            <div class="card-header"></div>
+            <div class="card-body">
+              <form [formGroup]="createForm">
+                <div class="row">
+                  <div class="col-md-5 pr-1">
+                    <div class="form-group">
+                      <!-- <label>Use Name</label> -->
+                      <input
+                        type="password"
+                        formControlName="username"
+                        class="form-control"
+                        placeholder="Enter username name"
+                      />
+                    </div>
+                  </div>
+
+ 
+</div>
+
+            
+
+                <div class="row">
+                  <div class="update ml-auto mr-auto" >
+                    <button type="submit" class="btn btn-primary btn-round" (click)="checkCashier()">Submit</button>
+                  </div>
+                  
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

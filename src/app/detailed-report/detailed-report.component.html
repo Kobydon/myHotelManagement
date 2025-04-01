@@ -115,6 +115,7 @@
                   <th>Item</th>
                   <th>Amount</th>
                   <th> Attendant</th>
+                  <th>Method</th>
                   <!-- <th>Reason</th> -->
                   <!-- <th>Date </th> -->
                 </tr>
@@ -124,6 +125,7 @@
                   <td>{{ item.name }}</td>
                   <td>GH₵{{ item.amount }}</td>
                   <td>{{ item.attendant }}</td>
+                  <td>{{item.method}}</td>
                   <!-- <td>{{ refund.reason }}</td> -->
                   <!-- <td>{{ refund.refund_time | date }}</td> -->
                 </tr>
@@ -135,9 +137,50 @@
               </tbody>
             </table>
 
+            
+            <p>Held Orders</p>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Item</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Subtotal</th>
+                  <th>Waiter</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Loop through HeldList (each order) -->
+                <ng-container *ngFor="let order of HeldList">
+                  <!-- Show Order ID and Company as a separator row -->
+                  <!-- <tr class="bg-light">
+                    <td colspan="6"><strong>Order ID: {{ order.id }} | {{ order.company_name }}</strong></td>
+                  </tr> -->
+            
+                  <!-- Loop through order items -->
+                  <tr *ngFor="let item of order.items">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>GH₵{{ item.price }}</td>
+                    <td>GH₵{{ item.qty * item.price }}</td>
+                    <td>{{ order.waiter }}</td>
+                    <td>{{ order.status }}</td>
+                  </tr>
+                </ng-container>
+            
+                <!-- Grand Total Row -->
+                <tr>
+                  <td colspan="6" class="text-end bg-light">
+                    <strong>Total: GH₵{{ totalHeldAmount | number }}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
             <p>Most Ordered Item</p>
             <table class="table table-bordered mt-3" >
-              <thead class="thead-dark">
+              <thead class="thead-light">
                 <tr>
                   <th>#</th>
                   <th>Item Name</th>
@@ -157,7 +200,7 @@
 
             <p>Top Seller</p>
             <table class="table table-bordered mt-3" >
-              <thead class="thead-dark">
+              <thead class="thead-light">
                 <tr>
                   <th>#</th>
                   <th>Item Name</th>
@@ -167,13 +210,32 @@
               <tbody>
                 <tr *ngFor="let item of mostAttendant; index as i">
                   <td>{{ i + 1 }}</td>
-                  <td>{{ item.attendant }}</td> <!-- Uses named properties -->
+                  <td>{{ item.waiter }}</td> <!-- Uses named properties -->
                   <td><strong>{{ item.count }}</strong></td>
                 </tr>
               </tbody>
             </table>
 
-            <!-- Refunds -->
+         
+            <p>Cook For the Day</p>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr class="bg-secondary text-white">
+                  <th>Name</th>
+                  <th>Food Prepared</th>
+               
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of chefList">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.food }}</td>
+              
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- RefundschefList -->
             <h5 class="text-gray-500 mt-4">Accounts Report</h5>
 
 

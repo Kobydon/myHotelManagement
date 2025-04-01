@@ -1,0 +1,45 @@
+<div class="main-container"> 
+  <!-- Orders Section -->
+  <div class="order-section">
+    <h3 class="form-kev" style="text-align: center;">
+      LONGFORD CITY    
+      <button class="btn btn-danger" (click)="logOut()">Log Out</button>
+    </h3>
+    
+    <div class="order-container">
+      <div *ngFor="let order of itemList" class="order-card">
+        <h3>Order #{{ order.id }} - {{order.waiter}}</h3>
+        <p>Status: <span [ngClass]="{ 'pending': order.status !== 'Confirmed', 'confirmed': order.status === 'Confirmed' }">
+          {{ order.status }}
+        </span></p>
+
+        <div *ngFor="let item of order.items">
+          <p><strong>{{ item.name }}</strong> (x{{ item.qty }})</p>
+        </div>
+
+        <button *ngIf="order.status !== 'Confirmed'" (click)="confirmOrder(order.id)">Confirm Order</button>
+        <span *ngIf="order.status === 'Confirmed'" class="confirmed-badge">Confirmed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order List Section -->
+   <h3>paid</h3>
+  <div class="order-section">
+    <div class="order-container">
+      <div *ngFor="let order of orderList" class="order-card">
+        <h3>Order #{{ order.order_id }} - {{order.waiter}}</h3>
+        <p>Status: <span [ngClass]="{ 'pending': order.status !== 'Confirmed', 'confirmed': order.status === 'Confirmed' }">
+          {{ order.status }}
+        </span></p>
+
+        <div>
+          <p><strong>{{ order.item_name }}</strong> ({{ order.quantity }})</p>
+        </div>
+
+        <button *ngIf="order.status !== 'Confirmed'" (click)="confirmOrderTwo(order.id)">Confirm Order</button>
+        <span *ngIf="order.status === 'Confirmed'" class="confirmed-badge">Confirmed</span>
+      </div>
+    </div>
+  </div>
+</div> <!-- ✅ Ensure main-container is properly closed -->

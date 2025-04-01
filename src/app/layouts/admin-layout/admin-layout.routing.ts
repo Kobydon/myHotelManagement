@@ -53,6 +53,7 @@ import { AccountReceivablePagesComponent } from 'app/account-receivable-pages/ac
 import { GopDeductionComponent } from 'app/gop-deduction/gop-deduction.component';
 import { FinancialOverviewComponent } from 'app/financial-overview/financial-overview.component';
 import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
+import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.component';
 
 
 
@@ -88,6 +89,7 @@ export const AdminLayoutRoutes: Routes = [
     {path:'add-budget',component:BudgetComponent},
     {path:'income',component:IncomeComponent},
     {path:'budget-report',component:BudgetReportComponent},
+    {path:'add-chef',component:TodaysFoodChefComponent},
     {path:'daily-income',component:DailyIncomeReportComponent},
     {path:'daily-income-dates',component:DailyIncomeReportDatesBetweenComponent},
     {path:'item',component:ItemComponent},

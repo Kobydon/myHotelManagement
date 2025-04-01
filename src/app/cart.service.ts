@@ -1,174 +1,123 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-  private cartItems = new BehaviorSubject<any[]>([]); // Holds cart items
-  cartItems$ = this.cartItems.asObservable(); // Exposes cart data as Observable
+  private cartItems = new BehaviorSubject<any[]>([]);
+  cartItems$ = this.cartItems.asObservable();
   private apiUrl = 'http://127.0.0.1:5000/guest/create_orders';
-
-  private orderUrl = 'http://localhost:5000/guest';
+  private apiUrl2 = 'http://127.0.0.1:5000/guest/create_orders_two';
+  private orderUrl = 'http://127.0.0.1:5000/guest';
 
   constructor(private http: HttpClient) {
-    this.loadCart(); // Load saved cart when service initializes
+    this.loadCart();
   }
 
-  
   payOrder(orderData: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, orderData);
   }
 
-  // Add item to cart
-  addToCart(userId: number, product: any) {
-    let items = this.getCartForUser(userId);
-    let existingItem = items.find((item) => item.name === product.name);
+  payOrderTwo(orderData: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl2, orderData);
+  }
+
+  
+  addToCart(product: any) {
+    const items = this.getCart();
+    const existingItem = items.find(item => item.id === product.id);
 
     if (existingItem) {
-      existingItem.qty += 1; // If item exists, increase quantity
+      existingItem.qty += 1;
     } else {
-      items.push({ ...product, qty: 1 }); // Otherwise, add new item
+      items.push({ ...product, qty: 1 });
     }
+    this.updateCart(items);
+  }
 
+  removeFromCart(product: any) {
+    const cartItems = this.getCart().filter(item => item.id !== product.id);
+    this.updateCart(cartItems);
+  }
+
+  increaseQty(product: any) {
+    this.updateItemQty(product, 1);
+  }
+
+  decreaseQty(product: any) {
+    this.updateItemQty(product, -1);
+  }
+
+  getTotal(): number {
+    return this.getCart().reduce((sum, item) => sum + item.price * item.qty, 0);
+  }
+
+  holdCart(userId: any, holdId: number, total: any): Observable<any> {
+    return this.http.post(`${this.orderUrl}/hold_order`, { id: holdId, userId, cartItems: this.getCart(), total });
+  }
+
+  getHeldCarts(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.orderUrl}/held_orders`);
+  }
+
+  loadHeldCart(holdId: number): Observable<any> {
+    return this.http.get(`${this.orderUrl}/load_held_order/${holdId}`);
+  }
+
+  removeHeldCart(holdId: number) {
+    return lastValueFrom(this.http.delete(`${this.orderUrl}/remove_held_order/${holdId}`));
+  }
+
+  clearCart() {
+    this.updateCart([]);
+  }
+
+  private getCart(): any[] {
+    return this.safeParse(localStorage.getItem('cart'), []);
+  }
+
+  private updateCart(items: any[]) {
+    localStorage.setItem('cart', JSON.stringify(items));
     this.cartItems.next([...items]);
-    this.saveCart(userId, items);
   }
 
-  // Remove item from cart
-  removeFromCart(userId: number, product: any) {
-    let items = this.getCartForUser(userId).filter((item) => item.name !== product.name);
-    this.cartItems.next([...items]);
-    this.saveCart(userId, items);
-  }
+  private updateItemQty(product: any, change: number) {
+    const items = this.getCart();
+    const item = items.find(i => i.id === product.id);
 
-  // Increase quantity
-  increaseQty(userId: number, product: any) {
-    let items = this.getCartForUser(userId);
-    let item = items.find((i) => i.name === product.name);
-    if (item) item.qty += 1;
-    this.cartItems.next([...items]);
-    this.saveCart(userId, items);
-  }
-
-  // Decrease quantity
-  decreaseQty(userId: number, product: any) {
-    let items = this.getCartForUser(userId);
-    let item = items.find((i) => i.name === product.name);
-    if (item && item.qty > 1) {
-      item.qty -= 1;
-    } else {
-      items = items.filter((i) => i.name !== product.name);
-    }
-    this.cartItems.next([...items]);
-    this.saveCart(userId, items);
-  }
-
-  // Get total price
-  getTotal(userId: number) {
-    return this.getCartForUser(userId).reduce((sum, item) => sum + item.price * item.qty, 0);
-  }
-
-  // Save the cart for a specific user
-  private saveCart(userId: number, items: any[]) {
-    localStorage.setItem(`cart_${userId}`, JSON.stringify(items));
-  }
-
-  // Load the cart for a specific user
-  private loadCart() {
-    const userId = this.getCurrentUserId();
-    const savedCart = JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
-    this.cartItems.next(savedCart);
-  }
-
-  // Get cart for a specific user
-  private getCartForUser(userId: number) {
-    return JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
-  }
-
-  // Hold the current cart with a unique ID for a specific user
-  holdCart(userId: number): number {
-    const cartId = Date.now(); // Unique ID
-    const newHeldCart = {
-      id: cartId,
-      userId: userId,
-      items: [...this.getCartForUser(userId)],
-      total: this.getTotal(userId),
-    };
-
-    let heldCarts = this.getHeldCarts(userId);
-    heldCarts.push(newHeldCart);
-    localStorage.setItem(`heldCarts_${userId}`, JSON.stringify(heldCarts));
-
-    this.clearCart(userId);
-    return cartId;
-  }
-
-  // Retrieve all held carts for a specific user
-  getHeldCarts(userId: number): any[] {
-    return JSON.parse(localStorage.getItem(`heldCarts_${userId}`) || '[]');
-  }
-
-  // Load a specific held cart by ID for a user
-  loadHeldCart(userId: number, cartId: number) {
-    const heldCarts = this.getHeldCarts(userId);
-    const selectedCart = heldCarts.find(cart => cart.id === cartId);
-
-    if (selectedCart) {
-      this.cartItems.next(selectedCart.items);
-      this.saveCart(userId, selectedCart.items);
-    }
-  }
-
-  // Remove a specific held cart by ID for a user
-  removeHeldCart(userId: number, cartId: number) {
-    let heldCarts = this.getHeldCarts(userId);
-    heldCarts = heldCarts.filter(cart => cart.id !== cartId);
-    localStorage.setItem(`heldCarts_${userId}`, JSON.stringify(heldCarts));
-  }
-
-  // Merge selected held orders into the active cart for a user
-  mergeSelectedOrders(userId: number, selectedCartIds: number[]) {
-    let heldCarts = this.getHeldCarts(userId);
-    let mergedItems: any[] = [...this.getCartForUser(userId)];
-
-    selectedCartIds.forEach(cartId => {
-      const cart = heldCarts.find(c => c.id === cartId);
-      if (cart) {
-        cart.items.forEach(item => {
-          let existingItem = mergedItems.find(i => i.name === item.name);
-          if (existingItem) {
-            existingItem.qty += item.qty;
-          } else {
-            mergedItems.push({ ...item });
-          }
-        });
+    if (item) {
+      item.qty += change;
+      if (item.qty <= 0) {
+        this.removeFromCart(product);
+        return;
       }
-    });
-
-    // Update the cart with merged items
-    this.cartItems.next(mergedItems);
-    this.saveCart(userId, mergedItems);
-
-    // Remove merged held carts
-    heldCarts = heldCarts.filter(cart => !selectedCartIds.includes(cart.id));
-    localStorage.setItem(`heldCarts_${userId}`, JSON.stringify(heldCarts));
+    }
+    this.updateCart(items);
   }
 
-  // Clear the cart (used for checkout or cancel)
-  clearCart(userId: number) {
-    this.cartItems.next([]);
-    this.saveCart(userId, []);
+  private loadCart() {
+    this.cartItems.next(this.getCart());
   }
-
-  // Get the current logged-in user ID
-  private getCurrentUserId(): number {
-    return JSON.parse(localStorage.getItem('currentUser') || '{}').id || 0;
-  }
-
 
   getOrders(): Observable<any[]> {
     return this.http.get<any[]>(`${this.orderUrl}/my_orders`);
+  }
+
+  private safeParse<T>(data: string | null, fallback: T): T {
+    try {
+      return data ? JSON.parse(data) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  updateOrderStatus(orderId: number, newStatus: string): Observable<any> {
+    return this.http.put(`${this.orderUrl}/update_order_status/${orderId}`, { status: newStatus });
+  }
+
+  mergeSelectedOrders(orderIds: number[]): Observable<any> {
+    return this.http.post<any>(`${this.orderUrl}/merge_orders`, { order_ids: orderIds });
   }
 }

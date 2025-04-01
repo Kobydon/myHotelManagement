@@ -24,8 +24,8 @@ export class userService {
 message:any;
 user:any;
 
+private userUrl = 'http://127.0.0.1:5000';
   // private userUrl = 'https://renderdemo-hwz6.onrender.com';
-  private userUrl = 'http://127.0.0.1:5000';
  
  
   isUserLoggedIn: boolean = false;
@@ -57,6 +57,10 @@ user:any;
 
   
 
+  findCashier(dep:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.post(this.userUrl + '/user/find_cashier', dep, httpOptions));
+    }  
 
 
   addUser(ad:any){

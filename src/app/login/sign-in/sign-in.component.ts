@@ -18,6 +18,10 @@ export class SignInComponent implements OnInit {
   user:any;
   isAdmin =false;
   load=false;
+  isKitchen=false;
+  isWaiter=false;
+  isBartender = false;
+
   constructor(private fb:FormBuilder,private router:Router,private userService:userService,private toastr:ToastrService) { 
 
 
@@ -88,11 +92,32 @@ export class SignInComponent implements OnInit {
    this.toastr.error(null,error.message)
    }
    finally{
-    if(this.user[0].roles=="guest" )
+    if(this.user[0]?.roles=="kitchen" ){
+      localStorage.setItem('isKitchen','true');
+      
     
-    this.router.navigate(["/home/features"]);
+    this.router.navigate(["/view-order"]);}
 
-    else if(this.user[0].roles=="admin" || this.user[0].roles=="receptionist"  ){
+    else if(this.user[0]?.roles=="waiter" ||  this.user[0]?.roles=="waitress"){
+      localStorage.setItem('isWaiter','true');
+      
+      this.router.navigate(["/item-list"])
+
+
+    }
+
+
+    
+    else if(this.user[0]?.roles=="bartender" ||  this.user[0]?.roles=="bartender"){
+      localStorage.setItem('isBartender','true');
+      this.router.navigate(["/view-drink-order"])
+
+
+    }
+
+   
+
+    else if(this.user[0]?.roles=="admin" || this.user[0].roles=="receptionist"  ){
       localStorage.setItem('isAdmin','true');
   
       this.router.navigate(["/dashboard"])

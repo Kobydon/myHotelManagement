@@ -28,7 +28,7 @@ export class DetailedReportComponent implements OnInit {
   page = 1;
   pageSize: number = 10;
   header:any;
-
+  HeldList: any;
  yester_daytodate:any;
   room_info:any;
   booking_info:any;
@@ -39,6 +39,7 @@ export class DetailedReportComponent implements OnInit {
   roomtype:any;
   bookings:any;
   guestList:any;
+  totalHeldAmount=0;
   roomList:any;
   yesterdayList:any;
   posList:any;
@@ -62,6 +63,8 @@ export class DetailedReportComponent implements OnInit {
   totalAmount:any;
   user:any;
   purchaseList:any;
+
+  chefList:any;
   orderList:any;
   mostAttendant:any;
  receivedList:any;
@@ -146,6 +149,7 @@ finally{
 async searchDates() {
   try {
     this.loading.start();
+    this.loadHeldOrders();
 
     const selectedDate = this.paymentForm.value.dates;
     if (!selectedDate) {
@@ -154,75 +158,91 @@ async searchDates() {
 
     const d = { date: selectedDate };
 
-    // Fetch payments
-    const paymentRes = await this.paymentService.searchDates(d);
-    this.paymentList = paymentRes || [];
-    this.totalAmount = this.paymentList.reduce((sum, item) => sum + parseInt(item.amount), 0);
-    const receivedRes = await this.guestService.searchReceivedDate(d);
-    this.receivedList = receivedRes || [];
+    // 🚀 Run all independent API calls concurrently
+    const [
+      paymentRes,
+      receivedRes,
+      stockRes,
+      attendantRres,
+      stockUsageRes,
+      returnedRes,
+      mostOrderedRes,
+      refundRes,
+      posRes,
+      roomRes,
+      incomeRes,
+      expenseRes,
+      attendanceRes,
+      purchaseRes,
+      orderRes,
+      
+    ] = await Promise.all([
+      this.paymentService.searchDates(d),
+      this.guestService.searchReceivedDate(d),
+      this.guestService.searchStockDate(d),
+      this.guestService.searchMostAttendantDate(d),
 
-    const stockRes = await this.guestService.searchStockDate(d);
-    this.stockList = stockRes || [];
-
-    const attendantRres = await this.guestService.searchMostAttendantDate(d);
-    this.mostAttendant = attendantRres || [];
-
-
-  const stockUsageRes = await this.guestService.searchStockUsuageDate(d);
-    this.stockUsuageList = stockUsageRes || [];
-    const ReturnedRes = await this.guestService.searchReturnDate(d);
-    this.returnList = ReturnedRes || [];
-
-
-    const most_ordere = await this.guestService.searchMostOrderedDate(d);
-    this.mostOrderedItems = most_ordere || [];
-
-    // Fetch refunds
-    const refundRes = await this.paymentService.searchRefundDates(d);
-    this.refundList = refundRes || [];
-    this.totalRefundAmount = this.refundList.reduce((sum, item) => sum + parseInt(item.refund_amount), 0);
-
-    const posRes = await this.paymentService.searchDatesPos(d);
-    this.posList = posRes || [];
-    this.totalPosAmount = this.posList.reduce((sum, item) => sum + parseInt(item.amount), 0);
-
-
+      this.guestService.searchStockUsuageDate(d),
+      this.guestService.searchReturnDate(d),
+      this.guestService.searchMostOrderedDate(d),
+      this.paymentService.searchRefundDates(d),
+      this.paymentService.searchDatesPos(d),
+      this.roomService.searchRoomDates(d),
+      this.guestService.searchIncomeDates(d),
+      this.guestService.searchExpenseDate(d),
+      this.guestService.searchattendanceDate(d),
+      this.guestService.searchPurchaseDate(d),
+      this.guestService.searchOrderDate(d),
     
-    // Fetch room data
-    const roomRes = await this.roomService.searchRoomDates(d);
+    ]);
+
+    // ✅ Assign API data safely
+    this.paymentList = paymentRes || [];
+    this.receivedList = receivedRes || [];
+    this.stockList = stockRes || [];
+    this.mostAttendant = attendantRres || [];
+    this.stockUsuageList = stockUsageRes || [];
+    this.returnList = returnedRes || [];
+    this.mostOrderedItems = mostOrderedRes || [];
+    this.refundList = refundRes || [];
+    this.posList = posRes || [];
     this.rooms = roomRes || [];
+    this.incomeList = incomeRes || [];
+    this.expenseList = expenseRes || [];
+    this.attendaceList = attendanceRes || [];
+    this.purchaseList = purchaseRes || [];
+    this.orderList = orderRes || [];
+
+
+
+    // ✅ Ensure `roomList` exists before using `.length`
+    this.roomList = this.roomList || [];
+
+   this.getFoodChef(d);
+  
+    // ✅ Safely calculate totals
+    this.totalAmount = this.paymentList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalRefundAmount = this.refundList.reduce((sum, item) => sum + (parseInt(item.refund_amount) || 0), 0);
+    this.totalPosAmount = this.posList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalIncome = this.incomeList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalExpenses = this.expenseList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalAttendance = this.attendaceList.length;
+
+    // ✅ Room calculations
     this.totalAvailableRooms = this.roomList.length - this.rooms.length;
     this.totalOcccupiedRooms = this.rooms.length;
-    this.occupancy = (this.totalOcccupiedRooms / this.roomList.length) * 100;
+    this.occupancy = (this.totalOcccupiedRooms / (this.roomList.length || 1)) * 100;
 
-    // Prepare yesterday's data
+    // ✅ Fetch Yesterday's Data
     const yesterday = new Date(selectedDate);
     yesterday.setDate(yesterday.getDate() - 1);
     const z = { date: yesterday.toISOString().split("T")[0] };
 
-    // Fetch income, expenses, and attendance
-    const incomeRes = await this.guestService.searchIncomeDates(d);
-    const expenseRes = await this.guestService.searchExpenseDate(d);
-    const attendanceRes = await this.guestService.searchattendanceDate(d);
-    const purchaseRes = await this.guestService.searchPurchaseDate(d);
-    const orderRes = await this.guestService.searchOrderDate(d);
-    this.incomeList = incomeRes || [];
-    this.expenseList = expenseRes || [];
-    this.attendaceList = attendanceRes || [];
-
-    this.purchaseList = purchaseRes || [];
-    this.orderList = orderRes || [];
-
-    this.totalIncome = this.incomeList.reduce((sum, item) => sum + parseInt(item.amount), 0);
-    this.totalExpenses = this.expenseList.reduce((sum, item) => sum + parseInt(item.amount), 0);
-    this.totalAttendance = this.attendaceList.length;
-
-    // Fetch yesterday's room data
     const yesterdayRoomRes = await this.roomService.searchYesterdayRoomDates(z);
     this.yesterdayList = yesterdayRoomRes || [];
-    this.yesterday_total = this.yesterdayList.reduce((sum, item) => sum + parseInt(item.amount), 0);
+    this.yesterday_total = this.yesterdayList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
 
-    // Calculate cumulative totals
+    // ✅ Cumulative total
     this.yester_daytodate = this.yesterday_total + this.totalAmount;
 
   } catch (err) {
@@ -230,6 +250,8 @@ async searchDates() {
   } finally {
     this.loading.stop();
   }
+
+
 }
 
 
@@ -429,6 +451,49 @@ printRepo(): void {
     console.error('Failed to open the print window.');
   }
 }
+loadHeldOrders() {
+  const selectedDate = this.paymentForm.value.dates;
+  this.guestService.getHeldReportOrders(selectedDate).subscribe((data) => {
+    console.log("API Response:", data); // Debugging: Check if data is received
 
+    if (!Array.isArray(data) || data.length === 0) {
+      console.log("No held orders found.");
+      this.HeldList = []; // Set empty array if no data
+      this.totalHeldAmount = 0;
+      return;
+    }
+
+    // Ensure 'items' is always an array and convert price to a number
+    this.HeldList = data.map((order: any) => ({
+      ...order,
+      items: Array.isArray(order.items)
+        ? order.items.map((item: any) => ({
+            ...item,
+            price: Number(item.price) || 0, // Convert price to a number
+            qty: Number(item.qty) || 0 // Ensure qty is a number
+          }))
+        : []
+    }));
+
+    console.log("Processed HeldList:", this.HeldList);
+    this.calculateTotal();
+  });
+}
+
+calculateTotal() {
+  this.totalHeldAmount = this.HeldList.reduce((sum, order) =>
+    sum + order.items.reduce((subSum, item) => subSum + (item.qty * item.price), 0)
+  , 0);
+}
+
+
+
+async getFoodChef(d){
+
+  var bi =  await this.guestService.searchChefDates(d);
+  if(bi) this.chefList=bi
+
+
+}
 
 }

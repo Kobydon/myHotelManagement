@@ -67,6 +67,10 @@ import { AllSessionsComponent } from './all-sessions/all-sessions.component';
 import { PosModule } from "./pos/pos.module";
 import { PosLayoutComponent } from "./pos-layout/pos-layout.component";
 import { ItemListCategoryComponent } from './item-list-category/item-list-category.component';
+import { ViewOrderComponent } from './view-order/view-order.component';
+import { ViewDrinkOrderComponent } from './view-drink-order/view-drink-order.component';
+import { TodaysFoodChefComponent } from './todays-food-chef/todays-food-chef.component';
+import { ItemListVipComponent } from './item-list-vip/item-list-vip.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -78,6 +82,10 @@ import { ItemListCategoryComponent } from './item-list-category/item-list-catego
     ResLayoutComponent,
   
     VendorsComponent,
+        ViewOrderComponent,
+        ViewDrinkOrderComponent,
+      
+      
       
 
      

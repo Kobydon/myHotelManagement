@@ -22,7 +22,7 @@ user:any;
    constructor(private guestService:GuestService,private cartService:CartService,private route:ActivatedRoute,private userService:userService) { }
  
    ngOnInit(): void {
-    this.getItemsList();
+    // this.getItemsList();
     this.cartService.cartItems$.subscribe(items => {
       this.cartItems = items;
     });
@@ -83,25 +83,25 @@ user:any;
   // Add item to cart
   addToCart(product: any) {
     // if (!this.user[0]?.id) return;
-    this.cartService.addToCart(this.user[0]?.is, product);
+    this.cartService.addToCart( product);
   }
   
   // Increase quantity
   increaseQty(product: any) {
     // if (!this.user[0]?.id) return;
-    this.cartService.increaseQty(this.user[0]?.is, product);
+    this.cartService.increaseQty( product);
   }
   
   // Decrease quantity
   decreaseQty(product: any) {
     // if (!this.user[0]?.id) return;
-    this.cartService.decreaseQty(this.user[0]?.is, product);
+    this.cartService.decreaseQty(product);
   }
   
   // Remove item from cart
   removeFromCart(product: any) {
     // if (!this.user[0]?.id) return;
-    this.cartService.removeFromCart(this.user[0]?.is, product);
+    this.cartService.removeFromCart(product);
   }
   
 

@@ -62,6 +62,7 @@ import { AccountReceivablePagesComponent } from 'app/account-receivable-pages/ac
 import { GopDeductionComponent } from 'app/gop-deduction/gop-deduction.component';
 import { FinancialOverviewComponent } from 'app/financial-overview/financial-overview.component';
 import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
+import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.component';
 
 
     
@@ -121,7 +122,7 @@ import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
     AddPurchaseRequestComponent,
     IncomeComponent,
     BudgetComponent,
-    BudgetReportComponent,
+    BudgetReportComponent,TodaysFoodChefComponent,
     DailyIncomeReportComponent,ReceivedItemsComponent,
 
     DailyIncomeReportDatesBetweenComponent,

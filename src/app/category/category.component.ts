@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 })
 export class CategoryComponent implements OnInit {
   categoryList:any;
+  showNormal: boolean = true;
+  showVip: boolean = false;
   constructor(private guestService:GuestService,private router:Router) { }
 
   ngOnInit(): void {
@@ -22,6 +24,12 @@ export class CategoryComponent implements OnInit {
        this.router.navigate(['/item-category-list', id]);
      }
    
+    
+    navigateToEventVip(id:string){
+
+      this.router.navigate(['/item-category-list-vip', id]);
+
+     }
   async getCategoryList() {
     try {
       // this.loading.start();
@@ -37,4 +45,14 @@ export class CategoryComponent implements OnInit {
   }
 
 
+  
+  showNormalView() {
+    this.showNormal = true;
+    this.showVip = false;
+  }
+
+  showVipView() {
+    this.showNormal = false;
+    this.showVip = true;
+  }
 }

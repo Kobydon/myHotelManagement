@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { userService } from './user.service';
@@ -8,54 +8,49 @@ import { userService } from './user.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-
-export class AppComponent{ isUserLoggedIn = false; isAdmin = false;
-   constructor(private toastr:ToastrService,private router:Router,private userService:userService){
-
-   }
+export class AppComponent implements OnInit {
+  isUserLoggedIn = false;
+  isAdmin = false;
   checking = false;
-  
-    ngOnInit() {
-      let storeData = localStorage.getItem("isUserLoggedIn");
-      let adminData = localStorage.getItem("isAdmin");
-  
 
-      // if( adminData != null && adminData == "true")
-      // this.isAdmin = true;
-      // console.log("adminData: " + adminData);
+  constructor(
+    private toastr: ToastrService,
+    private router: Router,
+    private userService: userService
+  ) {}
 
-    if(adminData == null && storeData == "true" )
-  
-{
-   this.router.navigate(['home/features'])
-      // this.isUserLoggedIn = false;
-      // this.toastr.error(null,"session expired,kindly login again");
-      // this.userService.logout();
-   }
+  ngOnInit() {
+    const storeData = localStorage.getItem('isUserLoggedIn');
+    const adminData = localStorage.getItem('isAdmin');
+    const barData = localStorage.getItem('isBartender');
+    const waiterData = localStorage.getItem('isWaiter');
+    const kitchenData = localStorage.getItem('isKitchen');
+    const checkData = localStorage.getItem('checking');
 
-      if( storeData != null && storeData == "true")
-         this.isUserLoggedIn = true;
-//       else if(storeData == null )
-// {
+    if (storeData === 'true') {
+      this.isUserLoggedIn = true;
 
+      if (adminData === 'true') {
+        this.redirectAndLogout('/dashboard');
+      } else if (kitchenData === 'true') {
+        this.redirectAndLogout('/view-order');
+      } else if (waiterData === 'true') {
+        this.redirectAndLogout('/item-order');
+      } else if (barData === 'true') {
+        this.redirectAndLogout('/view-drink-order');
+      }
+    } else {
+      this.isUserLoggedIn = false;
+      this.toastr.error(null, 'Session expired, kindly login again');
+      this.userService.logout();
+    }
 
-//          this.toastr.error(null,"session expired,kindly login again");
-//          this.userService.logout();
-//       }
+    this.checking = checkData === 'true';
+    console.log('Admin status:', adminData);
+  }
 
-         let checkData = localStorage.getItem("checking");
-      console.log("admin: " + adminData);
-
-      if( checkData != null && checkData == "true")
-         this.checking = true;
-      else
-
-
-         this.checking = false;
-   }
-
-
-
-
-
+  private redirectAndLogout(route: string) {
+    this.router.navigate([route]);
+    this.userService.logout();
+  }
 }

@@ -23,7 +23,7 @@ unitList: any[] = [];
   displayStyle = "none";
   header = '';
   page = 1;
-  pageSize: number = 10; // Change to whatever page size you need
+  pageSize: number = 100; // Change to whatever page size you need
   totalAmount: number = 0;
   itemForm!: FormGroup;
  user:any[]=[]

@@ -1,0 +1,23 @@
+.main-container {
+  padding: 10px; /* Reduce overall padding */
+}
+
+.order-section {
+  margin-bottom: 5px; /* Reduce space between order sections */
+  padding: 10px 0;
+}
+
+.order-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Reduce gap between order cards */
+  justify-content: center;
+}
+
+.order-card {
+  margin: 5px 0; /* Reduce vertical spacing */
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}

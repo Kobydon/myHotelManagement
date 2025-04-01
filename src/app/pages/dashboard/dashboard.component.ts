@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
   }
   async getPaymentList() {
     try {
-      const res = await this.paymentService.getPayment();
+      const res = await this.paymentService.getPaymentPos();
       if (res) {
         this.paymentList = res;
         this.processMonthlyPayments();

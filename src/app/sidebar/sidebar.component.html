@@ -98,7 +98,7 @@ li{
      <li    class="transparent">    
         <a id="fina" ><i id="fina" class="fa fa-user "  *ngIf="user[0].roles=='admin'" >&nbsp;</i><span>User&nbsp;</span>
           <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
-          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+         
         </a>
       </li>
 
@@ -106,43 +106,30 @@ li{
         <li>
         <a id="fina" routerLink="all-users"><i id="fina" class="fa fa-users "  *ngIf="user[0].roles=='admin'" >&nbsp;</i><span>Users&nbsp;</span>
 
-          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+         
         </a></li>
   <li>
         <a id="fina" routerLink="all-sessions"><i id="fina" class="fa fa-users "  *ngIf="user[0].roles=='admin'">&nbsp;</i><span>Sessions&nbsp;</span>
-          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+         
         </a>
 </li>
       </div>
 
       <li  >
-        <a id="fina" routerLink="all-guest"><i id="fina" class="fa fa-user "  >&nbsp;</i><span>Guest&nbsp;</span>
-          <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+        <a id="fina" routerLink="all-guest"><i id="fina" class="fa fa-user "  aria-disabled="true" >&nbsp;</i><span>Guest&nbsp;</span>
+        
         </a>
       </li>
       <li>
         <a id="fina" style="font-size: small;"  routerLink="refund-list"><i id="fina" class="fa fa-money " >&nbsp;</i>Refund</a>
       </li>
+
+
+
 <!-- 
-
-
-    
-        <div class="dropdown-container">
-        <li>  <a id="fina"style="font-size: small;" routerLink="all-users"><i id="fina" class="fa fa-list " >&nbsp;</i>All</a>
-        </li>
-        <li>
-          <a id="fina" style="font-size: small;"  routerLink="add-user"><i id="fina" class="fa fa-plus " >&nbsp;</i>New User</a>
-        </li>
-        </div> -->
-
-
-
-
-
         <li   class="transparent" >
           <a id="fina" ><i id="fina" class="fa fa-bed " >&nbsp;</i><span>Room &nbsp;</span>
-            <!-- <i id="fina" style="float: right;" class="fa fa-angle-down"></i> -->
-            <!-- <i id="fina" class="fa fa-caret-down"   ></i> -->
+       
             <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
           </a>
         </li>
@@ -162,17 +149,10 @@ li{
             <a id="fina" style="font-size: small;"  routerLink="payment"><i id="fina" class="fa fa-dollar " >&nbsp;</i>Payment</a>
           </li>
 
-          <!-- <li>  <a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-list " >&nbsp;</i>Add New Room</a></li> -->
-            <!-- <li class="transparent">  <a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-tasks " >&nbsp;</i>Reservations</a>
-
-              
-            </li> -->
-          
          
-            <!-- <div class="dropdown-container-child"> -->
+    
               <li><a id="fina"style="font-size: small;" routerLink="all-reservations"><i id="fina" class="fa fa-pencil " >&nbsp;</i>Reservation List</a></li>
-              <!-- <li> <a id="fina"style="font-size: small;" routerLink="pages/user-list"><i id="fina" class="fa fa-list " >&nbsp;</i>Add New </a></li> -->
-             <!-- </div> -->
+          
 
 
 
@@ -195,8 +175,7 @@ li{
           
           </div> 
     
-
-          
+       -->
  
 
           <li  class="transparent" >
@@ -259,18 +238,18 @@ li{
 
         <li   >
           <a id="fina" routerLink="add-budget" ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Budget&nbsp;</span>
-            <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+           
           </a>
         </li>
         <li   >
         <li   >
           <a id="fina" routerLink="expenses" ><i id="fina" class="fa fa-balance-scale"  >&nbsp;</i><span>Expenses&nbsp;</span>
-            <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+           
           </a>
         </li>
         <li   >
           <a id="fina" routerLink="income" ><i id="fina" class="fa fa-handshake-o"  >&nbsp;</i><span>Income&nbsp;</span>
-            <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+           
           </a></li>
 
           <li>  <a id="fina"style="font-size: small;"  routerLink="/gop-deduction">
@@ -324,7 +303,7 @@ li{
     
             <li   >
               <a id="fina" routerLink="daily-income-dates" ><i id="fina" class="fa fa-calendar"  >&nbsp;</i><span>Income Dates&nbsp;</span>
-                <!-- <i id="fina" class="fa fa-caret-down" routerLink="all-users"  ></i> -->
+               
               </a>
 
               
@@ -344,7 +323,12 @@ li{
       
           </div>
 
+          <li >  
+            <a id="fina"style="font-size: small;" routerLink="add-chef"><i id="fina" class=" fa fa-spoon" >&nbsp;</i>Today's Food</a>
+
             
+           </li>
+         
        <li   class="transparent">
           <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-building fa-fw " style="color: lih;">&nbsp;</i><span>Inventory &nbsp;</span>
             <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>

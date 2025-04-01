@@ -56,7 +56,20 @@ addExpense(dep:any) {
     return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_expense', dep, httpOptions));
   }  
 
+  addChef(dep:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_chef', dep, httpOptions));
+    }  
+  
 
+
+    getChefList() {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_chef_list'));
+      }
+  
+
+  
   startSession(dep:any) {
     //console.log(guest);
       return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_session', dep, httpOptions));
@@ -102,6 +115,19 @@ addExpense(dep:any) {
       ));
     }
 
+
+    
+    getFoodVip(id: any) {
+      const url = `${this.guestUrl}/guest/get_food_vip/${id}`;
+      return lastValueFrom(this.http.get<any>(url).pipe(
+        catchError((error) => {
+          console.error('Error fetching event:', error);
+          throw new Error('Failed to fetch event data');
+        })
+      ));
+    }
+    
+
     deleteItem(id:number) {
       if (confirm("do you want to delete?")) {
       // const id = typeof ad === 'number' ? ad : ad.id;
@@ -111,6 +137,18 @@ addExpense(dep:any) {
       return of({});
     }
 
+    deleteChef(id:number) {
+      if (confirm("do you want to delete?")) {
+      // const id = typeof ad === 'number' ? ad : ad.id;
+      const url = `${this.guestUrl}/guest/delete_chef/${id}`;
+      return  lastValueFrom(  this.http.delete(url, httpOptions))
+      }
+      return of({});
+    }
+
+
+
+    
 
 
     deleteDepartment(id:number) {
@@ -228,6 +266,21 @@ addExpense(dep:any) {
               //console.log(guest);
                 return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_vendor', dep, httpOptions));
               }   
+
+               
+              confirmOrder(dep:any) {
+              //console.log(guest);
+                return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/confirm_oder', dep, httpOptions));
+              }   
+
+                    
+              confirmOrderTwo(dep:any) {
+                //console.log(guest);
+                  return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/confirm_oder_two', dep, httpOptions));
+                }   
+
+           
+
 
 
               closeSession(dep:any) {
@@ -581,6 +634,12 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_budget_dates', d, httpOptions));
     }
 
+
+    searchChefDates(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/get_chef_dates', d, httpOptions));
+
+
+    }
         
     searchGopDate(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_gop_dates', d, httpOptions));
@@ -628,8 +687,12 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_attendant', d, httpOptions));
     }
 
-    
+    getHeldReportOrders(date: string) {
+      return this.http.post<any[]>(this.guestUrl +'/guest/search_held_order_dates', { date });
+    }
 
+    
+ 
     searchPurchaseDateTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_purchase_date_two', d, httpOptions));
     }
@@ -780,6 +843,25 @@ getcheckOut(): Observable<any[]>{
           return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_item_list'));
         }
   
+
+        getOrdersList(){
+          return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_orders'));
+      
+        }
+
+
+        getHeldOrders(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders`));
+        }
+
+        
+        getHeldOrdersDrinks(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_drinks`));
+        }
+        
+        
+
+        
         
       getItemList() {
         //console.log(guest);get

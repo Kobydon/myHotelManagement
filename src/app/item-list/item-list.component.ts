@@ -15,10 +15,11 @@ user:any;
   constructor(private guestService:GuestService,private cartService:CartService,private userService:userService) { }
 
   ngOnInit(): void {
-    this.getItemsList();
-    this.cartService.cartItems$.subscribe(items => {
-      this.cartItems = items;
-    });
+    // this.getItemsList();
+    // this.cartService.cartItems$.subscribe(items => {
+    //   this.cartItems = items;
+    // });
+
     this.getUser();
   }
 
@@ -39,32 +40,32 @@ user:any;
 
 
   // Check if product is already in cart
-  // getCartItem(product: any) {
-  //   return this.cartItems.find(item => item.name === product.name);
-  // }
+  getCartItem(product: any) {
+    return this.cartItems.find(item => item.name === product.name);
+  }
 
   // Add item to cart
   addToCart(product: any) {
     // if (!this.user?.id) return;
-    this.cartService.addToCart(this.user[0]?.id, product);
+    this.cartService.addToCart( product);
   }
   
   // Increase quantity
   increaseQty(product: any) {
     // if (!this.user?.id) return;
-    this.cartService.increaseQty(this.user[0]?.id, product);
+    this.cartService.increaseQty( product);
   }
   
   // Decrease quantity
   decreaseQty(product: any) {
     // if (!this.user?.id) return;
-    this.cartService.decreaseQty(this.user[0]?.id, product);
+    this.cartService.decreaseQty( product);
   }
   
   // Remove item from cart
   removeFromCart(product: any) {
     // if (!this.user?.id) return;
-    this.cartService.removeFromCart(this.user[0]?.id, product);
+    this.cartService.removeFromCart( product);
   }
   
 
@@ -74,6 +75,7 @@ user:any;
       const res = await this.userService.getUser();
       if (res) {
         this.user = res;
+       
         // this.loadHeldCarts();
       }
     } catch (err) {
