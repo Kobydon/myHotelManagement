@@ -17,7 +17,7 @@ export class RoomService {
 
   
   // private roomUrl = 'https://renderdemo-hwz6.onrender.com';
-  private roomUrl = 'http://127.0.0.1:5000';
+  private roomUrl = ' http://127.0.0.1:5000';
 
 
   constructor(private http: HttpClient,private router:Router) { }
@@ -116,7 +116,10 @@ getroom_number():Observable<any[]>{
     //console.log(user);
       return  lastValueFrom(this.http.post(this.roomUrl + '/guest/add_booking', ad, httpOptions));
     }
-    
+    searchRoomDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.roomUrl + '/room/search_room_dates_two', d, httpOptions));
+    }
+   
 
     searchYesterdayRoomDates(ad:any){
       return lastValueFrom(this.http.post(this.roomUrl + '/room/search_yesterday_date', ad, httpOptions)) ;

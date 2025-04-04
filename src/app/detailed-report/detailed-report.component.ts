@@ -97,6 +97,7 @@ export class DetailedReportComponent implements OnInit {
 
   ngOnInit(): void {
     this.getRoom();
+    
 
   }
   

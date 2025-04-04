@@ -9,36 +9,50 @@
     <div class="order-container">
       <div *ngFor="let order of itemList" class="order-card">
         <h3>Order #{{ order.id }} - {{order.waiter}}</h3>
-        <p>Status: <span [ngClass]="{ 'pending': order.status !== 'Confirmed', 'confirmed': order.status === 'Confirmed' }">
-          {{ order.status }}
-        </span></p>
+        <p>
+          Status:
+          <span 
+            [ngClass]="{ 
+              'pending': order.food_status === 'yes', 
+              'confirmed': order.food_status === 'no' 
+            }">
+            {{ order.food_status === 'yes' ? 'Pending' : order.status }}
+          </span>
+        </p>
 
         <div *ngFor="let item of order.items">
           <p><strong>{{ item.name }}</strong> (x{{ item.qty }})</p>
         </div>
 
-        <button *ngIf="order.status !== 'Confirmed'" (click)="confirmOrder(order.id)">Confirm Order</button>
-        <span *ngIf="order.status === 'Confirmed'" class="confirmed-badge">Confirmed</span>
+        <button *ngIf="order.food_status !== 'no'" (click)="confirmOrder(order.id)">Confirm Order</button>
+        <span *ngIf="order.food_status === 'no'" class="confirmed-badge">Confirmed</span>
       </div>
     </div>
   </div>
 
   <!-- Order List Section -->
-   <h3>paid</h3>
+   <!-- <h3>paid</h3> -->
   <div class="order-section">
     <div class="order-container">
       <div *ngFor="let order of orderList" class="order-card">
         <h3>Order #{{ order.order_id }} - {{order.waiter}}</h3>
-        <p>Status: <span [ngClass]="{ 'pending': order.status !== 'Confirmed', 'confirmed': order.status === 'Confirmed' }">
-          {{ order.status }}
-        </span></p>
+        <p>
+          Status:
+          <span 
+            [ngClass]="{ 
+              'pending': order.food_status === 'yes', 
+              'confirmed': order.food_status === 'no' 
+            }">
+            {{ order.food_status === 'yes' ? 'Pending' : order.status }}
+          </span>
+        </p>
 
         <div>
           <p><strong>{{ order.item_name }}</strong> ({{ order.quantity }})</p>
         </div>
 
-        <button *ngIf="order.status !== 'Confirmed'" (click)="confirmOrderTwo(order.id)">Confirm Order</button>
-        <span *ngIf="order.status === 'Confirmed'" class="confirmed-badge">Confirmed</span>
+        <button *ngIf="order.food_status !== 'no'" (click)="confirmOrderTwo(order.id)">Confirm Order</button>
+        <span *ngIf="order.food_status === 'no'" class="confirmed-badge">Confirmed</span>
       </div>
     </div>
   </div>

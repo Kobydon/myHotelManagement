@@ -47,9 +47,9 @@
                     <th scope="col">#</th>
                     <th scope="col">Item Name</th>
                     <th scope="col">Quanity</th>
-                    <th scope="col">Store</th>
+          
                     <th scope="col">Status</th>
-                    <!-- <th scope="col">Description</th> -->
+      
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -58,7 +58,7 @@
                         <th>{{ i + 1 }}</th>
                         <td>{{ item.name }}</td>
                         <td>{{ item.quantity }}</td>
-                        <td>{{ item.store }}</td>
+                        <!-- <td>{{ item.store }}</td> -->
 
                         <td>
                           <span [ngClass]="item.quantity > 0 ? 'text-success' : 'text-danger'">

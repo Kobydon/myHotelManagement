@@ -88,17 +88,22 @@ async getOrders(){
       console.log("User loaded successfully.");
     }
   }
+ 
   async loadHeldOrders() {
     try {
       const res = await this.guestService.getHeldOrdersDrinks();
       if (res) {
-        this.itemList = res; // Assign retrieved orders
+        this.itemList = res.map(order => ({
+          ...order,
+          items: typeof order.items === "string" ? JSON.parse(order.items) : order.items // Only parse if it's a string
+        }));
         console.log("Held Orders Loaded:", this.itemList);
       }
     } catch (error) {
       console.error("Error loading held orders:", error);
     }
   }
+  
 
 
 

@@ -63,6 +63,7 @@ import { GopDeductionComponent } from 'app/gop-deduction/gop-deduction.component
 import { FinancialOverviewComponent } from 'app/financial-overview/financial-overview.component';
 import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
 import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.component';
+import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-summary-two.component';
 
 
     
@@ -123,7 +124,7 @@ import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.c
     IncomeComponent,
     BudgetComponent,
     BudgetReportComponent,TodaysFoodChefComponent,
-    DailyIncomeReportComponent,ReceivedItemsComponent,
+    DailyIncomeReportComponent,ReceivedItemsComponent,DetailedSummaryTwoComponent,
 
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,

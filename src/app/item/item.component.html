@@ -48,7 +48,8 @@
                     <th scope="col">Item Name</th>
                     <th scope="col">Category</th>
                     <th scope="col">Price</th>
-                    <th scope="col">Description</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Status</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -57,8 +58,13 @@
                     <th>{{ i + 1 }}</th>
                     <td>{{ item.name }}</td>
                     <td>{{ item.category }}</td>
-                    <td>₵{{ item.price}}</td>
-                    <td>{{ item.description }}</td>
+                    <td>₵{{ item.price}}</td> <td>
+                      <span [ngClass]="item.quantity > 0 ? 'text-success' : 'text-danger'">
+                        {{ item.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
+                      </span>
+                    </td>
+                    <td>{{ item.quantity }}</td>
+
                     <td >
                       <!-- Vegetable Sauce -->
                       <i  

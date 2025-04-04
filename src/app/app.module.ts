@@ -71,6 +71,7 @@ import { ViewOrderComponent } from './view-order/view-order.component';
 import { ViewDrinkOrderComponent } from './view-drink-order/view-drink-order.component';
 import { TodaysFoodChefComponent } from './todays-food-chef/todays-food-chef.component';
 import { ItemListVipComponent } from './item-list-vip/item-list-vip.component';
+import { DetailedSummaryTwoComponent } from './detailed-summary-two/detailed-summary-two.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -84,6 +85,7 @@ import { ItemListVipComponent } from './item-list-vip/item-list-vip.component';
     VendorsComponent,
         ViewOrderComponent,
         ViewDrinkOrderComponent,
+       
       
       
       

@@ -16,7 +16,7 @@ const httpOptions = {
 export class GuestService {
 
   // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private guestUrl = 'http://127.0.0.1:5000';
+  private guestUrl = ' http://127.0.0.1:5000';
  
 
   constructor(private http: HttpClient,private router:Router) { }
@@ -270,7 +270,7 @@ addExpense(dep:any) {
                
               confirmOrder(dep:any) {
               //console.log(guest);
-                return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/confirm_oder', dep, httpOptions));
+                return  lastValueFrom ( this.http.put(this.guestUrl + '/guest/confirm_order', dep, httpOptions ));
               }   
 
                     
@@ -682,10 +682,49 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_item', d, httpOptions));
     }
 
+    searchMostOrderedDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_item_two', d, httpOptions));
+    }
+
+    
+
     
     searchMostAttendantDate(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_attendant', d, httpOptions));
     }
+
+        
+    searchMostAttendantDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_attendant_two', d, httpOptions));
+    }
+
+    searchStockUsuageDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_stock_usage_two', d, httpOptions));
+    }
+
+
+   
+
+    searchReturnDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_return_date_two', d, httpOptions));
+    }
+
+    searchStockDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_stock_date_two', d, httpOptions));
+    }
+
+    
+    searchReceivedDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_recieve_date_two', d, httpOptions));
+    }
+
+
+
+    
+    
+
+    
+    
 
     getHeldReportOrders(date: string) {
       return this.http.post<any[]>(this.guestUrl +'/guest/search_held_order_dates', { date });
@@ -711,6 +750,25 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_dates_two', d, httpOptions));
     }
 
+    searchChefDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_chef_dates_two', d, httpOptions));
+    }
+
+    searchOrderDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_order_dates_two', d, httpOptions));
+    }
+
+    searchattendanceDateTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_attendance_dates_two', d, httpOptions));
+    }
+   
+   
+    
+    
+    
+
+    
+
     // searchExpenseDate(d){
     //   return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates', d, httpOptions));
     // }
@@ -724,6 +782,21 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_dates', d, httpOptions));
     }
 
+    
+
+    searchWaiterDates(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_waiter_dates', d, httpOptions));
+    }
+
+    searchWaiterDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_waiter_dates_two', d, httpOptions));
+    }
+
+
+    
+
+
+    
 
     searchExpenseDateTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_expense_dates_two', d, httpOptions));

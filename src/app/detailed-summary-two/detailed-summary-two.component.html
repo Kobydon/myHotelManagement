@@ -1,0 +1,526 @@
+<div class="page">
+    <div class="row" *blockUI="'loading'">
+      <div class="col-md-12">
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+            <h4 class="text-center mb-4">Detailed Summary Report Week(s)</h4>
+  
+            <!-- Filters Section -->
+            <div class="d-flex mb-3">
+              <div class="flex-grow-1">
+                <!-- Optional Search Bar -->
+                <!-- Uncomment if needed -->
+                <!-- 
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search by Guest Name"
+                  id="myInput"
+                  (keyup)="myFunction()"
+                /> 
+                -->
+              </div>
+              <div class="ms-3">
+                <form [formGroup]="paymentForm">
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="dates"
+                  
+                  />
+
+                  <input
+                  type="date"
+                  class="form-control"
+                  formControlName="datetwo"
+                  (ngModelChange)="searchDates()"
+                />
+                </form>
+              </div>
+              <div class="ms-3">
+                <button class="btn btn-success btn-sm" (click)="exportexcel()">
+                  <i class="fa fa-file-excel-o"></i> Export to Excel
+                </button>
+              </div>
+              <div class="ms-3">
+                <button type="button"
+                  class="btn btn-primary btn-sm"
+                  (click)="printRepo()"
+                >
+                  <i class="fa fa-print"></i> Print
+                </button>
+              </div>
+              
+            </div>
+  
+            <!-- Reports Section -->
+            <div *ngIf="paymentForm.value.datetwo" id="excel-table">
+              <h1>From {{paymentForm.value.dates}} to  {{paymentForm.value.datetwo}} </h1>
+              <!-- Room Payments -->
+              <h5 class="text-gray-500">Room Report</h5>
+              <p>Bookings</p>
+              <table class="table table-bordered" >
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                    <th>Discount</th>
+                    <th>Method</th>
+                    <th>Room Type</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <!-- <th>Payment Date | Time</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let payment of paymentList">
+                    <td>{{ payment.name }}</td>
+                    <td>GH₵{{ payment.amount }}</td>
+                    <td>GH₵{{ payment.balance }}</td>
+                    <td>{{ payment.discount }}%</td>
+                    <td>{{ payment.method }}</td>
+                    <td>{{ payment.room_type }}</td>
+                    <td>{{ payment.checkin_date | date  }}</td>
+                    <td>{{ payment.checkout_date | date }}</td>
+                    <!-- <td>{{ payment.payment_date | date  }}</td> -->
+                  </tr>
+                  <tr>
+                    <td colspan="9" class="text-end bg-light">
+                      <strong>Daily Total: GH₵{{ totalAmount | number }}</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+  
+              <p>Statistics</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Rooms Occupied</th>
+                    <th>Rooms Available</th>
+                    <th>Total Guests</th>
+                    <th>Occupancy (%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{{ totalOcccupiedRooms }}</td>
+                    <td>{{ totalAvailableRooms }}</td>
+                    <td>{{ rooms.length }}</td>
+                    <td>{{ occupancy | number: '1.2-2' }}%</td>
+                  </tr>
+                </tbody>
+              </table>
+  
+  
+              <p>Restaurant & Bar Sales</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Item</th>
+                    <th>Amount</th>
+                    <th> Attendant</th>
+                    <th>Cashier</th>
+                    <th>Method</th>
+                    <!-- <th>Reason</th> -->
+                    <!-- <th>Date </th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of posList">
+                    <td>{{ item.name }}</td>
+                    <td>GH₵{{ item.amount }}</td>
+                    <td>{{ item.attendant }}</td>
+                    <td>{{item.cashier}}</td>
+                    <td>{{item.method}}</td>
+                    <!-- <td>{{ refund.reason }}</td> -->
+                    <!-- <td>{{ refund.refund_time | date }}</td> -->
+                  </tr>
+                  <tr>
+                    <td colspan="5" class="text-end bg-light">
+                      <strong>Daily Restaurant & Bar Total: GH₵{{ totalPosAmount | number }}</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+  
+              
+              <p>Held Orders</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                    <th>Waiter</th>
+                    <th>Food Was Confirmed By</th>
+                    <th>Drink Was Confirmed By</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loop through HeldList (each order) -->
+                  <ng-container *ngFor="let order of HeldList">
+                    <!-- Show Order ID and Company as a separator row -->
+                    <!-- <tr class="bg-light">
+                      <td colspan="6"><strong>Order ID: {{ order.id }} | {{ order.company_name }}</strong></td>
+                    </tr> -->
+              
+                    <!-- Loop through order items -->
+                    <tr *ngFor="let item of order.items">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.qty }}</td>
+                      <td>GH₵{{ item.price }}</td>
+                      <td>GH₵{{ item.qty * item.price }}</td>
+                      <td>{{ order.waiter }}</td>
+                      <td>{{order.food_confirm}}</td>
+                      <td>{{order.drink_confirm}}</td>
+                      <td>{{ order.status }}</td>
+                    </tr>
+                  </ng-container>
+              
+                  <!-- Grand Total Row -->
+                  <tr>
+                    <td colspan="6" class="text-end bg-light">
+                      <strong>Total: GH₵{{ totalHeldAmount | number }}</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <p>Most Ordered Item</p>
+              <table class="table table-bordered mt-3" >
+                <thead class="thead-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Item Name</th>
+                    <th>Times Ordered</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of mostOrderedItems; index as i">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.name }}</td> <!-- Uses named properties -->
+                    <td><strong>{{ item.count }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+  
+  
+  
+              <p>Top Seller</p>
+              <table class="table table-bordered mt-3" >
+                <thead class="thead-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Item Name</th>
+                    <th>Times Sold</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of mostAttendant; index as i">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.waiter }}</td> <!-- Uses named properties -->
+                    <td><strong>{{ item.count }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+  
+           
+              <p>Cook For the Day</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Name</th>
+                    <th>Food Prepared</th>
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of chefList">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.food }}</td>
+                
+                  </tr>
+                </tbody>
+              </table>
+  
+              <!-- RefundschefList -->
+              <h5 class="text-gray-500 mt-4">Accounts Report</h5>
+  
+  
+              <p>Refunds</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Authorized By</th>
+                    <th>Reason</th>
+                    <!-- <th>Date </th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let refund of refundList">
+                    <td>{{ refund.name }}</td>
+                    <td>GH₵{{ refund.refund_amount }}</td>
+                    <td>{{ refund.authorized_by }}</td>
+                    <td>{{ refund.reason }}</td>
+                    <!-- <td>{{ refund.refund_time | date }}</td> -->
+                  </tr>
+                  <tr>
+                    <td colspan="5" class="text-end bg-light">
+                      <strong>Daily Refunds Total: GH₵{{ totalRefundAmount | number }}</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+  
+              <!-- Income Report -->
+              <p>Income</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Source</th>
+                    <th>Amount</th>
+                    <!-- <th>Date</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let income of incomeList">
+                    <td>{{ income.name }}</td>
+                    <td>GH₵{{ income.amount }}</td>
+                    <!-- <td>{{ income.date | date  }}</td> -->
+                  </tr>
+                </tbody>
+              </table>
+  
+              <!-- Expense Report -->
+              <p>Expenses</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Category</th>
+                    <th>Amount</th>
+                    <!-- <th>Date</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let expense of expenseList">
+                    <td>{{ expense.name }}</td>
+                    <td>GH₵{{ expense.amount }}</td>
+                    <!-- <td>{{ expense.date | date  }}</td> -->
+                  </tr>
+                </tbody>
+              </table>
+  
+              <!-- Attendance Report -->
+              <h5 class="text-gray-500 mt-4">Attendance Report</h5>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Name</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <!-- <th>Date</th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let attendance of attendaceList">
+                    <td>{{ attendance.name }}</td>
+                    <td>{{ attendance.time_in }}</td>
+                    <td>{{ attendance.time_out }}</td>
+                    <!-- <td>{{ attendance.created_date | date }}</td> -->
+                  </tr>
+                </tbody>
+              </table>
+  
+  
+  
+              <h5 class="text-gray-500 mt-4">Inventory Report</h5>
+  
+              <p>Purchase Request</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th >Item</th>
+                    <th >Requested By</th>
+                    <th >Department</th>
+                    <th >Quantity</th>
+                    <th >Unit Price</th>
+                    <th >Total Cost</th>
+                    <!-- <th >Request Date</th> -->
+                    <th >Status</th>
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of purchaseList">
+                    <td>{{ item.item }}</td>
+                    <td>{{ item.requested_by }}</td>
+                    <td>{{ item.Department }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.unit_price | currency }}</td>
+                    <td>{{ item.total_cost | currency }}</td>
+                    <!-- <td>{{ item.created_date | date }}</td> -->
+                    <td>{{ item.status }}</td>
+                  
+                  </tr>
+                </tbody>
+              </table>
+  
+  
+  
+              
+              <p>Purchase Order</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+    
+                    <th >Item</th>
+                    <th >Supplier</th>
+                    <th >Quantity</th>
+                    <!-- <th >Order Date</th> -->
+                    <!-- <th >Approved By</th> -->
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of orderList">
+                
+                      <td>{{ item.item }}</td>
+                      <td>{{ item.store }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <!-- <td>{{ item.created_date | date }}</td> -->
+                      <!-- <td>{{ item.approved_by }}</td> -->
+                      <!-- <td> -->
+                    
+                  </tr>
+                </tbody>
+              </table>
+  
+  
+              <p>Received Items</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+    
+                    <th >Item</th>
+                    <th >Quantity</th>
+                    <!-- <th >Date</th> -->
+                    <!-- <th >Approved By</th> -->
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of receivedList">
+                
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <!-- <td>{{ item.created_date | date }}</td> -->
+                      <!-- <td>{{ item.approved_by }}</td> -->
+                      <!-- <td> -->
+                    
+                  </tr>
+                </tbody>
+              </table>
+  
+  
+  
+              <p>Stock</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+    
+                    <th >Item</th>
+                    <th >Quantity</th>
+                    <th >Store</th>
+                    <!-- <th>Date</th> -->
+                    <!-- <th >Approved By</th> -->
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of stockList">
+                
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{item.store}}</td>
+                      <!-- <td>{{ item.created_date | date  }}</td> -->
+                      <!-- <td>{{ item.approved_by }}</td> -->
+                      <!-- <td> -->
+                    
+                  </tr>
+                </tbody>
+              </table> 
+  
+  
+              <p>Stock Usuage</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+    
+                    <th >Item</th>
+                    <th >Quantity</th>
+                    <th >Received By</th>
+                    <th>Operation</th>
+                    <!-- <th>Date</th> -->
+                    <!-- <th >Approved By</th> -->
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of stockUsuageList">
+                
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{item.store}}</td>
+                      <td>{{item.operation}}</td>
+                      <!-- <td>{{ item.created_date | date  }}</td> -->
+                      <!-- <td>{{ item.approved_by }}</td> -->
+                      <!-- <td> -->
+                    
+                  </tr>
+                </tbody>
+              </table> 
+  
+  
+  
+              <p>Return Request</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+    
+                    <th >Item</th>
+                    <th >Quantity</th>
+                    <th>Request By</th>
+                    <th >Reason</th>
+                    <!-- <th>Date</th> -->
+                    <!-- <th >Approved By</th> -->
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of returnList">
+                
+                      <td>{{ item.item }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>{{ item.request_by }}</td>
+                      <td>{{item.reason}}</td>
+                      <!-- <td>{{ item.created_date | date  }}</td> -->
+                      <!-- <td>{{ item.approved_by }}</td> -->
+                      <!-- <td> -->
+                    
+                  </tr>
+                </tbody>
+              </table> 
+  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

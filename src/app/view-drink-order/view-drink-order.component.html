@@ -21,15 +21,24 @@
       <div class="order-container">
         <div *ngFor="let order of itemList" class="order-card">
           <h3>Order #{{ order.id }} - {{order.waiter}}</h3>
-          <p>Status: <span [ngClass]="{ 'pending': order.status !== 'Confirmed', 'confirmed': order.status === 'Confirmed' }">{{ order.status }}</span></p>
+          <p>
+            Status:
+            <span 
+              [ngClass]="{ 
+                'pending': order.drink_status === 'yes', 
+                'confirmed': order.drink_status === 'no' 
+              }">
+              {{ order.drink_status === 'yes' ? 'Pending' : order.status }}
+            </span>
+          </p>
           <p>Total: ₵{{ order.total }}</p>
   
           <div *ngFor="let item of order.items">
             <p><strong>{{ item.name }}</strong> (x{{ item.qty }})</p>
           </div>
   
-          <button *ngIf="order.status !== 'Confirmed'" (click)="confirmOrder(order.id)">Confirm Order</button>
-          <span *ngIf="order.status === 'Confirmed'" class="confirmed-badge">Confirmed</span>
+          <button *ngIf="order.drink_status !== 'no'" (click)="confirmOrder(order.id)">Confirm Order</button>
+          <span *ngIf="order.drink_status === 'no'" class="confirmed-badge">Confirmed</span>
         </div>
       </div>
     </div>

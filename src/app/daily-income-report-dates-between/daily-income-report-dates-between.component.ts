@@ -55,6 +55,7 @@ totalallowance=0;
 incomeReport:any;
 expenditureReport:any;
 totalIncome=0;
+users:any;
 totalExpenditure=0;
 cashAtHand:any;
 constructor(private fb:FormBuilder,private toastr:ToastrService,private guestService:GuestService,
@@ -70,12 +71,14 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
       date:['',Validators.required],
       dates:['',Validators.required],
       datestwo:['',Validators.required],
+      employee:['',Validators.required]
     
   })  
   }
 
   ngOnInit(): void {
     this.getUser();
+    this.getUsers();
 
   }
   
@@ -90,6 +93,61 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
   
   
   }
+
+  
+
+  async getUsers(){ 
+    try{
+      this.loading.start();
+      this.users = await this.userService.get_users_waiter();
+    
+   
+      
+    }
+
+
+catch (error) {
+  // this.toastr.error(null,"something went")
+  } finally {
+
+    this.loading.stop();
+   
+
+   
+
+
+   
+  }
+    console.log(this.users);
+  }
+  async findWaiter(data){
+    let sum :number= 0;
+    const d = {
+      date: this.createForm.value.dates,
+      waiter:this.createForm.value.employee,
+        datetwo: this.createForm.value.datestwo
+    }
+      try{
+        this.loading.start();
+       var res = await this.guestService.searchWaiterDatesTwo(d);
+       if (res)this.incomeReport =res;
+        
+       for (let index = 0; index < this.incomeReport.length; index++) {
+        sum += parseInt(this.incomeReport[index].amount);
+       //  this.totalAmount=sum;
+        this.totalIncome=sum;
+       
+    }
+          
+          
+      
+  
+      }
+      catch(err){this.toastr.error(null,err.message)}
+  
+      finally{this.loading.stop();}
+  }
+
   
   
   async searchDates(){

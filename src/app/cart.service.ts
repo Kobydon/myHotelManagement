@@ -6,13 +6,13 @@ import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CartService {
-  private cartItems = new BehaviorSubject<any[]>([]);
+  public cartItems = new BehaviorSubject<any[]>([]);
   cartItems$ = this.cartItems.asObservable();
-  private apiUrl = 'http://127.0.0.1:5000/guest/create_orders';
-  private apiUrl2 = 'http://127.0.0.1:5000/guest/create_orders_two';
-  private orderUrl = 'http://127.0.0.1:5000/guest';
+  public apiUrl = 'http://127.0.0.1:5000/guest/create_orders';
+  public apiUrl2 = 'http://127.0.0.1:5000/guest/create_orders_two';
+  public orderUrl = 'http://127.0.0.1:5000/guest';
 
-  constructor(private http: HttpClient) {
+  constructor(public http: HttpClient) {
     this.loadCart();
   }
 
@@ -41,7 +41,7 @@ export class CartService {
     const cartItems = this.getCart().filter(item => item.id !== product.id);
     this.updateCart(cartItems);
   }
-
+  
   increaseQty(product: any) {
     this.updateItemQty(product, 1);
   }
@@ -74,16 +74,17 @@ export class CartService {
     this.updateCart([]);
   }
 
-  private getCart(): any[] {
+  public getCart(): any[] {
     return this.safeParse(localStorage.getItem('cart'), []);
   }
 
-  private updateCart(items: any[]) {
+  public updateCart(items: any[]) {
     localStorage.setItem('cart', JSON.stringify(items));
-    this.cartItems.next([...items]);
+    this.cartItems.next([...items]); // emits to subscribers
   }
+  
 
-  private updateItemQty(product: any, change: number) {
+  public updateItemQty(product: any, change: number) {
     const items = this.getCart();
     const item = items.find(i => i.id === product.id);
 
@@ -97,7 +98,7 @@ export class CartService {
     this.updateCart(items);
   }
 
-  private loadCart() {
+  public loadCart() {
     this.cartItems.next(this.getCart());
   }
 
@@ -105,7 +106,7 @@ export class CartService {
     return this.http.get<any[]>(`${this.orderUrl}/my_orders`);
   }
 
-  private safeParse<T>(data: string | null, fallback: T): T {
+  public safeParse<T>(data: string | null, fallback: T): T {
     try {
       return data ? JSON.parse(data) : fallback;
     } catch {

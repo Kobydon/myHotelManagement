@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CartService } from 'app/cart.service';
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
+import { Router } from '@angular/router';
 import { catchError } from 'rxjs';
 
 @Component({
@@ -26,12 +27,14 @@ admin=false
 displayStyle="none";
 
 isHeldOrder: boolean = false;
-  constructor(private cartService: CartService, private userService: userService,private fb:FormBuilder,private guestService:GuestService) {
+  constructor(public cartService: CartService, private userService: userService,private fb:FormBuilder,private guestService:GuestService,private router:Router) {
     this.createForm= this.fb.group({
 
       id : ['',Validators.required],
+      id2 : ['',Validators.required],
       username:['',Validators.required],
-      method :['',Validators.required]
+      method :['',Validators.required],
+      cashier :['',Validators.required]
     })
   }
 
@@ -110,7 +113,7 @@ isHeldOrder: boolean = false;
   
   
     const userId = this.cartItems 
-    const holdId = this.createForm.value.id;  // Get the hold ID from the form
+    const holdId = this.createForm.value.id2;  // Get the hold ID from the form
     const tot =   this.total;
     // this.clearCart();
     this.cartService.holdCart(userId, holdId,tot).subscribe(
@@ -143,34 +146,35 @@ isHeldOrder: boolean = false;
       );
     
   }
-  loadHeldCart(cartId: any): void {
-    this.createForm.patchValue({ id: cartId });
-  
-    this.cartService.loadHeldCart(cartId).subscribe(
-      (response) => {
-        console.log("Cart loaded:", response);
-        alert(`Loaded cart #${cartId}!`);
-  
-        if (response && response.items) {
-          this.cartItems = response.items;
-          this.total = response.total || 0; 
-  
-          // Set isHeldOrder based on one_time column
-          this.isHeldOrder = response.one_time ? true : false;
-        } else {
-          console.warn("Loaded cart does not contain items.");
-          this.cartItems = [];
-          this.total = 0;
-          this.isHeldOrder = false;
-        }
-      },
-      (error) => {
-        console.error("Error loading cart:", error);
-        alert("Failed to load cart. Please try again.");
+loadHeldCart(cartId: any): void {
+  this.createForm.patchValue({ id2: cartId });
+
+  this.cartService.loadHeldCart(cartId).subscribe(
+    (response) => {
+      console.log("Cart loaded:", response);
+      alert(`Loaded cart #${cartId}!`);
+
+      if (response && response.items) {
+        this.total = response.total || 0;
+        this.isHeldOrder = response.one_time ? true : false;
+
+        // ✅ Update localStorage and emit new cart via BehaviorSubject
+        this.cartService.updateCart(response.items);
+      } else {
+        console.warn("Loaded cart does not contain items.");
+        this.cartService.updateCart([]); // Clear cart
+        this.total = 0;
         this.isHeldOrder = false;
       }
-    );
-  }
+    },
+    (error) => {
+      console.error("Error loading cart:", error);
+      alert("Failed to load cart. Please try again.");
+      this.isHeldOrder = false;
+    }
+  );
+}
+
   
  async removeHeldCart(cartId: number) {
  try{
@@ -238,8 +242,9 @@ isHeldOrder: boolean = false;
     const orderData = {
       cartItems: this.cartItems,
       total: this.total,
-      id:this.createForm.value.id,
-      method : this.createForm.value.method
+      id:this.createForm.value.id2,
+      method : this.createForm.value.method,
+      cashier :this.createForm.value.cashier
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -405,6 +410,7 @@ isHeldOrder: boolean = false;
 
   async checkCashier(){
     const ask:string = this.createForm.value.username;
+    this.createForm.patchValue({cashier:ask});
     const password ={
       username:ask
     }
@@ -426,4 +432,89 @@ isHeldOrder: boolean = false;
   logOut(){
     this.userService.logout();
   }
+
+
+
+
+
+
+  printBill() {
+    const currentDate = new Date().toLocaleString();
+    // const cashierName = "John Doe"; // Replace this with dynamic cashier info if available
+  
+    let receiptContent = `
+      <html>
+      <head>
+        <title>Receipt</title>
+        <style>
+          body { font-family: Arial, sans-serif; font-size: 12px; text-align: center; }
+          .receipt-header { font-size: 14px; font-weight: bold; text-align: center; }
+          h3 { margin-bottom: 5px; }
+          p { margin: 2px 0; }
+          table { width: 100%; border-collapse: collapse; }
+          th, td { border-bottom: 1px dashed #000; padding: 4px; text-align: left; }
+          .text-center { text-align: center; }
+        </style>
+      </head>
+      <body onload="window.print(); window.close();">
+        <div class="receipt-header">
+          <h3>LONGFORD CITY</h3>
+          <p><strong>Address:</strong> KOFROM, KUMASI</p>
+          <p><strong>Email:</strong> longfordroyalcentre@yahoo.com</p>
+          <p>------------------------------------</p>
+        </div>
+        
+        <p><strong>Date:</strong> ${currentDate}</p>
+      
+        <p>------------------------------------</p>
+  
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Qty</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+  
+    // Append cart items to receipt
+    this.cartItems.forEach(item => {
+      receiptContent += `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.qty}</td>
+          <td>₵${(item.price * item.qty).toFixed(2)}</td>
+        </tr>
+      `;
+    });
+  
+    // Append total and footer
+    receiptContent += `
+          </tbody>
+        </table>
+  
+        <p>------------------------------------</p>
+        <h4 class="text-center">Total: ₵${this.total.toFixed(2)}</h4>
+        <p class="text-center">Thank you for your purchase!</p>
+      </body>
+      </html>
+    `;
+  
+    // Open print window
+    const printWindow = window.open('', '', 'width=300,height=600');
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write(receiptContent);
+      printWindow.document.close();
+    }
+  }
+  
+  openSales(){
+    this.router.navigate(['/daily-income'])
+  }
+
 }
+
+

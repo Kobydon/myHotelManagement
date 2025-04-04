@@ -27,6 +27,12 @@
             style="max-width: 300px;"
           />
         </div>
+        <select formControlName="employee" id="" (ngModelChange)="findWaiter()">
+          <option  *ngFor="let item of users" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
+          
+        
+        
+        </select>
       </form>
 
       <!-- Action Buttons -->
@@ -62,12 +68,14 @@
                 <tr>
                   <th>Income Category</th>
                   <th>Amount (₵)</th>
+                  <th>Cashier</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of incomeReport">
                   <td>{{ item.name }}</td>
                   <td>{{ item.amount | currency: '₵' }}</td>
+                  <td>{{item.cashier}}</td>
                 </tr>
               </tbody>
               <tfoot>
@@ -111,8 +119,9 @@
         <section class="report-section mb-4">
           <h5>Cash at Hand</h5>
           <p>
+            <!-- - totalExpenditure  -->
             <strong
-              >{{ totalIncome - totalExpenditure | currency: '₵' }}</strong
+              >{{ totalIncome | currency: '₵' }}</strong
             >
           </p>
         </section>

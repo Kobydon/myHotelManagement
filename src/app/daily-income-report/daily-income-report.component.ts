@@ -58,6 +58,7 @@ expenditureReport:any;
 totalIncome=0;
 totalExpenditure=0;
 cashAtHand:any;
+users:any;
 constructor(private fb:FormBuilder,private toastr:ToastrService,private guestService:GuestService,
   private userService:userService) { 
     this.createForm = this.fb.group({
@@ -66,6 +67,7 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     
       role:['',Validators.required],
       method:['',Validators.required],
+      employee:['',Validators.required],
      
       
       date:['',Validators.required],
@@ -80,6 +82,7 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     // this.getSchoolDetail();
     // this.getStaff();
     this.getUser();
+    this.getUsers();
   }
   
 
@@ -94,6 +97,8 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
   
   
   }
+  
+
   
 
   // async getAllowancebyRole(){
@@ -157,7 +162,30 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
 
 
 
+    async getUsers(){ 
+      try{
+        this.loading.start();
+        this.users = await this.userService.get_users_waiter();
+      
+     
+        
+      }
   
+  
+  catch (error) {
+    // this.toastr.error(null,"something went")
+    } finally {
+  
+      this.loading.stop();
+     
+  
+     
+  
+  
+     
+    }
+      console.log(this.users);
+    }
     async searchIncomeDates(data){
       let sum :number= 0;
       const d = {
@@ -212,6 +240,35 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     }
       
   
+
+
+    async findWaiter(data){
+      let sum :number= 0;
+      const d = {
+        date: this.createForm.value.dates,
+        waiter:this.createForm.value.employee
+      }
+        try{
+          this.loading.start();
+         var res = await this.guestService.searchWaiterDates(d);
+         if (res)this.incomeReport =res;
+          
+         for (let index = 0; index < this.incomeReport.length; index++) {
+          sum += parseInt(this.incomeReport[index].amount);
+         //  this.totalAmount=sum;
+          this.totalIncome=sum;
+         
+      }
+            
+            
+        
+    
+        }
+        catch(err){this.toastr.error(null,err.message)}
+    
+        finally{this.loading.stop();}
+    }
+
 
 
 //   async getSchoolDetail(){

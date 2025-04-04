@@ -48,7 +48,7 @@
 
           <!-- Reports Section -->
           <div *ngIf="paymentForm.value.dates" id="excel-table">
-
+            <h1>Date: {{paymentForm.value.dates}}</h1>
             <!-- Room Payments -->
             <h5 class="text-gray-500">Room Report</h5>
             <p>Bookings</p>
@@ -114,6 +114,7 @@
                   <th>Item</th>
                   <th>Amount</th>
                   <th> Attendant</th>
+                  <th>Cashier</th>
                   <th>Method</th>
                   <!-- <th>Reason</th> -->
                   <!-- <th>Date </th> -->
@@ -124,6 +125,7 @@
                   <td>{{ item.name }}</td>
                   <td>GH₵{{ item.amount }}</td>
                   <td>{{ item.attendant }}</td>
+                  <td>{{item.cashier}}</td>
                   <td>{{item.method}}</td>
                   <!-- <td>{{ refund.reason }}</td> -->
                   <!-- <td>{{ refund.refund_time | date }}</td> -->
@@ -146,6 +148,8 @@
                   <th>Price</th>
                   <th>Subtotal</th>
                   <th>Waiter</th>
+                  <th>Food Was Confirmed By</th>
+                  <th>Drink Was Confirmed By</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -164,6 +168,8 @@
                     <td>GH₵{{ item.price }}</td>
                     <td>GH₵{{ item.qty * item.price }}</td>
                     <td>{{ order.waiter }}</td>
+                    <td>{{order.food_confirm}}</td>
+                    <td>{{order.drink_confirm}}</td>
                     <td>{{ order.status }}</td>
                   </tr>
                 </ng-container>
