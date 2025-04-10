@@ -1,0 +1,18 @@
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1050; /* Adjust as needed */
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: none; /* Change to 'block' or 'flex' when you want to show it */
+  }
+  
+  /* Optional: When modal is active */
+  .modal.show {
+    display: block;
+  }
+  

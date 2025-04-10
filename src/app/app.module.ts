@@ -72,6 +72,9 @@ import { ViewDrinkOrderComponent } from './view-drink-order/view-drink-order.com
 import { TodaysFoodChefComponent } from './todays-food-chef/todays-food-chef.component';
 import { ItemListVipComponent } from './item-list-vip/item-list-vip.component';
 import { DetailedSummaryTwoComponent } from './detailed-summary-two/detailed-summary-two.component';
+import { CheckTodaysOrdersComponent } from './check-todays-orders/check-todays-orders.component';
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orders.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -85,6 +88,8 @@ import { DetailedSummaryTwoComponent } from './detailed-summary-two/detailed-sum
     VendorsComponent,
         ViewOrderComponent,
         ViewDrinkOrderComponent,
+        CheckTodaysOrdersComponent,
+        CheckDrinkOrdersComponent,
        
       
       
@@ -124,6 +129,8 @@ import { DetailedSummaryTwoComponent } from './detailed-summary-two/detailed-sum
   
     BrowserAnimationsModule,
     FeaturesModule,
+    FormsModule,
+    ReactiveFormsModule,
   
     LoginModule,
     HttpClientModule,

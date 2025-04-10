@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CartService } from 'app/cart.service';
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
@@ -19,7 +20,9 @@ export class ViewOrderComponent implements OnInit {
   currentMonth: string;
   currentTime: string;
   daysInMonth: { date: number }[] = [];
-  constructor(private guestService:GuestService,private cartService:CartService,private userService:userService) { }
+  constructor(private guestService:GuestService,private cartService:CartService,private userService:userService,
+    private router:Router
+  ) { }
 
   ngOnInit(): void {
    
@@ -40,6 +43,11 @@ export class ViewOrderComponent implements OnInit {
     },1000);
  
 
+  }
+
+
+  checkOrder(){
+    this.router.navigate(['/todays-order']);
   }
 
   updateTime() {
@@ -86,22 +94,37 @@ async getOrders(){
       console.log("User loaded successfully.");
     }
   }
- 
   async loadHeldOrders() {
     try {
       const res = await this.guestService.getHeldOrders();
       if (res) {
-        this.itemList = res.map(order => ({
-          ...order,
-          items: typeof order.items === "string" ? JSON.parse(order.items) : order.items // Only parse if it's a string
-        }));
-        console.log("Held Orders Loaded:", this.itemList);
+        let parsedOrders = res.map(order => {
+          let items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
+  
+          // Optional: sort VIP items to the top *within* each order
+          items = items.sort((a, b) => {
+            return (b.is_vip === "yes" ? 1 : 0) - (a.is_vip === "yes" ? 1 : 0);
+          });
+  
+          return { ...order, items };
+        });
+  
+        // 🔥 Now sort the whole order list based on VIP presence
+        parsedOrders = parsedOrders.sort((a, b) => {
+          const aHasVip = a.items.some(item => item.is_vip === "yes");
+          const bHasVip = b.items.some(item => item.is_vip === "yes");
+          return (bHasVip ? 1 : 0) - (aHasVip ? 1 : 0);
+        });
+  
+        this.itemList = parsedOrders;
+  
+        console.log("Held Orders Loaded (VIP orders first):", this.itemList);
       }
     } catch (error) {
       console.error("Error loading held orders:", error);
     }
   }
-
+  
 
   async confirmOrder(id:any){
 

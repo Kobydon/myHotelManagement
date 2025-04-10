@@ -20,11 +20,11 @@ import { GuestService } from 'app/services/guest.service';
 export class DailyIncomeReportDatesBetweenComponent implements OnInit {
   @BlockUI('loading') loading!: NgBlockUI
  
-
+  cashiers:any;
   base64_string:any;
   header:any;
   displayStyle ="none";
-  fileName= 'payment.xlsx';
+  fileName= 'daily_income_week.xlsx';
   // @Input() ad: Adds ={brand:'',category:'',condition:'',price:'',description:'',
   //                     phone:'',negotiable:'',city:'',image:'',post_by_id:''};
   //  login:Login[]=[];
@@ -71,7 +71,9 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
       date:['',Validators.required],
       dates:['',Validators.required],
       datestwo:['',Validators.required],
-      employee:['',Validators.required]
+      employee:['',Validators.required],
+      cashier:['',Validators.required],
+      paymethod:['',Validators.required]
     
   })  
   }
@@ -79,9 +81,39 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
   ngOnInit(): void {
     this.getUser();
     this.getUsers();
+    this.getCashiers();
 
   }
   
+
+
+
+  async getCashiers(){ 
+    try{
+      this.loading.start();
+      this.cashiers = await this.userService.get_users_cashiers();
+    
+   
+      
+    }
+
+
+catch (error) {
+  // this.toastr.error(null,"something went")
+  } finally {
+
+    this.loading.stop();
+   
+
+   
+
+
+   
+  }
+    console.log(this.users);
+  }
+
+
   async getUser(){
     try{
         var res = await this.userService.getUser()
@@ -120,7 +152,8 @@ catch (error) {
   }
     console.log(this.users);
   }
-  async findWaiter(data){
+
+  async findWaiter(){
     let sum :number= 0;
     const d = {
       date: this.createForm.value.dates,
@@ -130,6 +163,71 @@ catch (error) {
       try{
         this.loading.start();
        var res = await this.guestService.searchWaiterDatesTwo(d);
+       if (res)this.incomeReport =res;
+        
+       for (let index = 0; index < this.incomeReport.length; index++) {
+        sum += parseInt(this.incomeReport[index].amount);
+       //  this.totalAmount=sum;
+        this.totalIncome=sum;
+       
+    }
+          
+          
+      
+  
+      }
+      catch(err){this.toastr.error(null,err.message)}
+  
+      finally{this.loading.stop();}
+  }
+
+  
+
+
+
+  async findMethod(){
+    let sum :number= 0;
+    const d = {
+      date: this.createForm.value.dates,
+      waiter:this.createForm.value.paymethod,
+        datetwo: this.createForm.value.datestwo
+    }
+      try{
+        this.loading.start();
+       var res = await this.guestService.searchMethodDatesTwo(d);
+       if (res)this.incomeReport =res;
+        
+       for (let index = 0; index < this.incomeReport.length; index++) {
+        sum += parseInt(this.incomeReport[index].amount);
+       //  this.totalAmount=sum;
+        this.totalIncome=sum;
+       
+    }
+          
+          
+      
+  
+      }
+      catch(err){this.toastr.error(null,err.message)}
+  
+      finally{this.loading.stop();}
+  }
+
+  
+
+
+
+
+  async findCashier(){
+    let sum :number= 0;
+    const d = {
+      date: this.createForm.value.dates,
+      waiter:this.createForm.value.cashier,
+        datetwo: this.createForm.value.datestwo
+    }
+      try{
+        this.loading.start();
+       var res = await this.guestService.searchCashierDatesTwo(d);
        if (res)this.incomeReport =res;
         
        for (let index = 0; index < this.incomeReport.length; index++) {

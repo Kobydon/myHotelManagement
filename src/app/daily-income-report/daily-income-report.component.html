@@ -15,15 +15,38 @@
             (ngModelChange)="searchDates()" 
             style="max-width: 300px;">
         </div>
+        <label for="">Filter By Waiter</label>
         <select formControlName="employee" id="" (ngModelChange)="findWaiter()">
           <option  *ngFor="let item of users" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
           
         
         
         </select>
+  <label for="">Filter By Cashier</label>
+        <select formControlName="cashier" id="" (ngModelChange)="findCashier()">
+          <option  *ngFor="let item of cashiers" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
+          
+        
+        
+        </select>
+
+
+
+            
+      </select>
+      <label for="">Filter By Method</label>
+            <select formControlName="paymethod" id="" (ngModelChange)="findMethod()">
+              <option value="Cash">Cash</option>
+              <option value="Mobile Money">MoMo</option>
+              <option value="Mobile Money & Cash">MoMo  & Cash</option>
+              <option value="Credit Card">Credit CArd</option>
+            
+            
+            </select>
+
       </form>
 
-    
+
 
       <!-- Action Buttons -->
       <div class="d-flex mb-4">
@@ -50,6 +73,7 @@
                     <tr>
                       <th>Income Category</th>
                       <th>Amount (₵)</th>
+                      <th>Method</th>
                       <th>Cashier</th>
                     </tr>
                   </thead>
@@ -57,6 +81,7 @@
                     <tr *ngFor="let item of incomeReport">
                       <td>{{ item.name }}</td>
                       <td>{{ item.amount | currency:'₵' }}</td>
+                      <td>{{item.method}}</td>
                       <td>{{item.cashier}}</td>
                     </tr>
                   </tbody>

@@ -27,12 +27,30 @@
             style="max-width: 300px;"
           />
         </div>
+        <label for="">Filter By Waiter</label>
         <select formControlName="employee" id="" (ngModelChange)="findWaiter()">
           <option  *ngFor="let item of users" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
           
         
         
         </select>
+     <label for="">Filter By Cashier</label>
+        <select formControlName="cashier" id="" (ngModelChange)="findCashier()">
+          <option  *ngFor="let item of cashiers" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
+          
+        
+          <label for="">Filter By Method</label>
+          <select formControlName="paymethod" id="" (ngModelChange)="findMethod()">
+            <option value="Cash">Cash</option>
+            <option value="Mobile Money">MoMo</option>
+            <option value="Mobile Money & Cash">MoMo  & Cash</option>
+            <option value="Credit Card">Credit CArd</option>
+          
+          
+          </select>
+        
+        </select>
+
       </form>
 
       <!-- Action Buttons -->

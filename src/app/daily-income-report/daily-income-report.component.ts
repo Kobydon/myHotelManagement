@@ -25,7 +25,7 @@ export class DailyIncomeReportComponent implements OnInit {
   base64_string:any;
   header:any;
   displayStyle ="none";
-  fileName= 'payment.xlsx';
+  fileName= 'daily_income.xlsx';
   // @Input() ad: Adds ={brand:'',category:'',condition:'',price:'',description:'',
   //                     phone:'',negotiable:'',city:'',image:'',post_by_id:''};
   //  login:Login[]=[];
@@ -39,6 +39,7 @@ export class DailyIncomeReportComponent implements OnInit {
   update = false;
   i_id !:number;
   staff:any;
+  cashiers:any;
   departmentList:any;
   pay_info:any;
   page = 1;
@@ -72,6 +73,8 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
       
       date:['',Validators.required],
       dates:['',Validators.required],
+      cashier:['',Validators.required],
+      paymethod:['',Validators.required]
     
   })  
   }
@@ -83,6 +86,7 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     // this.getStaff();
     this.getUser();
     this.getUsers();
+    this.getCashiers();
   }
   
 
@@ -186,6 +190,37 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     }
       console.log(this.users);
     }
+
+
+
+
+
+    async getCashiers(){ 
+      try{
+        this.loading.start();
+        this.cashiers = await this.userService.get_users_cashiers();
+      
+     
+        
+      }
+  
+  
+  catch (error) {
+    // this.toastr.error(null,"something went")
+    } finally {
+  
+      this.loading.stop();
+     
+  
+     
+  
+  
+     
+    }
+      console.log(this.users);
+    }
+
+
     async searchIncomeDates(data){
       let sum :number= 0;
       const d = {
@@ -270,6 +305,68 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     }
 
 
+
+
+
+
+
+    async findMethod(data){
+      let sum :number= 0;
+      const d = {
+        date: this.createForm.value.dates,
+        waiter:this.createForm.value.paymethod
+      }
+        try{
+          this.loading.start();
+         var res = await this.guestService.searchMethodDates(d);
+         if (res)this.incomeReport =res;
+          
+         for (let index = 0; index < this.incomeReport.length; index++) {
+          sum += parseInt(this.incomeReport[index].amount);
+         //  this.totalAmount=sum;
+          this.totalIncome=sum;
+         
+      }
+            
+            
+        
+    
+        }
+        catch(err){this.toastr.error(null,err.message)}
+    
+        finally{this.loading.stop();}
+    }
+
+
+
+   
+     async findCashier(data){
+      let sum :number= 0;
+      const d = {
+        date: this.createForm.value.dates,
+        waiter:this.createForm.value.cashier
+      }
+        try{
+          this.loading.start();
+         var res = await this.guestService.searchCashierDates(d);
+         if (res)this.incomeReport =res;
+          
+         for (let index = 0; index < this.incomeReport.length; index++) {
+          sum += parseInt(this.incomeReport[index].amount);
+         //  this.totalAmount=sum;
+          this.totalIncome=sum;
+         
+      }
+            
+            
+        
+    
+        }
+        catch(err){this.toastr.error(null,err.message)}
+    
+        finally{this.loading.stop();}
+    }
+    
 
 //   async getSchoolDetail(){
 //     try{

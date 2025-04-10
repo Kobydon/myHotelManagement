@@ -13,6 +13,8 @@ import { ItemListCategoryComponent } from './item-list-category/item-list-catego
 import { ViewOrderComponent } from './view-order/view-order.component';
 import { ViewDrinkOrderComponent } from './view-drink-order/view-drink-order.component';
 import { ItemListVipComponent } from './item-list-vip/item-list-vip.component';
+import { CheckTodaysOrdersComponent } from './check-todays-orders/check-todays-orders.component';
+import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orders.component';
 
 export const AppRoutes: Routes = [
   {
@@ -53,6 +55,19 @@ export const AppRoutes: Routes = [
   }]},
 
 
+
+  {
+
+    path:'todays-order',
+    component:CheckTodaysOrdersComponent
+  },
+
+
+  {
+
+    path:'todays-order-drink',
+    component:CheckDrinkOrdersComponent
+  },
   {
     path: '',canActivate:[AuthGuard],
     component: LayoutComponent,

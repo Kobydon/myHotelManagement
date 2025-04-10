@@ -8,7 +8,7 @@ import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
 export class CartService {
   public cartItems = new BehaviorSubject<any[]>([]);
   cartItems$ = this.cartItems.asObservable();
-  public apiUrl = 'http://127.0.0.1:5000/guest/create_orders';
+  public apiUrl = ' http://127.0.0.1:5000/guest/create_orders';
   public apiUrl2 = 'http://127.0.0.1:5000/guest/create_orders_two';
   public orderUrl = 'http://127.0.0.1:5000/guest';
 

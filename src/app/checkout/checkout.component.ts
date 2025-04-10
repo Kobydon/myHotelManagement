@@ -5,6 +5,7 @@ import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
 import { Router } from '@angular/router';
 import { catchError } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'checkout-list',
@@ -12,7 +13,8 @@ import { catchError } from 'rxjs';
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent implements OnInit {
-  
+  sessionList:any;
+  status:any;
   cartItems: any[] = [];
   total = 0;
   manager=false;
@@ -24,10 +26,13 @@ export class CheckoutComponent implements OnInit {
   createForm:FormGroup;
 cashier =false;
 admin=false
+id:any;
 displayStyle="none";
 
 isHeldOrder: boolean = false;
-  constructor(public cartService: CartService, private userService: userService,private fb:FormBuilder,private guestService:GuestService,private router:Router) {
+  constructor(public cartService: CartService, private userService: userService,private fb:FormBuilder,private guestService:GuestService,private router:Router,
+    private toatsr:ToastrService
+  ) {
     this.createForm= this.fb.group({
 
       id : ['',Validators.required],
@@ -46,6 +51,7 @@ isHeldOrder: boolean = false;
     this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items;
       this.total = this.cartService.getTotal();
+      this.getCurrentSession();
     });
   }
 
@@ -272,6 +278,38 @@ loadHeldCart(cartId: any): void {
 
 
 
+  async  startSession(){
+    const s ={
+      date:""
+    }
+    try{
+      var res = await this.guestService.startSession(s);
+      if(res)  this.toatsr.success(null,"successful"); this.getCurrentSession();
+    }catch(err) {this.toatsr.error(err)}
+    
+  }
+
+  
+ async  closeSession(id){
+  const s ={
+    id:id
+  }
+  try{
+    var res = await this.guestService.closeSession(s);
+    if(res)   this.getCurrentSession()
+  }catch(err) {this.toatsr.error(err)}
+  
+}
+
+
+  async  getCurrentSession(){
+  
+    try{
+      var res = await this.guestService.getCurrentSession();
+      if(res)  this.sessionList=res; this.status=res[0]?.status; this.id=res[0]?.id;
+    }catch(err) {this.toatsr.error(err)}
+    
+  }
   
   payOrderTwo() {
     const orderData = {
@@ -362,10 +400,10 @@ loadHeldCart(cartId: any): void {
           </style>
         </head>
         <body>
-          <div class="receipt-header">LONGFORD CITY</div>
-          <p><strong>Address:</strong> KOFROM, KUMASI</p>
+          <div class="receipt-header">LONGFORD Royal Center</div>
+          <p><strong>Address:</strong> Odeneho Kwadaso, KUMASI</p>
           <p><strong>Email:</strong> longfordroyalcentre@yahoo.com</p>
-          <p><strong>Tel:</strong> 0247047117</p>
+          <p><strong>Tel:</strong> 0595579928 / 0247903072 </p>
           <div class="line"></div>
           <h3>${title}</h3>
           <p><strong>Order ID:</strong> ${order.id}</p>

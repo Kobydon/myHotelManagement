@@ -1,0 +1,170 @@
+<div class="page">
+    <div class="row" >
+      <div class="col-md-12">
+        <div class="card shadow-sm">
+          <div class="card-body p-4">
+            <h4 class="text-center mb-4">Detailed Summary Report</h4>
+  
+            <!-- Filters Section -->
+            <div class="d-flex mb-3">
+              <div class="flex-grow-1">
+                <!-- Optional Search Bar -->
+                <!-- Uncomment if needed -->
+                <!-- 
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search by Guest Name"
+                  id="myInput"
+                  (keyup)="myFunction()"
+                /> 
+                -->
+              </div>
+              <div class="ms-3">
+                <form [formGroup]="paymentForm">
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="dates"
+                    (ngModelChange)="searchDates()"
+                  />
+                </form>
+              </div>
+              <div class="ms-3">
+                <button class="btn btn-success btn-sm" (click)="exportexcel()">
+                  <i class="fa fa-file-excel-o"></i> Export to Excel
+                </button>
+              </div>
+              <div class="ms-3">
+                <button type="button"
+                  class="btn btn-primary btn-sm"
+                  (click)="printRepo()"
+                >
+                  <i class="fa fa-print"></i> Print
+                </button>
+              </div>
+              
+            </div>
+  
+            <!-- Reports Section -->
+            <div *ngIf="paymentForm.value.dates" id="excel-table">
+             
+
+                <p>Total Held Amount: GH₵{{ totalHeldAmount }}</p>
+<p>Total Pending Orders: {{ pendingCount }}</p>
+<p>Confirmed Orders: {{ successCount }}</p>
+
+              
+              <p>Held Orders</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                    <th>Waiter</th>
+                    <!-- <th>Food Was Confirmed By</th> -->
+                    <th>Drink Was Confirmed By</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Loop through HeldList (each order) -->
+                  <ng-container *ngFor="let order of HeldList">
+                    <!-- Show Order ID and Company as a separator row -->
+                    <!-- <tr class="bg-light">
+                      <td colspan="6"><strong>Order ID: {{ order.id }} | {{ order.company_name }}</strong></td>
+                    </tr> -->
+              
+                    <!-- Loop through order items -->
+                    <tr *ngFor="let item of order.items">
+                      <td>{{ item.name }}</td>
+                      <td>{{ item.qty }}</td>
+                      <td>GH₵{{ item.price }}</td>
+                      <td>GH₵{{ item.qty * item.price }}</td>
+                      <td>{{ order.waiter }}</td>
+                      <!-- <td>{{order.food_confirm}}</td> -->
+                      <td>{{order.drink_confirm}}</td>
+                      <td>{{ order.status }}</td>
+                    </tr>
+                  </ng-container>
+              
+                  <!-- Grand Total Row -->
+                  <tr>
+                    <td colspan="6" class="text-end bg-light">
+                      <strong>Total: GH₵{{ totalHeldAmount | number }}</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <p>Most Ordered Item</p>
+              <table class="table table-bordered mt-3" >
+                <thead class="thead-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Item Name</th>
+                    <th>Times Ordered</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of mostOrderedItems; index as i">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.name }}</td> <!-- Uses named properties -->
+                    <td><strong>{{ item.count }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+  
+  
+  
+              <p>Top Seller</p>
+              <table class="table table-bordered mt-3" >
+                <thead class="thead-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Item Name</th>
+                    <th>Times Sold</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of mostAttendant; index as i">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.waiter }}</td> <!-- Uses named properties -->
+                    <td><strong>{{ item.count }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+  
+           
+              <p>Cook For the Day</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Name</th>
+                    <th>Food Prepared</th>
+                 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of chefList">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.food }}</td>
+                
+                  </tr>
+                </tbody>
+              </table>
+  
+        
+  
+
+            
+  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

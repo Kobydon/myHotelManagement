@@ -58,12 +58,14 @@
                     <th>{{ i + 1 }}</th>
                     <td>{{ item.name }}</td>
                     <td>{{ item.category }}</td>
-                    <td>₵{{ item.price}}</td> <td>
+                    <td>₵{{ item.price}}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>
                       <span [ngClass]="item.quantity > 0 ? 'text-success' : 'text-danger'">
                         {{ item.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
                       </span>
                     </td>
-                    <td>{{ item.quantity }}</td>
+            
 
                     <td >
                       <!-- Vegetable Sauce -->

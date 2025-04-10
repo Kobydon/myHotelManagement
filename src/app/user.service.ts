@@ -166,6 +166,12 @@ get_users_waiter(){
   }
 
 
+  
+  get_users_cashiers(){
+  return lastValueFrom(this.http.get<any[]>(this.userUrl + '/user/get_users_cashier'));
+  }
+
+  
 
 
 get_user_details(id: any){
