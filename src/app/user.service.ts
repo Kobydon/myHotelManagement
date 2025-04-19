@@ -116,15 +116,31 @@ private userUrl = 'http://127.0.0.1:5000';
       }
 
 	//console.log(user);
-  logout() {
-    this.isUserLoggedIn = false;
-    localStorage.removeItem("id_token");
-    localStorage.removeItem("expires_at");
+  logout(): void {
+    // Clear authentication-related data from local storage
+    
   
-    localStorage.removeItem('isUserLoggedIn');
-    localStorage.removeItem('isAdmin');
-    return this.router.navigate(['/account/signin']) 
+    // Notify backend about logout (optional, ensure endpoint supports it)
+    this.http.put(`${this.userUrl}/user/update_logout`, {}, httpOptions).subscribe({
+      next: () => {
+        // Navigate to the signin page after successful logout
+        this.router.navigate(['/account/signin']);
+      },
+      error: (err) => {
+        console.error('Logout update failed:', err);
+        // Still navigate even if the backend update fails
+        localStorage.removeItem("id_token");
+    localStorage.removeItem("expires_at");
+    localStorage.removeItem("isUserLoggedIn");
+    localStorage.removeItem("isAdmin");
+  
+    // Update local component state
+    this.isUserLoggedIn = false;
+        this.router.navigate(['/account/signin']);
+      }
+    });
   }
+  
 public isLoggedIn() {
     return moment().isBefore(this.getExpiration());
 }

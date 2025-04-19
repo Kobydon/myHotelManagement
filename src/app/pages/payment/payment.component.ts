@@ -84,7 +84,9 @@ export class PaymentComponent implements OnInit {
 
     room_number :['',Validators.required],
     default_amount :['',Validators.required],
-    booking_id :['',Validators.required]    
+    booking_id :['',Validators.required]    ,
+    nema:['',Validators.required],
+    short:['',Validators.required],
    
   })
 }
@@ -250,7 +252,7 @@ async fetchBookings(id:number){
     if (res) this.bookingDetail =res;
     this.paymentForm.patchValue({
       id:id,    guest_id:this.bookingDetail[0].guest_id, room_number:this.bookingDetail[0].room_number,
-      checkin_date: this.bookingDetail[0].arrival_date, checkout_date: this.bookingDetail[0].departure_date,
+      checkin_date: this.bookingDetail[0].arrival_date, checkout_date: this.bookingDetail[0].departure_date,nema:this.bookingDetail[0]?.name,
       room_type: this.bookingDetail[0].room_type, children:this.bookingDetail[0].children,adult:this.bookingDetail[0].adult
      
     })
@@ -266,37 +268,47 @@ async fetchBookings(id:number){
   }
   finally{
     // this.loading.stop();
+    this.fetchRoomType(this.paymentForm.value.room_type);
   }
 }
 
 
+async fetchRooms(record){
+  try{
+    // this.loading.start();
+    var res = await this.roomService.fetchRoomsByType(record.room_type);
+    if (res) this.roomList =res;
+  } catch (error){
+    console.log(error)
+  }
+  finally{
+    // this.loading.stop();
+  }
+}
 
-async fetchRoomType(id: number) {
+async fetchRoomType(id: any) {
   try {
-    var res = await this.roomService.get_room_details(id);
+    const res = await this.roomService.get_by_type_two(id);
     if (res) this.roomD = res;
 
-    // Get the current time and check if it's before 1 PM
-    const currentTime = new Date();
-    const checkInTime = new Date(currentTime);
-    checkInTime.setHours(13, 0, 0, 0); // Set check-in time to 1 PM (13:00)
+    // Get the base price of the room
+    const basePrice = parseInt(this.roomD[0]?.base_price);
 
-    // Early check-in charge calculation
-    let earlyCheckinCharge = 0;
-    if (currentTime < checkInTime) {
-      // Apply early check-in charge
-      const earlyCheckinHours = (checkInTime.getTime() - currentTime.getTime()) / (1000 * 3600); // Difference in hours
-      earlyCheckinCharge = earlyCheckinHours * 0.5 * parseInt(this.roomD[0].base_price); // Charge per hour (you can adjust this rate)
-    }
+    // Assume you have check-in and check-out dates in your form
+    const checkinDate = new Date(this.paymentForm.value.checkin);  // example format: "2025-04-12"
+    const checkoutDate = new Date(this.paymentForm.value.checkout); // example format: "2025-04-14"
 
-    // Round the values to two decimal places
-    const amount = (parseInt(this.roomD[0].base_price) + earlyCheckinCharge).toFixed(2);
-    const topay = (parseInt(this.roomD[0].base_price) + earlyCheckinCharge).toFixed(2);
+    // Calculate duration in days
+    const durationInMs = checkoutDate.getTime() - checkinDate.getTime();
+    const durationInDays = Math.ceil(durationInMs / (1000 * 60 * 60 * 24)); // round up for partial days
+
+    // Total amount calculation
+    const totalAmount = this.paymentForm.value.duration * basePrice;
 
     // Update the form with the calculated amounts
     this.paymentForm.patchValue({
-      amount: parseFloat(amount), // Convert back to float to remove trailing zeroes
-      topay: parseFloat(topay)   // Convert back to float to remove trailing zeroes
+      amount: totalAmount,
+      topay: totalAmount
     });
 
   } catch (error) {
@@ -319,13 +331,16 @@ calDiscount(record){
 async addPayment(record) {
   const amountToPay = Number(this.paymentForm.value.topay)  // Convert to number
   const totalAmount = Number(record.amount)  // Convert to number
-  const balance = amountToPay - totalAmount; // Calculate the balance
+  let balance = amountToPay - totalAmount;
+  if (this.paymentForm.value.short === "yes") {
+    balance = 0;
+  }
   const b ="0"
   
   const payment: any = {
     booking_id:record.id,
     amount: record.amount,    
-    name: record.name,
+    name: this.paymentForm.value.nema,
     guest_id: record.guest_id,
     discount: record.discount,
     method: record.method,
@@ -491,15 +506,11 @@ async getUser(){
 }
 async printReciept(id: number) {
   try {
-    // Fetch payment details for the given ID
     const response = await this.paymentService.get_payment_for(id);
-   
 
-    // Ensure we have data and access the first element
     if (response && response.length > 0) {
-      const payment = response[0]; // Access the first (and likely only) object
+      const payment = response[0];
 
-      // Helper function to format date to words
       const formatDateToWords = (dateString: string): string => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
@@ -507,69 +518,92 @@ async printReciept(id: number) {
         return date.toLocaleDateString('en-US', options);
       };
 
-      // Helper function to calculate the number of days between two dates
       const calculateDaysBetweenDates = (startDate: string, endDate: string): number => {
         if (!startDate || !endDate) return 0;
         const start = new Date(startDate);
         const end = new Date(endDate);
         const diffTime = end.getTime() - start.getTime();
-        return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert milliseconds to days
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       };
 
-      // Format dates
       const checkinDate = formatDateToWords(payment.checkin_date);
       const checkoutDate = formatDateToWords(payment.checkout_date);
       const paymentDate = formatDateToWords(payment.payment_date);
-
-      // Calculate number of nights
       const numberOfNights = calculateDaysBetweenDates(payment.checkin_date, payment.checkout_date);
-      const d = {
-        days:numberOfNights
-      }
-      // const wifi_code = await this.paymentService.getWifiCode(d);
-      // const code = wifi_code[0]?.id;
 
-    
-      // Dynamically create receipt content
       const receiptContent = `
-        <div style="width: 58mm; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; border: 1px solid #000; padding: 10px; margin: 0 auto;">
-          <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px;">
-            <h2 style="margin: 0; font-size: 14px;">West End Arena Hotel & Restaurant</h2>
-            <p style="margin: 5px 0;">P.O BOX K 46, Kumasi</p>
-            <p style="margin: 5px 0;">Tel: 0558384564 / 0244462935</p>
-            <p style="margin: 5px 0;">Location: Denkyemuoso New Historic Adventist Church</p>
-          </div>
+        <html>
+        <head>
+          <title>Receipt</title>
+          <style>
+            body {
+              font-family: monospace;
+              font-size: 10px;
+              width: 72mm;
+              margin: 0;
+              padding: 5px;
+              text-align: center;
+            }
+            .header {
+              font-size: 12px;
+              font-weight: bold;
+              margin-bottom: 5px;
+            }
+            .sub-info, .line, .section {
+              margin: 2px 0;
+            }
+            .line {
+              border-top: 1px dashed black;
+              margin: 4px 0;
+            }
+            .left {
+              text-align: left;
+            }
+            .bold {
+              font-weight: bold;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">Longford Royal Hotel</div>
+          <div class="sub-info">AS-060-771</div>
+          <div class="sub-info">Tel: 0322497756</div>
+          <div class="sub-info">Sepe-dote Opp. Akate Farms</div>
+          <div class="line"></div>
 
-          <div style="margin: 10px 0;">
-            <p><strong>Receipt :</strong> #${payment.id || 'N/A'}</p>
-            <p><strong>Received From:</strong> ${payment.name || 'N/A'}</p>
-            <p><strong>The Sum:</strong> GH₵${payment.amount || '0'}.00</p>
-            <p><strong>Payment Method:</strong> ${payment.method || 'N/A'}</p>
-            <p><strong>Balance:</strong> GH₵${payment.balance || '0'}.00</p>
-            <p><strong>Discount:</strong> ${payment.discount || '0'}%</p>
-            <p><strong>Room Type:</strong> ${payment.room_type || 'N/A'}</p>
-            <p><strong>Check-in Date:</strong> ${checkinDate}</p>
-            <p><strong>Check-out Date:</strong> ${checkoutDate}</p>
-            <p><strong>Number of Nights:</strong> ${numberOfNights} Night(s)</p>
-            <p><strong>Payment Date:</strong> ${paymentDate}</p>
-            <p><strong>Wi-Fi Code:</strong> ${payment.wifi_code}</p>
-          </div>
+          <div class="left section"><span class="bold">Receipt:</span> #${payment.id}</div>
+          <div class="left section"><span class="bold">Received From:</span> ${payment.name || 'N/A'}</div>
+          <div class="left section"><span class="bold">Amount:</span> GH₵${payment.amount || '0'}.00</div>
+          <div class="left section"><span class="bold">Payment Method:</span> ${payment.method || 'N/A'}</div>
+          <div class="left section"><span class="bold">Balance:</span> GH₵${payment.balance || '0'}.00</div>
+          <div class="left section"><span class="bold">Discount:</span> ${payment.discount || '0'}%</div>
+          <div class="left section"><span class="bold">Room Type:</span> ${payment.room_type || 'N/A'}</div>
+          <div class="left section"><span class="bold">Check-in:</span> ${checkinDate}</div>
+          <div class="left section"><span class="bold">Check-out:</span> ${checkoutDate}</div>
+          <div class="left section"><span class="bold">Nights:</span> ${numberOfNights}</div>
+          <div class="left section"><span class="bold">Payment Date:</span> ${paymentDate}</div>
+          <div class="left section"><span class="bold">Wi-Fi Code:</span> ${payment.wifi_code || 'N/A'}</div>
+          <div class="line"></div>
 
-          <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px;">
-            <p>Thank you for choosing West End Arena Hotel & Restaurant!</p>
-            <p>We hope to serve you again soon.</p>
-          </div>
-        </div>
+          <div class="section">Thank you for choosing</div>
+          <div class="section"> Longford  Royal Hotel!</div>
+          <div class="section">We hope to serve you again soon.</div>
+        </body>
+        </html>
       `;
 
-      // Open a new print window
       const printWindow = window.open('', '_blank', 'width=300,height=600');
       if (printWindow) {
+        printWindow.document.open();
         printWindow.document.write(receiptContent);
         printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
+
+        // Delay print to ensure content is fully rendered
+        setTimeout(() => {
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        }, 500);
       } else {
         console.error('Unable to open print window.');
       }
@@ -577,7 +611,6 @@ async printReciept(id: number) {
       this.toastr.error('No payment details found.');
     }
   } catch (error) {
-    // Show error message if something goes wrong
     this.toastr.error('Failed to fetch payment details or print receipt.');
     console.error('Error:', error);
   }
@@ -611,10 +644,10 @@ async generateInvoice(id: number) {
       const invoiceContent = `
         <div style="width: 58mm; font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; border: 1px solid #000; padding: 10px; margin: 0 auto;">
           <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px;">
-            <h2 style="margin: 0; font-size: 14px;">West End Arena Hotel & Restaurant</h2>
-            <p style="margin: 5px 0;">P.O BOX K 46, Kumasi</p>
-            <p style="margin: 5px 0;">Tel: 0558384564 / 0244462935</p>
-            <p style="margin: 5px 0;">Location: Denkyemuoso New Historic Adventist Church</p>
+            <h2 style="margin: 0; font-size: 14px;">Longford Royal Hotel</h2>
+            <p style="margin: 5px 0;">AS-060-7751</p>
+            <p style="margin: 5px 0;">Tel: 0322497756</p>
+            <p style="margin: 5px 0;">Location: Sepe-dote Opp. Akate Farms</p>
           </div>
 
           <div style="margin: 10px 0;">
@@ -631,7 +664,7 @@ async generateInvoice(id: number) {
           </div>
 
           <div style="text-align: center; border-top: 1px dashed #000; padding-top: 10px;">
-            <p>Thank you for staying with us at West End Arena Hotel & Restaurant!</p>
+            <p>Thank you for staying with us atLongford Royal </p>
             <p>We look forward to hosting you again soon.</p>
           </div>
         </div>

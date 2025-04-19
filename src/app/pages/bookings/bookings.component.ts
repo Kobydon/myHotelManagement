@@ -45,6 +45,8 @@ export class BookingsComponent implements OnInit {
       name:['',Validators.required],
       room_type:['',Validators.required],
       country:['',Validators.required],
+      nema:['',Validators.required],
+      
       // Language:['',Validators.required],
       purpose:['',Validators.required],
       
@@ -221,7 +223,7 @@ finally{
 async fetchRooms(record){
       try{
         // this.loading.start();
-        var res = await this.roomService.fetchRoomsByType(record.room_type);
+        var res = await this.roomService.fetchRoomsByType(record);
         if (res) this.roomList =res;
       } catch (error){
         console.log(error)
@@ -239,7 +241,7 @@ async fetchGuest(id:number){
     if (res) this.guestDetails =res;
     this.bookingForm.patchValue({
       arrival_date: this.guestDetails[0]?.arrival_date, departure_date: this.guestDetails[0]?.checkout_date,
-      country:this.guestDetails[0]?.country,guest_id:this.guestDetails[0]?.id
+      country:this.guestDetails[0]?.country,guest_id:this.guestDetails[0]?.id,nema:this.guestDetails[0]?.first_name + ' ' + this.guestDetails[0]?.last_name 
     })
   } catch (error){
     this.toastr.error(null,error)
@@ -256,7 +258,7 @@ async fetchGuest(id:number){
  async addBooking(record){
   const book ={
 
-    name:record.name,
+    name:this.bookingForm.value.nema,
     guest_id:record.guest_id,
     room_type:record.room_type,
     country: record.country,

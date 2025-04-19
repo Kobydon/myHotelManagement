@@ -619,6 +619,10 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_income', sch, httpOptions));
     }
 
+    updateHallPayment(sch:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_hall_payment', sch, httpOptions));
+      }
 
   
     updateGop(sch:any) {
@@ -649,6 +653,13 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_return_date', d, httpOptions));
     }
 
+    
+    searchEventDates(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_event_date', d, httpOptions));
+    }
+
+
+    
     
           
     searchExpenseDate(d){
@@ -739,11 +750,21 @@ getcheckOut(): Observable<any[]>{
     
     
 
-    getHeldReportOrders(date: string) {
+    getHeldReportOrders(date: any) {
       return this.http.post<any[]>(this.guestUrl +'/guest/search_held_order_dates', { date });
     }
 
 
+    
+    getHeldReportOrdersTwo(d: any) {
+      return this.http.post<any[]>(this.guestUrl +'/guest/search_held_order_dates_two',  d,httpOptions);
+    }
+
+
+    // searchReturnDateTwo(d){
+    //   return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_return_date_two', d, httpOptions));
+    // }
+    
         
 
     getHeldReportOrdersFood(date: string) {
@@ -778,6 +799,11 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_chef_dates_two', d, httpOptions));
     }
 
+    searchEventDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_event_dates_two', d, httpOptions));
+    }
+
+    
     searchOrderDateTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_order_dates_two', d, httpOptions));
     }
@@ -896,6 +922,14 @@ getcheckOut(): Observable<any[]>{
     return   lastValueFrom( this.http.get<any>(url));
   }
 
+  getHallPaymentOne(id: number){
+    const url = `${this.guestUrl}/guest/get_hall_payment_one/${id}`;
+    return   lastValueFrom( this.http.get<any>(url));
+  }
+
+
+
+  
   getGop(id: number){
     const url = `${this.guestUrl}/guest/get_gop/${id}`;
     return   lastValueFrom( this.http.get<any>(url));
@@ -911,6 +945,13 @@ getcheckOut(): Observable<any[]>{
     //console.log(guest);
       return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_income', sch, httpOptions));
     }
+
+
+    addHallPayment(sch:any) {
+      //console.log(guest);
+        return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_hall_payment', sch, httpOptions));
+      }
+  
 
        
     addStock(sch:any) {
@@ -930,6 +971,12 @@ getcheckOut(): Observable<any[]>{
     //console.log(guest);get
       return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_income_list'));
     }
+
+    getHallPayment() {
+      //console.log(guest);get
+        return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_hall_payment'));
+      }
+
 
 
     getStoreList() {

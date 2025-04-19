@@ -52,6 +52,7 @@ export class DetailedSummaryTwoComponent implements OnInit {
   yesterday_total:any
   totalAvailableRooms:any;
   totalOcccupiedRooms:any;
+  eventList:any;
   occupancy:any;
   incomeList:any;
   attendaceList:any;
@@ -220,6 +221,7 @@ async searchDates() {
     this.roomList = this.roomList || [];
 
    this.getFoodChef(d);
+   this.getEventPayment(d);
   
     // ✅ Safely calculate totals
     this.totalAmount = this.paymentList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
@@ -454,7 +456,8 @@ printRepo(): void {
 }
 loadHeldOrders() {
   const selectedDate = this.paymentForm.value.dates;
-  this.guestService.getHeldReportOrders(selectedDate).subscribe((data) => {
+  const d = { date: selectedDate,datetwo:this.paymentForm.value.datetwo };
+  this.guestService.getHeldReportOrdersTwo(d).subscribe((data) => {
     console.log("API Response:", data); // Debugging: Check if data is received
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -493,6 +496,15 @@ async getFoodChef(d){
 
   var bi =  await this.guestService.searchChefDatesTwo(d);
   if(bi) this.chefList=bi
+
+
+}
+
+
+async getEventPayment(d){
+
+  var bi =  await this.guestService.searchEventDatesTwo(d);
+  if(bi) this.eventList=bi
 
 
 }

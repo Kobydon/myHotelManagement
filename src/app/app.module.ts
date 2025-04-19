@@ -75,6 +75,7 @@ import { DetailedSummaryTwoComponent } from './detailed-summary-two/detailed-sum
 import { CheckTodaysOrdersComponent } from './check-todays-orders/check-todays-orders.component';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orders.component';
+import { AddEventPaymentComponent } from './add-event-payment/add-event-payment.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -90,6 +91,7 @@ import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orde
         ViewDrinkOrderComponent,
         CheckTodaysOrdersComponent,
         CheckDrinkOrdersComponent,
+  
        
       
       

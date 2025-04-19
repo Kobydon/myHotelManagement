@@ -55,6 +55,7 @@ import { FinancialOverviewComponent } from 'app/financial-overview/financial-ove
 import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
 import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.component';
 import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-summary-two.component';
+import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-payment.component';
 
 
 
@@ -115,5 +116,6 @@ export const AdminLayoutRoutes: Routes = [
     {path:'gop-deduction',component:GopDeductionComponent},
     {path:'financial-overview',component:FinancialOverviewComponent},
     {path:'all-sessions',component:AllSessionsComponent},
+    {path:'add-event-payment',component:AddEventPaymentComponent},
 
 ]

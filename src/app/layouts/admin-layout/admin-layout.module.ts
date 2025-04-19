@@ -64,6 +64,7 @@ import { FinancialOverviewComponent } from 'app/financial-overview/financial-ove
 import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
 import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.component';
 import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-summary-two.component';
+import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-payment.component';
 
 
     
@@ -128,7 +129,8 @@ import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-s
 
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,
-    StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent
+    StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent,
+    AddEventPaymentComponent
 
 
 

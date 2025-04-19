@@ -39,7 +39,8 @@ isHeldOrder: boolean = false;
       id2 : ['',Validators.required],
       username:['',Validators.required],
       method :['',Validators.required],
-      cashier :['',Validators.required]
+      cashier :['',Validators.required],
+      table :['',Validators.required],
     })
   }
 
@@ -120,9 +121,10 @@ isHeldOrder: boolean = false;
   
     const userId = this.cartItems 
     const holdId = this.createForm.value.id2;  // Get the hold ID from the form
-    const tot =   this.total;
+    const tot =   this.total; 
+   const table = this.createForm.value.table;
     // this.clearCart();
-    this.cartService.holdCart(userId, holdId,tot).subscribe(
+    this.cartService.holdCart(userId, holdId,tot,table).subscribe(
       (response) => {
         alert(`Cart is now on hold!`);
   
@@ -180,6 +182,40 @@ loadHeldCart(cartId: any): void {
     }
   );
 }
+loadHeldCartAll(): void {
+  this.cartService.loadHeldCartAll().subscribe(
+    (response: any[]) => {
+      console.log("Held orders loaded:", response);
+
+      if (Array.isArray(response) && response.length > 0) {
+        // Now we're handling all orders
+        this.heldCarts = response; // Store all held orders in heldCarts array
+
+        // Optionally, you can calculate the total for all held carts
+        this.total = this.heldCarts.reduce((sum, cart) => sum + (cart.total || 0), 0);
+
+        this.isHeldOrder = true;
+
+        // If needed, you can update the cart with items from any selected order
+        // (or even from all orders if needed)
+        // For now, let's update the cart with the items of the latest held order (the first one)
+        this.cartService.updateCart(this.heldCarts.map(cart => cart.items).flat()); // Example: merging all items from held carts
+      } else {
+        console.warn("No held orders found.");
+        this.cartService.updateCart([]);
+        this.total = 0;
+        this.isHeldOrder = false;
+      }
+    },
+    (error) => {
+      console.error("Error loading held orders:", error);
+      alert("Failed to load held orders. Please try again.");
+      this.isHeldOrder = false;
+    }
+  );
+}
+
+
 
   
  async removeHeldCart(cartId: number) {
@@ -250,7 +286,8 @@ loadHeldCart(cartId: any): void {
       total: this.total,
       id:this.createForm.value.id2,
       method : this.createForm.value.method,
-      cashier :this.createForm.value.cashier
+      cashier :this.createForm.value.cashier,
+      table: this.createForm.value.table
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -275,6 +312,50 @@ loadHeldCart(cartId: any): void {
       }
     );
   }
+
+
+
+
+
+
+
+
+
+  payOrderAll() {
+    const orderData = {
+      cartItems: this.cartItems,
+      total: this.total,
+      // id:this.createForm.value.id2,
+      method : this.createForm.value.method,
+      cashier :this.createForm.value.cashier,
+     
+      table: this.createForm.value.table
+    };
+
+    console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
+
+    this.cartService.payOrderAll(orderData).subscribe(
+      (response) => {
+        this.clearCart();
+        this.loadHeldCarts();
+        this.closePopup();
+        this.createForm.get('username')?.reset();
+        // this.cartService.clearCart(this.user?.id);
+        alert(`Payment successful! Order #${response.id} has been placed.`);
+
+        this.printReceipts(response);
+        
+        this.cashier=false;
+        this.admin=false
+      },
+      (error) => {
+        console.error("Payment failed:", error);
+        alert("Payment failed. Please try again.");
+      }
+    );
+  }
+
+
 
 
 
@@ -316,7 +397,9 @@ loadHeldCart(cartId: any): void {
       cartItems: this.cartItems,
       total: this.total,
       id:this.createForm.value.id,
-      method : this.createForm.value.method
+      method : this.createForm.value.method,
+      cashier :this.createForm.value.cashier,
+      table:this.createForm.value.table
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -345,91 +428,135 @@ loadHeldCart(cartId: any): void {
 
 
 
-  
+  payOrderTwoAll() {
+    const orderData = {
+      cartItems: this.cartItems,
+      total: this.total,
+      // id:this.createForm.value.id,
+      method : this.createForm.value.method,
+      table:this.createForm.value.table,
+      cashier:this.createForm.value.cashier
+    };
 
-  printReceipts(order: any) {
-    this.printReceipt(order, "Customer Receipt", "Thank you for your purchase!");
-    this.printReceipt(order, "Seller Copy", "Keep this copy for records.");
+    console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
+
+    this.cartService.payOrderTwoAll(orderData).subscribe(
+      (response) => {
+        this.clearCart();
+        this.loadHeldCarts();
+        this.closePopup();
+        this.createForm.get('username')?.reset();
+
+        // this.cartService.clearCart(this.user?.id);
+        alert(`Payment successful! Order #${response.id} has been placed.`);
+
+        this.printReceipts(response);
+        
+        this.cashier=false;
+        this.admin=false
+      },
+      (error) => {
+        console.error("Payment failed:", error);
+        alert("Payment failed. Please try again.");
+      }
+    );
   }
 
-  printReceipt(order: any, title: string, footer: string) {
-    const receiptWindow = window.open('', '_blank');
-    if (receiptWindow) {
-      let items = [];
-
-      try {
-        items = Array.isArray(order.items) ? order.items : JSON.parse(order.items);
-      } catch (error) {
-        console.error("Error parsing order items:", error);
-        items = [];
-      }
-
-      receiptWindow.document.write(`
+  printReceipts(order: any) {
+    let items = [];
+  
+    try {
+      items = Array.isArray(order.items) ? order.items : JSON.parse(order.items);
+    } catch (error) {
+      console.error("Error parsing order items:", error);
+      items = [];
+    }
+  
+    const printWindow = window.open('', '', 'width=300,height=600');
+  
+    if (printWindow) {
+      const printContent = `
         <html>
         <head>
-          <title>${title}</title>
+          <meta charset="UTF-8">
+          <title>Customer Receipt</title>
           <style>
             body {
               font-family: monospace;
-              font-size: 14px;
-              width: 280px;
-              margin: auto;
-              text-align: center;
+              font-size: 12px;
+              padding: 5px;
+              margin: 0;
+              width: 260px;
+              word-wrap: break-word;
+              text-align: left;
             }
-            .receipt-header {
-              font-size: 18px;
+            .header {
+              text-align: center;
               font-weight: bold;
+              font-size: 14px;
+            }
+            .info, .footer {
+              text-align: center;
+              font-size: 12px;
+              margin: 2px 0;
             }
             .line {
               border-top: 1px dashed black;
-              margin: 5px 0;
+              margin: 6px 0;
             }
-            .items {
-              text-align: left;
+            table {
               width: 100%;
+              font-size: 12px;
+              border-collapse: collapse;
+            }
+            td {
+              padding: 2px 0;
             }
             .total {
-              font-size: 16px;
               font-weight: bold;
               text-align: right;
-            }
-            .footer {
-              text-align: center;
-              font-size: 12px;
+              margin-top: 5px;
             }
           </style>
         </head>
-        <body>
-          <div class="receipt-header">LONGFORD Royal Center</div>
-          <p><strong>Address:</strong> Odeneho Kwadaso, KUMASI</p>
-          <p><strong>Email:</strong> longfordroyalcentre@yahoo.com</p>
-          <p><strong>Tel:</strong> 0595579928 / 0247903072 </p>
+        <body onload="window.print(); window.close();">
+          <div class="header">LONGFORD Royal Center</div>
+          <div class="info">Odeneho Kwadaso, KUMASI</div>
+          <div class="info">longfordroyalcentre@yahoo.com</div>
+          <div class="info">0595579928 / 0247903072</div>
           <div class="line"></div>
-          <h3>${title}</h3>
-          <p><strong>Order ID:</strong> ${order.id}</p>
-          <p><strong>Date:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+          <div class="info"><strong>Customer Receipt</strong></div>
+          <div class="info">Order ID: ${order.id}</div>
+          <div class="info">Date: ${new Date(order.created_at).toLocaleString()}</div>
           <div class="line"></div>
-          
-          <div class="items">
-            ${items.length > 0 ? items.map(item => `
-              <p>${item.name || "N/A"} x${item.qty || 0} .... ₵${(parseFloat(item.price) || 0) * (parseInt(item.qty) || 0)}</p>
-            `).join('') : `<p>No items found</p>`}
-          </div>
-
+  
+          <table>
+            ${items.map(item => `
+              <tr>
+                <td>${item.name || "N/A"} x${item.qty || 0}</td>
+                <td style="text-align:right;">₵${((parseFloat(item.price) || 0) * (parseInt(item.qty) || 0)).toFixed(2)}</td>
+              </tr>
+            `).join('')}
+          </table>
+  
           <div class="line"></div>
-          <p class="total">Total: ₵${order.total}</p>
-          <p class="footer">${footer}</p>
+          <div class="total">Total: ₵${parseFloat(order.total).toFixed(2)}</div>
           <div class="line"></div>
-          <p class="footer">Thank you for shopping with us!</p>
+          <div class="footer">Please keep this as your proof of purchase.</div>
+          <div class="footer">Thank you!</div>
+          <div class="footer">-----------------------------</div>
         </body>
         </html>
-      `);
-
-      receiptWindow.document.close();
-      receiptWindow.print();
+      `;
+  
+      printWindow.document.open();
+      printWindow.document.write(printContent);
+      printWindow.document.close();
     }
   }
-
+  
+  
+  
   loadOrders() {
     this.cartService.getOrders().subscribe((data: any[]) => {
       this.orders = data;
@@ -461,7 +588,7 @@ loadHeldCart(cartId: any): void {
 
     catch(err){
 
-      alert("password is incorrect");
+      alert("username is incorrect");
     }
   }
 
@@ -470,84 +597,114 @@ loadHeldCart(cartId: any): void {
   logOut(){
     this.userService.logout();
   }
-
-
-
-
-
-
   printBill() {
     const currentDate = new Date().toLocaleString();
-    // const cashierName = "John Doe"; // Replace this with dynamic cashier info if available
   
-    let receiptContent = `
-      <html>
-      <head>
-        <title>Receipt</title>
-        <style>
-          body { font-family: Arial, sans-serif; font-size: 12px; text-align: center; }
-          .receipt-header { font-size: 14px; font-weight: bold; text-align: center; }
-          h3 { margin-bottom: 5px; }
-          p { margin: 2px 0; }
-          table { width: 100%; border-collapse: collapse; }
-          th, td { border-bottom: 1px dashed #000; padding: 4px; text-align: left; }
-          .text-center { text-align: center; }
-        </style>
-      </head>
-      <body onload="window.print(); window.close();">
-        <div class="receipt-header">
-          <h3>LONGFORD CITY</h3>
-          <p><strong>Address:</strong> KOFROM, KUMASI</p>
-          <p><strong>Email:</strong> longfordroyalcentre@yahoo.com</p>
-          <p>------------------------------------</p>
-        </div>
-        
-        <p><strong>Date:</strong> ${currentDate}</p>
-      
-        <p>------------------------------------</p>
-  
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Qty</th>
-              <th>Price</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-  
-    // Append cart items to receipt
-    this.cartItems.forEach(item => {
-      receiptContent += `
-        <tr>
-          <td>${item.name}</td>
-          <td>${item.qty}</td>
-          <td>₵${(item.price * item.qty).toFixed(2)}</td>
-        </tr>
-      `;
-    });
-  
-    // Append total and footer
-    receiptContent += `
-          </tbody>
-        </table>
-  
-        <p>------------------------------------</p>
-        <h4 class="text-center">Total: ₵${this.total.toFixed(2)}</h4>
-        <p class="text-center">Thank you for your purchase!</p>
-      </body>
-      </html>
-    `;
-  
-    // Open print window
     const printWindow = window.open('', '', 'width=300,height=600');
     if (printWindow) {
+      let receiptContent = `
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Receipt</title>
+          <style>
+            body {
+              font-family: monospace;
+              font-size: 12px;
+              width: 260px;
+              margin: 0;
+              padding: 5px;
+              word-wrap: break-word;
+              text-align: left;
+            }
+            .header {
+              text-align: center;
+              font-weight: bold;
+              font-size: 14px;
+              margin-bottom: 5px;
+            }
+            .info {
+              text-align: center;
+              font-size: 12px;
+              margin: 2px 0;
+            }
+            .line {
+              border-top: 1px dashed black;
+              margin: 6px 0;
+            }
+            table {
+              width: 100%;
+              font-size: 12px;
+              border-collapse: collapse;
+            }
+            th, td {
+              padding: 4px 0;
+              text-align: left;
+            }
+            td:last-child, th:last-child {
+              text-align: right;
+            }
+            .total {
+              font-weight: bold;
+              font-size: 13px;
+              text-align: right;
+              margin-top: 5px;
+            }
+            .footer {
+              text-align: center;
+              font-size: 12px;
+              margin-top: 8px;
+            }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          <div class="header">LONGFORD City </div>
+          <div class="info">KOFROM, KUMASI</div>
+          <div class="info">longfordroyalcentre@yahoo.com</div>
+          <div class="line"></div>
+          <div class="info">Date: ${currentDate}</div>
+          <div class="line"></div>
+  
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Qty</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+  
+      this.cartItems.forEach(item => {
+        receiptContent += `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>₵${(item.price * item.qty).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+  
+      receiptContent += `
+            </tbody>
+          </table>
+  
+          <div class="line"></div>
+          <div class="total">Total: ₵${this.total.toFixed(2)}</div>
+          <div class="line"></div>
+          <div class="footer">Thank you for your purchase!</div>
+          <div class="footer">-----------------------------</div>
+        </body>
+        </html>
+      `;
+  
       printWindow.document.open();
       printWindow.document.write(receiptContent);
       printWindow.document.close();
     }
   }
+  
   
   openSales(){
     this.router.navigate(['/daily-income'])

@@ -97,6 +97,12 @@ getroom_number():Observable<any[]>{
       return  lastValueFrom(this.http.get<any[]>(url));
    }
 
+   get_by_type_two(type){
+    const url = `${this.roomUrl}/room/get_by_type_two/${type}`;
+    return  lastValueFrom(this.http.get<any[]>(url));
+ }
+
+   
 
     get_rooms_details(id){
       const url = `${this.roomUrl}/room/get_rooms_details/${id}`;

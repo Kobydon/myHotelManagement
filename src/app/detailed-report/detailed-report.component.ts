@@ -42,6 +42,7 @@ export class DetailedReportComponent implements OnInit {
   totalHeldAmount=0;
   roomList:any;
   yesterdayList:any;
+  eventList:any;
   posList:any;
   paymentList:any;
   totalPosAmount:any;
@@ -220,6 +221,8 @@ async searchDates() {
     this.roomList = this.roomList || [];
 
    this.getFoodChef(d);
+   
+   this.getEventPayment(d);
   
     // ✅ Safely calculate totals
     this.totalAmount = this.paymentList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
@@ -496,5 +499,16 @@ async getFoodChef(d){
 
 
 }
+
+
+async getEventPayment(d){
+
+  var bi =  await this.guestService.searchEventDates(d);
+  if(bi) this.eventList=bi
+
+
+}
+
+
 
 }

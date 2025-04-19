@@ -124,9 +124,6 @@ li{
         <a id="fina" style="font-size: small;"  routerLink="refund-list"><i id="fina" class="fa fa-money " >&nbsp;</i>Refund</a>
       </li>
 
-
-
-<!-- 
         <li   class="transparent" >
           <a id="fina" ><i id="fina" class="fa fa-bed " >&nbsp;</i><span>Room &nbsp;</span>
        
@@ -175,7 +172,7 @@ li{
           
           </div> 
     
-       -->
+    
  
 
           <li  class="transparent" >
@@ -225,7 +222,7 @@ li{
 
               
       <li   class ="transparent">
-        <a id="fina"*ngIf="user[0].roles=='accountant' || user[0].roles=='admin' "  ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
+        <a id="fina"*ngIf="user[0].roles=='receptionist' || user[0].roles=='admin' "  ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
           <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
         </a>
       </li>
@@ -237,13 +234,13 @@ li{
      
 
         <li   >
-          <a id="fina" routerLink="add-budget" ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Budget&nbsp;</span>
+          <a id="fina" routerLink="add-budget" ><i id="fina" class="fa fa-money"  *ngIf="user[0].roles=='admin' ">&nbsp;</i><span>Budget&nbsp;</span>
            
           </a>
         </li>
         <li   >
         <li   >
-          <a id="fina" routerLink="expenses" ><i id="fina" class="fa fa-balance-scale"  >&nbsp;</i><span>Expenses&nbsp;</span>
+          <a id="fina" routerLink="expenses" ><i id="fina" class="fa fa-balance-scale" *ngIf="user[0].roles=='admin' "  >&nbsp;</i><span>Expenses&nbsp;</span>
            
           </a>
         </li>
@@ -252,29 +249,35 @@ li{
            
           </a></li>
 
-          <li>  <a id="fina"style="font-size: small;"  routerLink="/gop-deduction">
+          <li   >
+            <a id="fina" routerLink="add-event-payment" ><i id="fina" class="fa fa-calendar"  >&nbsp;</i><span>Event&nbsp;</span>
+             
+            </a></li>
+         
+
+          <li>  <a id="fina"style="font-size: small;"  *ngIf="user[0].roles=='admin' "   routerLink="/gop-deduction" >
             <i id="fina" class="fa fa-minus"  >&nbsp;</i>GOP deductions</a></li>
        
           
-        <li class="transparent"> <a id="fina"style="font-size: small;"  routerLink="/account-receivable"><i id="fina" class=" fa fa-money " >&nbsp;</i>
+        <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' "   routerLink="/account-receivable"><i id="fina" class=" fa fa-money " >&nbsp;</i>
           Accounts Receiv. </a></li> 
 
             <div class="dropdown-container">
-              <li class="transparent"> <a id="fina"style="font-size: small;"  routerLink="/account-receivable"><i id="fina" class=" fa fa-calendar-o " >&nbsp;</i>
+              <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' "   routerLink="/account-receivable"><i id="fina" class=" fa fa-calendar-o " >&nbsp;</i>
                 Daily</a></li> 
 
-                <li class="transparent"> <a id="fina"style="font-size: small;"  routerLink="/account-receivable-dates"><i id="fina" class=" fa fa-calendar-o " >&nbsp;</i>
+                <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' "  routerLink="/account-receivable-dates"><i id="fina" class=" fa fa-calendar-o " >&nbsp;</i>
                  Dates Between</a></li> 
 <!-- right -->
             </div>
           
-        <li  class="transparent"> <a id="fina"style="font-size: small;"  routerLink="/general-ledger"><i id="fina" class="  fa fa-book"  >&nbsp;</i>General Ledger  
+        <li  class="transparent"> <a id="fina"style="font-size: small;" *ngIf=" user[0].roles=='admin' " routerLink="/general-ledger"><i id="fina" class="  fa fa-book"  >&nbsp;</i>General Ledger  
           <!-- <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i> -->
         </a></li> 
 
         <div class="dropdown-container">
-          <li > <a id="fina"style="font-size: small;"  routerLink="/general-ledger"><i id="fina" class="  fa fa-calendar-o"  >&nbsp;</i>Daily</a></li>
-            <li > <a id="fina"style="font-size: small;"  routerLink="/general-ledger-dates"><i id="fina" class="  fa fa-calendar-o"  >&nbsp;</i>Different Dates</a></li>
+          <li > <a id="fina"style="font-size: small;"  routerLink="/general-ledger" *ngIf="user[0].roles=='admin' " ><i id="fina" class="  fa fa-calendar-o" >&nbsp;</i>Daily</a></li>
+            <li > <a id="fina"style="font-size: small;"  routerLink="/general-ledger-dates" *ngIf=" user[0].roles=='admin' "><i id="fina" class="  fa fa-calendar-o"  >&nbsp;</i>Different Dates</a></li>
    
 
 

@@ -27,7 +27,7 @@ export class ItemComponent implements OnInit {
   page = 1;
   pageSize: number = 60;
   totalAmount: number = 0;
-  
+  user:any;
   itemForm!: FormGroup;
 
   constructor(
@@ -62,9 +62,25 @@ export class ItemComponent implements OnInit {
       // this.getGroupList(),
       this.getFamilyList(),
       this.getUnitList(),
-      this.getUsers()
+      this.getUsers(),
+      this.getUser()
     ]);
   }
+
+
+  
+  async getUser(){
+    try{
+        var res = await this.userService.getUser()
+        if (res) this.user=res;
+  
+    }catch(err){console.log(err)}
+    finally{console.log("success");}
+  
+  
+  
+  }
+  
 
   async getUsers() {
     try {

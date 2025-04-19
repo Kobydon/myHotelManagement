@@ -210,10 +210,10 @@
   
                     <div class="row">
                       <div class="update ml-auto mr-auto" *ngIf="header === 'Add New'">
-                        <button type="submit" class="btn btn-primary btn-round">Save</button>
+                        <button type="submit" class="btn btn-primary btn-round" *ngIf="user[0]?.roles=='superadmin'">Save</button>
                       </div>
                       <div class="update ml-auto mr-auto" *ngIf="header === 'Edit'">
-                        <button type="submit" class="btn btn-primary btn-round">Update</button>
+                        <button type="submit" class="btn btn-primary btn-round" *ngIf="user[0]?.roles=='superadmin'">Update</button>
                       </div>
                     </div>
                   </form>

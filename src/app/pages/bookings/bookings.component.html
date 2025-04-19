@@ -162,12 +162,13 @@
                     <div class="form-group">
                       <label>Guest's NAME</label>
                 
-                      <select class="form-control" formControlName="name"  (ngModelChange)="fetchGuest(guestList[0].id)">
-                        <option value=""  hidden selected>Select Guest</option>
-                        <option  *ngFor="let item of guestList"  value="{{item.first_name + ' '+ item.last_name}}">
-                            {{item.first_name + ' '+ item.last_name}}</option>
+                      <select class="form-control" formControlName="name" (change)="fetchGuest($event.target.value)">
+                        <option value="" hidden selected>Select Guest</option>
+                        <option *ngFor="let item of guestList" [value]="item.id">
+                          {{ item.first_name + ' ' + item.last_name }}
+                        </option>
                       </select>
-                  
+                      
                     </div>
                   </div>
 
@@ -175,10 +176,10 @@
                   <div class="col-md-5 pr-1"  >
                     <div class="form-group">
                       <label> Room Type </label>
-                      <select class="form-control" formControlName="room_type" (ngModelChange)="fetchRooms(bookingForm.value)">
+                      <select class="form-control" formControlName="room_type" (change)="fetchRooms($event.target.value)">
                         <option value="" hidden selected>---select----</option>
                   
-                        <option  *ngFor="let item of roomtype"  value="{{item.room_type}}" > {{item.room_type}}</option>
+                        <option  *ngFor="let item of roomtype"  [value]="item.room_type" > {{item.room_type}}</option>
             
                   
                       </select>

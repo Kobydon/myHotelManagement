@@ -22,6 +22,7 @@
         
         
         </select>
+   
   <label for="">Filter By Cashier</label>
         <select formControlName="cashier" id="" (ngModelChange)="findCashier()">
           <option  *ngFor="let item of cashiers" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
@@ -33,7 +34,7 @@
 
 
             
-      </select>
+
       <label for="">Filter By Method</label>
             <select formControlName="paymethod" id="" (ngModelChange)="findMethod()">
               <option value="Cash">Cash</option>

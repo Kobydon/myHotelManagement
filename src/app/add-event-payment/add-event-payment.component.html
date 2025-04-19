@@ -41,14 +41,22 @@
           <!-- <th scope="col">#</th> -->
     
           <th scope="col">#</th>
-     <th scope="col"> Name</th>
+     <th scope="col"> Event Name</th>
    <th scope="col">Date</th>
+   <th scope="col">Start Time</th>
+   <th scope="col">End Time</th>
      <!-- <th scope="col">Total Number Of Teachers</th>
 
       <th scope="col"> Created Date | Time</th>  -->
      
       <th scope="col">Amount</th>
+      <th scope="col">Balance</th>
+      <th scope="col">Paid by</th>
+
+      <th scope="col">Phone </th>
+      
       <th scope="col">Note</th>
+      <th scope="col">Status</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
@@ -61,14 +69,19 @@
             <th> {{i+1 }}</th>
             <td> {{item.name }}</td>
             <td> {{item.date }}</td>
+            <td> {{item.start_time }}</td>
+            <td> {{item.end_time }}</td>
          <!-- <td> {{item.user }}</td> -->
 
             <td>{{item.amount}}</td>
+            <td>{{item.balance}}</td>
+            <td>{{item.customer_name}}</td>
+            <td>{{item.customer_phone}}</td>
             <td>{{item.note}}</td>
+            <td>{{item.status}}</td>
       
  
-            <!-- <td ><i class="fa fa-edit fa-lg text-info" (click)="editIncome(item.id)"></i><i
-                *ngIf="user[0].roles=='admin'"  class="fa fa-close fa-lg text-danger" (click)="deleteIncome(item.id)"></i></td> -->
+            <td ><i class="fa fa-edit fa-lg text-info" (click)="editIncome(item.id)"></i></td>
           </tr>
 
        
@@ -142,7 +155,7 @@
       
                   <div class="col-md-5 pr-1">
                     <div class="form-group">
-                      <label> Name </label>
+                      <label>  Event Name </label>
                       <input type="text"  formControlName="name"  class="form-control" placeholder=" .." >
                       
                     </div>
@@ -157,6 +170,23 @@
                   </div>
 
 
+                    
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label>  Start Time</label>
+                       <input type="time" class="form-control" formControlName="start_time">
+                    </div>
+                  </div>
+
+
+                        
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label>  End Time</label>
+                       <input type="time" class="form-control" formControlName="end_time">
+                    </div>
+                  </div>
+
 
                   
                   <div class="col-md-5 pr-1"  >
@@ -166,6 +196,44 @@
                     </div>
                   </div>
 
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label>  Balance</label>
+                       <input type="text" class="form-control" formControlName="balance">
+                    </div>
+                  </div>
+
+                  
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label>  Payment Method</label>
+                      <select formControlName="method" id="" style="color: black;" >
+
+                        <option value="Cash">Cash</option>
+                        <option value="Mobile Money">MoMo</option>
+                        <option value="Mobile Money & Cash">MoMo  & Cash</option>
+                        <option value="Credit Card">Credit CArd</option>
+                      </select>
+                    </div>
+                  </div>
+
+
+                 
+
+                  
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label>  Customer Name</label>
+                       <input type="text" class="form-control" formControlName="customer_name">
+                    </div>
+                  </div>
+
+                  <div class="col-md-5 pr-1"  >
+                    <div class="form-group">
+                      <label>  Customer Phone Number</label>
+                       <input type="text" class="form-control" formControlName="customer_phone">
+                    </div>
+                  </div>
 
                   
                   <div class="col-md-5 pr-1"  >

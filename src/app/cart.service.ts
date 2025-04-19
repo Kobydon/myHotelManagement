@@ -8,9 +8,11 @@ import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
 export class CartService {
   public cartItems = new BehaviorSubject<any[]>([]);
   cartItems$ = this.cartItems.asObservable();
-  public apiUrl = ' http://127.0.0.1:5000/guest/create_orders';
-  public apiUrl2 = 'http://127.0.0.1:5000/guest/create_orders_two';
-  public orderUrl = 'http://127.0.0.1:5000/guest';
+  public apiUrl = ' http://192.168.10.20:5000/guest/create_orders';
+  public apiUrl3 = ' http://192.168.10.20:5000/guest/create_orders_all';
+  public apiUrl4 = ' http://192.168.10.20:5000/guest/create_orders_two_all';
+  public apiUrl2 = 'http://192.168.10.20:5000/guest/create_orders_two';
+  public orderUrl = 'http://192.168.10.20:5000/guest';
 
   constructor(public http: HttpClient) {
     this.loadCart();
@@ -20,9 +22,22 @@ export class CartService {
     return this.http.post<any>(this.apiUrl, orderData);
   }
 
+  payOrderTwoAll(orderData: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl3, orderData);
+  }
+
+
+
+
+
+  payOrderAll(orderData: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl4, orderData);
+  }
+
   payOrderTwo(orderData: any): Observable<any> {
     return this.http.post<any>(this.apiUrl2, orderData);
   }
+
 
   
   addToCart(product: any) {
@@ -54,8 +69,8 @@ export class CartService {
     return this.getCart().reduce((sum, item) => sum + item.price * item.qty, 0);
   }
 
-  holdCart(userId: any, holdId: number, total: any): Observable<any> {
-    return this.http.post(`${this.orderUrl}/hold_order`, { id: holdId, userId, cartItems: this.getCart(), total });
+  holdCart(userId: any, holdId: number, total: any,table:any): Observable<any> {
+    return this.http.post(`${this.orderUrl}/hold_order`, { id: holdId, userId,table, cartItems: this.getCart(), total });
   }
 
   getHeldCarts(): Observable<any[]> {
@@ -65,6 +80,13 @@ export class CartService {
   loadHeldCart(holdId: number): Observable<any> {
     return this.http.get(`${this.orderUrl}/load_held_order/${holdId}`);
   }
+
+  loadHeldCartAll(): Observable<any> {
+    return this.http.get(`${this.orderUrl}/load_held_order_all`);
+  }
+
+
+  
 
   removeHeldCart(holdId: number) {
     return lastValueFrom(this.http.delete(`${this.orderUrl}/remove_held_order/${holdId}`));

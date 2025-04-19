@@ -156,7 +156,12 @@
                     <th>Subtotal</th>
                     <th>Waiter</th>
                     <th>Food Was Confirmed By</th>
+                    <th>Date | Time (Food)</th>
                     <th>Drink Was Confirmed By</th>
+                    <th>Date | Time (Drink)</th>
+                    <th>Actual Date | Time</th>
+
+
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -176,7 +181,10 @@
                       <td>GH₵{{ item.qty * item.price }}</td>
                       <td>{{ order.waiter }}</td>
                       <td>{{order.food_confirm}}</td>
+                      <td>{{order.food_confirm_at}}</td>
                       <td>{{order.drink_confirm}}</td>
+                      <td>{{order.drink_confirm_at}}</td>
+                      <td>{{order.created_at}}</td>
                       <td>{{ order.status }}</td>
                     </tr>
                   </ng-container>
@@ -278,6 +286,34 @@
                 </tbody>
               </table>
   
+
+              <p>Event Payment</p>
+              <table class="table table-bordered">
+                <thead class="table-light">
+                  <tr class="bg-secondary text-white">
+                    <th>Event Name</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                    <th>Method</th>
+                    <th>Customer Name</th>
+                    <th>Received_by</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let income of eventList">
+                    <td>{{ income.name }}</td>
+                    <td>GH₵{{ income.amount }}</td>
+                    <td>{{ income.balance}}</td>
+                      <td>{{income.method}}</td>
+                    <td>{{ income.customer_name }}</td>
+                    <td>{{ income.received_by }}</td>
+                    <td>{{ income.start_time}}</td>
+                    <td>{{ income.end_time}}</td>
+                  </tr>
+                </tbody>
+              </table>
               <!-- Income Report -->
               <p>Income</p>
               <table class="table table-bordered">
