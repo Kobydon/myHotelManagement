@@ -76,6 +76,7 @@ import { CheckTodaysOrdersComponent } from './check-todays-orders/check-todays-o
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orders.component';
 import { AddEventPaymentComponent } from './add-event-payment/add-event-payment.component';
+import { OutsideStockSideComponent } from './outside-stock-side/outside-stock-side.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -91,6 +92,7 @@ import { AddEventPaymentComponent } from './add-event-payment/add-event-payment.
         ViewDrinkOrderComponent,
         CheckTodaysOrdersComponent,
         CheckDrinkOrdersComponent,
+       
   
        
       

@@ -17,7 +17,7 @@ export class RoomService {
 
   
   // private roomUrl = 'https://renderdemo-hwz6.onrender.com';
-  private roomUrl = 'http://127.0.0.1:5000';
+  private roomUrl = 'https://backend.sikadwammaassociation.com';
 
 
   constructor(private http: HttpClient,private router:Router) { }

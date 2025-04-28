@@ -56,6 +56,7 @@ import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
 import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.component';
 import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-summary-two.component';
 import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-payment.component';
+import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-side.component';
 
 
 
@@ -117,5 +118,6 @@ export const AdminLayoutRoutes: Routes = [
     {path:'financial-overview',component:FinancialOverviewComponent},
     {path:'all-sessions',component:AllSessionsComponent},
     {path:'add-event-payment',component:AddEventPaymentComponent},
+    {path:'outside-stock-transfer',component:OutsideStockSideComponent},
 
 ]

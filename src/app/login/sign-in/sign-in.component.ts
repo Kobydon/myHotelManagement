@@ -117,7 +117,7 @@ export class SignInComponent implements OnInit {
 
    
 
-    else if(this.user[0]?.roles=="admin" || this.user[0].roles=="receptionist"  ){
+    else if(this.user[0]?.roles=="admin" || this.user[0]?.roles=="superadmin" || this.user[0].roles=="receptionist"  ){
       localStorage.setItem('isAdmin','true');
   
       this.router.navigate(["/dashboard"])

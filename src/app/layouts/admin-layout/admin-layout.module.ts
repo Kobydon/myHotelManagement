@@ -65,6 +65,7 @@ import { AllSessionsComponent } from 'app/all-sessions/all-sessions.component';
 import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.component';
 import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-summary-two.component';
 import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-payment.component';
+import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-side.component';
 
 
     
@@ -130,7 +131,7 @@ import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-paymen
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,
     StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent,
-    AddEventPaymentComponent
+    AddEventPaymentComponent,OutsideStockSideComponent
 
 
 

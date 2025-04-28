@@ -24,7 +24,7 @@ export class userService {
 message:any;
 user:any;
 
-private userUrl = 'http://127.0.0.1:5000';
+private userUrl = 'https://backend.sikadwammaassociation.com';
   // private userUrl = 'https://renderdemo-hwz6.onrender.com';
  
  

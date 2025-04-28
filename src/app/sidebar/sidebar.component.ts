@@ -73,6 +73,9 @@ export const ROUTES: RouteInfo[] = [
     { path: '/add-chef',    title: ' Food Chef   ',        icon:'nc-caps-small', class: '' },
     { path: '/detailed-report-week',    title: ' week report   ',        icon:'nc-caps-small', class: '' },
     { path: '/add-event-payment',    title: ' Add Event Payment   ',        icon:'nc-caps-small', class: '' },
+    { path: '/outside-stock-transfer',    title: ' Add outside stock transfer   ',        icon:'nc-caps-small', class: '' },
+
+    
 
 ];
 

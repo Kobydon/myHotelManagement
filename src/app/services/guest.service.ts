@@ -16,8 +16,9 @@ const httpOptions = {
 export class GuestService {
 
   // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private guestUrl = 'http://127.0.0.1:5000';
- 
+  private guestUrl = 'https://backend.sikadwammaassociation.com';
+
+  // 
 
   constructor(private http: HttpClient,private router:Router) { }
 
@@ -90,6 +91,11 @@ addExpense(dep:any) {
       } 
   
 
+      addStockTransferOutside(dep:any) {
+        //console.log(guest);
+          return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_stock_transfer_outside', dep, httpOptions));
+        } 
+      
       
 
     addVendor(dep:any) {
@@ -223,6 +229,13 @@ addExpense(dep:any) {
         return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_stock_transfer'));
       }
 
+      getStockTransferListOutside() {
+        //console.log(guest);
+          return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_stock_transfer_outside'));
+        }
+
+      
+
     getCategoryList() {
       //console.log(guest);
         return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_category_list'));
@@ -326,6 +339,12 @@ addExpense(dep:any) {
                   //console.log(guest);
                     return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_stock_transfer', dep, httpOptions));
                   }   
+
+                  updateStockOutside(dep:any) {
+                    //console.log(guest);
+                      return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_stock_transfer_outside', dep, httpOptions));
+                    }   
+  
 
               updateStock(dep:any) {
                 //console.log(guest);
