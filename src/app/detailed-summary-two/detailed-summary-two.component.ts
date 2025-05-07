@@ -221,7 +221,7 @@ async searchDates() {
     this.roomList = this.roomList || [];
 
    this.getFoodChef(d);
-   this.getEventPayment(d);
+  //  this.getEventPayment(d);
   
     // ✅ Safely calculate totals
     this.totalAmount = this.paymentList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
@@ -501,13 +501,13 @@ async getFoodChef(d){
 }
 
 
-async getEventPayment(d){
+// async getEventPayment(d){
 
-  var bi =  await this.guestService.searchEventDatesTwo(d);
-  if(bi) this.eventList=bi
+//   var bi =  await this.guestService.searchEventDatesTwo(d);
+//   if(bi) this.eventList=bi
 
 
-}
+// }
 
 
 }

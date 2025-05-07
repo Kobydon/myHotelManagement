@@ -73,7 +73,8 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
       datestwo:['',Validators.required],
       employee:['',Validators.required],
       cashier:['',Validators.required],
-      paymethod:['',Validators.required]
+      paymethod:['',Validators.required],
+      barrest:[Validators.required],
     
   })  
   }
@@ -97,6 +98,7 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
       
     }
 
+    
 
 catch (error) {
   // this.toastr.error(null,"something went")
@@ -126,7 +128,35 @@ catch (error) {
   
   }
 
+  async findDepartment(data){
+    let sum :number= 0;
+    const d = {
+      date: this.createForm.value.dates,
+      waiter:this.createForm.value.paymethod,
+        datetwo: this.createForm.value.datestwo
+    }
+      try{
+        this.loading.start();
+       var res = await this.guestService.searchDepartmentDatesTwo(d);
+       if (res)this.incomeReport =res;
+        
+       for (let index = 0; index < this.incomeReport.length; index++) {
+        sum += parseInt(this.incomeReport[index].amount);
+       //  this.totalAmount=sum;
+        this.totalIncome=sum;
+       
+    }
+          
+          
+      
   
+      }
+      catch(err){this.toastr.error(null,err.message)}
+  
+      finally{this.loading.stop();}
+  }
+  
+
 
   async getUsers(){ 
     try{

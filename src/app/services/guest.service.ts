@@ -16,7 +16,7 @@ const httpOptions = {
 export class GuestService {
 
   // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private guestUrl = 'https://backend.sikadwammaassociation.com';
+  private guestUrl = 'http://127.0.0.1:5000';
 
   // 
 
@@ -863,6 +863,14 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_method_dates', d, httpOptions));
 
     }
+
+    searchDepartmentDates(d){
+
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_department_dates', d, httpOptions));
+
+    }
+
+    
     
     searchCashierDates(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_cashier_dates', d, httpOptions));
@@ -878,6 +886,12 @@ getcheckOut(): Observable<any[]>{
     searchMethodDatesTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_method_dates_two', d, httpOptions));
     }
+
+    
+    searchDepartmentDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_department_dates_two', d, httpOptions));
+    }
+
 
 
     

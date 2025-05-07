@@ -23,8 +23,8 @@ const httpOptions = {
 export class userService {
 message:any;
 user:any;
-
-private userUrl = 'https://backend.sikadwammaassociation.com';
+// https://backend.sikadwammaassociation.com
+private userUrl = 'http://127.0.0.1:5000';
   // private userUrl = 'https://renderdemo-hwz6.onrender.com';
  
  

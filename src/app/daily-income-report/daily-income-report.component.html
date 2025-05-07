@@ -45,6 +45,15 @@
             
             </select>
 
+
+            <label for="">Filter By Department</label>
+            <select formControlName="barrest" id="" (ngModelChange)="findDepartment()">
+              <option value="drink">Bar</option>
+              <option value="food">Restaurant</option>
+              
+            
+            
+            </select>
       </form>
 
 
@@ -58,7 +67,7 @@
       <!-- Daily Report Display -->
       <div *ngIf="incomeReport.length > 0 || expenditureReport.length > 0; else noReport" id="pdf">
         <header class="text-center mb-4">
-          <h2>Longford City</h2>
+          <h2>Longford </h2>
           <p>Daily Income and Expenditure Report</p>
           <p>Date: {{ createForm.value.dates | date:'MMMM d, yyyy' }}</p>
         </header>

@@ -126,7 +126,7 @@ isHeldOrder: boolean = false;
     // this.clearCart();
     this.cartService.holdCart(userId, holdId,tot,table).subscribe(
       (response) => {
-        alert(`Cart is now on hold!`);
+        // alert(`Cart is now on hold!`);
   
         this.loadHeldCarts(); // Refresh the list of held carts
        
@@ -160,7 +160,7 @@ loadHeldCart(cartId: any): void {
   this.cartService.loadHeldCart(cartId).subscribe(
     (response) => {
       console.log("Cart loaded:", response);
-      alert(`Loaded cart #${cartId}!`);
+      // alert(`Loaded cart #${cartId}!`);
 
       if (response && response.items) {
         this.total = response.total || 0;
@@ -299,7 +299,7 @@ loadHeldCartAll(): void {
         this.closePopup();
         this.createForm.get('username')?.reset();
         // this.cartService.clearCart(this.user?.id);
-        alert(`Payment successful! Order #${response.id} has been placed.`);
+        // alert(`Payment successful! Order #${response.id} has been placed.`);
 
         this.printReceipts(response);
         
@@ -341,7 +341,7 @@ loadHeldCartAll(): void {
         this.closePopup();
         this.createForm.get('username')?.reset();
         // this.cartService.clearCart(this.user?.id);
-        alert(`Payment successful! Order #${response.id} has been placed.`);
+        // alert(`Payment successful! Order #${response.id} has been placed.`);
 
         this.printReceipts(response);
         

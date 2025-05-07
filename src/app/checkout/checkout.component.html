@@ -57,7 +57,7 @@
   <button 
  
   (click)="loadHeldCartAll()"  class="btn btn-warning"
-  [disabled]="cartItems.length > 0">
+  [disabled]="!(cashier || admin)">
   Load All
 </button>
 
