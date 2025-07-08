@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CartService } from 'app/cart.service';
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'view-drink-order',
   templateUrl: './view-drink-order.component.html',
@@ -16,11 +17,13 @@ export class ViewDrinkOrderComponent implements OnInit {
   interval:any;
   interval1:any;
   orderList:any[]
-  inta:any;
+  intervalId:any;
   currentDate: Date = new Date();
   currentMonth: string;
   currentTime: string;
+    private heldOrderSub: Subscription;
   daysInMonth: { date: number }[] = [];
+  
   constructor(private guestService:GuestService,private cartService:CartService,private userService:userService,
     private router:Router
   ) { }
@@ -28,24 +31,37 @@ export class ViewDrinkOrderComponent implements OnInit {
   ngOnInit(): void {
 
      
-    this.interval= setInterval(()=>{
-      this.loadHeldOrders();
+    // this.interval= setInterval(()=>{
+    //   this.loadHeldOrders();
 
-    },1000);
+    // },1000);
     this.getUser();
-    this.updateTime();
-    this.generateCalendar();
-    this.inta= setInterval(() => this.updateTime(), 1000);
+    // this.updateTime();
+    // this.generateCalendar();
+    // this.inta= setInterval(() => this.updateTime(), 1000);
 
 
-    this.interval1= setInterval(()=>{
-       this.getOrders();
+    // this.interval1= setInterval(()=>{
+    //    this.getOrders();
 
-    },1000);
- 
+    // },1000);
+    this.intervalId = setInterval(() => {
+  if (document.visibilityState === 'visible') {
+    this.loadHeldOrders(); // fallback check
+    console.log("🕒 Fallback polling for new held orders...");
+  }
+}, 7000); // poll every 30 seconds
+
+
+  // 🔔 React to subject notification
+
+
+  // 📦 Initial load
+  this.loadHeldOrders();
 
   }
 
+  
 
   updateTime() {
     this.currentDate = new Date();

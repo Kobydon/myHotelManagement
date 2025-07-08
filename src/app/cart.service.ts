@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
+import { Injectable,EventEmitter } from '@angular/core';
+import { BehaviorSubject, lastValueFrom, Observable,Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,14 +10,23 @@ import { BehaviorSubject, lastValueFrom, Observable } from 'rxjs';
 export class CartService {
   public cartItems = new BehaviorSubject<any[]>([]);
   cartItems$ = this.cartItems.asObservable();
-  public apiUrl = ' http://127.0.0.1:5000/guest/create_orders';
-  public apiUrl3 = ' http://127.0.0.1:5000/guest/create_orders_all';
-  public apiUrl4 = ' http://127.0.0.1:5000/guest/create_orders_two_all';
+  public apiUrl = 'http://127.0.0.1:5000/guest/create_orders';
+  public apiUrl3 = 'http://127.0.0.1:5000/guest/create_orders_all';
+  public apiUrl4 = 'http://127.0.0.1:5000/guest/create_orders_two_all';
   public apiUrl2 = 'http://127.0.0.1:5000/guest/create_orders_two';
   public orderUrl = 'http://127.0.0.1:5000/guest';
+  
+
+
+
+ private heldOrderSubject = new ReplaySubject<void>(1);
+  public heldOrder$ = this.heldOrderSubject.asObservable();
+
+ holdOrderMade = new EventEmitter<void>();
 
   constructor(public http: HttpClient) {
     this.loadCart();
+   
   }
 
   payOrder(orderData: any): Observable<any> {
@@ -68,10 +79,34 @@ export class CartService {
   getTotal(): number {
     return this.getCart().reduce((sum, item) => sum + item.price * item.qty, 0);
   }
+  holdCart(userId: any, holdId: number, total: any, table: any): Observable<any> {
+  const holdPayload = {
+    id: holdId,
+    userId: userId,
+    table: table,
+    cartItems: this.getCart(),
+    total: total
+  };
 
-  holdCart(userId: any, holdId: number, total: any,table:any): Observable<any> {
-    return this.http.post(`${this.orderUrl}/hold_order`, { id: holdId, userId,table, cartItems: this.getCart(), total });
+  console.log("📤 Sending hold request to backend:", holdPayload);
+
+  return this.http.post(`${this.orderUrl}/hold_order`, holdPayload).pipe(
+    tap({
+      next: () => {
+        console.log("📢 Hold request successful — notifying heldOrder$ subscribers...");
+        this.heldOrderSubject.next(); // Notifies subscribers
+      },
+      error: (error) => {
+        console.error("❌ Error during holdCart request:", error);
+      }
+    })
+  );
+}
+
+  loadHeldCartAll(): Observable<any> {
+    return this.http.get(`${this.orderUrl}/load_held_order_all`);
   }
+
 
   getHeldCarts(): Observable<any[]> {
     return this.http.get<any[]>(`${this.orderUrl}/held_orders`);
@@ -81,9 +116,7 @@ export class CartService {
     return this.http.get(`${this.orderUrl}/load_held_order/${holdId}`);
   }
 
-  loadHeldCartAll(): Observable<any> {
-    return this.http.get(`${this.orderUrl}/load_held_order_all`);
-  }
+
 
 
   

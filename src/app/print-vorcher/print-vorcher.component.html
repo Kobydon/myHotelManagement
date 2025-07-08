@@ -1,0 +1,89 @@
+<!-- Print-only Section -->
+<div id="printSection">
+  <div class="voucher-container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <div>
+        <h2 class="voucher-title">PURCHASE VOUCHER</h2>
+        <p><strong>Department:</strong> {{ purchases[0]?.department || '___________________________' }}</p>
+        <p><strong>Cart / Requisition No:</strong> {{ cartId || '___________________________' }}</p>
+        <p><strong>Date:</strong> {{ today | date: 'mediumDate' }}</p>
+        <p><strong>Supplier:</strong> _______________________________</p>
+      </div>
+      <div class="text-right company-info">
+        <strong>Longford City Restaurant</strong><br>
+        Krofrom, Kumasi<br>
+        Phone: 055-727-6073<br>
+      </div>
+    </div>
+
+    <!-- Purchase Table -->
+    <table class="table table-bordered voucher-table">
+      <thead class="table-success">
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Unit Price (₵)</th>
+          <th>Total Cost (₵)</th>
+          <th>Requested By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of purchases">
+          <td>{{ item.item }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unit_price }}</td>
+          <td>{{ item.total_cost }}</td>
+          <td>{{ item.requested_by }}</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" class="text-right"><strong>Grand Total</strong></td>
+          <td colspan="2"><strong>₵{{ getTotalCost() | number: '1.2-2' }}</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- Signature Section -->
+    <div class="mt-4">
+      <div class="row">
+        <div class="col-sm-6">
+          <p><strong>Prepared by:</strong> ________________________</p>
+          <p><strong>Date:</strong> ________________________</p>
+        </div>
+        <div class="col-sm-6">
+          <p><strong>Approved by:</strong> ________________________</p>
+          <p><strong>Date:</strong> ________________________</p>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-sm-6">
+          <p><strong>Store Keeper:</strong> ________________________</p>
+        </div>
+        <div class="col-sm-6">
+          <p><strong>Received by:</strong> ________________________</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Control Panel (excluded from print) -->
+<div class="form-group row no-print mt-4">
+  <div class="col-sm-6">
+    <input type="number" [(ngModel)]="cartId" class="form-control" placeholder="Enter Cart ID">
+  </div>
+  <div class="col-sm-3">
+    <button class="btn btn-primary" (click)="loadVoucher()">Search</button>
+  </div>
+  <div class="col-sm-3 text-right">
+    <button class="btn btn-secondary" (click)="printVoucher()">
+      <i class="fa fa-print"></i> Print
+    </button>
+  </div>
+</div>
+
+<div *ngIf="errorMessage" class="alert alert-danger mt-2 no-print">
+  {{ errorMessage }}
+</div>

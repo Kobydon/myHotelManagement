@@ -1,0 +1,12 @@
+/* stock-receipt.component.css */
+table th, table td {
+  text-align: center;
+  vertical-align: middle;
+}
+thead th {
+  background-color: #343a40;
+  color: white;
+}
+.table-secondary {
+  background-color: #e9ecef;
+}

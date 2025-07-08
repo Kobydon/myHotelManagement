@@ -48,17 +48,17 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.getPaymentList();
-    this.exchangeInterval= setInterval(()=>{
-      this.getExchangeRates();
+    // this.exchangeInterval= setInterval(()=>{
+    //   this.getExchangeRates();
 
-    },7000);
+    // },7000);
     this.getGust();
 
   
-    this.interval= setInterval(()=>{
-      this.getBookingList();
+    // this.interval= setInterval(()=>{
+    //   this.getBookingList();
 
-    },1000);
+    // },1000);
     this.getRoom();
     this.getUser();
   
@@ -113,7 +113,7 @@ export class DashboardComponent implements OnInit {
     }, {});
 
     this.paymentList.forEach((payment: any) => {
-      const paymentDate = new Date(payment.payment_date);
+      const paymentDate = new Date(payment.date);
       const monthName = this.months[paymentDate.getMonth()];
       const amount = parseInt(payment.amount, 10);
       this.monthlyPayments[monthName] += amount;

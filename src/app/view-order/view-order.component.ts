@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { CartService } from 'app/cart.service';
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'view-order',
   templateUrl: './view-order.component.html',
@@ -15,7 +16,8 @@ export class ViewOrderComponent implements OnInit {
   interval:any;
   interval1:any;
   orderList:any[]
-  inta:any;
+  heldOrderSub: Subscription;
+  intervalId:any;
   currentDate: Date = new Date();
   currentMonth: string;
   currentTime: string;
@@ -23,27 +25,23 @@ export class ViewOrderComponent implements OnInit {
   constructor(private guestService:GuestService,private cartService:CartService,private userService:userService,
     private router:Router
   ) { }
-
-  ngOnInit(): void {
-   
-    
-    this.interval= setInterval(()=>{
-      this.loadHeldOrders();
-
-    },1000);
-    this.getUser();
-    this.updateTime();
-    this.generateCalendar();
-    this.inta= setInterval(() => this.updateTime(), 1000);
+ngOnInit(): void {
+  // ✅ React to held cart event from cartService
 
 
-    this.interval1= setInterval(()=>{
-       this.getOrders();
+  // ✅ Initial load
+  this.loadHeldOrders();
+  this.getUser();
 
-    },1000);
  
-
-  }
+  this.intervalId = setInterval(() => {
+    if (document.visibilityState === 'visible') {
+      console.log("🕒 Polling for held orders as fallback...");
+      this.loadHeldOrders();
+    }
+  }, 7000);
+  
+}
 
 
   checkOrder(){
@@ -100,31 +98,33 @@ async getOrders(){
       if (res) {
         let parsedOrders = res.map(order => {
           let items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
-  
-          // Optional: sort VIP items to the top *within* each order
+
+          // Optional: sort VIP items within each order
           items = items.sort((a, b) => {
             return (b.is_vip === "yes" ? 1 : 0) - (a.is_vip === "yes" ? 1 : 0);
           });
-  
+
           return { ...order, items };
         });
-  
-        // 🔥 Now sort the whole order list based on VIP presence
+
+        // Sort whole order list by VIP presence
         parsedOrders = parsedOrders.sort((a, b) => {
           const aHasVip = a.items.some(item => item.is_vip === "yes");
           const bHasVip = b.items.some(item => item.is_vip === "yes");
           return (bHasVip ? 1 : 0) - (aHasVip ? 1 : 0);
         });
-  
+
         this.itemList = parsedOrders;
-  
         console.log("Held Orders Loaded (VIP orders first):", this.itemList);
       }
     } catch (error) {
       console.error("Error loading held orders:", error);
     }
   }
-  
+
+  ngOnDestroy(): void {
+    this.heldOrderSub?.unsubscribe();
+  }
 
   async confirmOrder(id:any){
 

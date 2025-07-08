@@ -9,7 +9,10 @@ import { userService } from 'app/user.service';
   styleUrls: ['./item-list.component.css']
 })
 export class ItemListComponent implements OnInit {
-itemList:any;
+// itemList:any;
+searchTerm: string = '';
+itemList: any[] = [];
+filteredItemList: any[] = [];
 cartItems: any[] = [];
 user:any;
   constructor(private guestService:GuestService,private cartService:CartService,private userService:userService) { }
@@ -22,23 +25,36 @@ user:any;
 
     this.getUser();
   }
-
-
-  async getItemsList() {
-    try {
-      // this.loading.start();
-      const res = await this.guestService.getItemsList(); // Assuming getItemsList() fetches the items from the API
-      if (res) {
-        this.itemList = res;
-      }
-    } catch (error) {
-      // this.toastr.error('Error fetching items list');
-    } finally {
-      // this.loading.stop();
+async getItemsList() {
+  try {
+    const res = await this.guestService.getItemsList();
+    if (res) {
+      this.itemList = res;
+      this.filteredItemList = res; // ✅ This ensures all items show by default
     }
+  } catch (error) {
+    console.error('Error fetching items:', error);
   }
+}
+
+onSearchChange() {
+  const term = this.searchTerm.trim().toLowerCase();
+
+  if (!term) {
+    this.filteredItemList = this.itemList; // ✅ Reset to full list
+  } else {
+    this.filteredItemList = this.itemList.filter(product =>
+      product.name.toLowerCase().includes(term)
+    );
+  }
+}
 
 
+matchesSearch(product: any): boolean {
+  const term = this.searchTerm.trim().toLowerCase();
+  if (!term) return true; // show all if no search term
+  return product.name.toLowerCase().includes(term);
+}
   // Check if product is already in cart
   getCartItem(product: any) {
     return this.cartItems.find(item => item.name === product.name);

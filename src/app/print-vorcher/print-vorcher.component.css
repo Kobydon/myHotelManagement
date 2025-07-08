@@ -1,0 +1,55 @@
+.voucher-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 25px;
+  border: 2px solid #000;
+  background: #fff;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.voucher-title {
+  font-weight: 900;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.company-info {
+  font-size: 14px;
+  text-align: right;
+}
+
+.voucher-table {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.voucher-table th, .voucher-table td {
+  vertical-align: middle;
+  padding: 8px;
+}
+
+tfoot td {
+  font-weight: bold;
+  background: #e0ffe0;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .voucher-container {
+    border: none;
+    box-shadow: none;
+  }
+}
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

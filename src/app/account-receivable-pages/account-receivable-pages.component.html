@@ -10,7 +10,7 @@
               <div class="d-flex">
                 <form [formGroup]="paymentForm" class="me-3">
                   <label for="dates" class="me-2">Select Date:</label>
-                  <input type="date" class="form-control" formControlName="dates" (ngModelChange)="searchDates()" />
+                  <input type="date" class="form-control" formControlName="dates"  />
                   <input type="date" class="form-control" formControlName="date_two" (ngModelChange)="searchDates()" />
                 </form><br><br><br>
                 <div class="button-group">
@@ -25,8 +25,9 @@
             </div>
   
             <!-- Account Receivable Table Section -->
-            <div *ngIf="paymentForm.value.dates" id="receivable-table">
+            <div *ngIf="paymentForm.value.date_two" id="receivable-table">
               <h5 class="text-secondary">Account Receivable</h5>
+               <p>Hotel </p>
               <table class="table table-bordered">
                 <thead class="table-light">
                   <tr class="bg-secondary text-white">
@@ -60,6 +61,50 @@
                   </tr>
                 </tbody>
               </table>
+
+              <p>Restaurant & Bar</p>
+
+
+                 
+            <p>Held Orders</p>
+            <table class="table table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Item</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Subtotal</th>
+                  <th>Waiter</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Loop through HeldList (each order) -->
+                <ng-container *ngFor="let order of HeldList">
+                  <!-- Show Order ID and Company as a separator row -->
+                  <!-- <tr class="bg-light">
+                    <td colspan="6"><strong>Order ID: {{ order.id }} | {{ order.company_name }}</strong></td>
+                  </tr> -->
+            
+                  <!-- Loop through order items -->
+                  <tr *ngFor="let item of order.items">
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.qty }}</td>
+                    <td>GH₵{{ item.price }}</td>
+                    <td>GH₵{{ item.qty * item.price }}</td>
+                    <td>{{ order.waiter }}</td>
+                    <td>{{ order.status }}</td>
+                  </tr>
+                </ng-container>
+            
+                <!-- Grand Total Row -->
+                <tr>
+                  <td colspan="6" class="text-end bg-light">
+                    <strong>Total: GH₵{{ totalHeldAmount | number }}</strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             </div>
           </div>
         </div>

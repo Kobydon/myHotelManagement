@@ -28,6 +28,7 @@ cashier =false;
 admin=false
 id:any;
 displayStyle="none";
+displayStyleManager
 
 isHeldOrder: boolean = false;
   constructor(public cartService: CartService, private userService: userService,private fb:FormBuilder,private guestService:GuestService,private router:Router,
@@ -81,8 +82,18 @@ isHeldOrder: boolean = false;
     this.displayStyle = "block";
   }
 
+
+  openPopup2() {
+    // this.header = action;
+    // this.createForm.reset();
+
+    this.displayStyleManager = "block";
+  }
+
+
   closePopup() {
     this.displayStyle = "none";
+    this.displayStyleManager="none";
   }
 
 
@@ -112,6 +123,7 @@ isHeldOrder: boolean = false;
   removeFromCart(product: any) {
     // if (!this.user[0]?.id) return;
     this.cartService.removeFromCart( product);
+    this.admin=false;
   }
   
 
@@ -124,21 +136,20 @@ isHeldOrder: boolean = false;
     const tot =   this.total; 
    const table = this.createForm.value.table;
     // this.clearCart();
-    this.cartService.holdCart(userId, holdId,tot,table).subscribe(
-      (response) => {
-        // alert(`Cart is now on hold!`);
-  
-        this.loadHeldCarts(); // Refresh the list of held carts
-       
-        this.cashier=false;
-        this.clearCart();
-        this.total=0;
-      },
-      (error) => {
-        console.error("Error holding cart:", error);
-        alert("Failed to hold cart. Please try again.");
-      }
-    );
+   this.cartService.holdCart(userId, holdId, tot, table).subscribe({
+  next: (response) => {
+    console.log('✅ holdCart response received');
+    this.loadHeldCarts(); // Refresh held carts
+    this.cashier = false;
+    this.clearCart();
+    this.total = 0;
+    this.createForm.reset();
+  },
+  error: (error) => {
+    console.error('Error holding cart:', error);
+    alert('Failed to hold cart. Please try again.');
+  }
+});
   }
   
   loadHeldCarts(): void {
@@ -307,8 +318,13 @@ loadHeldCartAll(): void {
         this.admin=false
       },
       (error) => {
-        console.error("Payment failed:", error);
-        alert("Payment failed. Please try again.");
+        let errorMessage = "Payment failed. Please try again.";
+
+         if (error?.error?.error) {
+             errorMessage = error.error.error;  // Flask sends { "error": "..." }
+  }
+
+  alert(errorMessage);
       }
     );
   }
@@ -349,8 +365,13 @@ loadHeldCartAll(): void {
         this.admin=false
       },
       (error) => {
-        console.error("Payment failed:", error);
-        alert("Payment failed. Please try again.");
+       let errorMessage = "Payment failed. Please try again.";
+
+  if (error?.error?.error) {
+    errorMessage = error.error.error;  // Flask sends { "error": "..." }
+  }
+
+  alert(errorMessage);
       }
     );
   }
@@ -420,8 +441,13 @@ loadHeldCartAll(): void {
         this.admin=false
       },
       (error) => {
-        console.error("Payment failed:", error);
-        alert("Payment failed. Please try again.");
+        let errorMessage = "Payment failed. Please try again.";
+
+  if (error?.error?.error) {
+    errorMessage = error.error.error;  // Flask sends { "error": "..." }
+  }
+
+  alert(errorMessage);
       }
     );
   }
@@ -456,106 +482,140 @@ loadHeldCartAll(): void {
         this.admin=false
       },
       (error) => {
-        console.error("Payment failed:", error);
-        alert("Payment failed. Please try again.");
+       let errorMessage = "Payment failed. Please try again.";
+
+  if (error?.error?.error) {
+    errorMessage = error.error.error;  // Flask sends { "error": "..." }
+  }
+
+  alert(errorMessage);
       }
     );
   }
 
   printReceipts(order: any) {
-    let items = [];
-  
-    try {
-      items = Array.isArray(order.items) ? order.items : JSON.parse(order.items);
-    } catch (error) {
-      console.error("Error parsing order items:", error);
-      items = [];
-    }
-  
-    const printWindow = window.open('', '', 'width=300,height=600');
-  
-    if (printWindow) {
-      const printContent = `
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Customer Receipt</title>
-          <style>
-            body {
-              font-family: monospace;
-              font-size: 12px;
-              padding: 5px;
-              margin: 0;
-              width: 260px;
-              word-wrap: break-word;
-              text-align: left;
-            }
-            .header {
-              text-align: center;
-              font-weight: bold;
-              font-size: 14px;
-            }
-            .info, .footer {
-              text-align: center;
-              font-size: 12px;
-              margin: 2px 0;
-            }
-            .line {
-              border-top: 1px dashed black;
-              margin: 6px 0;
-            }
-            table {
-              width: 100%;
-              font-size: 12px;
-              border-collapse: collapse;
-            }
-            td {
-              padding: 2px 0;
-            }
-            .total {
-              font-weight: bold;
-              text-align: right;
-              margin-top: 5px;
-            }
-          </style>
-        </head>
-        <body onload="window.print(); window.close();">
-          <div class="header">LONGFORD Royal Center</div>
-          <div class="info">Odeneho Kwadaso, KUMASI</div>
-          <div class="info">longfordroyalcentre@yahoo.com</div>
-          <div class="info">0595579928 / 0247903072</div>
-          <div class="line"></div>
-          <div class="info"><strong>Customer Receipt</strong></div>
-          <div class="info">Order ID: ${order.id}</div>
-          <div class="info">Date: ${new Date(order.created_at).toLocaleString()}</div>
-          <div class="line"></div>
-  
-          <table>
-            ${items.map(item => `
-              <tr>
-                <td>${item.name || "N/A"} x${item.qty || 0}</td>
-                <td style="text-align:right;">₵${((parseFloat(item.price) || 0) * (parseInt(item.qty) || 0)).toFixed(2)}</td>
-              </tr>
-            `).join('')}
-          </table>
-  
-          <div class="line"></div>
-          <div class="total">Total: ₵${parseFloat(order.total).toFixed(2)}</div>
-          <div class="line"></div>
-          <div class="footer">Please keep this as your proof of purchase.</div>
-          <div class="footer">Thank you!</div>
-          <div class="footer">-----------------------------</div>
-        </body>
-        </html>
-      `;
-  
-      printWindow.document.open();
-      printWindow.document.write(printContent);
-      printWindow.document.close();
-    }
+  let items: any[] = [];
+
+  try {
+    items = Array.isArray(order.items) ? order.items : JSON.parse(order.items);
+  } catch (error) {
+    console.error("Error parsing order items:", error);
+    items = [];
   }
-  
-  
+
+  const printWindow = window.open('', '', 'width=300,height=800');
+
+  if (printWindow) {
+    const printContent = `
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Customer Receipt</title>
+        <style>
+          @media print {
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
+            body {
+              margin: 0;
+            }
+          }
+
+          body {
+            font-family: monospace, 'Courier New', sans-serif;
+            font-size: 13px;
+            padding: 5px;
+            width: 80mm;
+            box-sizing: border-box;
+          }
+
+          .header {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 2px;
+          }
+
+          .info, .footer {
+            text-align: center;
+            margin: 2px 0;
+          }
+
+          .line {
+            border-top: 1px dashed #000;
+            margin: 6px 0;
+          }
+
+          table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+          }
+
+          td {
+            padding: 2px 0;
+            word-break: break-word;
+          }
+
+          .item-name {
+            width: 60%;
+          }
+
+          .item-price {
+            width: 40%;
+            text-align: right;
+          }
+
+          .total {
+            font-weight: bold;
+            font-size: 14px;
+            text-align: right;
+            margin-top: 4px;
+          }
+        </style>
+      </head>
+      <body onload="window.print(); window.close();">
+        <div class="header">Longford</div>
+        <div class="info">Krofrom KUMASI</div>
+        <div class="info">Attendant: ${this.user[0]?.firstname +' '+ this.user[0]?.lastname}</div>
+        <div class="line"></div>
+        <div class="info"><strong>Customer Receipt</strong></div>
+        <div class="info">Order ID: ${order.id}</div>
+        <div class="info">Date: ${new Date(order.created_at).toLocaleString()}</div>
+        <div class="line"></div>
+
+        <table>
+          ${items.map(item => `
+            <tr>
+              <td class="item-name">${item.name || 'N/A'}</td>
+              <td class="item-price">
+                ₵${parseFloat(item.price).toFixed(2)} x${item.qty}<br>
+                = ₵${((+item.price || 0) * (+item.qty || 0)).toFixed(2)}
+              </td>
+            </tr>
+          `).join('')}
+        </table>
+
+        <div class="line"></div>
+        <div class="total">Total: ₵${parseFloat(order.total).toFixed(2)}</div>
+        <div class="line"></div>
+        <div class="footer">Keep this as your proof of purchase.</div>
+        <div class="footer">Thank you!</div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+  } else {
+    console.error('Failed to open print window');
+  }
+}
+
+
+
   
   loadOrders() {
     this.cartService.getOrders().subscribe((data: any[]) => {
@@ -594,121 +654,168 @@ loadHeldCartAll(): void {
 
 
 
+  
+  async checkManager(){
+    const ask:string = this.createForm.value.username;
+    this.createForm.patchValue({cashier:ask});
+    const password ={
+      username:ask
+    }
+    try{
+
+      var res = await this.userService.findManager(password);
+      if(res) this.admin=true; this.closePopup();
+
+    }
+
+    catch(err){
+
+      alert("username is incorrect");
+    }
+  }
+
+
+
   logOut(){
     this.userService.logout();
   }
-  printBill() {
-    const currentDate = new Date().toLocaleString();
-  
-    const printWindow = window.open('', '', 'width=300,height=600');
-    if (printWindow) {
-      let receiptContent = `
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>Receipt</title>
-          <style>
-            body {
-              font-family: monospace;
-              font-size: 12px;
-              width: 260px;
+ printBill() {
+  const currentDate = new Date().toLocaleString();
+
+  const printWindow = window.open('', '', 'width=300,height=800');
+
+  if (printWindow) {
+    let receiptContent = `
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>INVOICE</title>
+        <style>
+          @media print {
+            @page {
+              size: 80mm auto;
               margin: 0;
-              padding: 5px;
-              word-wrap: break-word;
-              text-align: left;
             }
-            .header {
-              text-align: center;
-              font-weight: bold;
-              font-size: 14px;
-              margin-bottom: 5px;
+            body {
+              margin: 0;
             }
-            .info {
-              text-align: center;
-              font-size: 12px;
-              margin: 2px 0;
-            }
-            .line {
-              border-top: 1px dashed black;
-              margin: 6px 0;
-            }
-            table {
-              width: 100%;
-              font-size: 12px;
-              border-collapse: collapse;
-            }
-            th, td {
-              padding: 4px 0;
-              text-align: left;
-            }
-            td:last-child, th:last-child {
-              text-align: right;
-            }
-            .total {
-              font-weight: bold;
-              font-size: 13px;
-              text-align: right;
-              margin-top: 5px;
-            }
-            .footer {
-              text-align: center;
-              font-size: 12px;
-              margin-top: 8px;
-            }
-          </style>
-        </head>
-        <body onload="window.print(); window.close();">
-          <div class="header">LONGFORD City </div>
-          <div class="info">KOFROM, KUMASI</div>
-          <div class="info">longfordroyalcentre@yahoo.com</div>
-          <div class="line"></div>
-          <div class="info">Date: ${currentDate}</div>
-          <div class="line"></div>
-  
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Qty</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-  
-      this.cartItems.forEach(item => {
-        receiptContent += `
-          <tr>
-            <td>${item.name}</td>
-            <td>${item.qty}</td>
-            <td>₵${(item.price * item.qty).toFixed(2)}</td>
-          </tr>
-        `;
-      });
-  
+          }
+
+          body {
+            font-family: monospace, 'Courier New', sans-serif;
+            font-size: 13px;
+            padding: 5px;
+            width: 80mm;
+            box-sizing: border-box;
+          }
+
+          .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 4px;
+          }
+
+          .info {
+            text-align: center;
+            font-size: 12px;
+            margin: 2px 0;
+          }
+
+          .line {
+            border-top: 1px dashed black;
+            margin: 6px 0;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+          }
+
+          th, td {
+            padding: 2px 0;
+            word-break: break-word;
+          }
+
+          th {
+            text-align: left;
+          }
+
+          td:last-child, th:last-child {
+            text-align: right;
+          }
+
+          .total {
+            font-weight: bold;
+            font-size: 14px;
+            text-align: right;
+            margin-top: 5px;
+          }
+
+          .footer {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 8px;
+          }
+        </style>
+      </head>
+      <body onload="window.print(); window.close();">
+        <div class="header">Longford city</div>
+        <div class="info">Krofrom, KUMASI</div>
+        <div class="info">Attendant: ${this.user[0]?.firstname +' '+ this.user[0]?.lastname}</div>
+       <div class="line"> </div>
+        <div class="info"><strong>INVOICE</strong></div>
+        <div class="info">Date: ${currentDate}</div>
+        <div class="line"></div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Qty</th>
+              <th>Amt</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    this.cartItems.forEach(item => {
       receiptContent += `
-            </tbody>
-          </table>
-  
-          <div class="line"></div>
-          <div class="total">Total: ₵${this.total.toFixed(2)}</div>
-          <div class="line"></div>
-          <div class="footer">Thank you for your purchase!</div>
-          <div class="footer">-----------------------------</div>
-        </body>
-        </html>
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.qty}</td>
+          <td>₵${(item.price * item.qty).toFixed(2)}</td>
+        </tr>
       `;
-  
-      printWindow.document.open();
-      printWindow.document.write(receiptContent);
-      printWindow.document.close();
-    }
+    });
+
+    receiptContent += `
+          </tbody>
+        </table>
+
+        <div class="line"></div>
+        <div class="total">Total: ₵${this.total.toFixed(2)}</div>
+        <div class="line"></div>
+        <div class="footer">Thank you for your purchase!</div>
+        <div class="footer">-----------------------------</div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(receiptContent);
+    printWindow.document.close();
   }
-  
+}
+
   
   openSales(){
     this.router.navigate(['/daily-income'])
   }
+
+
+  
 
 }
 

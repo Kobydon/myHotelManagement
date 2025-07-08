@@ -57,6 +57,8 @@ import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.c
 import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-summary-two.component';
 import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-payment.component';
 import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-side.component';
+import { StockSheetComponent } from 'app/stock-sheet/stock-sheet.component';
+import { PrintVorcherComponent } from 'app/print-vorcher/print-vorcher.component';
 
 
 
@@ -104,7 +106,7 @@ export const AdminLayoutRoutes: Routes = [
     {path:'item-category',component:ItemCategoryComponent},
     {path:'item-store',component:StoreComponent},
     {path:'item-stock',component:StockComponent},
-
+      {path:'stock-sheet',component:StockSheetComponent},
     {path:'department',component:DepartmentsComponent},
     {path:'item-transfer',component:TransferStockComponent},
     {path:'vendor',component:VendorComponent},
@@ -119,5 +121,6 @@ export const AdminLayoutRoutes: Routes = [
     {path:'all-sessions',component:AllSessionsComponent},
     {path:'add-event-payment',component:AddEventPaymentComponent},
     {path:'outside-stock-transfer',component:OutsideStockSideComponent},
+    {path:'print-voucher',component:PrintVorcherComponent},
 
 ]

@@ -49,7 +49,7 @@
           <!-- Reports Section -->
           <div *ngIf="paymentForm.value.dates" id="excel-table">
             <h1>Date: {{paymentForm.value.dates}}</h1>
-            <!-- Room Payments -->
+<!--          
             <h5 class="text-gray-500">Room Report</h5>
             <p>Bookings</p>
             <table class="table table-bordered" >
@@ -63,7 +63,7 @@
                   <th>Room Type</th>
                   <th>Check In</th>
                   <th>Check Out</th>
-                  <!-- <th>Payment Date | Time</th> -->
+                
                 </tr>
               </thead>
               <tbody>
@@ -76,7 +76,7 @@
                   <td>{{ payment.room_type }}</td>
                   <td>{{ payment.checkin_date | date  }}</td>
                   <td>{{ payment.checkout_date | date }}</td>
-                  <!-- <td>{{ payment.payment_date | date  }}</td> -->
+                 
                 </tr>
                 <tr>
                   <td colspan="9" class="text-end bg-light">
@@ -105,9 +105,9 @@
                 </tr>
               </tbody>
             </table>
+ -->
 
-
-            <p>Restaurant & Bar Sales</p>
+            <p>Shop Sales</p>
             <table class="table table-bordered">
               <thead class="table-light">
                 <tr class="bg-secondary text-white">
@@ -132,7 +132,7 @@
                 </tr>
                 <tr>
                   <td colspan="5" class="text-end bg-light">
-                    <strong>Daily Restaurant & Bar Total: GH₵{{ totalPosAmount | number }}</strong>
+                    <strong>Total: GH₵{{ totalPosAmount | number }}</strong>
                   </td>
                 </tr>
               </tbody>

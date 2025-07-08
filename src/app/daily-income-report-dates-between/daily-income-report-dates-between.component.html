@@ -62,7 +62,19 @@
         
         
         </select>
+     
+
+
+  <label for="">Filter By Category</label>
+        <select formControlName="categos" id="" (ngModelChange)="findCategory()">
+          <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
+         
+          
+        
+        
+        </select>
       </form>
+
 
       <!-- Action Buttons -->
       <div class="d-flex mb-4">
@@ -80,7 +92,7 @@
         id="pdf"
       >
         <header class="text-center mb-4">
-          <h2>Longford City</h2>
+          <!-- <h2>Rismork Enterprice </h2> -->
           <p>Income and Expenditure Report</p>
           <p>
             Date: {{ createForm.value.dates | date: 'MMMM d, yyyy' }} to

@@ -24,6 +24,7 @@ export class userService {
 message:any;
 user:any;
 // https://backend.sikadwammaassociation.com
+// 'http://192.168.123.2:5000';
 private userUrl = 'http://127.0.0.1:5000';
   // private userUrl = 'https://renderdemo-hwz6.onrender.com';
  
@@ -60,6 +61,12 @@ private userUrl = 'http://127.0.0.1:5000';
   findCashier(dep:any) {
     //console.log(guest);
       return  lastValueFrom (  this.http.post(this.userUrl + '/user/find_cashier', dep, httpOptions));
+    }  
+
+
+     findManager(dep:any) {
+    //console.log(guest);
+      return  lastValueFrom (  this.http.post(this.userUrl + '/user/find_manager', dep, httpOptions));
     }  
 
 

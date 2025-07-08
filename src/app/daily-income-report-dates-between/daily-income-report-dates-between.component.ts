@@ -58,6 +58,7 @@ totalIncome=0;
 users:any;
 totalExpenditure=0;
 cashAtHand:any;
+categoryList:any;
 constructor(private fb:FormBuilder,private toastr:ToastrService,private guestService:GuestService,
   private userService:userService) { 
     this.createForm = this.fb.group({
@@ -75,6 +76,7 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
       cashier:['',Validators.required],
       paymethod:['',Validators.required],
       barrest:[Validators.required],
+      categos:[Validators.required],
     
   })  
   }
@@ -83,11 +85,24 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     this.getUser();
     this.getUsers();
     this.getCashiers();
+    this.getCategoryList();
 
   }
   
 
-
+  async getCategoryList() {
+    try {
+      // this.loading.start();
+      const res = await this.guestService.getCategoryList(); // Assuming getItemsList() fetches the items from the API
+      if (res) {
+        this.categoryList = res;
+      }
+    } catch (error) {
+      // this.toastr.error('Error fetching category list');
+    } finally {
+      // this.loading.stop();
+    }
+  }
 
   async getCashiers(){ 
     try{
@@ -157,6 +172,37 @@ catch (error) {
   }
   
 
+  
+  async findCategory(data){
+    let sum :number= 0;
+    const d = {
+      date: this.createForm.value.dates,
+      waiter:this.createForm.value.categos,
+        datetwo: this.createForm.value.datestwo
+    }
+      try{
+        this.loading.start();
+       var res = await this.guestService.searchCategoryDatesTwo(d);
+       if (res)this.incomeReport =res;
+        
+       for (let index = 0; index < this.incomeReport.length; index++) {
+        sum += parseInt(this.incomeReport[index].amount);
+       //  this.totalAmount=sum;
+        this.totalIncome=sum;
+       
+    }
+          
+          
+      
+  
+      }
+      catch(err){this.toastr.error(null,err.message)}
+  
+      finally{this.loading.stop();}
+  }
+  
+
+  
 
   async getUsers(){ 
     try{

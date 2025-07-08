@@ -67,6 +67,7 @@ export const ROUTES: RouteInfo[] = [
     
 
     { path: '/vendor',    title: ' Vendor  ',        icon:'nc-caps-small', class: '' },
+    { path: '/stock-sheet',    title: ' Vendor  ',        icon:'nc-caps-small', class: '' },
     { path: '/gop-deduction',    title: ' Gop Dedutcion  ',        icon:'nc-caps-small', class: '' },
     { path: '/all-sessions',    title: ' Sessions   ',        icon:'nc-caps-small', class: '' },
     { path: '/item-list',    title: ' Sessions   ',        icon:'nc-caps-small', class: '' },
@@ -74,6 +75,7 @@ export const ROUTES: RouteInfo[] = [
     { path: '/detailed-report-week',    title: ' week report   ',        icon:'nc-caps-small', class: '' },
     { path: '/add-event-payment',    title: ' Add Event Payment   ',        icon:'nc-caps-small', class: '' },
     { path: '/outside-stock-transfer',    title: ' Add outside stock transfer   ',        icon:'nc-caps-small', class: '' },
+     { path: '/print-voucher',    title: ' Add outside stock transfer   ',        icon:'nc-caps-small', class: '' },
 
     
 

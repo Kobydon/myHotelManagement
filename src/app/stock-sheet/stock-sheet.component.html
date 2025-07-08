@@ -1,0 +1,69 @@
+<div class="container my-4">
+  <h2 class="text-center font-weight-bold">LONGFORD CITY</h2>
+  <h4 class="text-center mb-4">RESTAURANT STOCK RECEIVED FORM</h4>
+
+  <div class="text-right mb-3">
+    <strong>SIGN:</strong> ___________________ &nbsp;&nbsp;&nbsp;
+    <strong>DATE:</strong> ___________________
+  </div>
+
+  <div *ngFor="let group of stockData; let i = index" class="mb-3">
+    <div class="card">
+      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span class="font-weight-bold">{{ group.category }}</span>
+        <button class="btn btn-light btn-sm" 
+                type="button" 
+                data-toggle="collapse" 
+                [attr.data-target]="'#collapse' + i"
+                aria-expanded="false" 
+                aria-controls="'collapse' + i">
+          Toggle
+        </button>
+      </div>
+
+      <div [id]="'collapse' + i" class="collapse show">
+        <div class="card-body p-0">
+          <div class="p-2">
+            <input type="text" class="form-control form-control-sm mb-2" placeholder="Search in {{ group.category }}..." [(ngModel)]="group.searchTerm">
+          </div>
+
+          <table class="table table-bordered table-sm mb-0">
+            <thead class="thead-light text-center">
+              <tr>
+                <th rowspan="2">ITEM</th>
+                <th colspan="8">SHIFT 1</th>
+                <th colspan="8">SHIFT 2</th>
+              </tr>
+              <tr>
+                <th>OP. STK</th><th>REC'VD</th><th>TRSF IN</th><th>TRSF OUT</th><th>SOLD</th><th>SP'LGE</th><th>CL.STK</th><th>VAR.</th>
+                <th>OP. STK</th><th>REC'VD</th><th>TRSF IN</th><th>TRSF OUT</th><th>SOLD</th><th>SP'LGE</th><th>CL.STK</th><th>VAR.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of group.items">
+                <td>{{ item.description }}</td>
+                <td *ngFor="let col of columns">
+                  <input type="text" class="form-control form-control-sm" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAFF SIGNATURE SECTION -->
+  <div class="form-group mt-4">
+    <label><strong>SHIFT 1 STAFF:</strong></label>
+    <input type="text" class="form-control" placeholder="Enter names">
+  </div>
+  <div class="form-group">
+    <label><strong>SHIFT 2 STAFF:</strong></label>
+    <input type="text" class="form-control" placeholder="Enter names">
+  </div>
+  <div class="form-group">
+    <label><strong>NOTES:</strong></label>
+    <textarea class="form-control" rows="3" placeholder="Enter any notes..."></textarea>
+  </div>
+</div>

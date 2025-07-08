@@ -77,6 +77,9 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orders.component';
 import { AddEventPaymentComponent } from './add-event-payment/add-event-payment.component';
 import { OutsideStockSideComponent } from './outside-stock-side/outside-stock-side.component';
+import { StockSheetComponent } from './stock-sheet/stock-sheet.component';
+import { PrintVorcherComponent } from './print-vorcher/print-vorcher.component';
+import { SearchPropertyComponent } from './search-property/search-property.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -92,6 +95,9 @@ import { OutsideStockSideComponent } from './outside-stock-side/outside-stock-si
         ViewDrinkOrderComponent,
         CheckTodaysOrdersComponent,
         CheckDrinkOrdersComponent,
+        SearchPropertyComponent,
+       
+        
        
   
        

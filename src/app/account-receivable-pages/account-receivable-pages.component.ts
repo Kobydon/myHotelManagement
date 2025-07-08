@@ -27,7 +27,7 @@ export class AccountReceivablePagesComponent implements OnInit {
   page = 1;
   pageSize: number = 10;
   header:any;
-
+  HeldList: any;
  yester_daytodate:any;
   room_info:any;
   booking_info:any;
@@ -40,7 +40,7 @@ export class AccountReceivablePagesComponent implements OnInit {
   guestList:any;
   roomList:any;
   yesterdayList:any;
-  
+  totalHeldAmount=0;
   paymentList:any;
   day_difference:any;
   payList:any;
@@ -64,6 +64,7 @@ export class AccountReceivablePagesComponent implements OnInit {
   orderList:any;
  receivedList:any;
  stockList:any;
+ heldCart:any;
  returnList:any;
   constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
     private paymentService:PaymentService,private guestService:GuestService,private userService:userService,
@@ -140,6 +141,7 @@ export class AccountReceivablePagesComponent implements OnInit {
     async searchDates() {
       try {
         this.loading.start();
+        this.loadHeldOrders();
     
         const selectedDate = this.paymentForm.value.dates;
         if (!selectedDate) {
@@ -175,6 +177,44 @@ export class AccountReceivablePagesComponent implements OnInit {
       }
     }
     
+    
+     
+
+    loadHeldOrders() {
+      const selectedDate = this.paymentForm.value.dates;
+       const d = { date: selectedDate,date_two:this.paymentForm.value.date_two };
+      this.guestService.getHeldReportOrdersTwo(d).subscribe((data) => {
+        console.log("API Response:", data); // Debugging: Check if data is received
+    
+        if (!Array.isArray(data) || data.length === 0) {
+          console.log("No held orders found.");
+          this.HeldList = []; // Set empty array if no data
+          this.totalHeldAmount = 0;
+          return;
+        }
+    
+        // Ensure 'items' is always an array and convert price to a number
+        this.HeldList = data.map((order: any) => ({
+          ...order,
+          items: Array.isArray(order.items)
+            ? order.items.map((item: any) => ({
+                ...item,
+                price: Number(item.price) || 0, // Convert price to a number
+                qty: Number(item.qty) || 0 // Ensure qty is a number
+              }))
+            : []
+        }));
+    
+        console.log("Processed HeldList:", this.HeldList);
+        this.calculateTotal();
+      });
+    }
+    
+    calculateTotal() {
+      this.totalHeldAmount = this.HeldList.reduce((sum, order) =>
+        sum + order.items.reduce((subSum, item) => subSum + (item.qty * item.price), 0)
+      , 0);
+    }
     
     
     

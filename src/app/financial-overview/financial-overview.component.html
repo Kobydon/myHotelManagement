@@ -34,7 +34,7 @@
       <!-- Financial Overview Section -->
       <div *ngIf="incomeReport.length > 0 || expenditureReport.length > 0 || gopList.length > 0; else noReport" id="pdf">
         <header class="text-center mb-4">
-          <h2>Longford City</h2>
+          <!-- <h2>Longford City</h2> -->
           <p>Financial Overview</p>
           <p>Date: {{ createForm.value.dates | date:'MMMM d, yyyy' }}</p>
         </header>

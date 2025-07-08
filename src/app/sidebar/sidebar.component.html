@@ -123,7 +123,7 @@ li{
       <li>
         <a id="fina" style="font-size: small;"  routerLink="refund-list"><i id="fina" class="fa fa-money " >&nbsp;</i>Refund</a>
       </li>
-
+-
         <li   class="transparent" >
           <a id="fina" ><i id="fina" class="fa fa-bed " >&nbsp;</i><span>Room &nbsp;</span>
        
@@ -173,7 +173,7 @@ li{
           </div> 
     
     
- 
+       
 
           <li  class="transparent" >
             <a id="fina"  *ngIf="user[0].roles=='admin'"  ><i id="fina" class="fa fa-users " >&nbsp;</i><span>Employee&nbsp;</span>
@@ -222,7 +222,7 @@ li{
 
               
       <li   class ="transparent">
-        <a id="fina"*ngIf="user[0].roles=='receptionist' || user[0].roles=='admin' "  ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
+        <a id="fina"*ngIf="user[0].roles=='admin' "  ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
           <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
         </a>
       </li>
@@ -306,7 +306,7 @@ li{
             <!-- <i id="fina" class=""></i> Icon for PDF Download -->
     
             <li   >
-              <a id="fina" routerLink="daily-income-dates" ><i id="fina" class="fa fa-calendar"  >&nbsp;</i><span>Weekly Income&nbsp;</span>
+              <a id="fina" routerLink="daily-income-dates" ><i id="fina" class="fa fa-calendar" id="fina" *ngIf="user[0].roles=='admin'"  >&nbsp;</i><span>Weekly Income&nbsp;</span>
                
               </a>
 
@@ -345,6 +345,7 @@ li{
         
           <li> <a id="fina"style="font-size: small;"  routerLink="/item-receieved"><i id="fina" class=" fa fa-list " >&nbsp;</i>Received Items  </a></li> 
           <li> <a id="fina"style="font-size: small;"  routerLink="/return-request"><i id="fina" class="  fa fa-hand-lizard-o" >&nbsp;</i>Return Request </a></li>
+          <li> <a id="fina"style="font-size: small;"  routerLink="/print-voucher"><i id="fina" class=" fa fa-print " >&nbsp;</i>Purchase Voucher  </a></li> 
           <li class="transparent">
             <a id="fina"class="" ><i id="fina" class="fa fa-hourglass-3" >&nbsp;</i><span>Stock &nbsp;</span>
               <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
@@ -352,9 +353,12 @@ li{
             <div class="dropdown-container">
               <li> <a id="fina"style="font-size: small;" routerLink="item-stock"><i id="fina" class="	fa fa-pencil" >&nbsp;</i>Manage Stock</a></li>
               <li> <a id="fina"style="font-size: small;" routerLink="item-transfer"><i id="fina" class="	fa fa-exchange" >&nbsp;</i>Transfer Stock</a></li>  
-              <li> <a id="fina"style="font-size: small;" routerLink="outside-stock-transfer"><i id="fina" class="	fa fa-exchange" >&nbsp;</i>Transfer Out</a></li>  
+              <li> <a id="fina"style="font-size: small;" routerLink="outside-stock-transfer"><i id="fina" class="	fa fa-exchange" >&nbsp;</i>Transfer Out</a></li> 
+               <!-- <li> <a id="fina"style="font-size: small;" routerLink="stock-sheet"><i id="fina" class="	fa fa-file`" >&nbsp;</i>Stock Sheet</a></li>  -->
               
               <li> <a id="fina"style="font-size: small;"  routerLink="/todo-list"><i id="fina" class=" fa fa-tachnometer " >&nbsp;</i>Stock Usage  </a></li> 
+              
+              
         
             </div> 
       

@@ -66,6 +66,8 @@ import { TodaysFoodChefComponent } from 'app/todays-food-chef/todays-food-chef.c
 import { DetailedSummaryTwoComponent } from 'app/detailed-summary-two/detailed-summary-two.component';
 import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-payment.component';
 import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-side.component';
+import { StockSheetComponent } from 'app/stock-sheet/stock-sheet.component';
+import { PrintVorcherComponent } from 'app/print-vorcher/print-vorcher.component';
 
 
     
@@ -110,7 +112,7 @@ import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-
     LedgerPagesComponent,
     AccountReceivablePagesComponent,
     GopDeductionComponent,
- 
+   StockSheetComponent,
     BookingsComponent,
     PaymentComponent,
 
@@ -126,7 +128,7 @@ import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-
     IncomeComponent,
     BudgetComponent,
     BudgetReportComponent,TodaysFoodChefComponent,
-    DailyIncomeReportComponent,ReceivedItemsComponent,DetailedSummaryTwoComponent,
+    DailyIncomeReportComponent,ReceivedItemsComponent,DetailedSummaryTwoComponent,PrintVorcherComponent,
 
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,

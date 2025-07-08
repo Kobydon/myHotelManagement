@@ -69,6 +69,9 @@ addExpense(dep:any) {
         return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_chef_list'));
       }
   
+       async getStockItems(): Promise<any[]> {
+    return await lastValueFrom(this.http.get<any[]>(`${this.guestUrl}/guest/get_stock_items`));
+  }
 
   
   startSession(dep:any) {
@@ -473,6 +476,11 @@ getcheckOut(): Observable<any[]>{
       //console.log(guest);
         return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_itm', guest, httpOptions));
       }
+submitMultiplePurchases(cartItems: any[]) {
+  return lastValueFrom(
+    this.http.post(this.guestUrl + '/guest/add_purchase_bulk', cartItems, httpOptions)
+  );
+}
 
 
     addFamily(guest:any) {
@@ -892,6 +900,11 @@ getcheckOut(): Observable<any[]>{
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_department_dates_two', d, httpOptions));
     }
 
+        searchCategoryDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_category_dates_two', d, httpOptions));
+    }
+
+
 
 
     
@@ -1076,6 +1089,10 @@ getcheckOut(): Observable<any[]>{
             return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_return_request'));
           }
   
+
+    getPurchaseRequestsByCartId(cartId: number) {
+    return this.http.get<any[]>(`http://192.168.10.20:5000/guest/get_purchase_by_cart/${cartId}`);
+}
 }
 
 
