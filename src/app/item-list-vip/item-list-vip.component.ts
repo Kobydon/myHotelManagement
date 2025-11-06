@@ -43,6 +43,16 @@ export class ItemListVipComponent implements OnInit {
     this.getUser();
   }
 
+handleCardClick(product: any) {
+  if (+product.quantity === 0) return;
+
+  const existingItem = this.getCartItem(product);
+  if (existingItem) {
+    this.cartService.increaseQty(product);
+  } else {
+    this.cartService.addToCart(product);
+  }
+}
 
 
   async getIncomeDetails(id: string) {

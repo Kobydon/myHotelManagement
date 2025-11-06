@@ -37,6 +37,15 @@
               >
                 <i class="fa fa-file-excel-o"></i> Export
               </button>
+          <button
+  class="btn btn-danger btn-sm"
+  [ngClass]="{ 'glow-btn': showGlow }"
+  (click)="sortByExpiry()"
+>
+  Check Expiry Status
+</button>
+
+
             </div>
   
             <!-- Item table -->
@@ -47,18 +56,34 @@
                     <th scope="col">#</th>
                     <th scope="col">Item Name</th>
                     <th scope="col">Quanity</th>
+                    <th scope="col">Expiry Date</th>
                     <th scope="col">Date</th>
-                    
+
+                       <th scope="col">Status</th>
                     <!-- <th scope="col">Description</th> -->
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                     <tr *ngFor="let item of itemList | slice: (page-1) * pageSize : page * pageSize; index as i">
-                        <th>{{ i + 1 }}</th>
+                        <th>{{ item.batch_number}}</th>
                         <td>{{ item.name }}</td>
                         <td>{{ item.quantity }}</td>
+                        <td>{{item.expired_date | date}}
+                        </td>
                         <td>{{ item.created_date }}</td>
+                        <td>
+  <span 
+    [ngClass]="{
+      'text-danger fw-bold': getStatus(item.expired_date) === 'Expired',
+      'text-warning fw-bold': getStatus(item.expired_date) === 'Expiring Soon',
+      'text-success fw-bold': getStatus(item.expired_date) === 'Active'
+    }"
+  >
+    {{ getStatus(item.expired_date) }}
+  </span>
+</td>
+
 
                         <!-- <td>
                           <span [ngClass]="item.quantity > 0 ? 'text-success' : 'text-danger'">
@@ -166,6 +191,18 @@
                             formControlName="quantity"
                             class="form-control"
                             placeholder="Enter quantity"
+                           />
+                        </div>
+                      </div>
+
+                        <div class="col-md-5 pr-1">
+                        <div class="form-group">
+                          <label>Expiry date</label>
+                          <input
+                            type="date"
+                            formControlName="expired_date"
+                            class="form-control"
+                           
                            />
                         </div>
                       </div>

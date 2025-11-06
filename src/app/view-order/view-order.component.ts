@@ -39,7 +39,7 @@ ngOnInit(): void {
       console.log("🕒 Polling for held orders as fallback...");
       this.loadHeldOrders();
     }
-  }, 7000);
+  }, 5000);
   
 }
 

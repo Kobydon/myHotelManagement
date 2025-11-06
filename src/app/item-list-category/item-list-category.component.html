@@ -7,60 +7,62 @@
 />
 
 <!-- Product Cards -->
+<!-- Product Card -->
 <div class="row">
   <div class="col-md-4" *ngFor="let product of itemList">
-    <ng-container *ngIf="matchesSearch(product)">
-      <div
-        class="card p-2 position-relative"
-        [ngClass]="{ 'disabled-card': +product.quantity === 0 }"
-      >
-        <img [src]="product.image" class="img-fluid" />
-        <h6>{{ product.name }}</h6>
-        <p class="text-success">₵{{ product.price }}</p>
+    <div
+      class="card p-2 position-relative"
+      [ngClass]="{ 'disabled-card': +product.quantity === 0 }"
+      (click)="handleCardClick(product)"
+      style="cursor: pointer;"
+    >
+      <img [src]="product.image" class="img-fluid" />
+      <h6>{{ product.name }}</h6>
+      <p class="text-success">₵{{ product.price }}</p>
 
-        <!-- Out of Stock Message -->
-        <div *ngIf="+product.quantity === 0" class="out-of-stock-overlay">
-          <p class="text-danger">Out of Stock</p>
-        </div>
-
-        <!-- If item is in cart -->
-        <div *ngIf="getCartItem(product); else addButton">
-          <div class="d-flex align-items-center">
-            <button
-              class="btn btn-sm btn-light"
-              (click)="decreaseQty(product)"
-              [disabled]="+product.quantity === 0"
-            >
-              -
-            </button>
-            <span class="mx-2">{{ getCartItem(product)?.qty }}</span>
-            <button
-              class="btn btn-sm btn-light"
-              (click)="increaseQty(product)"
-              [disabled]="+product.quantity === 0"
-            >
-              +
-            </button>
-            <button
-              class="btn btn-danger btn-sm ml-2"
-              (click)="removeFromCart(product)"
-            >
-              🗑️
-            </button>
-          </div>
-        </div>
-
-        <!-- Add button if not in cart -->
-        <ng-template #addButton>
-          <button
-            class="btn btn-primary btn-sm"
-            (click)="addToCart(product)"
-            [disabled]="+product.quantity === 0"
-          >
-            Add
-          </button>
-        </ng-template>
+      <!-- Out of Stock Message (Covers the card) -->
+      <div *ngIf="+product.quantity === 0" class="out-of-stock-overlay">
+        <p class="text-danger">Out of Stock</p>
       </div>
-    </ng-container>
+
+      <!-- If item is in cart -->
+      <div *ngIf="getCartItem(product); else addButton">
+        <div class="d-flex align-items-center">
+          <button
+            class="btn btn-sm btn-light"
+            (click)="decreaseQty(product); $event.stopPropagation()"
+            disabled=""
+          >
+            -
+          </button>
+          <span class="mx-2">{{ getCartItem(product)?.qty }}</span>
+          <button
+            class="btn btn-sm btn-light"
+            (click)="increaseQty(product); $event.stopPropagation()"
+            disabled=""
+          >
+            +
+          </button>
+          <button
+            class="btn btn-danger btn-sm ml-2"
+            (click)="removeFromCart(product); $event.stopPropagation()" disabled=""
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <!-- Add button if not in cart -->
+      <ng-template #addButton>
+        <button
+          class="btn btn-primary btn-sm"
+          (click)="addToCart(product); $event.stopPropagation()"
+          disabled=""
+        >
+          Add
+        </button>
+         <!-- [disabled]="+product.quantity === 0" -->
+      </ng-template>
+    </div>
   </div>
 </div>

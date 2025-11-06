@@ -3,15 +3,22 @@
 
 
 <div class="btn-group">
-
+<div class="row">
+  <div class="col-sm-3">
   <button class="btn btn-info btn-xs" (click)="openPopup()">Cashier</button><br><br>
+  </div>
+  <div class="col-sm-3">
   <button class="btn btn-info btn-info" (click)="openPopup2()">Manager</button><br><br>
-
-  <button class="btn btn-info btn-xs" (click)="openSales()" [disabled]="!(cashier || admin)" >Sales</button><br><br>  
-
-  <button class="btn btn- btn-xs" (click)="logOut()"><i class="fa fa-lock"></i> Lock Till</button><br><br>
 </div>
-
+<div class="col-sm-3">
+  <button class="btn btn-info btn-xs" (click)="openSales()" disabled="" >Sales</button><br><br>  
+</div>
+<div class="col-sm-3">
+  <button class="btn btn- btn-xs" (click)="logOut()"><i class="fa fa-lock"></i> Lock Till</button><br><br>
+  </div>
+  </div>
+</div>
+<!-- [disabled]="!(cashier || admin)" -->
 <!-- Cart Table -->
 <table class="table table-bordered">
   <thead class="thead-light">
@@ -31,9 +38,13 @@
         <!-- <button class="btn btn-sm btn-light" (click)="increaseQty(item)">+</button> -->
       </td>
       <td>₵{{ (item.price * item.qty) | number: '1.2-2' }}</td>
-      <td>
-        <button class="btn btn-danger btn-sm" (click)="removeFromCart(item)" [disabled]="!(admin)">🗑️</button>
-      </td>
+    <td>
+  <button 
+    class="btn btn-danger btn-sm" 
+    (click)="removeFromCart(item, item.id)">
+    🗑️
+  </button>
+</td>
     </tr>
   </tbody>
 </table>
@@ -46,12 +57,12 @@
 
 <!-- Payment & Order Actions -->
 <div class="mt-3 d-flex gap-2">
-  <button class="btn btn-danger" (click)="clearCart()" [disabled]="">Cancel Order</button>
+  <button class="btn btn-danger" (click)="clearCart()" disabled="">Cancel Order</button>
   <button class="btn btn-warning" (click)="holdOrder()" [disabled]="cartItems.length === 0">
     Hold Order
   </button>
-  
-  <button class="btn btn-primary" (click)="printBill()" [disabled]="cartItems.length === 0">
+  <!-- [disabled]="cartItems.length === 0" -->
+  <button class="btn btn-primary" (click)="printBill()" >
     Print Bill 🖨️
   </button>
   
@@ -62,7 +73,17 @@
   Load All
 </button>
 
-   
+   <button class="btn btn-info" 
+
+ >
+<form [formGroup]="createForm">
+  <label for="">Customer ID
+  </label>
+<input formControlName="customer" id="" style="color: black;"  type="text" placeholder="Customer ID .." class="form-control">
+</form>
+</button>
+<button class="btn btn-success " (click)="openPopup4()">Add New</button>
+
 <button class="btn btn-info" 
 
  
@@ -75,6 +96,28 @@
   <option value="Mobile Money">MoMo</option>
   <option value="Mobile Money & Cash">MoMo  & Cash</option>
   <option value="Credit Card">Credit CArd</option>
+</select>
+</form>
+</button>
+
+<button class="btn btn-info" 
+
+ 
+[disabled]="!(cashier || admin)">
+<form [formGroup]="createForm">
+  <label for="">Discount</label>
+<select formControlName="discount" id="" style="color: black;" (change)="calDiscount(createForm.value)">
+
+  <option value="1">1</option>
+  <option value="2">2</option>
+  <option value="3">3</option>
+  <option value="4">4</option>
+   <option value="5">5</option>
+  <option value="6">6</option>
+  <option value="7">7</option>
+  <option value="8">8</option>
+   <option value="9">9</option>
+    <option value="10">10</option>
 </select>
 </form>
 </button>
@@ -198,7 +241,7 @@
       Load
     </button>
     
-      <button class="btn btn-danger btn-sm" (click)="removeHeldCart(cart.id)"  *ngIf="admin">Remove</button>
+      <!-- <button class="btn btn-danger btn-sm" (click)="removeHeldCart(cart.id)"  *ngIf="admin">Remove</button> -->
     </div>
   </li>
 </ul>
@@ -320,6 +363,84 @@
                 <div class="row">
                   <div class="update ml-auto mr-auto" >
                     <button type="submit" class="btn btn-primary btn-round" (click)="checkManager()">Submit</button>
+                  </div>
+                  
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': displayStyleCustomer }">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- {{ header }} -->
+        <i class="fa fa-close" (click)="closePopup()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12" style="width: 100%;">
+          <div class="card card-room">
+            <div class="card-header"></div>
+            <div class="card-body">
+              <form [formGroup]="createForm " (ngSubmit)="addCustomer(createForm.value)">
+                <div class="row">
+                  <div class="col-md-5 pr-1">
+                    <div class="form-group">
+                      <!-- <label>Use Name</label> -->
+                      <input
+                        type="text"
+                        formControlName="firstname"
+                        class="form-control"
+                        placeholder="Enter first name"
+                      />
+                    </div>
+
+                     <div class="form-group">
+                      <!-- <label>Use Name</label> -->
+                      <input
+                        type="text"
+                        formControlName="lastname"
+                        class="form-control"
+                        placeholder="Enter last name"
+                      />
+                    </div>
+
+                     <div class="form-group">
+                      <!-- <label>Use Name</label> -->
+                      <input
+                        type="text"
+                        formControlName="customer_new_id" disabled=""
+                        class="form-control"
+                        
+                      /> <button (click)="generateId()">Generate ID</button>
+                    </div>
+                  </div>
+
+ 
+</div>
+
+            
+
+                <div class="row">
+                  <div class="update ml-auto mr-auto" >
+                    <button type="submit" class="btn btn-primary btn-round" >Submit</button>
                   </div>
                   
                 </div>

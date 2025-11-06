@@ -59,7 +59,16 @@ matchesSearch(product: any): boolean {
   getCartItem(product: any) {
     return this.cartItems.find(item => item.name === product.name);
   }
+handleCardClick(product: any) {
+  if (+product.quantity === 0) return;
 
+  const existingItem = this.getCartItem(product);
+  if (existingItem) {
+    this.cartService.increaseQty(product);
+  } else {
+    this.cartService.addToCart(product);
+  }
+}
   // Add item to cart
   addToCart(product: any) {
     // if (!this.user?.id) return;

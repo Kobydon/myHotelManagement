@@ -14,6 +14,7 @@ import { userService } from 'app/user.service';
 export class ReceivedItemsComponent implements OnInit {
 
   @BlockUI('loading') loading!: NgBlockUI;
+  showGlow = false;
   itemList: any[] = [];
   itemsList: any[] = [];
   stockList: any[] = [];
@@ -38,6 +39,7 @@ unitList: any[] = [];
       id: ['', Validators.required],
       name: ['', Validators.required],
       quantity: ['', Validators.required],
+      expired_date: ['', Validators.required],
 
     });
   }
@@ -45,7 +47,51 @@ unitList: any[] = [];
   ngOnInit(): void {
     this.getItemsList();
     this.getItemList();
+     this.checkExpiryGlow();
   }
+
+checkExpiryGlow() {
+  const today = new Date();
+
+  // Loop through all items and check if any expire within 1 month
+  for (let item of this.itemList) {
+    const expiry = new Date(item.expired_date);
+    const timeDiff = expiry.getTime() - today.getTime();
+    const daysToExpiry = timeDiff / (1000 * 3600 * 24);
+
+    if (daysToExpiry <= 30 && daysToExpiry >= 0) {
+      this.showGlow = true;
+      return; // Stop once we find one
+    }
+  }
+
+  // If none are within 1 month
+  this.showGlow = false;
+}
+async sortByExpiry() {
+  try{
+
+
+  var res = await this.guestService.getExpiry();
+  if(res) this.itemList= res;
+    }catch(err){
+      alert(err);
+    }
+}
+isExpired(date: string | Date): boolean {
+  const today = new Date();
+  const expiry = new Date(date);
+  return expiry.getTime() < today.getTime(); // True if expired
+}
+getStatus(date: string | Date): string {
+  const today = new Date();
+  const expiry = new Date(date);
+  const diffDays = (expiry.getTime() - today.getTime()) / (1000 * 3600 * 24);
+
+  if (diffDays < 0) return 'Expired';
+  else if (diffDays <= 30) return 'Expiring Soon';
+  else return 'Active';
+}
 
 
   async getItemList() {

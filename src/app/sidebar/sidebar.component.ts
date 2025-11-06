@@ -76,6 +76,7 @@ export const ROUTES: RouteInfo[] = [
     { path: '/add-event-payment',    title: ' Add Event Payment   ',        icon:'nc-caps-small', class: '' },
     { path: '/outside-stock-transfer',    title: ' Add outside stock transfer   ',        icon:'nc-caps-small', class: '' },
      { path: '/print-voucher',    title: ' Add outside stock transfer   ',        icon:'nc-caps-small', class: '' },
+      { path: '/canceled-order',    title: ' Canceled Order  ',        icon:'nc-caps-small', class: '' },
 
     
 

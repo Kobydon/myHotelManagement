@@ -29,8 +29,9 @@ admin=false
 id:any;
 displayStyle="none";
 displayStyleManager
-
+displayStyleCustomer;
 isHeldOrder: boolean = false;
+customers:any;
   constructor(public cartService: CartService, private userService: userService,private fb:FormBuilder,private guestService:GuestService,private router:Router,
     private toatsr:ToastrService
   ) {
@@ -42,6 +43,11 @@ isHeldOrder: boolean = false;
       method :['',Validators.required],
       cashier :['',Validators.required],
       table :['',Validators.required],
+       customer :['',Validators.required],
+       discount: [0, Validators.required],
+       customer_new_id :['',Validators.required],
+       firstname: ['', Validators.required],
+       lastname: ['', Validators.required],
     })
   }
 
@@ -49,13 +55,30 @@ isHeldOrder: boolean = false;
     
     this.getUser();
     // this.loadOrders();
+    this.getCustomers();
 
     this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items;
       this.total = this.cartService.getTotal();
       this.getCurrentSession();
     });
+   this.createForm.get('discount')?.valueChanges.subscribe(() => {
+    this.calDiscount(this.createForm.value);
+  });
   }
+
+calDiscount(formValue: any): void {
+  const discount = Number(formValue.discount) || 0; // percentage
+  const totalWithoutDiscount = this.cartItems.reduce(
+    (sum, item) => sum + item.qty * item.price,
+    0
+  );
+  const discountAmount = (discount / 100) * totalWithoutDiscount;
+  this.total = totalWithoutDiscount - discountAmount;
+
+  // Optional: force Angular to update the view if it's not auto-detecting
+  // this.changeDetectorRef.detectChanges();
+}
 
   async getUser() {
     try {
@@ -90,11 +113,49 @@ isHeldOrder: boolean = false;
     this.displayStyleManager = "block";
   }
 
+   openPopup4() {
+    // this.header = action;
+    // this.createForm.reset();
+
+    this.displayStyleCustomer= "block";
+  }
+
 
   closePopup() {
     this.displayStyle = "none";
     this.displayStyleManager="none";
+    this.displayStyleCustomer="none";
   }
+
+  async addCustomer(record){
+         try{
+          var res = await this.guestService.addCustomer(record);
+          if(res) alert("successful");
+        }catch(err){alert(err)}
+  }
+
+ async getCustomers() {
+  try {
+    const res = await this.guestService.getCustomers();
+    if (res && Array.isArray(res)) {
+      this.customers = res;
+    } else {
+      this.customers = [];
+    }
+  } catch (err) {
+    console.error('Error fetching customers:', err);
+    alert('Failed to load customers');
+  }
+}
+
+generateId() {
+  try{
+  const count = this.customers && this.customers.length ? this.customers.length + 1 : 1;
+  this.createForm.patchValue({ customer_new_id: count });
+  }catch(err){
+    console.log(err);
+  }
+}
 
 
   updateOrderStatus(orderId: number, newStatus: string) {
@@ -120,11 +181,18 @@ isHeldOrder: boolean = false;
     // if (!this.user[0]?.id) return;
     this.cartService.decreaseQty( product);
   }
-  removeFromCart(product: any) {
+  removeFromCart(product: any,cartId) {
     // if (!this.user[0]?.id) return;
     this.cartService.removeFromCart( product);
+    const data ={
+      name:product.name,
+      price:product.price
+
+
+    }
+    this.guestService.removeFromCart(data);
     this.admin=false;
-  }
+  } 
   
 
   
@@ -136,6 +204,7 @@ isHeldOrder: boolean = false;
     const tot =   this.total; 
    const table = this.createForm.value.table;
     // this.clearCart();
+     this.printBill();
    this.cartService.holdCart(userId, holdId, tot, table).subscribe({
   next: (response) => {
     console.log('✅ holdCart response received');
@@ -202,7 +271,7 @@ loadHeldCartAll(): void {
         // Now we're handling all orders
         this.heldCarts = response; // Store all held orders in heldCarts array
 
-        // Optionally, you can calculate the total for all held carts
+        // Optionally, you can cdralculate the total for all held carts
         this.total = this.heldCarts.reduce((sum, cart) => sum + (cart.total || 0), 0);
 
         this.isHeldOrder = true;
@@ -298,7 +367,9 @@ loadHeldCartAll(): void {
       id:this.createForm.value.id2,
       method : this.createForm.value.method,
       cashier :this.createForm.value.cashier,
-      table: this.createForm.value.table
+      table: this.createForm.value.table,
+       discount:this.createForm.value.discount,
+       customer:this.createForm.value.customer
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -345,7 +416,9 @@ loadHeldCartAll(): void {
       method : this.createForm.value.method,
       cashier :this.createForm.value.cashier,
      
-      table: this.createForm.value.table
+      table: this.createForm.value.table,
+       discount:this.createForm.value.discount,
+       customer:this.createForm.value.customer
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -420,7 +493,8 @@ loadHeldCartAll(): void {
       id:this.createForm.value.id,
       method : this.createForm.value.method,
       cashier :this.createForm.value.cashier,
-      table:this.createForm.value.table
+      table:this.createForm.value.table,
+      customer:this.createForm.value.customer
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -461,7 +535,8 @@ loadHeldCartAll(): void {
       // id:this.createForm.value.id,
       method : this.createForm.value.method,
       table:this.createForm.value.table,
-      cashier:this.createForm.value.cashier
+      cashier:this.createForm.value.cashier,
+      customer:this.createForm.value.customer
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));

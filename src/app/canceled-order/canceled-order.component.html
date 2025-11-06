@@ -1,0 +1,190 @@
+<div class="container" *blockUI="'loading'">
+  <!-- Report Card -->
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <h4 class="card-title text-center mb-4">Canceled Order Report</h4>
+
+      <!-- Report Selection Form -->
+      <form [formGroup]="createForm" class="mb-4">
+        <div class="form-group">
+          <label for="start-date">Start Date:</label>
+          <input
+            type="date"
+            id="start-date"
+            class="form-control mb-2"
+            formControlName="dates"
+            style="max-width: 300px;"
+          />
+        </div>
+        <div class="form-group">
+          <label for="end-date">End Date:</label>
+          <input
+            type="date"
+            id="end-date"
+            class="form-control mb-2"
+            formControlName="datestwo"
+            (ngModelChange)="searchDates()"
+            style="max-width: 300px;"
+          />
+        </div>
+        <label for="">Filter By Waiter</label>
+        <select formControlName="employee" id="" (ngModelChange)="findWaiter()"  >
+          <option  *ngFor="let item of users" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
+          
+        
+        
+        </select>
+     <!-- <label for="">Filter By Cashier</label> -->
+        <!-- <select formControlName="cashier" id="" (ngModelChange)="findCashier()">
+          <option  *ngFor="let item of cashiers" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
+          
+        
+        
+        
+        </select> -->
+
+        <!-- <label for="">Filter By Method</label>
+        <select formControlName="paymethod" id="" (ngModelChange)="findMethod()">
+          <option value="Cash">Cash</option>
+          <option value="Mobile Money">MoMo</option>
+          <option value="Mobile Money & Cash">MoMo  & Cash</option>
+          <option value="Credit Card">Credit CArd</option>
+        
+        
+        </select> -->
+
+<!--         
+        <label for="">Filter By Department</label>
+        <select formControlName="barrest" id="" (ngModelChange)="findDepartment()">
+          <option value="drink">Bar</option>
+          <option value="food">Restaurant</option>
+          
+        
+        
+        </select>
+      -->
+
+
+  <!-- <label for="">Filter By Category</label>
+        <select formControlName="categos" id="" (ngModelChange)="findCategory()">
+          <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
+         
+          
+        
+        
+        </select> -->
+      </form>
+
+
+      <!-- Action Buttons -->
+      <div class="d-flex mb-4">
+        <button class="btn btn-primary mr-2" (click)="printToPdf()">
+          Print
+        </button>
+        <button id="pdfBtn" class="btn btn-secondary" (click)="downloadPdf()">
+          Download PDF
+        </button>
+      </div>
+
+      <!-- Daily Report Display -->
+      <div
+        *ngIf="incomeReport.length > 0 ; else noReport"
+        id="pdf"
+      >
+        <header class="text-center mb-4">
+          <!-- <h2>Rismork Enterprice </h2> -->
+          <p>Canceled Order Report</p>
+          <p>
+            Date: {{ createForm.value.dates | date: 'MMMM d, yyyy' }} to
+            {{ createForm.value.datestwo | date: 'MMMM d, yyyy' }}
+          </p>
+        </header>
+
+        <!-- Income Section -->
+        <section class="report-section mb-4">
+          <h5>Canceled Order</h5>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Item</th>
+                  <th>Amount (₵)</th>
+                  <th>Waiter</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of incomeReport">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.amount | currency: '₵' }}</td>
+                  <td>{{item.attendant}}</td>
+                  <td>{{item.created_date}}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="font-weight-bold">
+                  <td>Total </td>
+                  <td>{{ totalIncome | currency: '₵' }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+
+        <!-- Expenditure Section -->
+        <!-- <section class="report-section mb-4">
+         
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Expenditure Category</th>
+                  <th>Amount (₵)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of expenditureReport">
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.amount | currency: '₵' }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="font-weight-bold">
+                  <td>Total Expenditure</td>
+                  <td>{{ totalExpenditure | currency: '₵' }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section> -->
+
+        <!-- Cash at Hand Section -->
+        <section class="report-section mb-4">
+          <h5>Total</h5>
+          <p>
+            <!-- - totalExpenditure  -->
+            <strong
+              >{{ totalIncome | currency: '₵' }}</strong
+            >
+          </p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer text-right mt-5">
+          <p>
+            Generated by:
+            <strong>{{ user[0].firstname + " " + user[0].lastname }}</strong>
+          </p>
+          <p>Signature: __________________________</p>
+        </footer>
+      </div>
+
+      <!-- No Report Available Message -->
+      <ng-template #noReport>
+        <div class="alert alert-info text-center">
+          <p>No records found for the selected date range.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

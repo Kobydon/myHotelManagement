@@ -80,6 +80,7 @@ import { OutsideStockSideComponent } from './outside-stock-side/outside-stock-si
 import { StockSheetComponent } from './stock-sheet/stock-sheet.component';
 import { PrintVorcherComponent } from './print-vorcher/print-vorcher.component';
 import { SearchPropertyComponent } from './search-property/search-property.component';
+import { CanceledOrderComponent } from './canceled-order/canceled-order.component';
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -96,6 +97,7 @@ import { SearchPropertyComponent } from './search-property/search-property.compo
         CheckTodaysOrdersComponent,
         CheckDrinkOrdersComponent,
         SearchPropertyComponent,
+       
        
         
        

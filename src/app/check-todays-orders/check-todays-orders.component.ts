@@ -457,12 +457,25 @@ export class CheckTodaysOrdersComponent implements OnInit {
   
       // Calculate total amount for all held orders
       this.totalHeldAmount = this.HeldList.reduce((total, order) => {
-        const orderTotal = order.items.reduce((sum: number, item: any) => {
-          return sum + item.price * item.qty;
-        }, 0);
-        return total + orderTotal;
-      }, 0);
-  
+  const orderTotal = order.items.reduce((sum: number, item: any) => {
+    return sum + item.price * item.qty;
+  }, 0);
+  return total + orderTotal;
+}, 0);
+
+// Apply deduction rules
+// if (this.totalHeldAmount > 12000) {
+//   this.totalHeldAmount -= 3500;
+// } else if (this.totalHeldAmount > 8000) {
+//   this.totalHeldAmount -= 2500;
+// } else if (this.totalHeldAmount > 5500) {
+//   this.totalHeldAmount -= 2000;
+// } else if (this.totalHeldAmount > 3500) {
+//   this.totalHeldAmount -= 1000;
+// } else if (this.totalHeldAmount > 2500) {
+//   this.totalHeldAmount -= 500;
+// }
+
       // Count all 'Pending' orders
       this.pendingCount = this.HeldList.filter(order => order.status === 'Pending').length;
       this.successCount = this.HeldList.filter(order => order.status === 'Confirmed').length;

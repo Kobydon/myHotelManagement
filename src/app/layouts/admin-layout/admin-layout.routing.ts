@@ -59,6 +59,7 @@ import { AddEventPaymentComponent } from 'app/add-event-payment/add-event-paymen
 import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-side.component';
 import { StockSheetComponent } from 'app/stock-sheet/stock-sheet.component';
 import { PrintVorcherComponent } from 'app/print-vorcher/print-vorcher.component';
+import { CanceledOrderComponent } from 'app/canceled-order/canceled-order.component';
 
 
 
@@ -122,5 +123,6 @@ export const AdminLayoutRoutes: Routes = [
     {path:'add-event-payment',component:AddEventPaymentComponent},
     {path:'outside-stock-transfer',component:OutsideStockSideComponent},
     {path:'print-voucher',component:PrintVorcherComponent},
+    {path:'canceled-order',component:CanceledOrderComponent},
 
 ]

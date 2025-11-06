@@ -4,15 +4,18 @@
   class="form-control mb-3"
   placeholder="Search products..."
   [(ngModel)]="searchTerm"
+  (input)="onSearchChange()"
 />
 
 <!-- Product Cards -->
 <div class="row">
-  <div class="col-md-4" *ngFor="let product of itemList">
+  <div class="col-md-4" *ngFor="let product of filteredItemList">
     <ng-container *ngIf="matchesSearch(product)">
       <div
         class="card p-2 position-relative"
         [ngClass]="{ 'disabled-card': +product.quantity === 0 }"
+        (click)="handleCardClick(product)"
+        style="cursor: pointer;"
       >
         <img [src]="product.image" class="img-fluid" />
         <h6>{{ product.name }}</h6>
@@ -28,22 +31,22 @@
           <div class="d-flex align-items-center">
             <button
               class="btn btn-sm btn-light"
-              (click)="decreaseQty(product)"
-              [disabled]="+product.quantity === 0"
+              (click)="decreaseQty(product); $event.stopPropagation()"
+              disabled=""
             >
               -
             </button>
             <span class="mx-2">{{ getCartItem(product)?.qty }}</span>
             <button
               class="btn btn-sm btn-light"
-              (click)="increaseQty(product)"
-              [disabled]="+product.quantity === 0"
+              (click)="increaseQty(product); $event.stopPropagation()"
+              disabled=""
             >
               +
             </button>
             <button
               class="btn btn-danger btn-sm ml-2"
-              (click)="removeFromCart(product)"
+              (click)="removeFromCart(product); $event.stopPropagation()" disabled=""
             >
               🗑️
             </button>
@@ -54,8 +57,8 @@
         <ng-template #addButton>
           <button
             class="btn btn-primary btn-sm"
-            (click)="addToCart(product)"
-            [disabled]="+product.quantity === 0"
+            (click)="addToCart(product); $event.stopPropagation()"
+            disabled=""
           >
             Add
           </button>

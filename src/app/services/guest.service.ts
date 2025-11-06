@@ -16,7 +16,7 @@ const httpOptions = {
 export class GuestService {
 
   // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private guestUrl = 'http://127.0.0.1:5000';
+  private guestUrl = 'http://127.0.0.1:5000'
 
   // 
 
@@ -31,8 +31,15 @@ getrooms():Observable<any[]>{
    return this.http.get<any[]>(this.guestUrl + '/room/get_room');
 }
 
+
 getGuests(){
   return  lastValueFrom(this.http.get<any[]>(this.guestUrl + '/guest/get_all_guest')) ;
+}
+
+
+
+getCustomers(){
+  return  lastValueFrom(this.http.get<any[]>(this.guestUrl + '/guest/get_customers')) ;
 }
 
 CustomReservation(){
@@ -42,6 +49,10 @@ CustomReservation(){
 
 allReservation(){
   return  lastValueFrom(this.http.get<any[]>(this.guestUrl + '/guest/get_all_reserve')) ;
+}
+
+getExpiry(){
+  return  lastValueFrom(this.http.get<any[]>(this.guestUrl + '/guest/get_expiry')) ;
 }
 
 
@@ -56,6 +67,12 @@ addExpense(dep:any) {
   //console.log(guest);
     return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_expense', dep, httpOptions));
   }  
+
+  addCustomer(dep:any) {
+  //console.log(guest);
+    return  lastValueFrom (  this.http.post(this.guestUrl + '/guest/add_customer', dep, httpOptions));
+  }  
+  
 
   addChef(dep:any) {
     //console.log(guest);
@@ -822,6 +839,10 @@ submitMultiplePurchases(cartItems: any[]) {
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_income_dates_two', d, httpOptions));
     }
 
+
+ searchCanceledDate(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_canceled_dates_two', d, httpOptions));
+    }
     searchChefDatesTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_chef_dates_two', d, httpOptions));
     }
@@ -889,6 +910,15 @@ submitMultiplePurchases(cartItems: any[]) {
     searchWaiterDatesTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_waiter_dates_two', d, httpOptions));
     }
+      searchattendantDatesTwo(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_attendant_dates_two', d, httpOptions));
+    }
+
+    removeFromCart(d){
+      return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/remove_held_order', d, httpOptions));
+    }
+
+
 
 
     searchMethodDatesTwo(d){

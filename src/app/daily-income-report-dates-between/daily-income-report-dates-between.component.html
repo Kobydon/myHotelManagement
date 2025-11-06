@@ -28,12 +28,12 @@
           />
         </div>
         <label for="">Filter By Waiter</label>
-        <select formControlName="employee" id="" (ngModelChange)="findWaiter()">
+        <!-- <select formControlName="employee" id="" (ngModelChange)="findWaiter()"  disabled="">
           <option  *ngFor="let item of users" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
           
         
         
-        </select>
+        </select> -->
      <label for="">Filter By Cashier</label>
         <select formControlName="cashier" id="" (ngModelChange)="findCashier()">
           <option  *ngFor="let item of cashiers" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
@@ -84,6 +84,8 @@
         <button id="pdfBtn" class="btn btn-secondary" (click)="downloadPdf()">
           Download PDF
         </button>
+        <button class="btn btn-success" (click)="filterByMostPayment()">Filter by Most Payment</button>
+        <button class="btn btn-info" (click)="filterByMostPaymentCustomer()">Filter by Most Payment</button>
       </div>
 
       <!-- Daily Report Display -->
@@ -109,6 +111,8 @@
                 <tr>
                   <th>Income Category</th>
                   <th>Amount (₵)</th>
+                  <th>Discount</th>
+                  <th>Customer</th>
                   <th>Cashier</th>
                 </tr>
               </thead>
@@ -116,6 +120,8 @@
                 <tr *ngFor="let item of incomeReport">
                   <td>{{ item.name }}</td>
                   <td>{{ item.amount | currency: '₵' }}</td>
+                  <td>{{ item.discount }}</td>
+                  <td>{{ item.customer }}</td>
                   <td>{{item.cashier}}</td>
                 </tr>
               </tbody>

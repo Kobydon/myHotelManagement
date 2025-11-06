@@ -50,7 +50,7 @@ export class ViewDrinkOrderComponent implements OnInit {
     this.loadHeldOrders(); // fallback check
     console.log("🕒 Fallback polling for new held orders...");
   }
-}, 7000); // poll every 30 seconds
+}, 5000); // poll every 30 seconds
 
 
   // 🔔 React to subject notification

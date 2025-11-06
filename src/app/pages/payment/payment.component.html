@@ -236,7 +236,7 @@
                     <div class="form-group">
                         <label for="phone">Discount </label>
                         <select id="idType" formControlName="discount"  class="form-control"
-                         (ngModelChange)="calDiscount(paymentForm.value)">
+                         (change)="calDiscount(paymentForm.value)">
                           <option value="" hidden> Apply Discount</option>
                           <option value="0" selected>0%</option>
                           <option value="10">10%</option>

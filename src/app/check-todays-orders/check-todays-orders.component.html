@@ -49,10 +49,9 @@
             <!-- Reports Section -->
             <div *ngIf="paymentForm.value.dates" id="excel-table">
              
-
-                <!-- <p>Total Held Amount: GH₵{{ totalHeldAmount }}</p>
+ <p>Total Held Amount: GH₵{{ totalHeldAmount }}</p>
 <p>Total Pending Orders: {{ pendingCount }}</p>
-<p>Confirmed Orders: {{ successCount }}</p> -->
+<p>Confirmed Orders: {{ successCount }}</p> 
 
               
               <p>Held Orders</p>
@@ -65,7 +64,7 @@
                     <th>Subtotal</th>
                     <th>Waiter</th>
                     <th>Food Was Confirmed By</th>
-                    <!-- <th>Drink Was Confirmed By</th> -->
+                    <th>Drink Was Confirmed By</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -85,7 +84,7 @@
                       <td>GH₵{{ item.qty * item.price }}</td>
                       <td>{{ order.waiter }}</td>
                       <td>{{order.food_confirm}}</td>
-                      <!-- <td>{{order.drink_confirm}}</td> -->
+                      <td>{{order.drink_confirm}}</td>
                       <td>{{ order.status }}</td>
                     </tr>
                   </ng-container>
@@ -93,7 +92,7 @@
                   <!-- Grand Total Row -->
                   <tr>
                     <td colspan="6" class="text-end bg-light">
-                      <strong>Total: GH₵{{ totalHeldAmount | number }}</strong>
+                      <strong>Total: GH₵{{ totalHeldAmount | number  }}</strong>
                     </td>
                   </tr>
                 </tbody>

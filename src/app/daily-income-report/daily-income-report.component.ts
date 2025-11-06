@@ -165,6 +165,23 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
     }
 
 
+filterByMostPayment() {
+  if (!this.incomeReport || this.incomeReport.length === 0) {
+    this.toastr.info('No income records available to sort.');
+    return;
+  }
+
+  // Convert amount string to number safely before sorting
+  this.incomeReport.sort((a, b) => {
+    const amountA = parseFloat(a.amount) || 0;
+    const amountB = parseFloat(b.amount) || 0;
+    return amountB - amountA; // descending order
+  });
+
+  // this.toastr.success('Filtered by most payment in descending order.');
+}
+
+
 
 
     async getUsers(){ 
@@ -194,6 +211,32 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
 
 
 
+filterByMostPaymentCustomer() {
+  if (!this.incomeReport || this.incomeReport.length === 0) {
+    this.toastr.info('No income records available to sort.');
+    return;
+  }
+
+  // Group payments by customer
+  const grouped = this.incomeReport.reduce((acc: { [key: string]: number }, curr: any) => {
+    const customer = curr.customer || 'Unknown';
+    const amount = parseFloat(curr.amount) || 0;
+    acc[customer] = (acc[customer] || 0) + amount;
+    return acc;
+  }, {});
+
+  // Sort by total payment descending
+  const sortedCustomers = Object.entries(grouped)
+    .sort(([, a], [, b]) => (b as number) - (a as number));
+
+  // Create new sorted incomeReport based on grouped totals
+  this.incomeReport = sortedCustomers.map(([customer, total]) => ({
+    customer,
+    amount: total as number,
+  }));
+
+  // this.toastr.success('Filtered customers by most payment in descending order.');
+}
 
 
     async getCashiers(){ 

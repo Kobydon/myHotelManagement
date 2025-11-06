@@ -71,6 +71,18 @@ user:any;
     console.error('Error fetching items:', error);
   }
 }
+handleCardClick(product: any) {
+  if (+product.quantity === 0) return;
+
+  const existingItem = this.getCartItem(product);
+  if (existingItem) {
+    this.cartService.increaseQty(product);
+  } else {
+    this.cartService.addToCart(product);
+  }
+}
+
+
 
 onSearchChange() {
   const term = this.searchTerm.trim().toLowerCase();

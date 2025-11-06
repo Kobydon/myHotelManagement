@@ -1,0 +1,48 @@
+/* Container Styling */
+.container {
+    padding: 20px;
+  }
+  
+  /* Header Styling */
+  header h2 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  header p {
+    margin-top: 5px;
+    color: #555;
+  }
+  
+  /* Table Styling */
+  .table th, .table td {
+    text-align: left;
+    vertical-align: middle;
+  }
+  
+  .table tfoot {
+    background-color: #f8f9fa;
+    font-weight: bold;
+  }
+  
+  /* Buttons */
+  .buttons .btn {
+    min-width: 120px;
+  }
+  
+  /* Adjust for Small Screens */
+  @media (max-width: 576px) {
+    .form-group input[type="date"] {
+      width: 100%;
+    }
+  
+    .buttons {
+      flex-direction: column;
+    }
+  
+    .buttons .btn {
+      margin-bottom: 10px;
+    }
+  }
+  
