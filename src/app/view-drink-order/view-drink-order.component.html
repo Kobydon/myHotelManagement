@@ -34,7 +34,7 @@
               {{ order.drink_status === 'yes' ? 'Pending' : order.status }}
             </span>
           </p>
-          <p>Total: ₵{{ order.total }}</p>
+          <!-- <p>Total: ₵{{ order.total }}</p> -->
   
           <div *ngFor="let item of order.items">
             <p><strong>{{ item.name }}</strong> (x{{ item.qty }})</p>
