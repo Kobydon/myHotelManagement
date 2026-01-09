@@ -55,7 +55,7 @@ customers:any;
     
     this.getUser();
     // this.loadOrders();
-    this.getCustomers();
+    // this.getCustomers();
 
     this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items;
@@ -65,6 +65,10 @@ customers:any;
    this.createForm.get('discount')?.valueChanges.subscribe(() => {
     this.calDiscount(this.createForm.value);
   });
+  
+  setInterval(() => {
+    this.checkSessionByTime();
+  }, 60000); // check every 1 minute
   }
 
 calDiscount(formValue: any): void {
@@ -450,6 +454,20 @@ loadHeldCartAll(): void {
   }
 
 
+checkSessionByTime() {
+  const now = new Date();
+  const hour = now.getHours(); // 0–23
+
+  // Close session at 5am
+  if (hour === 5 ) {
+    this.closeSession(this.createForm.value.id);
+  }
+
+  // Start session from 8am upwards
+  if (hour >= 8 ) {
+    this.startSession();
+  }
+}
 
 
 

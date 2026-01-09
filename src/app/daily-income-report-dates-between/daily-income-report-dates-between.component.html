@@ -54,25 +54,25 @@
         </select>
 
         
-        <!-- <label for="">Filter By Department</label>
-        <select formControlName="barrest" id="" (ngModelChange)="findDepartment()" disabled="">
+        <label for="">Filter By Department</label>
+        <select formControlName="barrest" id="" (ngModelChange)="findDepartment()" >
           <option value="drink">Bar</option>
           <option value="food">Restaurant</option>
           
         
         
         </select>
-      -->
+     
 
-<!-- 
+
   <label for="">Filter By Category</label>
-        <select formControlName="categos" id="" (ngModelChange)="findCategory()" disabled="">
+        <select formControlName="categos" id="" (ngModelChange)="findCategory()" >
           <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
          
           
         
         
-        </select> -->
+        </select>
       </form>
 
 
@@ -109,20 +109,20 @@
             <table class="table table-bordered table-striped">
               <thead class="thead-dark">
                 <tr>
-                  <!-- <th>Income Category</th>
+                  <th>Income Category</th>
                   <th>Amount (₵)</th>
                   <th>Discount</th>
                   <th>Customer</th>
-                  <th>Cashier</th> -->
+                  <th>Cashier</th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let item of incomeReport">
-                  <!-- <td>{{ item.name }}</td>
+                  <td>{{ item.name }}</td>
                   <td>{{ item.amount | currency: '₵' }}</td>
                   <td>{{ item.discount }}</td>
                   <td>{{ item.customer }}</td>
-                  <td>{{item.cashier}}</td> -->
+                  <td>{{item.cashier}}</td>
                 </tr>
               </tbody>
               <tfoot>
