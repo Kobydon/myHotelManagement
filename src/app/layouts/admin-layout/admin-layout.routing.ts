@@ -60,6 +60,12 @@ import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-
 import { StockSheetComponent } from 'app/stock-sheet/stock-sheet.component';
 import { PrintVorcherComponent } from 'app/print-vorcher/print-vorcher.component';
 import { CanceledOrderComponent } from 'app/canceled-order/canceled-order.component';
+import { CocktailSetupComponent } from 'app/cocktail-setup/cocktail-setup.component';
+import { AccountGroupComponent } from 'app/account-group/account-group.component';
+import { AddAccountComponent } from 'app/add-account/add-account.component';
+import { BalancesheetComponent } from 'app/balancesheet/balancesheet.component';
+import { SalaryTemplateComponent } from 'app/salary-template/salary-template.component';
+import { SalaryPaymentComponent } from 'app/salary-payment/salary-payment.component';
 
 
 
@@ -124,5 +130,13 @@ export const AdminLayoutRoutes: Routes = [
     {path:'outside-stock-transfer',component:OutsideStockSideComponent},
     {path:'print-voucher',component:PrintVorcherComponent},
     {path:'canceled-order',component:CanceledOrderComponent},
+
+      {path:'cocktail-order',component:CocktailSetupComponent},
+         {path:'account-group',component:AccountGroupComponent},
+        {path:'add-account',component:AddAccountComponent},
+          {path:'balance-sheet',component:BalancesheetComponent},
+            {path:'salary-template',component:SalaryTemplateComponent},
+             {path:'salary-payment',component:SalaryPaymentComponent},
+
 
 ]

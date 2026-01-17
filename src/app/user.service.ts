@@ -25,7 +25,7 @@ message:any;
 user:any;
 // https://backend.sikadwammaassociation.com
 // 'http://192.168.123.2:5000';
-private userUrl = 'http://192.168.10.20:5000';
+private userUrl = 'http://127.0.0.1:5000';
   // private userUrl = 'https://renderdemo-hwz6.onrender.com';
  
  

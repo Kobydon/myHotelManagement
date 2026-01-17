@@ -48,6 +48,7 @@ customers:any;
        customer_new_id :['',Validators.required],
        firstname: ['', Validators.required],
        lastname: ['', Validators.required],
+       phone: ['', Validators.required],
     })
   }
 
@@ -66,9 +67,7 @@ customers:any;
     this.calDiscount(this.createForm.value);
   });
   
-  setInterval(() => {
-    this.checkSessionByTime();
-  }, 60000); // check every 1 minute
+ 
   }
 
 calDiscount(formValue: any): void {
@@ -373,7 +372,8 @@ loadHeldCartAll(): void {
       cashier :this.createForm.value.cashier,
       table: this.createForm.value.table,
        discount:this.createForm.value.discount,
-       customer:this.createForm.value.customer
+       customer:this.createForm.value.customer,
+       phone:this.createForm.value.phone
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -422,7 +422,8 @@ loadHeldCartAll(): void {
      
       table: this.createForm.value.table,
        discount:this.createForm.value.discount,
-       customer:this.createForm.value.customer
+       customer:this.createForm.value.customer,
+       phone:this.createForm.value.phone
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -459,7 +460,7 @@ checkSessionByTime() {
   const hour = now.getHours(); // 0–23
 
   // Close session at 5am
-  if (hour === 5 ) {
+  if (hour === 5  ) {
     this.closeSession(this.createForm.value.id);
   }
 
@@ -477,7 +478,7 @@ checkSessionByTime() {
     }
     try{
       var res = await this.guestService.startSession(s);
-      if(res)  this.toatsr.success(null,"successful"); this.getCurrentSession();
+      if(res)   this.getCurrentSession();
     }catch(err) {this.toatsr.error(err)}
     
   }
@@ -512,7 +513,8 @@ checkSessionByTime() {
       method : this.createForm.value.method,
       cashier :this.createForm.value.cashier,
       table:this.createForm.value.table,
-      customer:this.createForm.value.customer
+      customer:this.createForm.value.customer,
+      phone:this.createForm.value.phone
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));
@@ -554,7 +556,9 @@ checkSessionByTime() {
       method : this.createForm.value.method,
       table:this.createForm.value.table,
       cashier:this.createForm.value.cashier,
-      customer:this.createForm.value.customer
+      customer:this.createForm.value.customer,
+      phone:this.createForm.value.phone,
+      
     };
 
     console.log("🛒 Cart Items Being Sent:", JSON.stringify(orderData.cartItems, null, 2));

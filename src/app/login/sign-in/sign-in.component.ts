@@ -98,7 +98,7 @@ export class SignInComponent implements OnInit {
     
     this.router.navigate(["/view-order"]);}
 
-    else if(this.user[0]?.roles=="waiter" ||  this.user[0]?.roles=="waitress"){
+    else if(this.user[0]?.roles=="waiter" ||  this.user[0]?.roles=="waitress" ||  this.user[0]?.roles=="sales"){
       localStorage.setItem('isWaiter','true');
       
       this.router.navigate(["/item-list"])
@@ -117,7 +117,7 @@ export class SignInComponent implements OnInit {
 
    
 
-    else if(this.user[0]?.roles=="admin" || this.user[0]?.roles=="superadmin" || this.user[0].roles=="receptionist"  ){
+    else if(this.user[0]?.roles=="admin" || this.user[0]?.roles=="superadmin" || this.user[0].roles=="receptionist"  || this.user[0].roles=="auditor" ){
       localStorage.setItem('isAdmin','true');
   
       this.router.navigate(["/dashboard"])

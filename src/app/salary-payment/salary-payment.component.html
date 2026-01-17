@@ -1,0 +1,123 @@
+<div class="card payroll-card">
+  <div class="card-header">
+    <h4>Bulk Salary Payment</h4>
+  </div>
+
+  <div class="card-body">
+    <form [formGroup]="form">
+
+      <div class="row">
+        <div class="col-md-4">
+          <label>Salary Template</label>
+          <select class="form-control"
+                  formControlName="template_id"
+                  (change)="onTemplateChange()">
+            <option value="">Select Template</option>
+            <option *ngFor="let t of templates" [value]="t.id">
+              {{ t.name }} ({{ t.position }})
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label>Session</label>
+          <input class="form-control" type="date" formControlName="session">
+        </div>
+
+        <div class="col-md-4">
+          <label>Payment Method</label>
+          <select class="form-control" formControlName="payment_method">
+            <option value="cash">Cash</option>
+            <option value="momo">Mobile Money</option>
+            <option value="bank">Bank</option>
+          </select>
+        </div>
+      </div>
+
+      <hr>
+
+      <div *ngIf="selectedTemplate" class="summary-box">
+        <div>Gross Salary: <strong>{{ gross() | number }}</strong></div>
+        <div>Deductions: <strong>{{ deductions() | number }}</strong></div>
+        <div class="net">Net Salary: {{ net() | number }}</div>
+      </div>
+
+      <button class="btn btn-success btn-pay" type="button" (click)="submit()">
+        Pay All Employees
+      </button>
+
+    </form>
+  </div>
+</div>
+
+<hr>
+
+<div class="card payroll-card mt-4">
+  <div class="card-header d-flex justify-content-between align-items-center">
+
+    <h4 class="mb-0">Salary Payment History</h4>
+
+    <div class="btn-group" role="group" aria-label="Export buttons">
+      <button class="btn btn-warning export-btn excel"
+              title="Export to Excel" (click)="exportExcel()">
+        <i class="fa fa-file-excel-o"></i> Excel
+      </button>
+
+      <button class="btn btn-success export-btn pdf-btn"
+              title="Export to PDF"
+              (click)="printToPdf()">
+        <i class="fa fa-file-pdf-o"></i> PDF
+      </button>
+    </div>
+
+  </div>
+
+  <div class="card-body">
+
+    <!-- Date Filter -->
+    <div class="row mb-3">
+      <div class="col-md-4">
+        <label>Filter by Date</label>
+        <input type="date"
+               class="form-control"
+               [(ngModel)]="dateSelected"
+               (ngModelChange)="filterByDate()">
+      </div>
+    </div>
+
+    <!-- Payment Table -->
+    <div id="pdf" class="table-responsive">
+      <table class="table table-bordered payroll-table mb-0">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Position</th>
+            <th>Net</th>
+            <th>Method</th>
+            <th>Session</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let h of history">
+            <td>{{ h.employee_name }}</td>
+            <td>{{ h.position }}</td>
+            <td class="text-success font-weight-bold">
+              {{ h.net_salary | number }}
+            </td>
+            <td>{{ h.payment_method }}</td>
+            <td>{{ h.session }}</td>
+            <td>{{ h.payment_date | date:'mediumDate' }}</td>
+          </tr>
+
+          <tr *ngIf="history.length === 0">
+            <td colspan="6" class="text-center text-muted">
+              No salary payments found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

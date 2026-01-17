@@ -4,7 +4,9 @@
   class="form-control mb-3"
   placeholder="Search products..."
   [(ngModel)]="searchTerm"
+  (ngModelChange)="searchItems(searchTerm)" 
 />
+
 
 <!-- Product Cards -->
 <!-- Product Card -->

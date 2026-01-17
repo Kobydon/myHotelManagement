@@ -18,6 +18,17 @@
                 <div class="w-100"></div>
               </div>
             </div>
+              <form [formGroup]="itemForm" class="mb-4">
+    <label for="">Filter</label>
+            <select formControlName="name" id="" (ngModelChange)="findAccountGroup()">
+          <option  *ngFor="let item of findList" value="{{item.name}}">{{item.name}}</option>
+          
+        
+        
+        
+        </select>
+        </form>
+
   
             <!-- Button group for adding and exporting -->
             <div class="btn-group" role="group" aria-label="Basic example">
@@ -27,7 +38,7 @@
                 style="float: right;"
                 (click)="openPopup('Add New')"
               >
-                Add New Item
+                Add New Group
               </button>
               <button
                 type="button"
@@ -45,12 +56,9 @@
                 <thead class="table-light">
                   <tr class="bg-secondary">
                     <th scope="col">#</th>
-                    <th scope="col">Item Name</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Vip Price </th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Group Name</th>
+
+                     <th scope="col"> Parent</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -58,17 +66,21 @@
                   <tr *ngFor="let item of itemsList; index as i">
                     <th>{{ i + 1 }}</th>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.category }}</td>
-                    <td>₵{{ item.price}}</td>
-                    <td>₵{{item.whole_price}}</td>
-                      <td>{{ item.quantity }}</td>
+                               
+                     <td *ngIf="item.subcategory=='Uncategorized'">
+                        <span class="badge badge-danger badge sm">{{item.subcategory}}</span>
 
-                      <td>
-                      <span [ngClass]="item.quantity > 0 ? 'text-success' : 'text-danger'">
-                        {{ item.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
-                      </span>
-                    </td>
-            
+
+
+  </td>
+
+      <td  *ngIf="item.subcategory!='Uncategorized'" >
+         <span class="badge badge-success badge sm">{{item.subcategory}}</span>
+
+
+
+  </td>
+
 
                     <td >
                       <!-- Vegetable Sauce -->
@@ -131,7 +143,7 @@
                     <div class="row">
                       <div class="col-md-5 pr-1">
                         <div class="form-group">
-                          <label>Item Name</label>
+                          <label>Group Name</label>
                           <input
                             type="text"
                             formControlName="name"
@@ -140,16 +152,20 @@
                           />
                         </div>
                       </div>
-  
-                      <div class="col-md-5 pr-1">
+
+                                            <div class="col-md-5 pr-1">
                         <div class="form-group">
-                          <label>Category</label>
-                          <select    formControlName="category" class="form-control">
-                            <option value=""  disabled>Select</option>
-                            <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
-                          </select>
+                          <label>Parent</label>
+                                            <select formControlName="subcategory" class="form-control">
+                                         
+                    <option value="uncategorized" selected>Uncategorized</option>
+                    <option *ngFor="let item of findList" value="{{item.name}}">{{item.name}}</option>
+                    </select>
+
                         </div>
                       </div>
+  
+
 
 <!-- 
                       <div class="col-md-5 pr-1">
@@ -163,76 +179,16 @@
 
 
                       
-                      <div class="col-md-5 pr-1">
-                        <div class="form-group">
-                          <label>Family</label>
-                          <select    formControlName="family" class="form-control">
-                            <option value="" hidden selected>Select</option>
-                            <option *ngFor="let item of familyList" value="{{item.name}}">{{item.name}}</option>
-                          </select>
-                        </div>
-                      </div>
+                     
 
 
-                           
-                      <div class="col-md-5 pr-1">
-                        <div class="form-group">
-                          <label>Unit</label>
-                          <select    formControlName="unit" class="form-control">
-                            <option value="" hidden selected>Select</option>
-                            <option *ngFor="let item of unitList" value="{{item.name}}">{{item.name}}</option>
-                          </select>
-                        </div>
-                      </div>
+                    
 
-  
-                      <div class="col-md-5 pr-1">
-                        <div class="form-group">
-                          <label>Price</label>
-                          <input
-                            type="number"
-                            formControlName="price"
-                            class="form-control"
-                            placeholder="Enter price"
-                           />
-                        </div>
-                      </div>
-
-                          
-                      <div class="col-md-5 pr-1">
-                        <div class="form-group">
-                          <label>Vip Price</label>
-                          <input
-                            type="number"
-                            formControlName="whole_price"
-                            class="form-control"
-                            placeholder="Enter price"
-                           />
-                        </div>
-                      </div>
                               
-                      <div class="col-md-5 pr-1">
-                        <div class="form-group">
-                          <label>Vip / Normal</label>
-                          <select    formControlName="wholesale" class="form-control">
-                            <option value="yes" >Vip</option>
-                             <option value="no" >retail</option>
-                          </select>
-                        </div>
-                      </div>
+                   
 
   
-                      <div class="col-md-5 pr-1">
-                        <div class="form-group">
-                          <label>Description</label>
-                          <textarea
-                            formControlName="description"
-                            class="form-control"
-                            placeholder="Enter item description"
-                            rows="4"
-                          ></textarea>
-                        </div>
-                      </div>
+                     
                     </div>
                     <!-- *ngIf="user[0]?.roles=='superadmin'" -->
   

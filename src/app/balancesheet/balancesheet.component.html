@@ -1,0 +1,113 @@
+<div class="balance-container">
+  <div class="sheet-card">
+
+    <!-- HEADER -->
+    <h2 class="company-title">Longford </h2>
+    <h3 class="sheet-title">Balance Sheet</h3>
+    <p class="sheet-date">As at {{ result?.date }}</p>
+
+    <hr class="divider">
+
+    <!-- FILTER FORM -->
+    <form [formGroup]="filterForm" class="filter-row">
+      <div>
+        <label>From Date</label>
+        <input type="date" formControlName="from_date">
+      </div>
+
+      <div>
+        <label>To Date</label>
+        <input type="date" formControlName="to_date">
+      </div>
+
+      <div class="btn-container">
+        <button class="btn-generate" (click)="fetchBalance()" [disabled]="loading">
+          {{ loading ? "Loading..." : "Generate" }}
+        </button>
+      </div>
+    </form>
+
+    <!-- RESULT -->
+    <div *ngIf="result" class="sheet-content">
+
+      <!-- ASSETS -->
+      <h4 class="section-title">Assets</h4>
+
+      <div class="row-item">
+        <span>Income</span>
+        <span>{{ result.income_total | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="row-item">
+        <span>Accounts Receivable (Credit Sales Pending)</span>
+        <span>{{ result.accounts_receivable | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="row-item">
+        <span>Stock Available for Sale</span>
+        <span>{{ result.stock_for_sale | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="row-item">
+        <span>Stock in Store</span>
+        <span>{{ result.stock_in_store | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="grand-total">
+        <span>Total Assets</span>
+        <span>{{ (result.income_total + result.accounts_receivable + result.stock_for_sale + result.stock_in_store) | number:'1.2-2' }}</span>
+      </div>
+
+      <br>
+
+      <!-- LIABILITIES -->
+      <h4 class="section-title">Liabilities</h4>
+      <h5 class="subsection-title">Current Liabilities</h5>
+
+      <div *ngFor="let cat of expenseKeys" class="category-group">
+        <div class="category-name">{{ cat }}</div>
+
+        <div *ngFor="let sub of subKeys(cat)" class="row-item">
+          <span>{{ sub }}</span>
+          <span>{{ result.expense_groups[cat][sub] | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="total-row">
+          <span>Total — {{ cat }}</span>
+          <span>{{ result.expense_totals[cat] | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <div class="grand-total">
+        <span>Total — Current Liabilities</span>
+        <span>{{ result.total_expenses | number:'1.2-2' }}</span>
+      </div>
+
+      <br>
+
+      <!-- NET ASSETS -->
+      <h4 class="section-title">Net Assets</h4>
+      <div class="grand-total">
+        <span>Net Assets</span>
+        <span>{{ result.net | number:'1.2-2' }}</span>
+      </div>
+
+      <br>
+
+      <!-- EQUITY -->
+      <h4 class="section-title">Equity</h4>
+
+      <div class="row-item">
+        <span>Retained Earnings</span>
+        <span>{{ result.net | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="grand-total">
+        <span>Total Equity</span>
+        <span>{{ result.net | number:'1.2-2' }}</span>
+      </div>
+
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,96 @@
+
+<div class="card">
+  <div class="card-header">
+    <h4>{{ editingId ? 'Edit' : 'Create' }} Salary Template</h4>
+  </div>
+
+  <div class="card-body">
+    <form [formGroup]="salaryForm">
+
+      <div class="form-group">
+        <label>Template Name</label>
+        <input class="form-control" formControlName="name">
+      </div>
+
+      <div class="form-group">
+        <label>Position</label>
+        <input class="form-control" formControlName="position">
+      </div>
+
+      <hr>
+
+      <h5>Earnings</h5>
+      <div formArrayName="earnings">
+        <div *ngFor="let e of earnings.controls; let i=index"
+             [formGroupName]="i" class="row mb-2">
+          <div class="col-md-5">
+            <input class="form-control" placeholder="Label" formControlName="label">
+          </div>
+          <div class="col-md-4">
+            <input type="number" class="form-control" placeholder="Amount" formControlName="amount">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-danger btn-sm" type="button" (click)="removeEarning(i)">Remove</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" type="button" (click)="addEarning()">+ Add Earning</button>
+
+      <hr>
+
+      <h5>Deductions</h5>
+      <div formArrayName="deductions">
+        <div *ngFor="let d of deductions.controls; let i=index"
+             [formGroupName]="i" class="row mb-2">
+          <div class="col-md-5">
+            <input class="form-control" placeholder="Label" formControlName="label">
+          </div>
+          <div class="col-md-4">
+            <input type="number" class="form-control" placeholder="Amount" formControlName="amount">
+          </div>
+          <div class="col-md-3">
+            <button class="btn btn-danger btn-sm" type="button" (click)="removeDeduction(i)">Remove</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" type="button" (click)="addDeduction()">+ Add Deduction</button>
+
+      <hr>
+
+      <button class="btn btn-primary" type="button" (click)="submit()">
+        {{ editingId ? 'Update' : 'Save' }} Template
+      </button>
+      <button *ngIf="editingId" class="btn btn-warning ml-2" type="button" (click)="resetForm()">
+        Cancel
+      </button>
+
+    </form>
+  </div>
+</div>
+
+<hr>
+
+<h4>Salary Templates</h4>
+<table class="table table-bordered table-sm">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Position</th>
+      <th>Earnings</th>
+      <th>Deductions</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let t of salaryTemplates">
+      <td>{{ t.name }}</td>
+      <td>{{ t.position }}</td>
+      <td>{{ t.earnings.length }}</td>
+      <td>{{ t.deductions.length }}</td>
+      <td>
+        <button class="btn btn-info btn-sm" (click)="editTemplate(t.id)">Edit</button>
+        <button class="btn btn-danger btn-sm ml-1" (click)="deleteTemplate(t.id)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>

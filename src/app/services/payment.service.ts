@@ -17,7 +17,7 @@ export class PaymentService {
 
   // private paymentUrl = 'https://renderdemo-w1s0.onrender.com' // URL to REST API
   // private paymentUrl = 'https://renderdemo-hwz6.onrender.com'pcar;
-  private paymentUrl = 'http://192.168.10.20:5000'
+  private paymentUrl = 'http://127.0.0.1:5000'
   constructor(private http: HttpClient,private router:Router) { }
 
   /** GET users from the server */
@@ -115,7 +115,7 @@ getWifiCode(d){
 
     
     searchPaymentHeldDates(d){
-      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/search_payment_held_date', d, httpOptions));
+      return  lastValueFrom(  this.http.post(this.paymentUrl + '/guest/ qZw2wa', d, httpOptions));
     }
 
 

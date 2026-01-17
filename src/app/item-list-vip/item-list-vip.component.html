@@ -1,3 +1,14 @@
+<!-- Search Field -->
+<input
+  type="text"
+  class="form-control mb-3"
+  placeholder="Search products..."
+  [(ngModel)]="searchTerm"
+  (ngModelChange)="searchItems(searchTerm)" 
+/>
+
+
+<!-- Product Cards -->
 <!-- Product Card -->
 <div class="row">
   <div class="col-md-4" *ngFor="let product of itemList">
@@ -9,7 +20,7 @@
     >
       <img [src]="product.image" class="img-fluid" />
       <h6>{{ product.name }}</h6>
-      <p class="text-success">₵{{ product.price }}</p>
+      <p class="text-success">₵{{ product.whole_price }}</p>
 
       <!-- Out of Stock Message (Covers the card) -->
       <div *ngIf="+product.quantity === 0" class="out-of-stock-overlay">

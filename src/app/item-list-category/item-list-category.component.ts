@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CartService } from 'app/cart.service';
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
 import { Router } from 'express';
+import { find } from 'rxjs';
 
 @Component({
   selector: 'item-list-category',
@@ -13,15 +15,20 @@ import { Router } from 'express';
 export class ItemListCategoryComponent implements OnInit {
 
 searchTerm: string = '';
-itemList: any[] = [];
+itemList: any
 filteredItemList: any[] = [];
  cartItems: any[] = [];
 user:any;
+createForm:FormGroup
  itemId: string | null = null;
  incomeDetails: any;
 
  
-   constructor(private guestService:GuestService,private cartService:CartService,private route:ActivatedRoute,private userService:userService) { }
+   constructor(private guestService:GuestService,private cartService:CartService,private route:ActivatedRoute,private userService:userService,private fb:FormBuilder) { 
+    this.fb.group({
+      find:['',Validators.required]
+    })
+   }
  
    ngOnInit(): void {
     // this.getItemsList();
@@ -29,6 +36,8 @@ user:any;
       this.cartItems = items;
     });
   
+
+   
 
     
     // Subscribe to route params changes
@@ -82,6 +91,26 @@ handleCardClick(product: any) {
   }
 }
 
+async searchItems(term: string) {
+  term = term.trim().toLowerCase();
+  if (!term) {
+    // optionally reload all items when input is empty
+    this.itemList = await this.guestService.getItemsList();
+    return;
+  }
+
+  try {
+    var ad={
+      find:term
+    }
+    const res = await this.guestService.searchItem(ad);
+    if (res) {
+      this.itemList = res;
+    }
+  } catch (error) {
+    console.error('Error searching items:', error);
+  }
+}
 
 
 onSearchChange() {

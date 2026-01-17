@@ -1,0 +1,76 @@
+<div class="cocktail-wrapper">
+
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <h3>🍹 Cocktail Setup</h3>
+    <p class="text-muted">Define ingredients and quantities used to prepare cocktails</p>
+  </div>
+
+  <!-- Cocktail Selector -->
+  <div class="card card-select">
+    <label>Select Cocktail</label>
+    <select class="form-control"
+            (change)="loadSetup($event.target.value)">
+      <option value="">-- Choose Cocktail --</option>
+      <option *ngFor="let item of cocktails" [value]="item.id">
+        {{ item.name }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Setup Card -->
+  <div class="card card-setup" *ngIf="cocktailItemId">
+
+    <div class="card-header">
+      <span>{{ isEdit ? 'Edit Cocktail Recipe' : 'Create Cocktail Recipe' }}</span>
+      <span class="badge"
+            [ngClass]="isEdit ? 'badge-success' : 'badge-warning'">
+        {{ isEdit ? 'EDIT MODE' : 'NEW SETUP' }}
+      </span>
+    </div>
+
+    <!-- Ingredients -->
+    <div class="ingredient-row"
+         *ngFor="let ing of ingredients; let i = index">
+
+      <select class="form-control ingredient"
+              [(ngModel)]="ing.ingredient_item_id">
+        <option value="">Ingredient</option>
+        <option *ngFor="let item of itemsList"
+                [value]="item.id">
+          {{ item.name }}
+        </option>
+      </select>
+
+      <input type="number"
+             min="0.1"
+             class="form-control qty"
+             [(ngModel)]="ing.quantity">
+
+      <select class="form-control unit"
+              [(ngModel)]="ing.unit">
+        <option value="shots">Shots</option>
+        <option value="ml">ML</option>
+        <option value="pcs">Pieces</option>
+      </select>
+
+      <button class="btn btn-remove"
+              (click)="removeIngredient(i)">
+        ✖
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-outline"
+              (click)="addIngredient()">
+        + Add Ingredient
+      </button>
+
+      <button class="btn btn-primary"
+              (click)="saveSetup()">
+        {{ isEdit ? 'Update Cocktail' : 'Save Cocktail' }}
+      </button>
+    </div>
+  </div>
+</div>

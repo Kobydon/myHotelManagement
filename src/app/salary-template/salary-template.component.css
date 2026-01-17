@@ -1,0 +1,148 @@
+/* Card Styling */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: none;
+  margin-bottom: 30px;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+  border-radius: 12px 12px 0 0;
+  padding: 16px 20px;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Form Styling */
+.form-group label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #2a5298;
+  box-shadow: 0 0 0 0.15rem rgba(42, 82, 152, 0.25);
+}
+
+/* Section Headers */
+h5 {
+  font-weight: 600;
+  color: #2a5298;
+  margin-bottom: 15px;
+}
+
+/* Earnings / Deductions Rows */
+.row.mb-2 {
+  background: #f8f9fc;
+  padding: 10px;
+  border-radius: 8px;
+  align-items: center;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #2a5298;
+  border-color: #2a5298;
+}
+
+.btn-primary:hover {
+  background: #1e3c72;
+  border-color: #1e3c72;
+}
+
+.btn-secondary {
+  background: #6c757d;
+}
+
+.btn-info {
+  background: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-danger {
+  background: #dc3545;
+}
+
+.btn-warning {
+  background: #ffc107;
+  color: #333;
+}
+
+/* Add Buttons */
+.btn-secondary.btn-sm {
+  margin-top: 10px;
+}
+
+/* Table Styling */
+.table {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.table thead {
+  background: #2a5298;
+  color: #fff;
+}
+
+.table th,
+.table td {
+  vertical-align: middle !important;
+  padding: 12px;
+}
+
+.table tbody tr:hover {
+  background: #f1f4fb;
+}
+
+/* Action Buttons */
+.table .btn-sm {
+  padding: 4px 12px;
+  border-radius: 16px;
+}
+
+/* Divider */
+hr {
+  margin: 25px 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Responsive Fix */
+@media (max-width: 768px) {
+  .row.mb-2 {
+    flex-direction: column;
+  }
+
+  .row.mb-2 .col-md-3,
+  .row.mb-2 .col-md-4,
+  .row.mb-2 .col-md-5 {
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .table {
+    font-size: 13px;
+  }
+}

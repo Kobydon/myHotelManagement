@@ -69,7 +69,7 @@ export class DashboardComponent implements OnInit {
       if (res) {
         this.user = res;
         // If roles are loaded, initialize chart
-        if (this.user[0]?.roles === 'admin') {
+        if (this.user[0]?.roles === 'admin' || this.user[0]?.roles === 'auditor') {
           this.initializePaymentChart();
         }
       }
@@ -82,14 +82,14 @@ export class DashboardComponent implements OnInit {
 
   ngOnChanges(changes: SimpleChanges) {
     // Make sure the chart initializes when the roles change and conditions are satisfied.
-    if (changes.user && this.user[0]?.roles === 'admin') {
+    if (changes.user && (this.user[0]?.roles === 'admin' || this.user[0]?.roles === 'auditor')) {
       this.initializePaymentChart();
     }
   }
 
   ngAfterViewInit() {
     // If the user data is already available, trigger chart initialization after the view has loaded
-    if (this.user[0]?.roles === 'admin') {
+    if (this.user[0]?.roles === 'admin' || this.user[0]?.roles === 'auditor') {
       this.initializePaymentChart();
     }
   }

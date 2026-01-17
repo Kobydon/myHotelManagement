@@ -115,17 +115,17 @@ li{
 </li>
       </div>
 
-      <li  >
+      <li   *ngIf="user[0].roles=='admin'">
         <a id="fina" routerLink="all-guest"><i id="fina" class="fa fa-user "  aria-disabled="true" >&nbsp;</i><span>Guest&nbsp;</span>
         
         </a>
       </li>
       <li>
-        <a id="fina" style="font-size: small;"  routerLink="refund-list"><i id="fina" class="fa fa-money " >&nbsp;</i>Refund</a>
+        <a id="fina" style="font-size: small;"  routerLink="refund-list"><i id="fina" class="fa fa-money "  *ngIf="user[0].roles=='admin'">&nbsp;</i>Refund</a>
       </li>
--
-        <li   class="transparent" >
-          <a id="fina" ><i id="fina" class="fa fa-bed " >&nbsp;</i><span>Room &nbsp;</span>
+
+        <li   class="transparent"  >
+          <a id="fina" ><i id="fina" class="fa fa-bed " *ngIf="user[0].roles=='admin'" >&nbsp;</i><span>Room &nbsp;</span>
        
             <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
           </a>
@@ -222,7 +222,7 @@ li{
 
               
       <li   class ="transparent">
-        <a id="fina"*ngIf="user[0].roles=='admin' "  ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
+        <a id="fina"*ngIf="user[0].roles=='admin' || user[0].roles=='auditor'  "  ><i id="fina" class="fa fa-money"  >&nbsp;</i><span>Finance&nbsp;</span>
           <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
         </a>
       </li>
@@ -234,13 +234,13 @@ li{
      
 
         <li   >
-          <a id="fina" routerLink="add-budget" ><i id="fina" class="fa fa-money"  *ngIf="user[0].roles=='admin' ">&nbsp;</i><span>Budget&nbsp;</span>
+          <a id="fina" routerLink="add-budget" ><i id="fina" class="fa fa-money"  *ngIf="user[0].roles=='admin' || user[0].roles=='auditor' ">&nbsp;</i><span>Budget&nbsp;</span>
            
           </a>
         </li>
         <li   >
         <li   >
-          <a id="fina" routerLink="expenses" ><i id="fina" class="fa fa-balance-scale" *ngIf="user[0].roles=='admin' "  >&nbsp;</i><span>Expenses&nbsp;</span>
+          <a id="fina" routerLink="expenses" ><i id="fina" class="fa fa-balance-scale" *ngIf="user[0].roles=='admin' || user[0].roles=='auditor' "  >&nbsp;</i><span>Expenses&nbsp;</span>
            
           </a>
         </li>
@@ -249,34 +249,45 @@ li{
            
           </a></li>
 
-          <li   >
-            <a id="fina" routerLink="add-event-payment" ><i id="fina" class="fa fa-calendar"  >&nbsp;</i><span>Event&nbsp;</span>
-             
-            </a></li>
+          <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' || user[0].roles=='accountant' "  ><i id="fina" class=" fa fa-dollar " >&nbsp;</i>
+          PayRoll </a></li> 
+
+            <div class="dropdown-container">
+              <li > <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' || user[0].roles=='accountant'"   routerLink="/salary-template"><i id="fina" class=" fa fa-calculator" >&nbsp;</i>
+                Salary Template</a></li> 
+
+                <li > <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin'|| user[0].roles=='accountant'"  routerLink="/salary-payment"><i id="fina" class=" fa fa-money " >&nbsp;</i>
+                 Make Payment</a></li> 
+<!-- right -->
+            </div>
+           
          
 
           <li>  <a id="fina"style="font-size: small;"  *ngIf="user[0].roles=='admin' "   routerLink="/gop-deduction" >
             <i id="fina" class="fa fa-minus"  >&nbsp;</i>GOP deductions</a></li>
        
           
-        <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' "   routerLink="/account-receivable"><i id="fina" class=" fa fa-money " >&nbsp;</i>
+        <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' || user[0].roles=='auditor' "   routerLink="/account-receivable"><i id="fina" class=" fa fa-money " >&nbsp;</i>
           Accounts Receiv. </a></li> 
 
             <div class="dropdown-container">
-              <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' "   routerLink="/account-receivable"><i id="fina" class=" fa fa-calendar-o " >&nbsp;</i>
+              <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' || user[0].roles=='auditor' "   routerLink="/account-receivable"><i id="fina" class=" fa fa-calendar-o " >&nbsp;</i>
                 Daily</a></li> 
 
                 <li class="transparent"> <a id="fina"style="font-size: small;" *ngIf="user[0].roles=='admin' "  routerLink="/account-receivable-dates"><i id="fina" class=" fa fa-calendar-o " >&nbsp;</i>
                  Dates Between</a></li> 
 <!-- right -->
             </div>
-          
+           <li> <a id="fina"style="font-size: small;" *ngIf=" user[0].roles=='admin' " routerLink="/balance-sheet"><i id="fina" class="  fa fa-balance-scale"  >&nbsp;</i>Balance Sheet  
+          <!-- <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i> -->
+        </a></li> 
+
         <li  class="transparent"> <a id="fina"style="font-size: small;" *ngIf=" user[0].roles=='admin' " routerLink="/general-ledger"><i id="fina" class="  fa fa-book"  >&nbsp;</i>General Ledger  
           <!-- <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i> -->
         </a></li> 
 
         <div class="dropdown-container">
-          <li > <a id="fina"style="font-size: small;"  routerLink="/general-ledger" *ngIf="user[0].roles=='admin' " ><i id="fina" class="  fa fa-calendar-o" >&nbsp;</i>Daily</a></li>
+          <li > <a id="fina"style="font-size: small;"  routerLink="/general-ledger" *ngIf="user[0].roles=='admin' || user[0].roles=='auditor' " ><i id="fina" class="  fa fa-calendar-o" >&nbsp;</i>Daily</a></li>
             <li > <a id="fina"style="font-size: small;"  routerLink="/general-ledger-dates" *ngIf=" user[0].roles=='admin' "><i id="fina" class="  fa fa-calendar-o"  >&nbsp;</i>Different Dates</a></li>
    
 
@@ -292,7 +303,7 @@ li{
 
         
         <li   class="transparent">
-          <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-file fa-fw " style="color: lih;">&nbsp;</i><span>Reports &nbsp;</span>
+          <a id="fina"*ngIf="user[0].roles=='admin' || user[0].roles=='auditor'" ><i id="fina" class="fa fa-file fa-fw " style="color: lih;">&nbsp;</i><span>Reports &nbsp;</span>
           <!-- <i id="fina" class="fa fa fa-caret-down"></i> -->
           <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
           </a>
@@ -306,14 +317,14 @@ li{
             <!-- <i id="fina" class=""></i> Icon for PDF Download -->
     
             <li   >
-              <a id="fina" routerLink="daily-income-dates" ><i id="fina" class="fa fa-calendar" id="fina" *ngIf="user[0].roles=='admin'"  >&nbsp;</i><span>Weekly Income&nbsp;</span>
+              <a id="fina" routerLink="daily-income-dates" ><i id="fina" class="fa fa-calendar" id="fina" *ngIf="user[0].roles=='admin' || user[0].roles=='auditor'"  >&nbsp;</i><span>Weekly Income&nbsp;</span>
                
               </a>
 
               
             </li>
              <li   >
-              <a id="fina" routerLink="canceled-order" ><i id="fina" class="fa fa-close" id="fina" *ngIf="user[0].roles=='admin'"  >&nbsp;</i><span>Canceled Order&nbsp;</span>
+              <a id="fina" routerLink="canceled-order" ><i id="fina" class="fa fa-close" id="fina" *ngIf="user[0].roles=='admin' || user[0].roles=='auditor'"  >&nbsp;</i><span>Canceled Order&nbsp;</span>
                
               </a>
 
@@ -342,7 +353,7 @@ li{
            </li>
          
        <li   class="transparent">
-          <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-building fa-fw " style="color: lih;">&nbsp;</i><span>Inventory &nbsp;</span>
+          <a id="fina"*ngIf="user[0].roles=='admin' || user[0].roles=='auditor'" ><i id="fina" class="fa fa-building fa-fw " style="color: lih;">&nbsp;</i><span>Inventory &nbsp;</span>
             <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
        
           </a>
@@ -371,7 +382,7 @@ li{
             </div> 
       
           </div>   <li >
-            <a id="fina"*ngIf="user[0].roles=='admin'" href="/item-list"><i id="fina" class="fa fa-cutlery fa-fw " style="color: lih;">&nbsp;</i><span>POS &nbsp;</span>
+            <a id="fina"*ngIf="user[0].roles=='user[0].roles=='admin' || user[0].roles=='auditor''" href="/item-list"><i id="fina" class="fa fa-cutlery fa-fw " style="color: lih;">&nbsp;</i><span>POS &nbsp;</span>
               <!-- <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i> -->
             </a>
             </li>
@@ -379,23 +390,23 @@ li{
 
 
            <li   class="transparent">
-            <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-cog fa-fw " style="color: lih;">&nbsp;</i><span>Settings &nbsp;</span>
+            <a id="fina" *ngIf="user[0].roles=='admin' || user[0].roles=='auditor'"  ><i id="fina" class="fa fa-cog fa-fw " style="color: lih;">&nbsp;</i><span>Settings &nbsp;</span>
               <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
             </a>
             </li>
             <div class="dropdown-container">
               <li   class="transparent">
-              <a id="fina"*ngIf="user[0].roles=='admin'" ><i id="fina" class="fa fa-calculator fa-fw " style="color: lih;">&nbsp;</i><span>Accounts &nbsp;</span>
+              <a id="fina"*ngIf="user[0].roles=='user[0].roles=='admin' || user[0].roles=='auditor''" ><i id="fina" class="fa fa-calculator fa-fw " style="color: lih;">&nbsp;</i><span>Accounts &nbsp;</span>
                 <i id="fina" class="fa fa-caret-down"  style="float:right;" ></i>
               </a>
               </li>
           <div class="dropdown-container-child" id="dropdown">
-            <li>
+            <!-- <li>
             <a id="fina"style="font-size: small;" routerLink="/pages/room-list"  >Account Families
               
-            </a></li>
-          <li> <a id="fina"style="font-size: small;"  routerLink="/pages/add-room-type" >Account Groups</a></li> 
-          <li> <a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Account</a></li> 
+            </a></li> -->
+   <li> <a id="fina"style="font-size: small;"  routerLink="/account-group" ><i class="fa fa-briefcase"></i>      Account Groups</a></li> 
+          <li> <a id="fina" style="font-size: small;"  routerLink="/add-account"  > <i class="fa fa-bank"></i>  Account</a></li> 
            <li> <a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Journal Voucher Codes</a></li>
            <li><a id="fina" style="font-size: small;"  routerLink="/pages/add-room"  >Import Chart of Accounts</a></li> 
   
@@ -419,6 +430,7 @@ li{
   
            <li> <a id="fina"style="font-size: small;" routerLink="item-unit"><i id="fina" class="fa fa-balance-scale" >&nbsp;</i> Item Unit</a></li>
            <li> <a id="fina"style="font-size: small;"routerLink="item-family"><i id="fina" class="fa fa-cubes" >&nbsp;</i> Item Family</a></li>
+         <li> <a id="fina"style="font-size: small;"routerLink="cocktail-order"><i id="fina" class="fa fa-cutlery" >&nbsp;</i> Ingredient Setup</a></li>
          
 
      
@@ -478,7 +490,7 @@ li{
           </a></li>
    
           <div class="dropdown-container">
-         <li>   <a id="fina"style="font-size: small;"  routerLink="/pages/payment-list">Accounts Receivable</a></li>
+         <li>   <a id="fina"style="font-size: small;"  routerLink="/account-receivable-dates">Accounts Receivable</a></li>
             
            
           </div>

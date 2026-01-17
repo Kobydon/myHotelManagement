@@ -81,6 +81,12 @@ import { StockSheetComponent } from './stock-sheet/stock-sheet.component';
 import { PrintVorcherComponent } from './print-vorcher/print-vorcher.component';
 import { SearchPropertyComponent } from './search-property/search-property.component';
 import { CanceledOrderComponent } from './canceled-order/canceled-order.component';
+import { CocktailSetupComponent } from './cocktail-setup/cocktail-setup.component';
+import { SalaryTemplateComponent } from './salary-template/salary-template.component';
+import { AllowanceComponent } from './allowance/allowance.component';
+import { DeductionComponent } from './deduction/deduction.component';
+import { SalaryPaymentComponent } from './salary-payment/salary-payment.component';
+
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
 
@@ -97,6 +103,10 @@ import { CanceledOrderComponent } from './canceled-order/canceled-order.componen
         CheckTodaysOrdersComponent,
         CheckDrinkOrdersComponent,
         SearchPropertyComponent,
+        AllowanceComponent,
+        DeductionComponent,
+      
+      
        
        
         

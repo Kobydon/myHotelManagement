@@ -69,6 +69,12 @@ import { OutsideStockSideComponent } from 'app/outside-stock-side/outside-stock-
 import { StockSheetComponent } from 'app/stock-sheet/stock-sheet.component';
 import { PrintVorcherComponent } from 'app/print-vorcher/print-vorcher.component';
 import { CanceledOrderComponent } from 'app/canceled-order/canceled-order.component';
+import { CocktailSetupComponent } from 'app/cocktail-setup/cocktail-setup.component';
+import { AddAccountComponent } from 'app/add-account/add-account.component';
+import { AccountGroupComponent } from 'app/account-group/account-group.component';
+import { BalancesheetComponent } from 'app/balancesheet/balancesheet.component';
+import { SalaryTemplateComponent } from 'app/salary-template/salary-template.component';
+import { SalaryPaymentComponent } from 'app/salary-payment/salary-payment.component';
 
 
     
@@ -127,14 +133,14 @@ import { CanceledOrderComponent } from 'app/canceled-order/canceled-order.compon
     PurchaseRequestComponent,
     AddPurchaseRequestComponent,
     IncomeComponent,
-    BudgetComponent,
+    BudgetComponent,AddAccountComponent,AccountGroupComponent,BalancesheetComponent,SalaryTemplateComponent,
     BudgetReportComponent,TodaysFoodChefComponent,
     DailyIncomeReportComponent,ReceivedItemsComponent,DetailedSummaryTwoComponent,PrintVorcherComponent,
 
     DailyIncomeReportDatesBetweenComponent,
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,
     StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent,
-    AddEventPaymentComponent,OutsideStockSideComponent,CanceledOrderComponent
+    AddEventPaymentComponent,OutsideStockSideComponent,CanceledOrderComponent,CocktailSetupComponent,SalaryPaymentComponent
 
 
 

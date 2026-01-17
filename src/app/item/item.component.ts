@@ -51,7 +51,9 @@ export class ItemComponent implements OnInit {
       description: ['', Validators.required],
       group: ['', Validators.required],
       family: ['', Validators.required],
-      unit: ['', Validators.required]
+      unit: ['', Validators.required],
+       wholesale: ['', Validators.required],
+       whole_price: ['', Validators.required],
     });
   }
 

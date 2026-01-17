@@ -1,0 +1,141 @@
+/* Container */
+.balance-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+  background: #f5f6fa;
+}
+
+.sheet-card {
+  width: 900px;
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+/* Header */
+.company-title {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  margin-bottom: 5px;
+}
+
+.sheet-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.sheet-date {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.divider {
+  margin-top: 20px;
+  margin-bottom: 25px;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+/* Form */
+.filter-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.filter-row div {
+  flex: 1;
+}
+
+.filter-row label {
+  font-size: 14px;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.filter-row input {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+}
+
+.btn-container {
+  display: flex;
+  align-items: flex-end;
+}
+
+.btn-generate {
+  width: 100%;
+  background: #0077ff;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-generate:hover:not([disabled]) {
+  background: #005fcc;
+}
+
+/* Sections */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 25px;
+}
+
+.subsection-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+  color: #333;
+}
+
+/* Category blocks */
+.category-group {
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.category-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+/* Items */
+.row-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-weight: 600;
+  padding: 6px 0;
+  border-top: 1px solid #ccc;
+}
+
+.grand-total {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  margin-top: 10px;
+  padding: 10px 0;
+  border-top: 2px solid #000;
+}

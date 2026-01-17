@@ -1,0 +1,141 @@
+/* Layout */
+.cocktail-wrapper {
+  max-width: 1100px;
+  margin: auto;
+  padding: 25px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.page-header {
+  margin-bottom: 25px;
+}
+
+.page-header h3 {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.page-header p {
+  font-size: 14px;
+}
+
+/* Cards */
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  margin-bottom: 20px;
+}
+
+.card-select {
+  max-width: 450px;
+}
+
+.card-select label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Setup Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* Badges */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.badge-success {
+  background: #28a745;
+  color: #fff;
+}
+
+.badge-warning {
+  background: #ffc107;
+  color: #000;
+}
+
+/* Ingredient Row */
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1fr 1fr 45px;
+  gap: 10px;
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.ingredient-row select,
+.ingredient-row input {
+  height: 42px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  font-size: 14px;
+}
+
+/* Remove Button */
+.btn-remove {
+  height: 42px;
+  width: 42px;
+  border-radius: 50%;
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+}
+
+.btn-remove:hover {
+  background: #bd2130;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 25px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px dashed #6c757d;
+  color: #6c757d;
+}
+
+.btn-outline:hover {
+  background: #f8f9fa;
+}
+
+.btn-primary {
+  background: #007bff;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: #0069d9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ingredient-row {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

@@ -1,0 +1,33 @@
+.payroll-card {
+  border-radius: 14px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+}
+
+.payroll-card .card-header {
+  background: linear-gradient(135deg, #2c3e50, #4ca1af);
+  color: #fff;
+}
+
+.summary-box {
+  background: #f4faff;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.summary-box .net {
+  font-size: 18px;
+  font-weight: 700;
+  color: #27ae60;
+}
+
+.btn-pay {
+  border-radius: 30px;
+  padding: 10px 40px;
+  font-weight: 600;
+}
+
+.payroll-table {
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+}

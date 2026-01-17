@@ -12,11 +12,14 @@ import { Router } from 'express';
 })
 export class ItemListVipComponent implements OnInit {
 
-  itemList:any;
+  // itemList:any;
   cartItems: any[] = [];
  user:any;
   itemId: string | null = null;
   incomeDetails: any;
+  searchTerm: string = '';
+itemList: any;
+filteredItemList: any
  
   constructor(private guestService:GuestService,private cartService:CartService,private route:ActivatedRoute,private userService:userService) { }
 
@@ -42,6 +45,7 @@ export class ItemListVipComponent implements OnInit {
 
     this.getUser();
   }
+  
 
 handleCardClick(product: any) {
   if (+product.quantity === 0) return;
@@ -54,6 +58,39 @@ handleCardClick(product: any) {
   }
 }
 
+
+async searchItems(term: string) {
+  term = term.trim().toLowerCase();
+  if (!term) {
+    // optionally reload all items when input is empty
+    this.itemList = await this.guestService.getItemsList();
+    return;
+  }
+
+  try {
+    var ad={
+      find:term
+    }
+    const res = await this.guestService.searchItem(ad);
+    if (res) {
+      this.itemList = res;
+    }
+  } catch (error) {
+    console.error('Error searching items:', error);
+  }
+}
+
+onSearchChange() {
+  const term = this.searchTerm.trim().toLowerCase();
+
+  if (!term) {
+    this.filteredItemList = this.itemList; // ✅ Reset to full list
+  } else {
+    this.filteredItemList = this.itemList.filter(product =>
+      product.name.toLowerCase().includes(term)
+    );
+  }
+}
 
   async getIncomeDetails(id: string) {
     try {
@@ -78,6 +115,7 @@ handleCardClick(product: any) {
       const res = await this.guestService.getItemsList(); // Assuming getItemsList() fetches the items from the API
       if (res) {
         this.itemList = res;
+        this.filteredItemList = res; // ✅ This ensures all items show by default
       }
     } catch (error) {
       // this.toastr.error('Error fetching items list');

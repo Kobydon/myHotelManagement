@@ -64,7 +64,7 @@
   </div>
 </div>
 
-<div class="row" *ngIf="user[0]?.roles == 'admin'">
+<div class="row" *ngIf="user[0]?.roles == 'admin' || user[0]?.roles=='auditor'">
   <!-- Payment Chart (Now in place of Active Bookings) -->
   <div class="col-md-12">
     <div class="card card-chart">
