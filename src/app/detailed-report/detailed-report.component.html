@@ -18,6 +18,7 @@
                 id="myInput"
                 (keyup)="myFunction()"
               /> 
+               (ngModelChange)="searchDates()"
               -->
             </div>
             <div class="ms-3">
@@ -26,7 +27,7 @@
                   type="date"
                   class="form-control"
                   formControlName="dates"
-                  (ngModelChange)="searchDates()"
+                 
                 />
               </form>
             </div>

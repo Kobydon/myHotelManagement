@@ -1,194 +1,168 @@
 <div class="container" *blockUI="'loading'">
-  <!-- Report Card -->
   <div class="card shadow-sm">
     <div class="card-body p-4">
-      <h4 class="card-title text-center mb-4">Income and Expenditure Report</h4>
 
-      <!-- Report Selection Form -->
+      <h4 class="text-center mb-4">Income and Expenditure Report</h4>
+
+      <!-- FORM -->
       <form [formGroup]="createForm" class="mb-4">
+
+        <!-- START DATE -->
         <div class="form-group">
-          <label for="start-date">Start Date:</label>
+          <label>Start Date</label>
           <input
             type="date"
-            id="start-date"
-            class="form-control mb-2"
+            class="form-control"
             formControlName="dates"
-            style="max-width: 300px;"
           />
         </div>
+
+        <!-- END DATE -->
         <div class="form-group">
-          <label for="end-date">End Date:</label>
+          <label>End Date</label>
           <input
             type="date"
-            id="end-date"
-            class="form-control mb-2"
+            class="form-control"
             formControlName="datestwo"
-            (ngModelChange)="searchDates()"
-            style="max-width: 300px;"
+            (change)="searchDates()"
           />
         </div>
-        <label for="">Filter By Waiter</label>
-        <!-- <select formControlName="employee" id="" (ngModelChange)="findWaiter()"  disabled="">
-          <option  *ngFor="let item of users" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
-          
-        
-        
-        </select> -->
-     <label for="">Filter By Cashier</label>
-        <select formControlName="cashier" id="" (ngModelChange)="findCashier()">
-          <option  *ngFor="let item of cashiers" value="{{item.firstname +' ' +item.lastname}}">{{item.firstname +' ' +item.lastname}}</option>
-          
-        
-        
-        
-        </select>
 
-        <label for="">Filter By Method</label>
-        <select formControlName="paymethod" id="" (ngModelChange)="findMethod()">
-          <option value="Cash">Cash</option>
-          <option value="Mobile Money">MoMo</option>
-          <option value="Mobile Money & Cash">MoMo  & Cash</option>
-          <option value="Credit Card">Credit CArd</option>
-        
-        
-        </select>
+        <!-- DATE ERROR -->
+        <div
+          class="alert alert-danger mt-2"
+          *ngIf="
+            createForm.errors?.sameDate &&
+            createForm.get('datestwo')?.touched
+          "
+        >
+          Start date and End date must be different days.
+        </div>
 
-        
-        <label for="">Filter By Department</label>
-        <select formControlName="barrest" id="" (ngModelChange)="findDepartment()" >
-          <option value="drink">Bar</option>
-          <option value="food">Restaurant</option>
-          
-        
-        
-        </select>
-     
+        <!-- CASHIER -->
+        <div class="form-group mt-3">
+          <label>Filter By Cashier</label>
+          <select
+            class="form-control"
+            formControlName="cashier"
+            (change)="findCashier()"
+          >
+            <option value="">-- Select Cashier --</option>
+            <option
+              *ngFor="let item of cashiers"
+              [value]="item.firstname + ' ' + item.lastname"
+            >
+              {{ item.firstname }} {{ item.lastname }}
+            </option>
+          </select>
+        </div>
 
+        <!-- PAYMENT METHOD -->
+        <div class="form-group mt-3">
+          <label>Filter By Method</label>
+          <select
+            class="form-control"
+            formControlName="paymethod"
+            (change)="findMethod()"
+          >
+            <option value="">-- Select Method --</option>
+            <option value="Cash">Cash</option>
+            <option value="Mobile Money">Mobile Money</option>
+            <option value="Mobile Money & Cash">MoMo & Cash</option>
+            <option value="Credit Card">Credit Card</option>
+          </select>
+        </div>
 
-  <label for="">Filter By Category</label>
-        <select formControlName="categos" id="" (ngModelChange)="findCategory()" >
-          <option *ngFor="let item of categoryList" value="{{item.name}}">{{item.name}}</option>
-         
-          
-        
-        
-        </select>
+        <!-- DEPARTMENT -->
+        <div class="form-group mt-3">
+          <label>Filter By Department</label>
+          <select
+            class="form-control"
+            formControlName="barrest"
+            (change)="findDepartment()"
+          >
+            <option value="">-- Select Department --</option>
+            <option value="drink">Bar</option>
+            <option value="food">Restaurant</option>
+          </select>
+        </div>
+
+        <!-- CATEGORY -->
+        <div class="form-group mt-3">
+          <label>Filter By Category</label>
+          <select
+            class="form-control"
+            formControlName="categos"
+            (change)="findCategory()"
+          >
+            <option value="">-- Select Category --</option>
+            <option
+              *ngFor="let item of categoryList"
+              [value]="item.name"
+            >
+              {{ item.name }}
+            </option>
+          </select>
+        </div>
       </form>
 
-
-      <!-- Action Buttons -->
-      <div class="d-flex mb-4">
-        <button class="btn btn-primary mr-2" (click)="printToPdf()">
-          Print
-        </button>
-        <button id="pdfBtn" class="btn btn-secondary" (click)="downloadPdf()">
-          Download PDF
-        </button>
-        <button class="btn btn-success" (click)="filterByMostPayment()">Filter by Most Payment</button>
-        <button class="btn btn-info" (click)="filterByMostPaymentCustomer()">Filter by Most Payment</button>
+      <!-- ACTION BUTTONS -->
+      <div class="mb-4">
+        <button class="btn btn-primary mr-2" (click)="printToPdf()">Print</button>
+        <button class="btn btn-secondary mr-2" (click)="downloadPdf()">Download PDF</button>
+        <button class="btn btn-success mr-2" (click)="filterByMostPayment()">Most Payment</button>
+        <button class="btn btn-info" (click)="filterByMostPaymentCustomer()">Top Customers</button>
       </div>
 
-      <!-- Daily Report Display -->
-      <div
-        *ngIf="incomeReport.length > 0 || expenditureReport.length > 0; else noReport"
-        id="pdf"
-      >
-        <header class="text-center mb-4">
-          <!-- <h2>Rismork Enterprice </h2> -->
-          <p>Income and Expenditure Report</p>
-          <p>
-            Date: {{ createForm.value.dates | date: 'MMMM d, yyyy' }} to
-            {{ createForm.value.datestwo | date: 'MMMM d, yyyy' }}
-          </p>
-        </header>
+      <!-- REPORT -->
+      <div *ngIf="incomeReport?.length || expenditureReport?.length; else noData" id="pdf">
 
-        <!-- Income Section -->
-        <section class="report-section mb-4">
-          <h5>Income</h5>
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-              <thead class="thead-dark">
-                <tr>
-                  <th>Income Category</th>
-                  <th>Amount (₵)</th>
-                  <th>Discount</th>
-                  <th>Customer</th>
-                  <th>Cashier</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of incomeReport">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.amount | currency: '₵' }}</td>
-                  <td>{{ item.discount }}</td>
-                  <td>{{ item.customer }}</td>
-                  <td>{{item.cashier}}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="font-weight-bold">
-                  <td>Total Income</td>
-                  <td>{{ totalIncome | currency: '₵' }}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </section>
+        <p class="text-center">
+          {{ createForm.value.dates | date:'longDate' }}
+          to
+          {{ createForm.value.datestwo | date:'longDate' }}
+        </p>
 
-        <!-- Expenditure Section -->
-        <section class="report-section mb-4">
-          <h5>Expenditure</h5>
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-              <thead class="thead-dark">
-                <tr>
-                  <th>Expenditure Category</th>
-                  <th>Amount (₵)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of expenditureReport">
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.amount | currency: '₵' }}</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="font-weight-bold">
-                  <td>Total Expenditure</td>
-                  <td>{{ totalExpenditure | currency: '₵' }}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </section>
+        <!-- INCOME TABLE -->
+        <h5>Income</h5>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Customer</th>
+              <th>Cashier</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of incomeReport">
+              <td>{{ item.name }}</td>
+              <td>{{ item.amount | currency:'₵' }}</td>
+              <td>{{ item.customer }}</td>
+              <td>{{ item.cashier }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <!-- Cash at Hand Section -->
-        <section class="report-section mb-4">
-          <h5>Cash at Hand</h5>
-          <p>
-            <!-- - totalExpenditure  -->
-            <strong
-              >{{ totalIncome | currency: '₵' }}</strong
-            >
-          </p>
-        </section>
+        <!-- EXPENDITURE -->
+        <h5>Expenditure</h5>
+        <table class="table table-bordered">
+          <tr *ngFor="let item of expenditureReport">
+            <td>{{ item.name }}</td>
+            <td>{{ item.amount | currency:'₵' }}</td>
+          </tr>
+        </table>
 
-        <!-- Footer -->
-        <footer class="footer text-right mt-5">
-          <p>
-            Generated by:
-            <strong>{{ user[0].firstname + " " + user[0].lastname }}</strong>
-          </p>
-          <p>Signature: __________________________</p>
-        </footer>
+        <h5>Cash at Hand: {{ totalIncome - totalExpenditure | currency:'₵' }}</h5>
+
       </div>
 
-      <!-- No Report Available Message -->
-      <ng-template #noReport>
+      <ng-template #noData>
         <div class="alert alert-info text-center">
-          <p>No records found for the selected date range.</p>
+          No records found for selected date range.
         </div>
       </ng-template>
+
     </div>
   </div>
 </div>

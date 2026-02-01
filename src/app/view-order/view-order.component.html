@@ -21,9 +21,9 @@
             {{ order.food_status === 'yes' ? 'Pending' : order.status }}
           </span>
         </p>
-
+  <p>Total: ₵{{ order.total }}</p>
         <div *ngFor="let item of order.items">
-          <p><strong>{{ item.name }}</strong> (x{{ item.qty }})</p>
+          <p><strong>{{ item.name }}</strong> (x{{ item.qty }}) -> {{item.price*item.qty}}</p>
         </div>
 
         <button *ngIf="order.food_status !== 'no'" (click)="confirmOrder(order.id)">Confirm Order</button>
