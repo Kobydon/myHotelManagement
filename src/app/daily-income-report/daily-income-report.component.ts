@@ -159,7 +159,7 @@ constructor(private fb:FormBuilder,private toastr:ToastrService,private guestSer
         
     
         }
-        catch(err){this.toastr.error(null,err.message)}
+        catch(err){this.toastr.error()}
     
         finally{this.loading.stop();}
     }
@@ -172,7 +172,7 @@ filterByMostPayment() {
   }
 
   // Convert amount string to number safely before sorting
-  this.incomeReport.sort((a, b) => {
+  this.incomeReport.sort((a: any, b: any) => {
     const amountA = parseFloat(a.amount) || 0;
     const amountB = parseFloat(b.amount) || 0;
     return amountB - amountA; // descending order
@@ -265,7 +265,7 @@ filterByMostPaymentCustomer() {
     }
 
 
-    async searchIncomeDates(data){
+    async searchIncomeDates(data:any){
       let sum :number= 0;
       const d = {
         date: data
@@ -286,13 +286,13 @@ filterByMostPaymentCustomer() {
         
     
         }
-        catch(err){this.toastr.error(null,err.message)}
+        catch(err){this.toastr.error()}
     
         finally{this.loading.stop();}
     }
 
 
-    async searchExpenseDates(data){
+    async searchExpenseDates(data:any){
       let sum :number= 0;
       const d = {
         date: data
@@ -313,7 +313,7 @@ filterByMostPaymentCustomer() {
         
     
         }
-        catch(err){this.toastr.error(null,err.message)}
+        catch(err){this.toastr.error()}
     
         finally{this.loading.stop();}
     }
@@ -321,7 +321,7 @@ filterByMostPaymentCustomer() {
   
 
 
-    async findWaiter(data){
+    async findWaiter(data:any){
       let sum :number= 0;
       const d = {
         date: this.createForm.value.dates,
@@ -343,7 +343,7 @@ filterByMostPaymentCustomer() {
         
     
         }
-        catch(err){this.toastr.error(null,err.message)}
+        catch(err){this.toastr.error()}
     
         finally{this.loading.stop();}
     }
@@ -354,7 +354,7 @@ filterByMostPaymentCustomer() {
 
 
 
-    async findMethod(data){
+    async findMethod(){
       let sum :number= 0;
       const d = {
         date: this.createForm.value.dates,
@@ -376,14 +376,14 @@ filterByMostPaymentCustomer() {
         
     
         }
-        catch(err){this.toastr.error(null,err.message)}
+        catch(err){this.toastr.error()}
     
         finally{this.loading.stop();}
     }
 
 
 
-    async findDepartment(data){
+    async findDepartment(){
       let sum :number= 0;
       const d = {
         date: this.createForm.value.dates,
@@ -405,14 +405,14 @@ filterByMostPaymentCustomer() {
         
     
         }
-        catch(err){this.toastr.error(null,err.message)}
+        catch(err){this.toastr.error()}
     
         finally{this.loading.stop();}
     }
     
 
    
-     async findCashier(data){
+     async findCashier(){
       let sum :number= 0;
       const d = {
         date: this.createForm.value.dates,
@@ -434,7 +434,7 @@ filterByMostPaymentCustomer() {
         
     
         }
-        catch(err){this.toastr.error(null,err.message)}
+        catch(err){this.toastr.error()}
     
         finally{this.loading.stop();}
     }

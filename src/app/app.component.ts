@@ -24,8 +24,12 @@ export class AppComponent implements OnInit {
     const adminData = localStorage.getItem('isAdmin');
     const barData = localStorage.getItem('isBartender');
     const waiterData = localStorage.getItem('isWaiter');
-    const kitchenData = localStorage.getItem('isKitchen');
+    const kitchenData = localStorage.getItem('digital_printing');
+    const dtfData = localStorage.getItem('dtf');
     const checkData = localStorage.getItem('checking');
+    const labelData = localStorage.getItem('label');
+     const giverData = localStorage.getItem('isgiver');
+     console.log('Giver status:', giverData);
 
     if (storeData === 'true') {
       this.isUserLoggedIn = true;
@@ -37,7 +41,13 @@ export class AppComponent implements OnInit {
       } else if (waiterData === 'true') {
         this.redirectAndLogout('/item-order');
       } else if (barData === 'true') {
-        this.redirectAndLogout('/view-drink-order');
+        this.redirectAndLogout('/view-large-format-order');
+      } else if (dtfData === 'true') {
+        this.redirectAndLogout('/view-dtf-order');
+      } else if (labelData === 'true') {
+        this.redirectAndLogout('/view-label-order');
+      } else if (giverData === 'true') {
+        this.redirectAndLogout('/view-all-order');
       }
     } else {
       this.isUserLoggedIn = false;

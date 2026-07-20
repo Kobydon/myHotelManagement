@@ -62,12 +62,12 @@ export class DailyIncomeReportDatesBetweenComponent implements OnInit {
       return;
     }
 
-    const { dates, datestwo } = this.createForm.value;
+    const  { dates, datestwo } = this.createForm.value;
 
-    this.loading.start();
+   
     await this.searchIncome(dates, datestwo);
     await this.searchExpense(dates, datestwo);
-    this.loading.stop();
+  
   }
 
 async searchIncome(start: string, end: string) {

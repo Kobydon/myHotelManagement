@@ -122,7 +122,7 @@ export class DetailedReportComponent implements OnInit {
 
     
     catch(error:any){
-      this.toastr.error(null,error);
+      this.toastr.error('',error);
     }
      
   
@@ -140,7 +140,7 @@ async getRoom(){
 
   }
   catch(error:any){
-    this.toastr.error(null,error);
+    this.toastr.error('',error);
   }
    
 
@@ -176,7 +176,7 @@ async searchDates() {
       expenseRes,
       attendanceRes,
       purchaseRes,
-      orderRes,
+      // orderRes,
       
     ] = await Promise.all([
       this.paymentService.searchDates(d),
@@ -189,7 +189,7 @@ async searchDates() {
       this.guestService.searchMostOrderedDate(d),
       this.paymentService.searchRefundDates(d),
       this.paymentService.searchDatesPos(d),
-      this.roomService.searchRoomDates(d),
+      // this.roomService.searchRoomDates(d),
       this.guestService.searchIncomeDates(d),
       this.guestService.searchExpenseDate(d),
       this.guestService.searchattendanceDate(d),
@@ -213,7 +213,7 @@ async searchDates() {
     this.expenseList = expenseRes || [];
     this.attendaceList = attendanceRes || [];
     this.purchaseList = purchaseRes || [];
-    this.orderList = orderRes || [];
+    // this.orderList = orderRes || [];
 
 
 
@@ -225,11 +225,11 @@ async searchDates() {
   //  this.getEventPayment(d);
   
     // ✅ Safely calculate totals
-    this.totalAmount = this.paymentList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-    this.totalRefundAmount = this.refundList.reduce((sum, item) => sum + (parseInt(item.refund_amount) || 0), 0);
-    this.totalPosAmount = this.posList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-    this.totalIncome = this.incomeList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-    this.totalExpenses = this.expenseList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalAmount = this.paymentList.reduce((sum:any, item:any) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalRefundAmount = this.refundList.reduce((sum:any, item:any) => sum + (parseInt(item.refund_amount) || 0), 0);
+    this.totalPosAmount = this.posList.reduce((sum:any, item:any) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalIncome = this.incomeList.reduce((sum:any, item:any) => sum + (parseInt(item.amount) || 0), 0);
+    this.totalExpenses = this.expenseList.reduce((sum:any, item:any) => sum + (parseInt(item.amount) || 0), 0);
     this.totalAttendance = this.attendaceList.length;
 
     // ✅ Room calculations
@@ -244,13 +244,13 @@ async searchDates() {
 
     const yesterdayRoomRes = await this.roomService.searchYesterdayRoomDates(z);
     this.yesterdayList = yesterdayRoomRes || [];
-    this.yesterday_total = this.yesterdayList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
+    this.yesterday_total = this.yesterdayList.reduce((sum:any, item:any) => sum + (parseInt(item.amount) || 0), 0);
 
     // ✅ Cumulative total
     this.yester_daytodate = this.yesterday_total + this.totalAmount;
 
   } catch (err) {
-    console.error("Error fetching data:", err.message || err);
+    console.error("Error fetching data:",err);
   } finally {
     this.loading.stop();
   }
@@ -269,7 +269,7 @@ async searchDates() {
 
     }
     catch(error:any){
-      this.toastr.error(null,error);
+      this.toastr.error('',error);
     }
      
   
@@ -280,24 +280,29 @@ async searchDates() {
 
 
 myFunction() {
+  const input = document.getElementById("myInput") as HTMLInputElement | null;
+  if (!input) {
+    return;
+  }
 
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("myInput");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("excel-table");
-  tr = table.getElementsByTagName("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
+  const filter = input.value.toUpperCase();
+  const table = document.getElementById("excel-table");
+  if (!table) {
+    return;
+  }
+
+  const tr = table.getElementsByTagName("tr");
+  for (let i = 0; i < tr.length; i++) {
+    const td = tr[i].getElementsByTagName("td")[0];
 
     if (td) {
-      txtValue = td.textContent || td.innerText;
+      const txtValue = td.textContent || td.innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
         tr[i].style.display = "";
       } else {
         tr[i].style.display = "none";
       }
-      
-    }       
+    }
   }
 }
 
@@ -312,7 +317,7 @@ async applyFilter(){
 
   }
   catch(error:any){
-    this.toastr.error(null,error);
+    this.toastr.error('',error);
   }
    
 
@@ -485,14 +490,14 @@ loadHeldOrders() {
 }
 
 calculateTotal() {
-  this.totalHeldAmount = this.HeldList.reduce((sum, order) =>
-    sum + order.items.reduce((subSum, item) => subSum + (item.qty * item.price), 0)
+  this.totalHeldAmount = this.HeldList.reduce((sum:any, order:any) =>
+    sum + order.items.reduce((subSum:any, item:any) => subSum + (item.qty * item.price), 0)
   , 0);
 }
 
 
 
-async getFoodChef(d){
+async getFoodChef(d:any){
 
   var bi =  await this.guestService.searchChefDates(d);
   if(bi) this.chefList=bi

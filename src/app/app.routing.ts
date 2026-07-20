@@ -15,6 +15,9 @@ import { ViewDrinkOrderComponent } from './view-drink-order/view-drink-order.com
 import { ItemListVipComponent } from './item-list-vip/item-list-vip.component';
 import { CheckTodaysOrdersComponent } from './check-todays-orders/check-todays-orders.component';
 import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orders.component';
+import { ViewLabelOrderComponent } from './view-label-order/view-label-order.component';
+import { ViewDtfOrderComponent } from './view-dtf-order/view-dtf-order.component';
+import { GiversTabComponent } from './givers-tab/givers-tab.component';
 
 export const AppRoutes: Routes = [
   {
@@ -23,8 +26,11 @@ export const AppRoutes: Routes = [
     pathMatch: 'full',
   },
   {path:'view-order',component:ViewOrderComponent},
-  {path:'view-drink-order',component:ViewDrinkOrderComponent},
-  
+   {path:'view-all-order',component:GiversTabComponent},
+
+   {path:'view-dtf-order',component:ViewDtfOrderComponent},
+  {path:'view-large-format-order',component:ViewDrinkOrderComponent},
+    {path:'view-label-order',component:ViewLabelOrderComponent},
   {
     path: '',canActivate:[AuthGuard],
     component: AdminLayoutComponent,

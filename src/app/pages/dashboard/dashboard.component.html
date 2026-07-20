@@ -9,62 +9,9 @@
 }
 
 </style>
+<!-- *ngIf="user[0]?.roles == 'admin' || user[0]?.roles=='auditor' || user[0]?.roles=='accountant'" -->
 
-<div class="row" *ngIf="user[0]?.roles!='admin'" >
-  <!-- USD -->
-  <div class="col-md-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <span class="fi fi-us me-2"></span> <!-- Flag for the USA -->
-          <h5 class="card-title m-0">USD</h5>
-        </div>
-        <span class="badge bg-primary mt-2">{{ usdRate ? usdRate : 'Loading...' }}</span>
-      </div>
-    </div>
-  </div>
-  
-  <!-- GBP -->
-  <div class="col-md-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <span class="fi fi-gb me-2"></span> <!-- Flag for the UK -->
-          <h5 class="card-title m-0">GBP</h5>
-        </div>
-        <span class="badge bg-success mt-2">{{ gbpRate ? gbpRate : 'Loading...' }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- EUR -->
-  <div class="col-md-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <span class="fi fi-eu me-2"></span> <!-- Flag for the European Union -->
-          <h5 class="card-title m-0">EUR</h5>
-        </div>
-        <span class="badge bg-warning mt-2">{{ eurRate ? eurRate : 'Loading...' }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- GHS -->
-  <div class="col-md-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <span class="fi fi-gh me-2"></span> <!-- Flag for Ghana -->
-          <h5 class="card-title m-0">GHS</h5>
-        </div>
-        <span class="badge bg-info mt-2">{{ ghsRate ? ghsRate : 'Loading...' }}</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row" *ngIf="user[0]?.roles == 'admin' || user[0]?.roles=='auditor'">
+<div class="row" >
   <!-- Payment Chart (Now in place of Active Bookings) -->
   <div class="col-md-12">
     <div class="card card-chart">
@@ -89,7 +36,7 @@
         <p class="card-title">Active Bookings</p>
       </div>
       <div class="card-body">
-        <table class="table" style="width:80%;" id="myTable">
+        <!-- <table class="table" style="width:80%;" id="myTable">
           <thead>
             <tr>
               <th>Name</th>
@@ -116,7 +63,7 @@
               </tr>
             </ng-container>
           </tbody>
-        </table>
+        </table> -->
       </div>
       <div class="card-footer">
         <hr>
@@ -136,7 +83,7 @@
         <!-- <p class="card-category">Latest</p> -->
       </div>
       <div class="card-body">
-        <table class="table" style="width:80%;" id="myTable">
+        <!-- <table class="table" style="width:80%;" id="myTable">
           <thead>
             <tr>
               <th>Number</th>
@@ -152,7 +99,7 @@
               <td *ngIf="room.occupied_state != 'available'" class="text-info">Occupied</td>
             </tr>
           </tbody>
-        </table>
+        </table> -->
       </div>
       <div class="card-footer">
         <hr>
@@ -167,7 +114,7 @@
 
 
 
-  <div class="col-md-8" *ngIf="user[0]?.roles!='admin'">
+  <div class="col-md-8" *ngIf="user[0]?.roles!='admin' || user[0]?.roles!='auditor' || user[0]?.roles!='accountant'">
     <div class="card card-chart">
       <div class="card-header">
         <p class="card-title">Recent Pamyments</p>

@@ -23,9 +23,9 @@ const httpOptions = {
 export class userService {
 message:any;
 user:any;
-// https://backend.sikadwammaassociation.com
+// https://renderdemo-pnzm.onrender.com
 // 'http://192.168.123.2:5000';
-private userUrl = 'http://192.168.10.20:5000';
+private userUrl = 'https://renderdemo-pnzm.onrender.com';
   // private userUrl = 'https://renderdemo-hwz6.onrender.com';
  
  
@@ -140,6 +140,12 @@ private userUrl = 'http://192.168.10.20:5000';
     localStorage.removeItem("expires_at");
     localStorage.removeItem("isUserLoggedIn");
     localStorage.removeItem("isAdmin");
+    localStorage.removeItem('isBartender');
+     localStorage.removeItem('isWaiter');
+     localStorage.removeItem('digital_printing');
+    localStorage.removeItem('dtf');
+    localStorage.removeItem('checking');
+   localStorage.removeItem('label');
   
     // Update local component state
     this.isUserLoggedIn = false;
@@ -177,7 +183,7 @@ getExpiration() {
 
 getUser(){
   return lastValueFrom( this.http.get<any[]>(this.userUrl + '/user/get_info'));
-}n
+}
 
 getUsers(){
 return lastValueFrom(this.http.get<any[]>(this.userUrl + '/user/get_users'));

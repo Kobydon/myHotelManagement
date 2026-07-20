@@ -1,19 +1,287 @@
 .disabled-card {
-    opacity: 0.6; /* Fades the card */
-    pointer-events: none; /* Disables all clicks */
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed !important;
+}
+
+.out-of-stock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 8px;
+  z-index: 2;
+}
+
+.out-of-stock-overlay p {
+  color: #e74c3c;
+  margin: 0;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+}
+
+/* Measurement Badge */
+.measurement-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #3498db;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 8px;
+  font-weight: 600;
+  z-index: 5;
+}
+
+.measurement-badge i {
+  margin-right: 3px;
+  font-size: 9px;
+}
+
+/* Measurement Inputs */
+.measurement-inputs {
+  margin-top: 8px;
+  padding: 8px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.measurement-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.measurement-field {
+  flex: 1;
+}
+
+.measurement-field label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.measurement-field input,
+.measurement-field select {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+}
+
+.measurement-field input:focus,
+.measurement-field select:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.measurement-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.measurement-actions .btn {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+.btn-add-measurement {
+  background: #27ae60;
+  color: white;
+  border: none;
+}
+
+.btn-add-measurement:hover {
+  background: #229954;
+}
+
+.btn-add-measurement:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.measurement-price-preview {
+  font-size: 13px;
+  font-weight: 700;
+  color: #27ae60;
+  margin-left: auto;
+}
+
+/* Card Styles */
+.card {
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e9ecef;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+  background: #f8f9fa;
+}
+
+.card h6 {
+  margin: 8px 10px 2px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2c3e50;
+  min-height: 36px;
+}
+
+.card .text-success {
+  color: #27ae60 !important;
+  font-weight: 700;
+  font-size: 15px;
+  margin: 0 10px 8px 10px;
+}
+
+.card .d-flex {
+  padding: 0 10px 10px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.card .d-flex .btn {
+  min-width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.card .d-flex .btn-light {
+  background: #ecf0f1;
+  color: #2c3e50;
+  border: 1px solid #dde1e5;
+}
+
+.card .d-flex .btn-light:hover {
+  background: #dde1e5;
+}
+
+.card .d-flex .btn-primary {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  height: auto;
+  min-width: 50px;
+}
+
+.card .d-flex .btn-primary:hover {
+  background: #2980b9;
+}
+
+.card .d-flex .btn-danger {
+  background: #e74c3c;
+  color: white;
+  border: none;
+}
+
+.card .d-flex .btn-danger:hover {
+  background: #c0392b;
+}
+
+.card .d-flex .mx-2 {
+  font-weight: 600;
+  color: #2c3e50;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .measurement-row {
+    flex-direction: column;
+    gap: 4px;
   }
   
-  .out-of-stock-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 16px;
+  .measurement-actions {
+    flex-direction: column;
+    align-items: stretch;
   }
   
+  .measurement-price-preview {
+    text-align: center;
+    margin-left: 0;
+  }
+  
+  .card img {
+    height: 120px;
+  }
+  
+  .card h6 {
+    font-size: 12px;
+    min-height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card img {
+    height: 100px;
+  }
+  
+  .card h6 {
+    font-size: 11px;
+    min-height: 28px;
+  }
+  
+  .measurement-field label {
+    font-size: 9px;
+  }
+  
+  .measurement-field input,
+  .measurement-field select {
+    font-size: 11px;
+    padding: 3px 5px;
+  }
+}

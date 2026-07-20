@@ -42,4 +42,15 @@
         color: ;
     } */
 
-    
+    .logo-container {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+
+.login-logo {
+  max-width: 150px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}

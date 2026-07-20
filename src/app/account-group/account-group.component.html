@@ -20,7 +20,7 @@
             </div>
               <form [formGroup]="itemForm" class="mb-4">
     <label for="">Filter</label>
-            <select formControlName="name" id="" (ngModelChange)="findAccountGroup()">
+            <select formControlName="name" id="" (ngModelChange)="findAccountGroup()" class="form-control">
           <option  *ngFor="let item of findList" value="{{item.name}}">{{item.name}}</option>
           
         

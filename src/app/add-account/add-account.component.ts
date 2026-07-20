@@ -172,7 +172,9 @@ itemForm!: FormGroup;
     
       openPopup(action: string, item: any = null) {
         this.header = action;
-        this.itemForm.reset();
+        this.itemForm.reset({
+  subcategory: 'Uncategorized'
+});
     
         if (action === 'Edit' && item) {
           this.itemForm.patchValue(item);

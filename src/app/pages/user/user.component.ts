@@ -79,6 +79,7 @@ export class UserComponent implements OnInit{
             city : record.city,
             address :record.address,
             email : record.email,
+            role:record.role
         }
         try{
    this.loading.start();
@@ -92,7 +93,7 @@ export class UserComponent implements OnInit{
           this.errorMessage()
         }
        finally{
-        this.loading.start();
+        this.loading.stop();
      
        }
     }

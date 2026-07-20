@@ -4,12 +4,10 @@
   class="form-control mb-3"
   placeholder="Search products..."
   [(ngModel)]="searchTerm"
-  (ngModelChange)="searchItems(searchTerm)" 
+  (ngModelChange)="searchItems(searchTerm)"
 />
 
-
 <!-- Product Cards -->
-<!-- Product Card -->
 <div class="row">
   <div class="col-md-4" *ngFor="let product of itemList">
     <div
@@ -18,22 +16,85 @@
       (click)="handleCardClick(product)"
       style="cursor: pointer;"
     >
-      <img [src]="product.image" class="img-fluid" />
+      
       <h6>{{ product.name }}</h6>
       <p class="text-success">₵{{ product.price }}</p>
 
-      <!-- Out of Stock Message (Covers the card) -->
+      <!-- Measurement Badge -->
+      <span *ngIf="requiresMeasurement(product)" class="measurement-badge">
+        <i class="fa fa-arrows"></i> Needs Measurement
+      </span>
+
+      <!-- Out of Stock Message -->
       <div *ngIf="+product.quantity === 0" class="out-of-stock-overlay">
         <p class="text-danger">Out of Stock</p>
       </div>
 
+      <!-- Measurement Inputs -->
+      <div *ngIf="requiresMeasurement(product) && product.showMeasurement" class="measurement-inputs" (click)="$event.stopPropagation()">
+        <div class="measurement-row">
+          <div class="measurement-field">
+            <label>Width</label>
+            <input 
+              type="number" 
+              [(ngModel)]="product.measurementWidth"
+              placeholder="Width"
+              min="0.01"
+              step="0.01"
+              class="form-control form-control-sm"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
+          <div class="measurement-field">
+            <label>Height</label>
+            <input 
+              type="number" 
+              [(ngModel)]="product.measurementHeight"
+              placeholder="Height"
+              min="0.01"
+              step="0.01"
+              class="form-control form-control-sm"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
+          <div class="measurement-field">
+            <label>Unit</label>
+            <select 
+              [(ngModel)]="product.measurementUnit"
+              class="form-control form-control-sm"
+              (click)="$event.stopPropagation()"
+            >
+              <option value="inches">in</option>
+              <option value="feet">ft</option>
+            </select>
+          </div>
+        </div>
+        <div class="measurement-actions">
+          <button 
+            class="btn btn-success btn-sm btn-add-measurement"
+            (click)="addWithMeasurement(product, $event)"
+            [disabled]="!product.measurementWidth || !product.measurementHeight"
+          >
+            <i class="fa fa-cart-plus"></i> Add
+          </button>
+          <button 
+            class="btn btn-secondary btn-sm"
+            (click)="cancelMeasurement(product, $event)"
+          >
+            Cancel
+          </button>
+          <span *ngIf="product.measurementWidth && product.measurementHeight" class="measurement-price-preview">
+            ₵{{ calculatePricePreview(product) | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+
       <!-- If item is in cart -->
-      <div *ngIf="getCartItem(product); else addButton">
+      <div *ngIf="getCartItem(product) && !requiresMeasurement(product); else addButton">
         <div class="d-flex align-items-center">
           <button
             class="btn btn-sm btn-light"
             (click)="decreaseQty(product); $event.stopPropagation()"
-            disabled=""
           >
             -
           </button>
@@ -41,13 +102,12 @@
           <button
             class="btn btn-sm btn-light"
             (click)="increaseQty(product); $event.stopPropagation()"
-            disabled=""
           >
             +
           </button>
           <button
             class="btn btn-danger btn-sm ml-2"
-            (click)="removeFromCart(product); $event.stopPropagation()" disabled=""
+            (click)="removeFromCart(product); $event.stopPropagation()"
           >
             🗑️
           </button>
@@ -57,13 +117,19 @@
       <!-- Add button if not in cart -->
       <ng-template #addButton>
         <button
+          *ngIf="!requiresMeasurement(product)"
           class="btn btn-primary btn-sm"
           (click)="addToCart(product); $event.stopPropagation()"
-          disabled=""
         >
           Add
         </button>
-         <!-- [disabled]="+product.quantity === 0" -->
+        <button
+          *ngIf="requiresMeasurement(product) && !product.showMeasurement"
+          class="btn btn-primary btn-sm"
+          (click)="showMeasurementInputs(product, $event)"
+        >
+          Enter Size
+        </button>
       </ng-template>
     </div>
   </div>

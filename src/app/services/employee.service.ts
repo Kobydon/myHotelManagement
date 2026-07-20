@@ -17,7 +17,7 @@ export class EmployeeService {
 
 
   // private employeeUrl = 'https://renderdemo-hwz6.onrender.com';
-private employeeUrl ='http://192.168.10.20:5000';
+private employeeUrl ='https://renderdemo-pnzm.onrender.com';
   
 
   constructor(private http: HttpClient,private router:Router) { }

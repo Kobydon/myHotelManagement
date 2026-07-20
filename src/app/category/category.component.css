@@ -1,0 +1,16 @@
+.modal-dialog {
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.modal-content {
+  max-height: 90vh; /* limit modal height */
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  overflow-y: auto;   /* 🔥 enables vertical scroll */
+  max-height: 70vh;   /* controls scroll area */
+  padding: 15px;
+}

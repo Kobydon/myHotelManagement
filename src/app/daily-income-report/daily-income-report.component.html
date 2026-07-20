@@ -13,7 +13,7 @@
             class="form-control" 
             formControlName="dates" 
           
-            style="max-width: 300px;">
+            style="max-width: 300px;" (change)="searchDates()">
         </div>
         <!-- <label for="">Filter By Waiter</label>
         <select formControlName="employee" id="" (ngModelChange)="findWaiter()" >
@@ -47,7 +47,7 @@
 
 
             <label for="">Filter By Department</label>
-            <select formControlName="barrest" id="" (ngModelChange)="findDepartment()" >
+            <select formControlName="barrest" id="" (ngModelChange)="findDepartment()" disabled="" >
               <option value="drink">Bar</option>
               <option value="food">Restaurant</option>
               

@@ -66,6 +66,8 @@ import { AddAccountComponent } from 'app/add-account/add-account.component';
 import { BalancesheetComponent } from 'app/balancesheet/balancesheet.component';
 import { SalaryTemplateComponent } from 'app/salary-template/salary-template.component';
 import { SalaryPaymentComponent } from 'app/salary-payment/salary-payment.component';
+import { CustomersComponent } from 'app/customers/customers.component';
+import { HeldCartReportComponent } from 'app/held-cart-report/held-cart-report.component';
 
 
 
@@ -106,7 +108,8 @@ export const AdminLayoutRoutes: Routes = [
     {path:'daily-income',component:DailyIncomeReportComponent},
     {path:'daily-income-dates',component:DailyIncomeReportDatesBetweenComponent},
     {path:'item',component:ItemComponent},
-
+   {path:'customers',component:CustomersComponent},
+    {path:'daily-order-report',component:HeldCartReportComponent},
     {path:'item-unit',component:ItemGroupComponent},
     {path:'item-receieved',component:ReceivedItemsComponent},
     {path:'item-family',component:ItemFamilyComponent},

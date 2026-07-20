@@ -20,7 +20,7 @@
             </div>
               <form [formGroup]="itemForm" class="mb-4">
     <label for="">Filter</label>
-            <select formControlName="name" id="" (ngModelChange)="findAccountGroup()">
+            <select formControlName="name" id="" (ngModelChange)="findAccountGroup()" class="form-control">
           <option  *ngFor="let item of findList" value="{{item.name}}">{{item.name}}</option>
           
         
@@ -171,7 +171,7 @@
                           <label>Parent</label>
                                             <select formControlName="subcategory" class="form-control">
                                          
-                    <option value="Uncategorized" selected>Uncategorized</option>
+                    <option value="Uncategorized" >Uncategorized</option>
                     <option *ngFor="let item of itemsList" value="{{item.name}}">{{item.name}}</option>
                     </select>
 
@@ -225,4 +225,4 @@
     <!-- Hidden button for opening the modal -->
     <!-- <button style="margin: 50px; padding: 10px; display: none;" type="button" class="btn btn-primary" (click)="openPopup()"></button> -->
   </div>
-  <p>add-account works!</p>
+  

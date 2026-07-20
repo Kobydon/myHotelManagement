@@ -1,20 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { RoomService } from 'app/services/rooms.service';
-import { GuestService } from 'app/services/guest.service';
-import { error } from 'console';
-import { PaymentService } from 'app/services/payment.service';
-import jsPDF from 'jspdf';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import htmlToPdfmake from 'html-to-pdfmake';
-import {  ViewChild, ElementRef  } from '@angular/core';
-import * as html2pdf from 'html2pdf.js'
-import { userService } from 'app/user.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {BlockUI, NgBlockUI } from 'ng-block-ui';
 import { ToastrService } from 'ngx-toastr';
+import { BlockUI, NgBlockUI } from 'ng-block-ui';
 import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+import { GuestService } from 'app/services/guest.service';
+import { RoomService } from 'app/services/rooms.service';
+import { PaymentService } from 'app/services/payment.service';
+import { userService } from 'app/user.service';
 
 @Component({
   selector: 'detailed-summary-two',
@@ -22,492 +15,357 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./detailed-summary-two.component.css']
 })
 export class DetailedSummaryTwoComponent implements OnInit {
-  @BlockUI('loading') loading!: NgBlockUI
-  fileName= 'detailed_sales_report_week.xlsx';
-  paymentForm:FormGroup;
-  page = 1;
-  pageSize: number = 10;
-  header:any;
-  HeldList: any;
- yester_daytodate:any;
-  room_info:any;
-  booking_info:any;
-  rooms:any;
-  base64_string:any;
-  displayStyle = "none";
-  openStyle="none";
-  roomtype:any;
-  bookings:any;
-  guestList:any;
-  totalHeldAmount=0;
-  roomList:any;
-  yesterdayList:any;
-  posList:any;
-  paymentList:any;
-  totalPosAmount:any;
-  day_difference:any;
-  payList:any;
-  refundList:any;
-  totalRefundAmount:any;
-  yesterday_total:any
-  totalAvailableRooms:any;
-  totalOcccupiedRooms:any;
-  eventList:any;
-  occupancy:any;
-  incomeList:any;
-  attendaceList:any;
-  expenseList:any;
-  stockUsuageList:any;
-  totalAttendance:any;
-  totalExpenses:any;
-  totalIncome:any;
-  totalAmount:any;
-  user:any;
-  purchaseList:any;
+  @BlockUI('loading') loading!: NgBlockUI;
 
-  chefList:any;
-  orderList:any;
-  mostAttendant:any;
- receivedList:any;
- mostOrderedItems:any;
- stockList:any;
- returnList:any;
- constructor(private fb:FormBuilder,private roomService:RoomService,private toastr:ToastrService,
-  private paymentService:PaymentService,private guestService:GuestService,private userService:userService) {
+  // Report Data
+  HeldList: any[] = [];
+  posList: any[] = [];
+  refundList: any[] = [];
+  incomeList: any[] = [];
+  expenseList: any[] = [];
+  attendaceList: any[] = [];
+  mostOrderedItems: any[] = [];
+  mostAttendant: any[] = [];
+  paymentList: any[] = [];
+  roomList: any[] = [];
+  rooms: any[] = [];
+  purchaseList: any[] = [];
+  orderList: any[] = [];
+  receivedList: any[] = [];
+  stockList: any[] = [];
+  stockUsuageList: any[] = [];
+  returnList: any[] = [];
+  chefList: any[] = [];
+
+  // Totals
+  totalIncome: number = 0;
+  totalExpenses: number = 0;
+  totalPosAmount: number = 0;
+  totalRefundAmount: number = 0;
+  totalHeldAmount: number = 0;
+  totalAmount: number = 0;
+  totalItemsSold: number = 0;
+  heldOrderCount: number = 0;
+
+  // User
+  user: any;
+
+  // Form
+  paymentForm: FormGroup;
+
+  // UI State
+  isLoading: boolean = false;
+
+  // Date properties
+  currentYear: number = new Date().getFullYear();
+  currentDateTime: string = new Date().toLocaleString();
+
+  constructor(
+    private fb: FormBuilder,
+    private toastr: ToastrService,
+    private guestService: GuestService,
+    private roomService: RoomService,
+    private paymentService: PaymentService,
+    private userService: userService
+  ) {
     this.paymentForm = this.fb.group({
-      id:['',Validators.required],
-      name:['',Validators.required],
-      amount:['',Validators.required],
-  
-    // ÷floor:['',Validators.required],
-      duration:['',Validators.required],
-      // reserved:['',Validators.required],
-      method:['',Validators.required],
-      room_type :['',Validators.required],
-      discount :['',Validators.required],
+      dates: ['', Validators.required],
+      datetwo: ['', Validators.required]
+    });
+  }
 
-
-      dates: ['',Validators.required],
-      datetwo: ['',Validators.required],
-  
-  
-  
-      
-     
-    })
-   }
- ngOnInit(): void {
+  ngOnInit(): void {
+    this.getUser();
     this.getRoom();
     
-
-  }
-  
-
-
-  async getPaymentList(){
-    try{
-      // this.loading.start();
-     var res = await this.paymentService.getPayment()
-     if(res) {this.paymentList =res; this.paymentForm.patchValue({amount:this.paymentList[0].amount})}
-     let sum :number= 0;
-
-     for (let index = 0; index < this.paymentList.length; index++) {
-      sum += parseInt(this.paymentList[index].amount);
-      this.totalAmount=sum;
-      console.log(sum);
-  }
-     
-
-    }
-
+    // Set default dates
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
     
-    catch(error:any){
-      this.toastr.error(null,error);
-    }
-     
-  
-  finally{
-    // this.loading.stop();
-  }
-
-  
-}
-async getRoom(){
-  try{
-    // this.loading.start();
-   var res = await this.roomService.getrooms()
-   if(res) this.roomList =res;
-
-  }
-  catch(error:any){
-    this.toastr.error(null,error);
-  }
-   
-
-finally{
-  // this.loading.stop();
-}
-}
-async searchDates() {
-  try {
-    this.loading.start();
-    this.loadHeldOrders();
-
-    const selectedDate = this.paymentForm.value.dates;
-    if (!selectedDate) {
-      throw new Error("Please select a valid date.");
-    }
-
-    const d = { date: selectedDate,datetwo:this.paymentForm.value.datetwo };
-
-    // 🚀 Run all independent API calls concurrently
-    const [
-      paymentRes,
-      receivedRes,
-      stockRes,
-      attendantRres,
-      stockUsageRes,
-      returnedRes,
-      mostOrderedRes,
-      refundRes,
-      posRes,
-      roomRes,
-      incomeRes,
-      expenseRes,
-      attendanceRes,
-      purchaseRes,
-      orderRes,
-      
-    ] = await Promise.all([
-      this.paymentService.searchDatesTwo(d),
-      this.guestService.searchReceivedDateTwo(d),
-      this.guestService.searchStockDateTwo(d),
-      this.guestService.searchMostAttendantDateTwo(d),
-
-      this.guestService.searchStockUsuageDateTwo(d),
-      this.guestService.searchReturnDateTwo(d),
-      this.guestService.searchMostOrderedDateTwo(d),
-      this.paymentService.searchRefundDatesTwo(d),
-      this.paymentService.searchDatesPosTwo(d),
-      this.roomService.searchRoomDatesTwo(d),
-      this.guestService.searchIncomeDatesTwo(d),
-      this.guestService.searchExpenseDateTwo(d),
-      this.guestService.searchattendanceDateTwo(d),
-      this.guestService.searchPurchaseDateTwo(d),
-      this.guestService.searchOrderDateTwo(d),
+    this.paymentForm.patchValue({
+      dates: this.formatDate(sevenDaysAgo),
+      datetwo: this.formatDate(today)
+    });
     
-    ]);
-
-    // ✅ Assign API data safely
-    this.paymentList = paymentRes || [];
-    this.receivedList = receivedRes || [];
-    this.stockList = stockRes || [];
-    this.mostAttendant = attendantRres || [];
-    this.stockUsuageList = stockUsageRes || [];
-    this.returnList = returnedRes || [];
-    this.mostOrderedItems = mostOrderedRes || [];
-    this.refundList = refundRes || [];
-    this.posList = posRes || [];
-    this.rooms = roomRes || [];
-    this.incomeList = incomeRes || [];
-    this.expenseList = expenseRes || [];
-    this.attendaceList = attendanceRes || [];
-    this.purchaseList = purchaseRes || [];
-    this.orderList = orderRes || [];
-
-
-
-    // ✅ Ensure `roomList` exists before using `.length`
-    this.roomList = this.roomList || [];
-
-   this.getFoodChef(d);
-  //  this.getEventPayment(d);
-  
-    // ✅ Safely calculate totals
-    this.totalAmount = this.paymentList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-    this.totalRefundAmount = this.refundList.reduce((sum, item) => sum + (parseInt(item.refund_amount) || 0), 0);
-    this.totalPosAmount = this.posList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-    this.totalIncome = this.incomeList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-    this.totalExpenses = this.expenseList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-    this.totalAttendance = this.attendaceList.length;
-
-    // ✅ Room calculations
-    this.totalAvailableRooms = this.roomList.length - this.rooms.length;
-    this.totalOcccupiedRooms = this.rooms.length;
-    this.occupancy = (this.totalOcccupiedRooms / (this.roomList.length || 1)) * 100;
-
-    // ✅ Fetch Yesterday's Data
-    const yesterday = new Date(selectedDate);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const z = { date: yesterday.toISOString().split("T")[0] };
-
-    const yesterdayRoomRes = await this.roomService.searchYesterdayRoomDates(z);
-    this.yesterdayList = yesterdayRoomRes || [];
-    this.yesterday_total = this.yesterdayList.reduce((sum, item) => sum + (parseInt(item.amount) || 0), 0);
-
-    // ✅ Cumulative total
-    this.yester_daytodate = this.yesterday_total + this.totalAmount;
-
-  } catch (err) {
-    console.error("Error fetching data:", err.message || err);
-  } finally {
-    this.loading.stop();
+    // Auto-load data
+    setTimeout(() => {
+      this.searchDates();
+    }, 500);
   }
 
+  // ===================== HELPER METHODS =====================
 
-}
-
-
-
-
-  async getBookingList(){
-    try{
-      this.loading.start();
-     var res = await this.roomService.getBookingList()
-     if(res) this.bookings =res;
-
-    }
-    catch(error:any){
-      this.toastr.error(null,error);
-    }
-     
-  
-  finally{
-    this.loading.stop();
+  getCurrentYear(): number {
+    return this.currentYear;
   }
-}
 
+  getCurrentDateTime(): string {
+    return this.currentDateTime;
+  }
 
-myFunction() {
+  formatDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
 
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("myInput");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("excel-table");
-  tr = table.getElementsByTagName("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
+  formatDisplayDate(dateString: string): string {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return dateString;
+    }
+  }
 
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
+  // ===================== USER METHODS =====================
+
+  async getUser() {
+    try {
+      const res = await this.userService.getUser();
+      if (res && res.length > 0) {
+        this.user = res;
       }
+    } catch (err) {
+      console.error("Error loading user:", err);
+    }
+  }
+
+  async getRoom() {
+    try {
+      const res = await this.roomService.getrooms();
+      if (res) this.roomList = res;
+    } catch (error: any) {
+      console.error('Error loading rooms:', error);
+    }
+  }
+
+  // ===================== DATA LOADING METHODS =====================
+
+  async searchDates() {
+    try {
+      this.isLoading = true;
+      this.loading.start();
+
+      const dateFrom = this.paymentForm.value.dates;
+      const dateTo = this.paymentForm.value.datetwo;
+
+      if (!dateFrom || !dateTo) {
+        this.toastr.warning('Please select both dates');
+        this.loading.stop();
+        return;
+      }
+
+      const d = { 
+        date: dateFrom, 
+        datetwo: dateTo 
+      };
+
+      console.log("📅 Searching from:", dateFrom, "to:", dateTo);
+
+      // Load held orders for the date range
+      await this.loadHeldOrders(dateFrom, dateTo);
+
+      // ✅ Run all API calls concurrently with proper typing
+      const [
+        paymentRes,
+        receivedRes,
+        stockRes,
+        attendantRes,
+        stockUsageRes,
+        returnedRes,
+        mostOrderedRes,
+        refundRes,
+        posRes,
+        roomRes,
+        incomeRes,
+        expenseRes,
+        attendanceRes,
+        purchaseRes,
+        orderRes,
+      ] = await Promise.all([
+        this.paymentService.searchDatesTwo(d).catch(() => [] as any[]),
+        this.guestService.searchReceivedDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchStockDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchMostAttendantDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchStockUsuageDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchReturnDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchMostOrderedDateTwo(d).catch(() => [] as any[]),
+        this.paymentService.searchRefundDatesTwo(d).catch(() => [] as any[]),
+        this.paymentService.searchDatesPosTwo(d).catch(() => [] as any[]),
+        this.roomService.searchRoomDatesTwo(d).catch(() => [] as any[]),
+        this.guestService.searchIncomeDatesTwo(d).catch(() => ({ data: [], summary: {} })),
+        this.guestService.searchExpenseDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchattendanceDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchPurchaseDateTwo(d).catch(() => [] as any[]),
+        this.guestService.searchOrderDateTwo(d).catch(() => [] as any[]),
+      ]);
+
+      console.log("✅ All API calls completed");
+
+      // ✅ Assign data with proper type checking
+      this.paymentList = (paymentRes as any[]) || [];
+      this.receivedList = (receivedRes as any[]) || [];
+      this.stockList = (stockRes as any[]) || [];
+      this.mostAttendant = (attendantRes as any[]) || [];
+      this.stockUsuageList = (stockUsageRes as any[]) || [];
+      this.returnList = (returnedRes as any[]) || [];
+      this.mostOrderedItems = (mostOrderedRes as any[]) || [];
+      this.refundList = (refundRes as any[]) || [];
+      this.posList = (posRes as any[]) || [];
+      this.rooms = (roomRes as any[]) || [];
+
+      // ✅ Handle income data with type checking
+      if (incomeRes && typeof incomeRes === 'object' && 'data' in incomeRes) {
+        const incomeData = incomeRes as { data: any[], summary: any };
+        this.incomeList = incomeData.data || [];
+        this.totalIncome = incomeData.summary?.total_collected || 0;
+        this.totalItemsSold = incomeData.summary?.total_items || 0;
+        this.heldOrderCount = incomeData.summary?.total_orders || 0;
+        console.log("💰 Income data loaded:", this.incomeList.length, "items");
+      } else {
+        this.incomeList = [];
+        this.totalIncome = 0;
+        this.totalItemsSold = 0;
+        this.heldOrderCount = 0;
+      }
+
+      this.expenseList = (expenseRes as any[]) || [];
+      this.attendaceList = (attendanceRes as any[]) || [];
+      this.purchaseList = (purchaseRes as any[]) || [];
+      this.orderList = (orderRes as any[]) || [];
+
+      // Calculate totals
+      this.totalRefundAmount = this.refundList.reduce(
+        (sum: number, item: any) => sum + (parseFloat(item.refund_amount) || 0), 0
+      );
+      this.totalPosAmount = this.posList.reduce(
+        (sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0
+      );
+      this.totalExpenses = this.expenseList.reduce(
+        (sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0
+      );
+
+      console.log("✅ Report data loaded successfully");
+      this.toastr.success(`Report loaded for ${dateFrom} to ${dateTo}`);
+
+    } catch (err) {
+      console.error("❌ Error fetching data:", err);
+      this.toastr.error('Failed to load report data');
+    } finally {
+      this.isLoading = false;
+      this.loading.stop();
+    }
+  }
+
+  async loadHeldOrders(dateFrom: string, dateTo: string) {
+    try {
+      const d = { date: dateFrom, datetwo: dateTo };
+      const res = await this.guestService.getHeldReportOrdersTwo(d);
       
-    }       
-  }
-}
+      console.log("📦 Held Orders Response:", res);
 
-
-async applyFilter(){
-
-  try{
-    console.log(this.paymentForm.value.filter);
-    this.loading.start();
-   var res = await this.paymentService.getPaymentFilter(this.paymentForm.value.filter);
-   if(res) this.paymentList =res;
-
-  }
-  catch(error:any){
-    this.toastr.error(null,error);
-  }
-   
-
-finally{
-  this.loading.stop();
-}
-
-}
-
-openPopup(): void {
-
-  this.header ="Add Payment";
-
-  this.displayStyle = "block";
-  this.getBookingList();
-
-  // this.fecthRooms(this.bookingForm.value.room_type);
-
-}
-closePopup() {
-  this.displayStyle = "none";
-  this.openStyle = "none";
-}
-
-
-exportexcel()
-{
-  /* pass here the table id */
-  let element = document.getElementById('excel-table');
-  const ws: XLSX.WorkSheet =XLSX.utils.table_to_sheet(element);
-
-  /* generate workbook and add the worksheet */
-  const wb: XLSX.WorkBook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-  /* save to file */  
-  XLSX.writeFile(wb, this.fileName);
-
-}
-
-
-printReport() {
-  const printContents = document.querySelector('.page')?.innerHTML;
-  if (printContents) {
-    const printWindow = window.open('', '_blank');
-    printWindow?.document.write('<html><head><title>Report</title></head><body>');
-    printWindow?.document.write(printContents);
-    printWindow?.document.write('</body></html>');
-    printWindow?.document.close();
-    printWindow?.focus();
-    printWindow?.print();
-    printWindow?.close();
-  } else {
-    console.error("No content found to print.");
-  }
-}
-
-exportToExcel() {
-  const table = document.getElementById('excel-table');
-  if (table) {
-    const workbook = XLSX.utils.table_to_book(table);
-    XLSX.writeFile(workbook, 'Hotel_Report.xlsx');
-  } else {
-    console.error("Table not found for exporting to Excel.");
-  }
-}
-
-// async downloadPDF() {
-//   const element = document.querySelector('.page');
-//   if (element) {
-//     const canvas = await html2(element);
-//     const imgData = canvas.toDataURL('image/png');
-//     const pdf = new jsPDF('p', 'mm', 'a4');
-//     const imgWidth = 190;
-//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
-//     pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-//     pdf.save('Hotel_Report.pdf');
-//   } else {
-//     console.error("No content found to generate PDF.");
-//   }
-// }
-
-
-printRepo(): void {
-  const printContent = document.getElementById('excel-table')?.outerHTML;
-
-  if (!printContent) {
-    console.error('No content found to print.');
-    return;
-  }
-
-  // Open a new window
-  const printWindow = window.open('', '', 'height=800, width=800');
-
-  if (printWindow) {
-    printWindow.document.write('<html><head><title>Report</title>');
-    
-    // Add some basic CSS for printing (you can customize further if needed)
-    printWindow.document.write(`
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 0;
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        th, td {
-          padding: 8px;
-          border: 1px solid #ddd;
-        }
-        th {
-          background-color: #f2f2f2;
-        }
-        .text-end {
-          text-align: end;
-        }
-        .bg-light {
-          background-color: #f8f9fa;
-        }
-      </style>
-    `);
-
-    // Add the content
-    printWindow.document.write('</head><body>');
-    printWindow.document.write(printContent || '');
-    printWindow.document.write('</body></html>');
-
-    // Close the document to finish writing
-    printWindow.document.close();
-
-    // Wait for the content to load before triggering the print dialog
-    printWindow.onload = () => {
-      printWindow.print();
-      printWindow.close(); // Close the window after printing
-    };
-  } else {
-    console.error('Failed to open the print window.');
-  }
-}
-loadHeldOrders() {
-  const selectedDate = this.paymentForm.value.dates;
-  const d = { date: selectedDate,datetwo:this.paymentForm.value.datetwo };
-  this.guestService.getHeldReportOrdersTwo(d).subscribe((data) => {
-    console.log("API Response:", data); // Debugging: Check if data is received
-
-    if (!Array.isArray(data) || data.length === 0) {
-      console.log("No held orders found.");
-      this.HeldList = []; // Set empty array if no data
+      if (res && Array.isArray(res) && res.length > 0) {
+        this.HeldList = res.map((order: any) => ({
+          ...order,
+          items: Array.isArray(order.items)
+            ? order.items.map((item: any) => ({
+                ...item,
+                price: Number(item.price) || 0,
+                qty: Number(item.qty) || 0,
+                total: (Number(item.price) || 0) * (Number(item.qty) || 0)
+              }))
+            : [],
+          balance: Number(order.balance) || 0,
+          total: Number(order.total) || 0
+        }));
+        
+        this.calculateTotal();
+        console.log("✅ Held orders loaded:", this.HeldList.length);
+      } else {
+        this.HeldList = [];
+        this.totalHeldAmount = 0;
+        console.log("ℹ️ No held orders found in date range");
+      }
+    } catch (error) {
+      console.error("❌ Error loading held orders:", error);
+      this.HeldList = [];
       this.totalHeldAmount = 0;
+    }
+  }
+
+  calculateTotal() {
+    this.totalHeldAmount = this.HeldList.reduce((sum: number, order: any) =>
+      sum + order.items.reduce((subSum: number, item: any) => 
+        subSum + (item.qty * item.price), 0
+      ), 0
+    );
+  }
+
+  // ===================== EXPORT METHODS =====================
+
+  exportexcel() {
+    const element = document.getElementById('excel-table');
+    if (element) {
+      const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      XLSX.writeFile(wb, `detailed_report_${this.paymentForm.value.dates}_to_${this.paymentForm.value.datetwo}.xlsx`);
+      this.toastr.success('Report exported to Excel');
+    }
+  }
+
+  printRepo() {
+    const printContent = document.getElementById('excel-table')?.outerHTML;
+    if (!printContent) {
+      this.toastr.error('No content to print');
       return;
     }
 
-    // Ensure 'items' is always an array and convert price to a number
-    this.HeldList = data.map((order: any) => ({
-      ...order,
-      items: Array.isArray(order.items)
-        ? order.items.map((item: any) => ({
-            ...item,
-            price: Number(item.price) || 0, // Convert price to a number
-            qty: Number(item.qty) || 0 // Ensure qty is a number
-          }))
-        : []
-    }));
-
-    console.log("Processed HeldList:", this.HeldList);
-    this.calculateTotal();
-  });
-}
-
-calculateTotal() {
-  this.totalHeldAmount = this.HeldList.reduce((sum, order) =>
-    sum + order.items.reduce((subSum, item) => subSum + (item.qty * item.price), 0)
-  , 0);
-}
-
-
-
-async getFoodChef(d){
-
-  var bi =  await this.guestService.searchChefDatesTwo(d);
-  if(bi) this.chefList=bi
-
-
-}
-
-
-// async getEventPayment(d){
-
-//   var bi =  await this.guestService.searchEventDatesTwo(d);
-//   if(bi) this.eventList=bi
-
-
-// }
-
-
+    const printWindow = window.open('', '', 'height=800,width=800');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Detailed Report - Weekly</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              table { width: 100%; border-collapse: collapse; }
+              th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+              th { background: #2c3e50; color: white; }
+              .total-row { background: #f8f9fa; font-weight: bold; }
+              .text-end { text-align: right; }
+              .bg-light { background: #f8f9fa; }
+              .status-badge { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+              .status-paid { background: #d4edda; color: #155724; }
+              .status-partial { background: #fff3cd; color: #856404; }
+              .status-pending { background: #f8d7da; color: #721c24; }
+              .balance-warning { color: #f39c12; font-weight: bold; }
+              .balance-paid { color: #27ae60; }
+              .report-footer { text-align: center; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; color: #7f8c8d; }
+              .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+              .section-badge { background: #3498db; color: white; padding: 2px 12px; border-radius: 12px; font-size: 12px; }
+            </style>
+          </head>
+          <body>
+            ${printContent}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.onload = () => {
+        printWindow.print();
+        printWindow.close();
+      };
+    }
+  }
 }

@@ -14,9 +14,9 @@ const httpOptions = {
 
 @Injectable({ providedIn: 'root' })
 export class GuestService {
-
+// https://renderdemo-pnzm.onrender.com
   // private guestUrl = 'https://renderdemo-w1s0.onrender.com';  // URL to REST API
-  private guestUrl = 'http://192.168.10.20:5000';
+  private guestUrl = 'https://renderdemo-pnzm.onrender.com';
 
   // 
 
@@ -45,11 +45,30 @@ getCustomers(){
 CustomReservation(){
   return  lastValueFrom(this.http.get<any[]>(this.guestUrl + '/guest/get_reserve')) ;
 }
+acceptOrder(id: number) {
+  const url = `${this.guestUrl}/guest/accept_order/${id}`;
+  return lastValueFrom(this.http.put(url, httpOptions));
+
+}
 
  /* ================================
      🍹 COCKTAIL SETUP
   ================================= */
+// In guest.service.ts
 
+/**
+ * Get sales report
+ */
+getSalesReport(payload: any): Observable<any> {
+  return this.http.post(`${this.guestUrl}/guest/sales_report`, payload);
+}
+
+/**
+ * Get sales report by date (GET method)
+ */
+getSalesReportByDate(params: any): Observable<any> {
+  return this.http.get(`${this.guestUrl}/sales_report_by_date`, { params });
+}
   /**
    * Get cocktail setup (EDIT MODE)
    */
@@ -360,6 +379,7 @@ addExpense(dep:any) {
                 return  lastValueFrom (  this.http.get<any[]>(this.guestUrl + '/guest/get_all_session'));
               }
         
+              
             updateVendor(dep:any) {
               //console.log(guest);
                 return  lastValueFrom (  this.http.put(this.guestUrl + '/guest/update_vendor', dep, httpOptions));
@@ -885,7 +905,11 @@ getBalanceSheet(data: any) {
     searchMostAttendantDate(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_attendant', d, httpOptions));
     }
+// In guest.service.ts
 
+updateDeliveryStatus(data: any): Promise<any> {
+  return lastValueFrom(this.http.post(`${this.guestUrl}/guest/update_delivery_status`, data));
+}
         
     searchMostAttendantDateTwo(d){
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_most_attendant_two', d, httpOptions));
@@ -895,6 +919,9 @@ getBalanceSheet(data: any) {
       return  lastValueFrom(  this.http.post(this.guestUrl + '/guest/search_stock_usage_two', d, httpOptions));
     }
 
+ getHeldCartReport(payload: any): Promise<any> {
+    return lastValueFrom(this.http.post(`${this.guestUrl}/guest/held_cart_report`, payload));
+  }
 
    
 
@@ -1233,14 +1260,45 @@ getBalanceSheet(data: any) {
           return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders`));
         }
 
+          getHeldaOrders(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_ordersa`));
+        }
+
+
+      
+        getHeldOrdersLabel(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_label`));
+        }
+
         
+      
+        getHeldOrdersLabelProcessed(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_label_processed`));
+        }
+
         getHeldOrdersDrinks(){
           return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_drinks`));
         }
         
+          getHeldOrdersProcessedDrinks(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_processed_drinks`));
+        }
         
+getHeldOrdersDtf(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_dtf`));
+        }
 
+        getHeldOrdersGivers(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_givers`));
+        }
         
+         getHeldOrdersGiversProcessed(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_givers_processed`));
+        }
+        
+        getHeldOrdersDtfProcessed(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_dtf_processed`));
+        }
         
       getItemList() {
         //console.log(guest);get
@@ -1255,7 +1313,7 @@ getBalanceSheet(data: any) {
   
 
     getPurchaseRequestsByCartId(cartId: number) {
-    return this.http.get<any[]>(`http://192.168.10.20:5000/guest/get_purchase_by_cart/${cartId}`);
+    return this.http.get<any[]>(`https://renderdemo-pnzm.onrender.com/guest/get_purchase_by_cart/${cartId}`);
 }
 
 //  getCustomers(): Observable<any> {

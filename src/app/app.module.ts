@@ -86,6 +86,11 @@ import { SalaryTemplateComponent } from './salary-template/salary-template.compo
 import { AllowanceComponent } from './allowance/allowance.component';
 import { DeductionComponent } from './deduction/deduction.component';
 import { SalaryPaymentComponent } from './salary-payment/salary-payment.component';
+import { ViewLabelOrderComponent } from './view-label-order/view-label-order.component';
+import { ViewDtfOrderComponent } from './view-dtf-order/view-dtf-order.component';
+import { CustomersComponent } from './customers/customers.component';
+import { GiversTabComponent } from './givers-tab/givers-tab.component';
+import { HeldCartReportComponent } from './held-cart-report/held-cart-report.component';
 
 // import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
 
@@ -105,6 +110,11 @@ import { SalaryPaymentComponent } from './salary-payment/salary-payment.componen
         SearchPropertyComponent,
         AllowanceComponent,
         DeductionComponent,
+        ViewLabelOrderComponent,
+        ViewDtfOrderComponent,
+        GiversTabComponent,
+     
+     
       
       
        

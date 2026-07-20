@@ -1,61 +1,466 @@
-<div class="main-container"> 
-  <!-- Orders Section -->
-  <div class="order-section">
-    <h3 class="form-kev" style="text-align: center;">
-      LONGFORD CITY    
-      <button class="btn btn-danger" (click)="logOut()">Log Out</button>
-    </h3>
-
-    <button class="btn btn-info btn-sm" (click)="checkOrder()" >Check Today's Order</button>
+<div class="main-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="header-top">
+      <h3 class="form-kev">
+        <span>🧾 Assempahfie Graphics POS Orders</span>
+        <button class="btn btn-danger logout-btn" (click)="logOut()">
+          <i class="fa fa-sign-out"></i> Log Out
+        </button>
+      </h3>
+    </div>
     
-    <div class="order-container">
-      <div *ngFor="let order of itemList" class="order-card">
-        <h3>Order #{{ order.id }} - {{order.waiter}}</h3>
-        <p>
-          Status:
-          <span 
-            [ngClass]="{ 
-              'pending': order.food_status === 'yes', 
-              'confirmed': order.food_status === 'no' 
-            }">
-            {{ order.food_status === 'yes' ? 'Pending' : order.status }}
-          </span>
-        </p>
-  <p>Total: ₵{{ order.total }}</p>
-        <div *ngFor="let item of order.items">
-          <p><strong>{{ item.name }}</strong> (x{{ item.qty }}) -> {{item.price*item.qty}}</p>
-        </div>
+    <div class="header-actions">
+      <div class="action-buttons">
+        <button class="btn btn-info btn-sm" (click)="checkOrder()"  disable="">
+          <i class="fa fa-calendar-check-o"></i> Check Today's Order
+        </button>
+        <button class="btn btn-primary btn-sm" (click)="refreshOrders()">
+          <i class="fa fa-refresh"></i> Refresh
+        </button>
+      </div>
+      <div class="order-stats">
+        <span class="order-count incoming">📥 Incoming: {{ (filteredOrders?.length || itemList?.length || 0) }}</span>
+        <span class="order-count processed">✅ Processed: {{ (filteredProcessedOrders?.length || processedOrders?.length || 0) }}</span>
+      </div>
+    </div>
 
-        <button *ngIf="order.food_status !== 'no'" (click)="confirmOrder(order.id)">Confirm Order</button>
-        <span *ngIf="order.food_status === 'no'" class="confirmed-badge">Confirmed</span>
+    <!-- Search and Filter Section -->
+    <div class="filter-section">
+      <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input 
+          type="text" 
+          placeholder="Search by order #, attendant, customer, or item..." 
+          (input)="onSearchChange($event)"
+          class="form-control"
+        />
+      </div>
+      <div class="filter-actions">
+        <select (change)="onStatusChange($event)" class="form-control status-filter">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+        <button class="btn btn-secondary btn-sm" (click)="clearFilters()">
+          <i class="fa fa-times"></i> Clear
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Order List Section -->
-   <!-- <h3>paid</h3> -->
-  <!-- <div class="order-section">
-    <div class="order-container">
-      <div *ngFor="let order of orderList" class="order-card">
-        <h3>Order #{{ order.order_id }} - {{order.waiter}}</h3>
-        <p>
-          Status:
-          <span 
-            [ngClass]="{ 
-              'pending': order.food_status === 'yes', 
-              'confirmed': order.food_status === 'no' 
-            }">
-            {{ order.food_status === 'yes' ? 'Pending' : order.status }}
-          </span>
-        </p>
-
-        <div>
-          <p><strong>{{ order.item_name }}</strong> ({{ order.quantity }})</p>
-        </div>
-
-        <button *ngIf="order.food_status !== 'no'" (click)="confirmOrderTwo(order.id)">Confirm Order</button>
-        <span *ngIf="order.food_status === 'no'" class="confirmed-badge">Confirmed</span>
+  <!-- Two Column Layout for Tables -->
+  <div class="tables-container">
+    <!-- Left Table: Incoming Orders -->
+    <div class="table-wrapper incoming-orders">
+      <div class="table-header">
+        <h4><i class="fa fa-arrow-down"></i> Incoming Orders</h4>
+        <span class="table-badge">{{ (filteredOrders?.length || itemList?.length || 0) }}</span>
+      </div>
+      <div class="table-responsive" *ngIf="!isLoading; else loadingTemplate">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th class="col-order"># Order</th>
+              <th class="col-waiter">Attendant</th>
+              <th class="col-customer">Customer</th>
+              <th class="col-items">Items</th>
+              <th class="col-total">Total</th>
+              <th class="col-status">Status</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let order of (filteredOrders.length > 0 ? filteredOrders : itemList); trackBy: trackByOrderId">
+              <tr class="order-row" [class.expanded]="order.expanded" [class.vip-order]="hasVipItems(order)">
+                <td class="order-id" (click)="toggleOrderExpand(order, 'incoming')">
+                  <div class="order-id-wrapper">
+                    <span class="id-badge">#{{ order.id }}</span>
+                    <span class="expand-icon">
+                      <i class="fa" [ngClass]="{'fa-chevron-down': !order.expanded, 'fa-chevron-up': order.expanded}"></i>
+                    </span>
+                    <span *ngIf="hasVipItems(order)" class="vip-badge">⭐ VIP</span>
+                  </div>
+                </td>
+                <td class="waiter-cell">
+                  <span class="waiter-name">{{ order.waiter || 'N/A' }}</span>
+                </td>
+                <td class="customer-cell">
+                  <span class="customer-name">{{ order.customer_name || 'Walk-in' }}</span>
+                </td>
+                <td class="items-cell">
+                  <div class="items-preview">
+                    <span class="item-count">{{ getTotalItems(order) }} items</span>
+                    <div class="item-names-list">
+                      <span *ngFor="let item of order.items | slice:0:2; let last = last" class="item-name">
+                        {{ item.name }}{{ !last ? ', ' : '' }}
+                      </span>
+                      <span *ngIf="order.items?.length > 2" class="more-items">
+                        +{{ order.items.length - 2 }} more
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td class="total-cell">
+                  <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
+                </td>
+                <td class="status-cell">
+                  <span class="status-badge" [ngClass]="getStatusClass(order)">
+                    <span class="status-dot"></span>
+                    {{ getStatusText(order) }}
+                  </span>
+                </td>
+                <td class="action-cell">
+                  <button *ngIf="order.digital_printing_status !== 'no'" 
+                          class="btn-action confirm-btn" 
+                          (click)="confirmOrder(order.id)"
+                          title="Confirm Order">
+                    <i class="fa fa-check"></i> Confirm
+                  </button>
+                  <button *ngIf="order.working_on == 'not_started' "
+                          class="btn-action confirm-btn" 
+                          (click)="acceptOrder(order.id)"
+                          title="Accept Order">
+                    <i class="fa fa-check"></i> Accept
+                  </button>
+                  <span *ngIf="order.digital_printing_status === 'no'" 
+                        class="confirmed-badge">
+                    <i class="fa fa-check-circle"></i> Done
+                  </span>
+                  <button class="btn-action view-btn" (click)="toggleOrderExpand(order, 'incoming')" title="View Details">
+                    <i class="fa" [ngClass]="{'fa-eye': !order.expanded, 'fa-eye-slash': order.expanded}"></i>
+                  </button>
+                  <!-- <button class="btn-action delete-btn" (click)="deleteOrder(order.id)" title="Delete Order">
+                    <i class="fa fa-trash"></i>
+                  </button> -->
+                </td>
+              </tr>
+              <!-- Expanded Row -->
+              <tr *ngIf="order.expanded" class="expanded-row">
+                <td colspan="7">
+                  <div class="order-details">
+                    <div class="details-header">
+                      <h4>Order #{{ order.id }} Details</h4>
+                      <div class="details-meta">
+                        <span class="order-date">
+                          <i class="fa fa-clock-o"></i> {{ getFormattedDate(order.created_at) }}
+                        </span>
+                        <span class="order-customer">
+                          <i class="fa fa-user"></i> {{ order.customer_name || 'Walk-in' }}
+                        </span>
+                        <span class="order-note" *ngIf="order.note">
+                          <i class="fa fa-sticky-note"></i> {{ order.note }}
+                        </span>
+                      </div>
+                    </div>
+                    <table class="items-detail-table">
+                      <thead>
+                        <tr>
+                          <th>Item</th>
+                          <th>Description</th>
+                          <th>Qty</th>
+                          <th>Price</th>
+                          <th>Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of order.items; trackBy: trackByItemId" [class.vip-item]="item.is_vip === 'yes'">
+                          <td>
+                            <strong>{{ item.name }}</strong>
+                            <span *ngIf="item.is_vip === 'yes'" class="vip-label">VIP</span>
+                          </td>
+                          <td>{{ item.description || 'No description' }}</td>
+                          <td>{{ item.qty }}</td>
+                          <td>₵{{ item.price | number:'1.2-2' }}</td>
+                          <td>₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="4" class="total-label"><strong>Grand Total</strong></td>
+                          <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+            <tr *ngIf="(filteredOrders?.length === 0 && itemList?.length === 0) && !isLoading">
+              <td colspan="7">
+                <div class="empty-state">
+                  <i class="fa fa-inbox fa-3x"></i>
+                  <p>No incoming orders</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </div> -->
-</div> <!-- ✅ Ensure main-container is properly closed -->
+
+    <!-- Right Table: Processed Orders -->
+    <div class="table-wrapper processed-orders">
+      <div class="table-header">
+        <h4><i class="fa fa-check-circle"></i> Processed Orders</h4>
+        <span class="table-badge">{{ filteredProcessedOrders?.length || processedOrders?.length || 0 }}</span>
+      </div>
+      
+      <!-- Date Filter for Processed Orders -->
+      <div class="processed-filter-section">
+        <div class="date-filter-group">
+          <div class="date-filter-item">
+            <label><i class="fa fa-calendar"></i> From:</label>
+            <input 
+              type="date" 
+              [(ngModel)]="dateFrom" 
+              (change)="filterProcessedOrders()"
+              class="form-control date-input"
+            />
+          </div>
+          <div class="date-filter-item">
+            <label><i class="fa fa-calendar"></i> To:</label>
+            <input 
+              type="date" 
+              [(ngModel)]="dateTo" 
+              (change)="filterProcessedOrders()"
+              class="form-control date-input"
+            />
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="filterProcessedOrders()">
+            <i class="fa fa-filter"></i> Apply
+          </button>
+          <button class="btn btn-secondary btn-sm" (click)="clearDateFilter()">
+            <i class="fa fa-times"></i> Clear
+          </button>
+        </div>
+        
+        <!-- Quick Date Shortcuts -->
+        <div class="quick-date-buttons">
+          <button class="btn btn-outline-info btn-sm" (click)="setDateFilter('today')">
+            Today
+          </button>
+          <button class="btn btn-outline-info btn-sm" (click)="setDateFilter('yesterday')">
+            Yesterday
+          </button>
+          <button class="btn btn-outline-info btn-sm" (click)="setDateFilter('week')">
+            This Week
+          </button>
+          <button class="btn btn-outline-info btn-sm" (click)="setDateFilter('month')">
+            This Month
+          </button>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading; else loadingTemplate">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th class="col-order"># Order</th>
+              <th class="col-waiter">Attendant</th>
+              <th class="col-customer">Customer</th>
+              <th class="col-items">Items</th>
+              <th class="col-total">Total</th>
+              <th class="col-status">Status</th>
+              <th class="col-action">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let order of (filteredProcessedOrders.length > 0 ? filteredProcessedOrders : processedOrders); trackBy: trackByOrderId">
+              <tr class="order-row processed-row" [class.expanded]="order.expanded">
+                <td class="order-id" (click)="toggleOrderExpand(order, 'processed')">
+                  <div class="order-id-wrapper">
+                    <span class="id-badge processed">#{{ order.id }}</span>
+                    <span class="expand-icon">
+                      <i class="fa" [ngClass]="{'fa-chevron-down': !order.expanded, 'fa-chevron-up': order.expanded}"></i>
+                    </span>
+                    <span class="order-date-badge">{{ order.created_at | date:'dd/MM/yy' }}</span>
+                  </div>
+                </td>
+                <td class="waiter-cell">
+                  <span class="waiter-name">{{ order.waiter || 'N/A' }}</span>
+                </td>
+                <td class="customer-cell">
+                  <span class="customer-name">{{ order.customer_name || 'Walk-in' }}</span>
+                </td>
+                <td class="items-cell">
+                  <div class="items-preview">
+                    <span class="item-count">{{ getTotalItems(order) }} items</span>
+                    <div class="item-names-list">
+                      <span *ngFor="let item of order.items | slice:0:2; let last = last" class="item-name">
+                        {{ item.name }}{{ !last ? ', ' : '' }}
+                      </span>
+                      <span *ngIf="order.items?.length > 2" class="more-items">
+                        +{{ order.items.length - 2 }} more
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td class="total-cell">
+                  <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
+                </td>
+                <td class="status-cell">
+                  <span class="status-badge status-completed">
+                    <span class="status-dot"></span>
+                    Completed
+                  </span>
+                </td>
+                <td class="action-cell">
+                  <button class="btn-action view-btn" (click)="toggleOrderExpand(order, 'processed')" title="View Details">
+                    <i class="fa" [ngClass]="{'fa-eye': !order.expanded, 'fa-eye-slash': order.expanded}"></i>
+                  </button>
+                  <button class="btn-action print-btn" (click)="printOrder(order)" title="Print Receipt" disabled="">
+                    <i class="fa fa-print"></i>
+                  </button>
+                </td>
+              </tr>
+              <!-- Expanded Row for Processed Orders -->
+              <tr *ngIf="order.expanded" class="expanded-row">
+                <td colspan="7">
+                  <div class="order-details">
+                    <div class="details-header">
+                      <h4>Order #{{ order.id }} Details</h4>
+                      <div class="details-meta">
+                        <span class="order-date">
+                          <i class="fa fa-clock-o"></i> {{ getFormattedDate(order.created_at) }}
+                        </span>
+                        <span class="order-customer">
+                          <i class="fa fa-user"></i> {{ order.customer_name || 'Walk-in' }}
+                        </span>
+                        <span class="order-note" *ngIf="order.note">
+                          <i class="fa fa-sticky-note"></i> {{ order.note }}
+                        </span>
+                      </div>
+                    </div>
+                    <table class="items-detail-table">
+                      <thead>
+                        <tr>
+                          <th>Item</th>
+                          <th>Description</th>
+                          <th>Qty</th>
+                          <th>Price</th>
+                          <th>Subtotal</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let item of order.items; trackBy: trackByItemId">
+                          <td><strong>{{ item.name }}</strong></td>
+                          <td>{{ item.description || 'No description' }}</td>
+                          <td>{{ item.qty }}</td>
+                          <td>₵{{ item.price | number:'1.2-2' }}</td>
+                          <td>₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
+                          <td>
+                            <span class="status-badge" [ngClass]="{
+                              'status-finishing': item.confirmed === true,
+                              'status-processing': item.confirmed === false,
+                              'status-na': item.confirmed !== true && item.confirmed !== false
+                            }">
+                              {{ item.confirmed === true ? 'Finishing' : item.confirmed === false ? 'Processing' : 'N/A' }}
+                            </span>
+                          </td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <td colspan="5" class="total-label"><strong>Grand Total</strong></td>
+                          <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+            <tr *ngIf="(filteredProcessedOrders?.length === 0 && processedOrders?.length === 0) && !isLoading">
+              <td colspan="7">
+                <div class="empty-state">
+                  <i class="fa fa-check-circle-o fa-3x"></i>
+                  <p>No processed orders</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Template -->
+  <ng-template #loadingTemplate>
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <p>Loading orders...</p>
+    </div>
+  </ng-template>
+</div>
+
+<!-- Confirm Order Modal -->
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': showConfirmModal ? 'block' : 'none' }">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fa fa-check-circle" style="color: #28a745;"></i> Confirm Order
+        </h5>
+        <i class="fa fa-close" (click)="closeConfirmModal()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="order-info" *ngIf="orderToConfirm">
+          <div class="order-info-row">
+            <span class="info-label">Order #:</span>
+            <span class="info-value"><strong>{{ orderToConfirm.id }}</strong></span>
+          </div>
+          <div class="order-info-row">
+            <span class="info-label">Customer:</span>
+            <span class="info-value">{{ orderToConfirm.customer_name || 'Walk-in' }}</span>
+          </div>
+          <div class="order-info-row">
+            <span class="info-label">Total:</span>
+            <span class="info-value" style="color: #27ae60; font-weight: bold;">₵{{ orderToConfirm.total }}</span>
+          </div>
+          <div class="order-info-row">
+            <span class="info-label">Items:</span>
+            <span class="info-value">{{ orderToConfirm.items?.length || 0 }}</span>
+          </div>
+          <div class="order-info-row" *ngIf="orderToConfirm.note">
+            <span class="info-label">Note:</span>
+            <span class="info-value" style="color: #856404;">{{ orderToConfirm.note }}</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="confirmName">
+            <i class="fa fa-user"></i> Enter your full name <span class="text-danger">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="confirmName" 
+            class="form-control"
+            [(ngModel)]="confirmName" 
+            placeholder="Enter your full name..."
+            (keyup.enter)="submitConfirmation()"
+            autofocus
+          />
+          <small class="text-muted">
+            <i class="fa fa-info-circle"></i> This name will appear on the receipt as "Confirmed By"
+          </small>
+        </div>
+        
+        <div class="text-danger" *ngIf="showNameError">
+          <i class="fa fa-exclamation-circle"></i> Name is required to confirm order
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeConfirmModal()">
+          <i class="fa fa-times"></i> Cancel
+        </button>
+        <button class="btn btn-success" (click)="submitConfirmation()" [disabled]="!confirmName || confirmName.trim() === ''">
+          <i class="fa fa-check"></i> Confirm 
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

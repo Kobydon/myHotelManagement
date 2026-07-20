@@ -89,16 +89,16 @@ export class SignInComponent implements OnInit {
     if(x) this.user=x;
 
    }catch(error){
-   this.toastr.error(null,error.message)
+   this.toastr.error('',error.message)
    }
    finally{
-    if(this.user[0]?.roles=="kitchen" ){
-      localStorage.setItem('isKitchen','true');
+    if(this.user[0]?.roles=="digital_printing" ){
+      localStorage.setItem('digital_printing','true');
       
     
     this.router.navigate(["/view-order"]);}
 
-    else if(this.user[0]?.roles=="waiter" ||  this.user[0]?.roles=="waitress" ||  this.user[0]?.roles=="sales"){
+    else if(this.user[0]?.roles=="waiter" ||  this.user[0]?.roles=="waitress" ||  this.user[0]?.roles=="sales" ||  this.user[0]?.roles=="online"){
       localStorage.setItem('isWaiter','true');
       
       this.router.navigate(["/item-list"])
@@ -108,16 +108,40 @@ export class SignInComponent implements OnInit {
 
 
     
-    else if(this.user[0]?.roles=="bartender" ||  this.user[0]?.roles=="bartender"){
+    else if(this.user[0]?.roles=="bartender" ||  this.user[0]?.roles=="large_format"){
       localStorage.setItem('isBartender','true');
-      this.router.navigate(["/view-drink-order"])
+      this.router.navigate(["/view-large-format-order"])
+
+
+    }
+        else if(this.user[0]?.roles=="givers" ||  this.user[0]?.roles=="giver"){
+      localStorage.setItem('isgiver','true');
+      this.router.navigate(["/view-all-order"])
 
 
     }
 
+
+    
+    else if(this.user[0]?.roles=="label"){
+      localStorage.setItem('label','true');
+      this.router.navigate(["/view-label-order"])
+
+
+    }
+
+        
+    else if(this.user[0]?.roles=="dtf"){
+      localStorage.setItem('dtf','true');
+      this.router.navigate(["/view-dtf-order"])
+
+
+    }
    
 
-    else if(this.user[0]?.roles=="admin" || this.user[0]?.roles=="superadmin" || this.user[0].roles=="receptionist"  || this.user[0].roles=="auditor" ){
+    else if(this.user[0]?.roles=="admin" || this.user[0]?.roles=="superadmin" || this.user[0].roles=="receptionist"  || this.user[0].roles=="auditor"
+      || this.user[0].roles=="hr" || this.user[0].roles=="accountant"  
+     ){
       localStorage.setItem('isAdmin','true');
   
       this.router.navigate(["/dashboard"])

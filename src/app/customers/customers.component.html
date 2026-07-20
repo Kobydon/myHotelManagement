@@ -1,0 +1,44 @@
+<div>
+  <h1>Customer List</h1>
+  <table  class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Company Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Created Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let customer of customers">
+        <td>{{ customer.customer_id }}</td>
+        <td>{{ customer.firstname }}</td>
+        <td>{{ customer.lastname }}</td>
+        <td>{{ customer.company_name }}</td>
+        <td>{{ customer.email }}</td>
+        <td>{{ customer.phone }}</td>
+        <td>{{ customer.created_date }}</td>
+        <td>
+          <button (click)="editCustomer(customer.id)" class="btn btn-info btn sm">Edit</button>
+          <button (click)="deleteCustomer(customer.id)" class="btn btn-danger btn-sm">Delete</button>
+          <button (click)="openCouponModal(customer.id)" class="btn btn-primary btn-sm">Apply Coupon</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Coupon Modal -->
+<div class="modal" *ngIf="isCouponModalOpen">
+  <div class="modal-content">
+    <span class="close" (click)="closeCouponModal()">&times;</span>
+    <h2>Enter Discount Value</h2>
+    <label for="discount">Discount (%): </label>
+    <input type="number" id="discount" [(ngModel)]="discountValue" min="0" max="100" />
+    <button (click)="applyCoupon()">Apply Coupon</button>
+  </div>
+</div>
+</div>
