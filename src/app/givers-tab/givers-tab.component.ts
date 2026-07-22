@@ -44,7 +44,7 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
   totalInDelivery: number = 0;
   totalDelivered: number = 0;
   
-  // Barcode Scanner Properties
+  // Barcode Scanner Properties - Updated
   barcodeInput: string = '';
   isScanning: boolean = false;
   scannedOrder: any = null;
@@ -76,7 +76,8 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
     private userService: userService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private toastr: ToastrService,private cartService: CartService
+    private toastr: ToastrService,
+    private cartService: CartService
   ) { }
 
   ngOnInit(): void {
@@ -323,32 +324,40 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  // ===================== BARCODE SCANNING METHODS =====================
+  // ===================== BARCODE SCANNING METHODS - UPDATED =====================
 
   /**
-   * Handle barcode input from scanner
-   * This method is called when a barcode is scanned
+   * Handle Enter key on barcode input - THIS IS THE MAIN SEARCH TRIGGER
+   * Only searches when user presses Enter
    */
-  async onBarcodeScanned(event: any): Promise<void> {
-    const barcodeValue = event.target.value || event;
-    const orderId = barcodeValue.trim();
+  onBarcodeInputEnter(event: any): void {
+    // Get the value from the input
+    const value = this.barcodeInput || event.target.value;
     
-    if (!orderId) {
+    if (value && value.trim() !== '') {
+      console.log(`🔍 Searching for order: ${value}`);
+      this.findAndLoadOrder(value.trim());
+      // Clear the input after search
+      this.barcodeInput = '';
+      if (event.target) {
+        event.target.value = '';
+      }
+    } else {
+      this.toastr.warning('Please enter an Order ID', 'Warning');
+    }
+  }
+
+  /**
+   * Manual search when clicking the Find button
+   */
+  manualScan(): void {
+    if (!this.barcodeInput || this.barcodeInput.trim() === '') {
+      this.toastr.warning('Please enter an Order ID', 'Warning');
       return;
     }
-
-    console.log(`📷 Barcode scanned: ${orderId}`);
-    this.barcodeInput = orderId;
-    this.isScanning = true;
-    this.showScanResult = false;
-
-    // Clear the input for next scan
-    if (event.target) {
-      event.target.value = '';
-    }
-
-    // Find the order by ID
-    await this.findAndLoadOrder(orderId);
+    this.findAndLoadOrder(this.barcodeInput.trim());
+    // Clear the input after search
+    this.barcodeInput = '';
   }
 
   /**
@@ -358,19 +367,21 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
     const id = Number(orderId);
     
     if (isNaN(id) || id <= 0) {
-      this.toastr.warning('Invalid order ID format', 'Error');
+      this.toastr.warning('Invalid order ID format. Please enter a valid number.', 'Error');
       this.isScanning = false;
       return;
     }
 
+    // Show loading state
+    this.isScanning = true;
+    this.showScanResult = false;
+
     // First, try to find in pending orders
     let order = this.giversOrders.find(o => o.id === id);
-    let orderType = 'pending';
 
     // If not found, try in processed orders
     if (!order) {
       order = this.processedOrders.find(o => o.id === id);
-      orderType = 'processed';
     }
 
     // If still not found, try to load from server
@@ -402,20 +413,24 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
             this.cdr.detectChanges();
           }
           
-          this.toastr.success(`Order #${id} found and loaded`, 'Success');
-          this.openDeliveryModal(order);
-          this.isScanning = false;
+          this.toastr.success(`Order #${id} found and loaded`, 'Success ✅');
           this.showScanResult = true;
           this.scannedOrder = order;
+          this.isScanning = false;
+          
+          // Open delivery modal for the found order
+          setTimeout(() => {
+            this.openDeliveryModal(order);
+          }, 300);
           return;
         } else {
-          this.toastr.warning(`Order #${id} not found`, 'Not Found');
+          this.toastr.warning(`Order #${id} not found. Please check the ID and try again.`, 'Not Found');
           this.isScanning = false;
           return;
         }
       } catch (error) {
         console.error('Error loading order by barcode:', error);
-        this.toastr.error(`Order #${id} not found`, 'Error');
+        this.toastr.error(`Order #${id} not found.`, 'Error');
         this.isScanning = false;
         return;
       }
@@ -448,47 +463,13 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
           }, 3000);
         }
       }, 500);
+    } else {
+      this.toastr.warning(`Order #${id} not found`, 'Not Found');
     }
 
     this.isScanning = false;
-  }
-
-  /**
-   * Simulate barcode scan (for testing)
-   */
-  simulateScan(orderId: string): void {
-    if (!orderId || orderId.trim() === '') {
-      this.toastr.warning('Please enter an order ID', 'Warning');
-      return;
-    }
-    this.findAndLoadOrder(orderId);
-    // Clear input
+    // Clear the input
     this.barcodeInput = '';
-  }
-
-  /**
-   * Manually enter order ID for scanning
-   */
-  manualScan(): void {
-    if (!this.barcodeInput || this.barcodeInput.trim() === '') {
-      this.toastr.warning('Please enter an order ID', 'Warning');
-      return;
-    }
-    this.findAndLoadOrder(this.barcodeInput);
-    this.barcodeInput = '';
-  }
-
-  /**
-   * Handle enter key on barcode input
-   */
-  onBarcodeInputEnter(event: any): void {
-    if (event.key === 'Enter') {
-      const value = event.target.value;
-      if (value && value.trim() !== '') {
-        this.findAndLoadOrder(value);
-        event.target.value = '';
-      }
-    }
   }
 
   // ===================== DELIVERY METHODS =====================

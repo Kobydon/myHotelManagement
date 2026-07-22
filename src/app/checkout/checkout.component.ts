@@ -1275,224 +1275,256 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.openPrintWindow(receiptContent);
     }, 100);
   }
+buildReceiptHTML(
+  items: any[], 
+  customer: any, 
+  balance: number, 
+  amountPaid: number, 
+  totalAmount: number, 
+  currentDate: string, 
+  discount: number, 
+  note: string, 
+  orderId: any, 
+  order: any
+): string {
+  const orderIdString = orderId || order?.id || 'N/A';
+  const barcodeSVG = this.generateBarcode(orderIdString);
 
-  buildReceiptHTML(
-    items: any[], 
-    customer: any, 
-    balance: number, 
-    amountPaid: number, 
-    totalAmount: number, 
-    currentDate: string, 
-    discount: number, 
-    note: string, 
-    orderId: any, 
-    order: any
-  ): string {
-    const orderIdString = orderId || order?.id || 'N/A';
-    const barcodeSVG = this.generateBarcode(orderIdString);
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>Payment Receipt</title>
-        <style>
-          @media print {
-            @page { size: 80mm auto; margin: 0; }
-            body { margin: 0; }
-          }
-          body {
-            font-family: monospace, 'Courier New', sans-serif;
-            font-size: 13px;
-            padding: 5px;
-            width: 80mm;
-            box-sizing: border-box;
-          }
-          .header { text-align: center; margin-bottom: 2px; }
-          .logo-container { text-align: center; margin-bottom: 5px; }
-          .logo { max-width: 80px; height: auto; display: inline-block; }
-          .shop-name { font-size: 16px; font-weight: bold; }
-          .info, .footer { text-align: center; margin: 2px 0; }
-          .customer-info {
-            background: #f5f5f5;
-            padding: 5px;
-            margin: 5px 0;
-            border-radius: 3px;
-            font-size: 12px;
-          }
-          .customer-info .label { font-weight: bold; }
-          .customer-info .customer-name { font-size: 14px; font-weight: bold; }
-          .line { border-top: 1px dashed #000; margin: 6px 0; }
-          .barcode-container {
-            text-align: center;
-            margin: 5px 0;
-            padding: 3px 0;
-            background: #ffffff;
-          }
-          .barcode-container svg {
-            max-width: 100%;
-            height: auto;
-          }
-          table { width: 100%; font-size: 13px; border-collapse: collapse; }
-          th, td { padding: 2px 0; word-break: break-word; }
-          th { text-align: left; border-bottom: 1px solid #ccc; }
-          th:last-child, td:last-child { text-align: right; }
-          .total { font-weight: bold; font-size: 14px; text-align: right; margin-top: 4px; }
-          .balance-info { 
-            text-align: right; 
-            font-size: 12px; 
-            margin-top: 2px;
-            padding: 5px;
-            background: ${(balance > 0) ? '#fff3cd' : '#d4edda'};
-            border-radius: 3px;
-          }
-          .discount { text-align: right; font-size: 12px; margin-top: 2px; }
-          .divider { border: none; border-top: 1px dashed #000; margin: 6px 0; }
-          .thankyou { text-align: center; font-size: 13px; font-weight: bold; margin-top: 8px; }
-          .order-id { text-align: center; font-size: 12px; color: #555; }
-          .note-section {
-            text-align: center;
-            font-size: 12px;
-            margin: 5px 0;
-            padding: 5px;
-            background: #f9f9f9;
-            border-radius: 3px;
-          }
-          .payment-method { text-align: right; font-size: 12px; margin-top: 2px; }
-          .badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-          }
-          .badge-success { background: #d4edda; color: #155724; }
-          .badge-warning { background: #fff3cd; color: #856404; }
-          .barcode-label {
-            font-size: 9px;
-            color: #666;
-            text-align: center;
-            margin-top: 2px;
-          }
-          /* Thermal printer optimization */
-          @media print and (max-width: 80mm) {
-            body { font-size: 12px; }
-            .barcode-container svg { max-width: 70mm; }
-            .customer-info { font-size: 11px; }
-          }
-        </style>
-      </head>
-      <body onload="window.print(); window.close();">
-        <div class="header">
-          <div class="logo-container">
-            <img src="../../assets/img/asempa.jpg" alt="Asempa Graphics" class="logo" />
-          </div>
-          <div class="shop-name">Asempahfie Graphics</div>
-          <div class="info">📍 Kokomlemle, Accra</div>
-          <div class="info">📞 0243210009</div>
-          <div class="info">📧 asempahfie@gmail.com</div>
-          <div class="info">👤 Attendant: ${this.user[0]?.firstname || ''} ${this.user[0]?.lastname || ''}</div>
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>Payment Receipt</title>
+      <style>
+        @media print {
+          @page { size: 80mm auto; margin: 0; }
+          body { margin: 0; }
+        }
+        body {
+          font-family: monospace, 'Courier New', sans-serif;
+          font-size: 13px;
+          padding: 5px;
+          width: 80mm;
+          box-sizing: border-box;
+        }
+        .header { text-align: center; margin-bottom: 2px; }
+        .logo-container { text-align: center; margin-bottom: 5px; }
+        .logo { max-width: 80px; height: auto; display: inline-block; }
+        .shop-name { font-size: 16px; font-weight: bold; }
+        .info, .footer { text-align: center; margin: 2px 0; }
+        .customer-info {
+          background: #f5f5f5;
+          padding: 5px;
+          margin: 5px 0;
+          border-radius: 3px;
+          font-size: 12px;
+        }
+        .customer-info .label { font-weight: bold; }
+        .customer-info .customer-name { font-size: 14px; font-weight: bold; }
+        .line { border-top: 1px dashed #000; margin: 6px 0; }
+        .barcode-container {
+          text-align: center;
+          margin: 5px 0;
+          padding: 3px 0;
+          background: #ffffff;
+        }
+        .barcode-container svg {
+          max-width: 100%;
+          height: auto;
+        }
+        table { width: 100%; font-size: 13px; border-collapse: collapse; }
+        th, td { padding: 2px 0; word-break: break-word; }
+        th { text-align: left; border-bottom: 1px solid #ccc; }
+        th:last-child, td:last-child { text-align: right; }
+        .total { font-weight: bold; font-size: 14px; text-align: right; margin-top: 4px; }
+        .balance-info { 
+          text-align: right; 
+          font-size: 12px; 
+          margin-top: 2px;
+          padding: 5px;
+          background: ${(balance > 0) ? '#fff3cd' : '#d4edda'};
+          border-radius: 3px;
+        }
+        .discount { text-align: right; font-size: 12px; margin-top: 2px; }
+        .divider { border: none; border-top: 1px dashed #000; margin: 6px 0; }
+        .thankyou { text-align: center; font-size: 13px; font-weight: bold; margin-top: 8px; }
+        .order-id { 
+          text-align: center; 
+          font-size: 32px; 
+          font-weight: 900;
+          color: #1a1a1a;
+          padding: 8px 0;
+          letter-spacing: 3px;
+          background: #f8f9fa;
+          margin: 8px 0;
+          border-radius: 5px;
+        }
+        .order-id-label {
+          text-align: center;
+          font-size: 11px;
+          color: #666;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          font-weight: bold;
+          margin-top: 3px;
+        }
+        .note-section {
+          text-align: center;
+          font-size: 12px;
+          margin: 5px 0;
+          padding: 5px;
+          background: #f9f9f9;
+          border-radius: 3px;
+        }
+        .payment-method { text-align: right; font-size: 12px; margin-top: 2px; }
+        .badge {
+          display: inline-block;
+          padding: 2px 10px;
+          border-radius: 12px;
+          font-size: 11px;
+          font-weight: bold;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .barcode-label {
+          font-size: 9px;
+          color: #666;
+          text-align: center;
+          margin-top: 2px;
+        }
+        /* Thermal printer optimization */
+        @media print and (max-width: 80mm) {
+          body { font-size: 12px; }
+          .barcode-container svg { max-width: 70mm; }
+          .customer-info { font-size: 11px; }
+          .order-id { font-size: 28px; }
+        }
+        /* Order number highlight */
+        .order-number-box {
+          border: 2px solid #2c3e50;
+          padding: 5px 0;
+          margin: 5px 0;
+          border-radius: 8px;
+          background: #ffffff;
+        }
+      </style>
+    </head>
+    <body onload="window.print(); window.close();">
+      <div class="header">
+        <div class="logo-container">
+          <img src="../../assets/img/asempa.jpg" alt="Asempa Graphics" class="logo" />
         </div>
-        
-        <div class="customer-info">
-          ${customer ? `
-            <div class="customer-name">👤 ${customer.firstname || ''} ${customer.lastname || ''}</div>
-            <div><span class="label">Customer ID:</span> ${customer.id || 'N/A'}</div>
-            ${customer.phone ? `<div><span class="label">📱 Phone:</span> ${customer.phone}</div>` : ''}
-            ${customer.email ? `<div><span class="label">✉️ Email:</span> ${customer.email}</div>` : ''}
-          ` : `
-            <div>👤 <span class="label">Customer:</span> Walk-in Customer</div>
-          `}
-        </div>
-        
-        <div class="info"><strong>🧾 PAYMENT RECEIPT</strong></div>
-        <div class="order-id">Order #: ${orderIdString}</div>
-        <div class="info">📅 Date: ${currentDate}</div>
-        
-        <!-- BARCODE SECTION -->
-        <div class="barcode-container">
-          ${barcodeSVG}
-          <div class="barcode-label">Scan to verify order #${orderIdString}</div>
-        </div>
-        
-        ${note ? `
-          <div class="note-section">
-            <strong>📝 Note:</strong> ${note}
-          </div>
-        ` : ''}
-        
-        <hr class="divider" />
-
-        <table>
-          <thead>
-            <tr><th>Item</th><th>Qty</th><th>Amount</th></tr>
-          </thead>
-          <tbody>
-            ${items.map((item: any) => `
-              <tr>
-                <td>
-                  ${item.name || item.item_name || 'N/A'}
-                  ${item.description ? '<br><small style="color:#666;font-size:11px;">' + item.description + '</small>' : ''}
-                  ${item.width && item.height ? '<br><small style="color:#888;font-size:10px;">📐 ' + item.width + ' x ' + item.height + ' ' + (item.unit || 'inches') + '</small>' : ''}
-                </td>
-                <td>${item.qty || 1}</td>
-                <td>₵${((+item.price || 0) * (+item.qty || 1)).toFixed(2)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-
-        <hr class="divider" />
-        <div class="total">💰 Total: ₵${this.formatCurrency(totalAmount)}</div>
-        
-        ${discount > 0 ? `
-          <div class="discount">🏷️ Discount: ${discount}%</div>
-          <div class="discount">💵 Discount Amount: ₵${this.formatCurrency((discount / 100) * totalAmount)}</div>
-        ` : ''}
-        
-        <div class="payment-method">💳 Payment Method: ${this.createForm?.value?.method || 'Cash'}</div>
-        
-        ${(balance > 0) ? `
-          <div class="balance-info">
-            💳 Amount Paid: ₵${this.formatCurrency(amountPaid)}<br>
-            ⏳ Balance Due: ₵${this.formatCurrency(balance)}
-            <br>
-            <span class="badge badge-warning">Partial Payment</span>
-          </div>
+        <div class="shop-name">Asempahfie Graphics</div>
+        <div class="info">📍 Kokomlemle, Accra</div>
+        <div class="info">📞 0243210009</div>
+        <div class="info">📧 asempahfie@gmail.com</div>
+        <div class="info">👤 Attendant: ${this.user[0]?.firstname || ''} ${this.user[0]?.lastname || ''}</div>
+      </div>
+      
+      <!-- ORDER NUMBER - VERY BIG AND PROMINENT -->
+      <div class="order-number-box">
+        <div class="order-id-label">ORDER NUMBER</div>
+        <div class="order-id">#${orderIdString}</div>
+      </div>
+      
+      <div class="customer-info">
+        ${customer ? `
+          <div class="customer-name">👤 ${customer.firstname || ''} ${customer.lastname || ''}</div>
+          <div><span class="label">Customer ID:</span> ${customer.id || 'N/A'}</div>
+          ${customer.phone ? `<div><span class="label">📱 Phone:</span> ${customer.phone}</div>` : ''}
+          ${customer.email ? `<div><span class="label">✉️ Email:</span> ${customer.email}</div>` : ''}
         ` : `
-          <div class="balance-info" style="background: #d4edda;">
-            ✅ Fully Paid: ₵${this.formatCurrency(totalAmount)}
-            <br>
-            <span class="badge badge-success">Paid in Full</span>
-          </div>
+          <div>👤 <span class="label">Customer:</span> Walk-in Customer</div>
         `}
-        
-        <hr class="divider" />
-        
-        <div class="thankyou">🙏 Thank you for your patronage!</div>
-        <div class="footer" style="font-size: 10px; color: #666; margin-top: 5px;">
-          This is your official payment receipt
+      </div>
+      
+      <div class="info"><strong>🧾 PAYMENT RECEIPT</strong></div>
+      <div class="info">📅 Date: ${currentDate}</div>
+      
+      <!-- BARCODE SECTION -->
+      <div class="barcode-container">
+        ${barcodeSVG}
+        <div class="barcode-label">Scan to verify order #${orderIdString}</div>
+      </div>
+      
+      ${note ? `
+        <div class="note-section">
+          <strong>📝 Note:</strong> ${note}
         </div>
-        ${balance > 0 ? `
-          <div class="footer" style="font-size: 10px; color: #e74c3c; font-weight: bold;">
-            ⚠️ Outstanding balance of ₵${this.formatCurrency(balance)}
-          </div>
-          <div class="footer" style="font-size: 10px; color: #e74c3c;">
-            Please settle the balance on your next visit
-          </div>
-        ` : ''}
-        <div class="footer" style="font-size: 10px; color: #666; margin-top: 3px;">
-          Visit us again at Asempahfie Graphics
+      ` : ''}
+      
+      <hr class="divider" />
+
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Qty</th><th>Amount</th></tr>
+        </thead>
+        <tbody>
+          ${items.map((item: any) => `
+            <tr>
+              <td>
+                ${item.name || item.item_name || 'N/A'}
+                ${item.description ? '<br><small style="color:#666;font-size:11px;">' + item.description + '</small>' : ''}
+                ${item.width && item.height ? '<br><small style="color:#888;font-size:10px;">📐 ' + item.width + ' x ' + item.height + ' ' + (item.unit || 'inches') + '</small>' : ''}
+              </td>
+              <td>${item.qty || 1}</td>
+              <td>₵${((+item.price || 0) * (+item.qty || 1)).toFixed(2)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <hr class="divider" />
+      <div class="total">💰 Total: ₵${this.formatCurrency(totalAmount)}</div>
+      
+      ${discount > 0 ? `
+        <div class="discount">🏷️ Discount: ${discount}%</div>
+        <div class="discount">💵 Discount Amount: ₵${this.formatCurrency((discount / 100) * totalAmount)}</div>
+      ` : ''}
+      
+      <div class="payment-method">💳 Payment Method: ${this.createForm?.value?.method || 'Cash'}</div>
+      
+      ${(balance > 0) ? `
+        <div class="balance-info">
+          💳 Amount Paid: ₵${this.formatCurrency(amountPaid)}<br>
+          ⏳ Balance Due: ₵${this.formatCurrency(balance)}
+          <br>
+          <span class="badge badge-warning">Partial Payment</span>
         </div>
-        <div class="footer" style="font-size: 8px; color: #999;">
-          This is a computer-generated receipt | ${new Date().toLocaleDateString()}
-          <br>Order #${orderIdString}
+      ` : `
+        <div class="balance-info" style="background: #d4edda;">
+          ✅ Fully Paid: ₵${this.formatCurrency(totalAmount)}
+          <br>
+          <span class="badge badge-success">Paid in Full</span>
         </div>
-      </body>
-      </html>
-    `;
-  }
+      `}
+      
+      <hr class="divider" />
+      
+      <div class="thankyou">🙏 Thank you for your patronage!</div>
+      <div class="footer" style="font-size: 10px; color: #666; margin-top: 5px;">
+        This is your official payment receipt
+      </div>
+      ${balance > 0 ? `
+        <div class="footer" style="font-size: 10px; color: #e74c3c; font-weight: bold;">
+          ⚠️ Outstanding balance of ₵${this.formatCurrency(balance)}
+        </div>
+        <div class="footer" style="font-size: 10px; color: #e74c3c;">
+          Please settle the balance on your next visit
+        </div>
+      ` : ''}
+      <div class="footer" style="font-size: 10px; color: #666; margin-top: 3px;">
+        Visit us again at Asempahfie Graphics
+      </div>
+      <div class="footer" style="font-size: 8px; color: #999;">
+        This is a computer-generated receipt | ${new Date().toLocaleDateString()}
+        <br>Order #${orderIdString}
+      </div>
+    </body>
+    </html>
+  `;
+}
 
   openPrintWindow(content: string): void {
     let printWindow = window.open('', '_blank', 'width=400,height=600,scrollbars=yes');

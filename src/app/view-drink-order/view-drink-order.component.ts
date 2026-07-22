@@ -437,185 +437,205 @@ export class ViewDrinkOrderComponent implements OnInit, OnDestroy {
   /**
    * Print confirmed order receipt
    */
-  printConfirmedOrder(order: any, confirmedBy: string): void {
-    const currentDate = new Date().toLocaleString();
-    const customer = order.customer_details || null;
 
-    const printWindow = window.open('', '', 'width=300,height=800');
+printConfirmedOrder(order: any, confirmedBy: string): void {
+  const currentDate = new Date().toLocaleString();
+  const customer = order.customer_details || null;
 
-    if (printWindow) {
-      let receiptContent = `
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <title>CONFIRMED DRINK ORDER</title>
-          <style>
-            @media print {
-              @page { size: 80mm auto; margin: 0; }
-              body { margin: 0; }
+  const printWindow = window.open('', '', 'width=200,height=300');
+
+  if (printWindow) {
+    let stickerContent = `
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>ORDER STICKER</title>
+        <style>
+          @media print {
+            @page { 
+              size: 60mm 90mm; 
+              margin: 0; 
             }
-            body {
-              font-family: monospace, 'Courier New', sans-serif;
-              font-size: 13px;
-              padding: 5px;
-              width: 80mm;
-              box-sizing: border-box;
-            }
-            .header { text-align: center; margin-bottom: 4px; }
-            .logo-container { text-align: center; margin-bottom: 5px; }
-            .logo { max-width: 80px; height: auto; display: inline-block; }
-            .shop-name { font-weight: bold; font-size: 16px; }
-            .info { text-align: center; font-size: 12px; margin: 2px 0; }
-            .confirmed-info {
-              background: #d4edda;
-              padding: 8px;
-              margin: 5px 0;
-              border-radius: 3px;
-              text-align: center;
-              border: 1px solid #28a745;
-            }
-            .confirmed-info .label { font-weight: bold; color: #155724; }
-            .confirmed-info .name { font-size: 14px; font-weight: bold; color: #155724; }
-            .customer-info {
-              background: #f5f5f5;
-              padding: 5px;
-              margin: 5px 0;
-              border-radius: 3px;
-              font-size: 12px;
-            }
-            .customer-info .label { font-weight: bold; }
-            .customer-info .customer-name { font-size: 14px; font-weight: bold; }
-            .line { border-top: 1px dashed black; margin: 6px 0; }
-            table { width: 100%; border-collapse: collapse; font-size: 13px; }
-            th, td { padding: 2px 0; word-break: break-word; }
-            th { text-align: left; }
-            td:last-child, th:last-child { text-align: right; }
-            .total { font-weight: bold; font-size: 14px; text-align: right; margin-top: 5px; }
-            .footer { text-align: center; font-size: 12px; margin-top: 8px; }
-            .divider { border: none; border-top: 2px dashed #000; margin: 8px 0; }
-            .status-badge {
-              display: inline-block;
-              background: #28a745;
-              color: white;
-              padding: 3px 12px;
-              border-radius: 12px;
-              font-size: 12px;
-              font-weight: bold;
-            }
-          </style>
-        </head>
-        <body onload="window.print(); window.close();">
-          <div class="header">
-            <div class="logo-container">
-              <img src="../../assets/img/asempa.jpg" alt="Asempa Graphics" class="logo" />
-            </div>
-            <div class="shop-name">Assempahfie Graphics</div>
-            <div class="info">📍 Kokomlemle, Accra</div>
-            <div class="info">📞 0243210009</div>
-            <div class="info">👤 Attendant: ${this.user[0]?.firstname + ' ' + this.user[0]?.lastname}</div>
+            body { margin: 0; }
+          }
+          body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            padding: 8px;
+            margin: 0;
+            width: 60mm;
+            min-height: 90mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+          }
+          .sticker-container {
+            text-align: center;
+            width: 100%;
+            padding: 5px;
+            border: 2px dashed #333;
+            border-radius: 8px;
+            background: #fafafa;
+          }
+          .logo-container {
+            text-align: center;
+            margin-bottom: 5px;
+          }
+          .logo {
+            max-width: 50px;
+            height: auto;
+            display: inline-block;
+          }
+          .order-number {
+            font-size: 32px;
+            font-weight: 900;
+            color: #1a1a1a;
+            margin: 5px 0;
+            letter-spacing: 2px;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+          }
+          .label-order {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+          }
+          .working-on {
+            font-size: 13px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 5px 0;
+            padding: 3px 10px;
+            background: #e8f4f8;
+            border-radius: 12px;
+            display: inline-block;
+          }
+          .divider {
+            border: none;
+            border-top: 1px dashed #ccc;
+            margin: 6px 0;
+          }
+          .info-row {
+            font-size: 9px;
+            color: #555;
+            margin: 2px 0;
+          }
+          .info-row .label {
+            font-weight: bold;
+          }
+          .footer-text {
+            font-size: 8px;
+            color: #999;
+            margin-top: 5px;
+            border-top: 1px dotted #ddd;
+            padding-top: 5px;
+          }
+          .confirmed-by {
+            font-size: 10px;
+            color: #27ae60;
+            font-weight: bold;
+          }
+          .sticker-badge {
+            background: #27ae60;
+            color: white;
+            font-size: 8px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 3px;
+          }
+        </style>
+      </head>
+      <body onload="window.print(); window.close();">
+        <div class="sticker-container">
+          <!-- Company Logo -->
+          <div class="logo-container">
+            <img src="../../assets/img/asempa.jpg" alt="Asempa Graphics" class="logo" />
           </div>
           
-          <div class="confirmed-info">
-            <div><span class="label">✅ CONFIRMED BY:</span></div>
-            <div class="name">${confirmedBy}</div>
-            <div style="font-size: 11px; margin-top: 3px;">
-              <span class="status-badge">CONFIRMED</span>
-            </div>
+          <div style="font-size: 8px; font-weight: bold; color: #2c3e50; margin-bottom: 3px;">
+            ASSEMPAHFIE GRAPHICS
           </div>
           
-          <div class="customer-info">
-            ${customer ? `
-              <div class="customer-name">👤 ${customer.firstname || ''} ${customer.lastname || ''}</div>
-              <div><span class="label">Customer ID:</span> ${customer.id || 'N/A'}</div>
-              ${customer.phone ? `<div><span class="label">📱 Phone:</span> ${customer.phone}</div>` : ''}
-              ${customer.email ? `<div><span class="label">📧 Email:</span> ${customer.email}</div>` : ''}
-            ` : `
-              <div>👤 <span class="label">Customer:</span> Walk-in Customer</div>
-            `}
+          <div class="label-order">ORDER STICKER</div>
+          
+          <!-- ORDER NUMBER - VERY BIG -->
+          <div class="order-number">#${order.id}</div>
+          
+          <!-- Working On Status -->
+          <div class="working-on">
+            👤 ${order.working_on || 'Not Assigned'}
           </div>
           
-          <div class="info"><strong>🍹 DRINK ORDER CONFIRMATION</strong></div>
-          <div class="info">Order #: ${order.id}</div>
-          <div class="info">📅 Date: ${currentDate}</div>
+          <div class="divider"></div>
           
-          ${order.note ? `
-            <div style="text-align:center;font-size:12px;padding:3px;background:#f9f9f9;border-radius:3px;">
-              <strong>📝 Note:</strong> ${order.note}
-            </div>
-          ` : ''}
-          
-          <hr class="divider" />
-
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Qty</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-
-      if (order.items && Array.isArray(order.items)) {
-        order.items.forEach((item: any) => {
-          receiptContent += `
-            <tr>
-              <td>
-                ${item.name}
-                ${item.description ? '<br><small style="color:#666;font-size:11px;">' + item.description + '</small>' : ''}
-              </td>
-              <td>${item.qty}</td>
-              <td>₵${(item.price * item.qty).toFixed(2)}</td>
-            </tr>
-          `;
-        });
-      }
-
-      receiptContent += `
-            </tbody>
-          </table>
-
-          <hr class="divider" />
-          <div class="total">💰 Total: ₵${order.total}</div>
-          
-          <hr class="divider" />
-          <div class="footer" style="font-size: 10px; color: #666;">
-            Confirmed by: ${confirmedBy}
+          <!-- Customer Info -->
+          <div class="info-row">
+            <span class="label">Customer:</span> ${customer ? (customer.firstname || '') + ' ' + (customer.lastname || '') : 'Walk-in'}
           </div>
-          <div class="footer">━━━━━━━━━━━━━━━━━━━━━━━━</div>
-          <div class="footer" style="font-size: 10px; color: #666;">
-            Thank you for your order!
+          
+          <div class="info-row">
+            <span class="label">Items:</span> ${order.items?.length || 0} items
           </div>
-        </body>
-        </html>
-      `;
+          
+          <div class="info-row">
+            <span class="label">Total:</span> ₵${order.total}
+          </div>
+          
+          <div class="info-row">
+            <span class="label">Date:</span> ${new Date().toLocaleDateString()}
+          </div>
+          
+          <div class="divider"></div>
+          
+          <!-- Confirmed By -->
+          <div class="confirmed-by">
+            ✅ Confirmed by: ${confirmedBy}
+          </div>
+          
+          <div class="sticker-badge">CONFIRMED</div>
+          
+          <div class="footer-text">
+            Assempahfie Graphics • Kokomlemle, Accra
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
 
-      printWindow.document.open();
-      printWindow.document.write(receiptContent);
-      printWindow.document.close();
-    } else {
-      console.error('Failed to open print window');
-      this.toastr.error('Failed to print receipt', 'Error');
-    }
+    printWindow.document.open();
+    printWindow.document.write(stickerContent);
+    printWindow.document.close();
+  } else {
+    console.error('Failed to open print window');
+    this.toastr.error('Failed to print sticker', 'Error');
   }
-
+}
   /**
    * Print order receipt (for processed orders)
    */
-  printOrder(order: any): void {
-    const confirmedBy = prompt('Enter your full name to print this receipt:');
-    
-    if (confirmedBy === null) return;
-    
-    if (!confirmedBy || confirmedBy.trim() === '') {
-      this.toastr.warning('Name is required to print receipt', 'Required');
-      this.printOrder(order);
-      return;
-    }
-
-    this.printConfirmedOrder(order, confirmedBy.trim());
+/**
+ * Print order as sticker (for processed orders)
+ */
+printOrder(order: any): void {
+  const confirmedBy = prompt('Enter your full name to print this sticker:');
+  
+  if (confirmedBy === null) return;
+  
+  if (!confirmedBy || confirmedBy.trim() === '') {
+    this.toastr.warning('Name is required to print sticker', 'Required');
+    this.printOrder(order);
+    return;
   }
+
+  this.printConfirmedOrder(order, confirmedBy.trim());
+}
 
   // ===================== TABLE INTERACTION METHODS =====================
 

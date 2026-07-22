@@ -80,7 +80,7 @@
                   (input)="onQtyChange($event, item, i)"
                   min="1"
                   step="1"
-                  [class.is-loading]="updatingQty[i]"
+                  [class.is-loading]="updatingQty[i]"  style="width: auto;"
                 />
                 <span *ngIf="updatingQty[i]" class="saving-indicator">
                   <i class="fa fa-spinner fa-spin"></i>

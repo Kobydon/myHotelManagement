@@ -65,6 +65,7 @@
               <th class="col-waiter">Attendant</th>
               <th class="col-customer">Customer</th>
               <th class="col-items">Items</th>
+              <th class="col-customer">Accepted by</th>
               <th class="col-total">Total</th>
               <th class="col-status">Status</th>
               <th class="col-action">Action</th>
@@ -100,6 +101,9 @@
                       </span>
                     </div>
                   </div>
+                </td>
+                <td class="customer-cell">
+                  <span class="customer-name">{{ order.working_on || 'Not Yet Accepted' }}</span>
                 </td>
                 <td class="total-cell">
                   <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
@@ -261,6 +265,7 @@
               <th class="col-customer">Customer</th>
               <th class="col-items">Items</th>
               <th class="col-total">Total</th>
+              <th class="col-customer">Accepted by</th>
               <th class="col-status">Status</th>
               <th class="col-action">Action</th>
             </tr>
@@ -283,6 +288,7 @@
                 <td class="customer-cell">
                   <span class="customer-name">{{ order.customer_name || 'Walk-in' }}</span>
                 </td>
+                 
                 <td class="items-cell">
                   <div class="items-preview">
                     <span class="item-count">{{ getTotalItems(order) }} items</span>
@@ -298,6 +304,9 @@
                 </td>
                 <td class="total-cell">
                   <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
+                </td>
+                 <td class="customer-cell">
+                  <span class="customer-name">{{ order.working_on || 'Not Yet Accepted' }}</span>
                 </td>
                 <td class="status-cell">
                   <span class="status-badge status-completed">

@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <!-- Barcode Scanner Section -->
+    <!-- Barcode Scanner Section - Updated to require Enter key -->
     <div class="barcode-scanner-section">
       <div class="scanner-header">
         <span><i class="fa fa-qrcode"></i> Scan Order Barcode</span>
@@ -41,8 +41,7 @@
             #barcodeInputElement
             type="text" 
             class="form-control" 
-            placeholder="Scan barcode or enter Order ID..."
-            (input)="onBarcodeScanned($event)"
+            placeholder="Enter Order ID then press Enter to search..."
             (keyup.enter)="onBarcodeInputEnter($event)"
             [(ngModel)]="barcodeInput"
             autofocus
@@ -54,7 +53,7 @@
         </div>
         <small class="text-muted">
           <i class="fa fa-info-circle"></i> 
-          Focus the input and use a barcode scanner, or type the Order ID manually
+          Enter Order ID and press <kbd>Enter</kbd> or click <strong>Find</strong> to search
         </small>
       </div>
 
