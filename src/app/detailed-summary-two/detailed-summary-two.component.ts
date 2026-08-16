@@ -185,7 +185,7 @@ export class DetailedSummaryTwoComponent implements OnInit {
         returnedRes,
         mostOrderedRes,
         refundRes,
-        posRes,
+        // posRes,
         roomRes,
         incomeRes,
         expenseRes,
@@ -201,7 +201,7 @@ export class DetailedSummaryTwoComponent implements OnInit {
         this.guestService.searchReturnDateTwo(d).catch(() => [] as any[]),
         this.guestService.searchMostOrderedDateTwo(d).catch(() => [] as any[]),
         this.paymentService.searchRefundDatesTwo(d).catch(() => [] as any[]),
-        this.paymentService.searchDatesPosTwo(d).catch(() => [] as any[]),
+        // this.paymentService.searchDatesPosTwo(d).catch(() => [] as any[]),
         this.roomService.searchRoomDatesTwo(d).catch(() => [] as any[]),
         this.guestService.searchIncomeDatesTwo(d).catch(() => ({ data: [], summary: {} })),
         this.guestService.searchExpenseDateTwo(d).catch(() => [] as any[]),
@@ -221,7 +221,7 @@ export class DetailedSummaryTwoComponent implements OnInit {
       this.returnList = (returnedRes as any[]) || [];
       this.mostOrderedItems = (mostOrderedRes as any[]) || [];
       this.refundList = (refundRes as any[]) || [];
-      this.posList = (posRes as any[]) || [];
+      // this.posList = (posRes as any[]) || [];
       this.rooms = (roomRes as any[]) || [];
 
       // ✅ Handle income data with type checking
@@ -248,9 +248,9 @@ export class DetailedSummaryTwoComponent implements OnInit {
       this.totalRefundAmount = this.refundList.reduce(
         (sum: number, item: any) => sum + (parseFloat(item.refund_amount) || 0), 0
       );
-      this.totalPosAmount = this.posList.reduce(
-        (sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0
-      );
+      // this.totalPosAmount = this.posList.reduce(
+      //   (sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0
+      // );
       this.totalExpenses = this.expenseList.reduce(
         (sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0
       );

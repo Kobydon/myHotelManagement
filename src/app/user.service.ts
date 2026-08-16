@@ -191,6 +191,7 @@ return lastValueFrom(this.http.get<any[]>(this.userUrl + '/user/get_users'));
 
 
 get_users_waiter(){
+  
   return lastValueFrom(this.http.get<any[]>(this.userUrl + '/user/get_users_waiter'));
   }
 

@@ -49,8 +49,36 @@ acceptOrder(id: number) {
   const url = `${this.guestUrl}/guest/accept_order/${id}`;
   return lastValueFrom(this.http.put(url, httpOptions));
 
+
+}
+// guest.service.ts - Add this method
+getHoldingOrdersCustomers(): Observable<any> {
+  return this.http.get(`${this.guestUrl}/guest/get_helding_orders_customers`);
+}
+// guest.service.ts - Add this method
+getCustomerPayments(): Observable<any> {
+  return this.http.get(`${this.guestUrl}/guest/get_customer_payments`);
+}
+CuttingOrder(id: number) {
+  const url = `${this.guestUrl}/guest/cutting_order/${id}`;
+  return lastValueFrom(this.http.put(url, httpOptions));
 }
 
+takeOrder(id: number) {
+  const url = `${this.guestUrl}/guest/take_order/${id}`;
+  return lastValueFrom(this.http.put(url, httpOptions));
+}
+
+// In your service file (cart.service.ts or guest.service.ts)
+async checkOrderItem(orderId: number, itemId: number): Promise<any> {
+  try {
+    const response = await this.http.put(`${this.guestUrl}/guest/check_order_item/${orderId}/${itemId}`, {}).toPromise();
+    return response;
+  } catch (error) {
+    console.error('Error checking item:', error);
+    throw error;
+  }
+}
  /* ================================
      🍹 COCKTAIL SETUP
   ================================= */
@@ -624,6 +652,8 @@ submitMultiplePurchases(cartItems: any[]) {
       //console.log(guest);
         return this.http.post(this.guestUrl + '/room/add_room', ad, httpOptions);
       }
+
+  
       
   /** PUT: update the guest on the server */
   updateHouse(house: any) {
@@ -1329,7 +1359,55 @@ getHeldOrdersDtf(){
  applyCoupon(customerId: number, discount: number): Observable<any> {
     return this.http.post<any>(`${this.guestUrl}/apply_coupon/${customerId}`, { discount });
   }
+ getOnlineUsers(): Observable<any> {
+    return this.http.get(`${this.guestUrl}/api/chat/users/online`);
+  }
 
+  /**
+   * Get chat messages between current user and receiver
+   */
+  getChatMessages(receiverId: number): Observable<any> {
+    return this.http.get(`${this.guestUrl}/api/chat/messages/${receiverId}`);
+  }
+
+  /**
+   * Send a message via HTTP (fallback)
+   */
+  sendChatMessage(data: any): Observable<any> {
+    return this.http.post(`${this.guestUrl}/api/chat/messages`, data);
+  }
+
+  /**
+   * Mark message as read via HTTP
+   */
+  markMessageAsRead(messageId: number): Observable<any> {
+    return this.http.put(`${this.guestUrl}/api/chat/messages/${messageId}/read`, {});
+  }
+// Add these methods to your GuestService
+
+sendBulkMessage(data: any): Promise<any> {
+  return this.http.post(`${this.guestUrl}/guest/bulk_message/send`, data).toPromise();
+}
+
+getBulkMessageHistory(): Promise<any> {
+  return this.http.get(`${this.guestUrl}/guest/bulk_message/history`).toPromise();
+}
+
+getBulkMessageStatus(messageId: number): Promise<any> {
+  return this.http.get(`${this.guestUrl}/guest/bulk_message/status/${messageId}`).toPromise();
+}
+
+previewBulkMessage(data: any): Promise<any> {
+  return this.http.post(`${this.guestUrl}/guest/bulk_message/preview`, data).toPromise();
+}
+
+deleteBulkMessage(messageId: number): Promise<any> {
+  return this.http.delete(`${this.guestUrl}/guest/bulk_message/delete/${messageId}`).toPromise();
+}
+
+resendBulkMessage(messageId: number): Promise<any> {
+  return this.http.post(`${this.guestUrl}/guest/bulk_message/resend/${messageId}`, {}).toPromise();
+}
 }
 
 

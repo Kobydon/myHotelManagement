@@ -1,3 +1,4 @@
+// pos-layout.component.ts
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -12,4 +13,8 @@ export class PosLayoutComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  // Optional: Method to toggle chat if needed
+  toggleChat() {
+    // You can add logic here if you want to control chat from parent
+  }
 }

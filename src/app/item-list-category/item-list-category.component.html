@@ -1,31 +1,52 @@
 <!-- Search Field -->
-<input
-  type="text"
-  class="form-control mb-3"
-  placeholder="Search products..."
-  [(ngModel)]="searchTerm"
-  (ngModelChange)="searchItems(searchTerm)"
-/>
+<div class="search-container mb-3">
+  <div class="search-wrapper">
+    <i class="fa fa-search search-icon"></i>
+    <input
+      type="text"
+      class="form-control search-input"
+      placeholder="🔍 Search products..."
+      [(ngModel)]="searchTerm"
+      (input)="onSearchChange()"
+    />
+    <button *ngIf="searchTerm" class="btn btn-sm btn-clear" (click)="clearSearch()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+  <span class="search-results-count" *ngIf="itemList.length > 0">
+    {{ filteredItemList.length }} of {{ itemList.length }} products
+  </span>
+</div>
 
 <!-- Product Cards -->
 <div class="row">
-  <div class="col-md-4" *ngFor="let product of itemList">
+  <div class="col-md-4 col-sm-6 col-xs-12" *ngFor="let product of filteredItemList">
     <div
       class="card p-2 position-relative"
       [ngClass]="{ 'disabled-card': +product.quantity === 0 }"
       (click)="handleCardClick(product)"
       style="cursor: pointer;"
     >
+      <!-- Product Image/Icon -->
+      <div class="product-icon">
+        <i class="fa fa-cube" style="font-size: 24px; color: #6c757d;"></i>
+      </div>
       
-      <h6>{{ product.name }}</h6>
-      <p class="text-success">₵{{ product.price }}</p>
+      <h6 class="product-name">{{ product.name }}</h6>
+      <p class="text-success product-price">₵{{ product.price | number:'1.2-2' }}</p>
+
+      <!-- Stock Status -->
+      <span class="stock-badge" [ngClass]="{ 'in-stock': +product.quantity > 0, 'out-of-stock': +product.quantity === 0 }">
+        <i class="fa" [ngClass]="{ 'fa-check-circle': +product.quantity > 0, 'fa-times-circle': +product.quantity === 0 }"></i>
+        {{ +product.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
+      </span>
 
       <!-- Measurement Badge -->
       <span *ngIf="requiresMeasurement(product)" class="measurement-badge">
         <i class="fa fa-arrows"></i> Needs Measurement
       </span>
 
-      <!-- Out of Stock Message -->
+      <!-- Out of Stock Overlay -->
       <div *ngIf="+product.quantity === 0" class="out-of-stock-overlay">
         <p class="text-danger">Out of Stock</p>
       </div>
@@ -43,6 +64,7 @@
               step="0.01"
               class="form-control form-control-sm"
               (click)="$event.stopPropagation()"
+              (input)="updateMeasurementPreview(product)"
             />
           </div>
           <div class="measurement-field">
@@ -55,6 +77,7 @@
               step="0.01"
               class="form-control form-control-sm"
               (click)="$event.stopPropagation()"
+              (input)="updateMeasurementPreview(product)"
             />
           </div>
           <div class="measurement-field">
@@ -63,6 +86,7 @@
               [(ngModel)]="product.measurementUnit"
               class="form-control form-control-sm"
               (click)="$event.stopPropagation()"
+              (change)="updateMeasurementPreview(product)"
             >
               <option value="inches">in</option>
               <option value="feet">ft</option>
@@ -90,26 +114,28 @@
       </div>
 
       <!-- If item is in cart -->
-      <div *ngIf="getCartItem(product) && !requiresMeasurement(product); else addButton">
-        <div class="d-flex align-items-center">
+      <div *ngIf="getCartItem(product) && !requiresMeasurement(product); else addButton" class="cart-controls">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="qty-controls">
+            <button
+              class="btn btn-sm btn-light qty-btn"
+              (click)="decreaseQty(product); $event.stopPropagation()"
+            >
+              <i class="fa fa-minus"></i>
+            </button>
+            <span class="mx-2 qty-display">{{ getCartItem(product)?.qty }}</span>
+            <button
+              class="btn btn-sm btn-light qty-btn"
+              (click)="increaseQty(product); $event.stopPropagation()"
+            >
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
           <button
-            class="btn btn-sm btn-light"
-            (click)="decreaseQty(product); $event.stopPropagation()"
-          >
-            -
-          </button>
-          <span class="mx-2">{{ getCartItem(product)?.qty }}</span>
-          <button
-            class="btn btn-sm btn-light"
-            (click)="increaseQty(product); $event.stopPropagation()"
-          >
-            +
-          </button>
-          <button
-            class="btn btn-danger btn-sm ml-2"
+            class="btn btn-danger btn-sm remove-btn"
             (click)="removeFromCart(product); $event.stopPropagation()"
           >
-            🗑️
+            <i class="fa fa-trash"></i>
           </button>
         </div>
       </div>
@@ -118,19 +144,32 @@
       <ng-template #addButton>
         <button
           *ngIf="!requiresMeasurement(product)"
-          class="btn btn-primary btn-sm"
+          class="btn btn-primary btn-sm btn-add"
           (click)="addToCart(product); $event.stopPropagation()"
+          [disabled]="+product.quantity === 0"
         >
-          Add
+          <i class="fa fa-cart-plus"></i> Add to Cart
         </button>
         <button
           *ngIf="requiresMeasurement(product) && !product.showMeasurement"
-          class="btn btn-primary btn-sm"
+          class="btn btn-info btn-sm btn-measure"
           (click)="showMeasurementInputs(product, $event)"
+          [disabled]="+product.quantity === 0"
         >
-          Enter Size
+          <i class="fa fa-arrows"></i> Enter Size
         </button>
       </ng-template>
     </div>
   </div>
+</div>
+
+<!-- No Results -->
+<div *ngIf="filteredItemList.length === 0 && itemList.length > 0" class="no-results">
+  <i class="fa fa-search fa-3x" style="color: #bdc3c7;"></i>
+  <p>No products found matching "{{ searchTerm }}"</p>
+</div>
+
+<div *ngIf="itemList.length === 0" class="no-products">
+  <i class="fa fa-inbox fa-3x" style="color: #bdc3c7;"></i>
+  <p>No products available</p>
 </div>

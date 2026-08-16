@@ -1,0 +1,337 @@
+<!-- my-payments.component.html -->
+<div class="payments-container">
+  <!-- Header -->
+  <div class="payments-header">
+    <h2 class="page-title">💳 My Payments</h2>
+    <button class="refresh-btn" (click)="refreshPayments()" [disabled]="isLoading">
+      <span class="refresh-icon" [class.spinning]="isLoading">🔄</span>
+    </button>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalOrders }}</span>
+        <span class="stat-label">Total Orders</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalPaid | currency:'GHS':'symbol':'1.2-2' }}</span>
+        <span class="stat-label">Total Paid</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalBalance | currency:'GHS':'symbol':'1.2-2' }}</span>
+        <span class="stat-label">Balance</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="filter-section">
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="🔍 Search payments..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+    
+    <!-- Date Filter -->
+    <div class="date-filter-section">
+      <div class="date-filter-tabs">
+        <button 
+          *ngFor="let option of dateFilterOptions"
+          class="date-filter-tab" 
+          [class.active]="dateFilterType === option.value"
+          (click)="setDateFilter(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      </div>
+      
+      <!-- Custom Date Range -->
+      <div class="custom-date-range" *ngIf="dateFilterType === 'custom'">
+        <div class="date-input-group">
+          <label>From:</label>
+          <input 
+            type="date" 
+            [(ngModel)]="dateFrom" 
+            class="date-input"
+          />
+        </div>
+        <div class="date-input-group">
+          <label>To:</label>
+          <input 
+            type="date" 
+            [(ngModel)]="dateTo" 
+            class="date-input"
+          />
+        </div>
+        <button class="apply-date-btn" (click)="applyCustomDateFilter()">
+          Apply
+        </button>
+        <button class="clear-date-btn" (click)="clearDateFilter()">
+          ✕
+        </button>
+      </div>
+      
+      <!-- Show active date filter -->
+      <div class="active-filter" *ngIf="dateFilterType !== 'all' && dateFilterType !== 'custom'">
+        <span class="filter-badge">
+          📅 {{ getDateFilterLabel(dateFilterType) }}
+          <button class="remove-filter" (click)="clearDateFilter()">✕</button>
+        </span>
+      </div>
+      <div class="active-filter" *ngIf="dateFilterType === 'custom' && dateFrom && dateTo">
+        <span class="filter-badge">
+          📅 {{ formatDisplayDate(dateFrom) }} - {{ formatDisplayDate(dateTo) }}
+          <button class="remove-filter" (click)="clearDateFilter()">✕</button>
+        </span>
+      </div>
+    </div>
+
+    <!-- Status Filters -->
+    <div class="filter-tabs">
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'all'"
+        (click)="filterStatus = 'all'; applyFilters()"
+      >
+        All
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'completed'"
+        (click)="filterStatus = 'completed'; applyFilters()"
+      >
+        ✅ Completed
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'pending'"
+        (click)="filterStatus = 'pending'; applyFilters()"
+      >
+        ⏳ Pending
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'processing'"
+        (click)="filterStatus = 'processing'; applyFilters()"
+      >
+        🔄 Processing
+      </button>
+    </div>
+
+    <!-- Payment Status Filters -->
+    <div class="payment-filter-tabs">
+      <button 
+        class="filter-tab payment-filter" 
+        [class.active]="filterPaymentStatus === 'all'"
+        (click)="filterPaymentStatus = 'all'; applyFilters()"
+      >
+        All Payments
+      </button>
+      <button 
+        class="filter-tab payment-filter" 
+        [class.active]="filterPaymentStatus === 'completed'"
+        (click)="filterPaymentStatus = 'completed'; applyFilters()"
+      >
+        ✅ Paid
+      </button>
+      <button 
+        class="filter-tab payment-filter" 
+        [class.active]="filterPaymentStatus === 'pending'"
+        (click)="filterPaymentStatus = 'pending'; applyFilters()"
+      >
+        ⏳ Pending
+      </button>
+      <button 
+        class="filter-tab payment-filter" 
+        [class.active]="filterPaymentStatus === 'failed'"
+        (click)="filterPaymentStatus = 'failed'; applyFilters()"
+      >
+        ❌ Failed
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Count -->
+  <div class="results-count" *ngIf="!isLoading">
+    <span>{{ totalItems }} payment{{ totalItems !== 1 ? 's' : '' }} found</span>
+    <span *ngIf="dateFilterType !== 'all'" class="filter-info">
+      • {{ getDateFilterLabel(dateFilterType) }}
+    </span>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <span class="loading-spinner">⏳</span>
+    <p>Loading your payments...</p>
+  </div>
+
+  <!-- Payments Grid -->
+  <div class="payments-grid" *ngIf="!isLoading">
+    <div *ngIf="filteredPayments.length === 0" class="empty-state">
+      <span>📭</span>
+      <p>No payments found</p>
+      <button class="browse-btn" (click)="router.navigate(['/customer-category'])">
+        Browse Products
+      </button>
+    </div>
+
+    <div 
+      class="payment-card" 
+      *ngFor="let payment of getPaginatedPayments()"
+      (click)="viewPaymentDetail(payment)"
+    >
+      <!-- Payment Header -->
+      <div class="payment-header">
+        <div class="payment-id">
+          <span class="payment-number">#{{ payment.order_id }}</span>
+          <span class="payment-date">{{ formatDisplayDate(payment.created_at) }}</span>
+        </div>
+        <div class="payment-status-badge" [style.background]="getStatusColor(payment.status)">
+          {{ getStatusIcon(payment.status) }} {{ payment.status || 'Processing' }}
+        </div>
+      </div>
+
+      <!-- Payment Info -->
+      <div class="payment-info">
+        <div class="payment-types">
+          <span *ngFor="let type of getOrderType(payment)" class="type-tag">
+            {{ type }}
+          </span>
+        </div>
+        <div class="payment-details">
+          <span class="item-count">📦 {{ payment.item_count || 0 }} items</span>
+          <span class="payment-total">💰 {{ formatCurrency(payment.total) }}</span>
+        </div>
+      </div>
+
+      <!-- Payment Status -->
+      <div class="payment-status-row">
+        <span class="payment-status-badge" [style.background]="getPaymentStatusColor(payment.payment_status)">
+          {{ payment.payment_status || 'Pending' }}
+        </span>
+        <span class="payment-method">💳 {{ payment.payment_method || 'Not specified' }}</span>
+      </div>
+
+      <!-- Amount Details -->
+      <div class="amount-details">
+        <div class="amount-row">
+          <span>Amount Paid</span>
+          <span class="amount-paid">{{ formatCurrency(payment.amount_paid) }}</span>
+        </div>
+        <div class="amount-row" *ngIf="payment.balance > 0">
+          <span>Balance</span>
+          <span class="amount-balance">{{ formatCurrency(payment.balance) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalItems > itemsPerPage">
+    <button 
+      class="page-btn" 
+      [disabled]="currentPage === 1"
+      (click)="changePage(currentPage - 1)"
+    >
+      ←
+    </button>
+    <button 
+      *ngFor="let page of getPages()"
+      class="page-btn"
+      [class.active]="page === currentPage"
+      (click)="changePage(page)"
+    >
+      {{ page }}
+    </button>
+    <button 
+      class="page-btn" 
+      [disabled]="currentPage === getTotalPages()"
+      (click)="changePage(currentPage + 1)"
+    >
+      →
+    </button>
+  </div>
+</div>
+
+<!-- Payment Detail Modal -->
+<div class="modal-overlay" *ngIf="showPaymentDetail" (click)="closePaymentDetail()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Payment #{{ selectedPayment?.order_id }}</h3>
+      <button class="modal-close" (click)="closePaymentDetail()">✕</button>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Status -->
+      <div class="detail-status">
+        <span class="status-badge" [style.background]="getStatusColor(selectedPayment?.status)">
+          {{ getStatusIcon(selectedPayment?.status) }} {{ selectedPayment?.status || 'Processing' }}
+        </span>
+        <span class="payment-status-badge-detail" [style.background]="getPaymentStatusColor(selectedPayment?.payment_status)">
+          {{ selectedPayment?.payment_status || 'Pending' }}
+        </span>
+      </div>
+
+      <!-- Info -->
+      <div class="detail-info">
+        <p><strong>📅 Date:</strong> {{ formatDisplayDate(selectedPayment?.created_at) }}</p>
+        <p><strong>👤 Customer:</strong> {{ selectedPayment?.customer || 'Walk-in' }}</p>
+        <p><strong>💳 Payment Method:</strong> {{ selectedPayment?.payment_method || 'Not specified' }}</p>
+        <p><strong>📝 Note:</strong> {{ selectedPayment?.note || 'No notes' }}</p>
+      </div>
+
+      <!-- Amounts -->
+      <div class="detail-amounts">
+        <div class="amount-item">
+          <span class="amount-label">Total</span>
+          <span class="amount-value">{{ formatCurrency(selectedPayment?.total) }}</span>
+        </div>
+        <div class="amount-item">
+          <span class="amount-label">Amount Paid</span>
+          <span class="amount-value paid">{{ formatCurrency(selectedPayment?.amount_paid) }}</span>
+        </div>
+        <div class="amount-item" *ngIf="selectedPayment?.balance > 0">
+          <span class="amount-label">Balance</span>
+          <span class="amount-value balance">{{ formatCurrency(selectedPayment?.balance) }}</span>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="detail-items">
+        <h4>Order Items</h4>
+        <div class="items-list">
+          <div *ngFor="let item of selectedPayment?.items" class="detail-item">
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-qty">×{{ item.qty || 1 }}</span>
+            </div>
+            <span class="item-price">{{ formatCurrency(item.price * (item.qty || 1)) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="detail-actions">
+        <button class="action-btn view-order-btn" (click)="viewOrder(selectedPayment?.order_id)">
+          📋 View Order
+        </button>
+        <button class="action-btn close-btn" (click)="closePaymentDetail()">
+          ✕ Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -77,6 +77,7 @@ import { SalaryTemplateComponent } from 'app/salary-template/salary-template.com
 import { SalaryPaymentComponent } from 'app/salary-payment/salary-payment.component';
 import { CustomersComponent } from 'app/customers/customers.component';
 import { HeldCartReportComponent } from 'app/held-cart-report/held-cart-report.component';
+import { SendBulkMessageComponent } from 'app/send-bulk-message/send-bulk-message.component';
 
 
     
@@ -143,7 +144,7 @@ import { HeldCartReportComponent } from 'app/held-cart-report/held-cart-report.c
     ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,
     StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent,
     AddEventPaymentComponent,OutsideStockSideComponent,CanceledOrderComponent,CocktailSetupComponent,SalaryPaymentComponent,
-    HeldCartReportComponent
+    HeldCartReportComponent,SendBulkMessageComponent
 
 
 

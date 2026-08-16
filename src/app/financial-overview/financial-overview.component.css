@@ -48,4 +48,54 @@
     font-style: italic;
     color: #888;
   }
+  /* financial-overview.component.css */
+.card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.table th {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.table td {
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.badge {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+.summary-card {
+  transition: transform 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
   
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .card-body {
+    padding: 10px !important;
+  }
+  
+  .table {
+    font-size: 10px !important;
+  }
+}

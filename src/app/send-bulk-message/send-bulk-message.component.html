@@ -1,0 +1,276 @@
+<div class="container-fluid" *blockUI="'loading'">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
+          <h4 class="mb-0 text-dark">
+            <i class="fas fa-bullhorn mr-2 text-primary"></i> Bulk Message Center
+          </h4>
+          <div>
+            <button class="btn btn-outline-secondary btn-sm mr-2" (click)="loadMessageHistory()">
+              <i class="fas fa-history"></i> History
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="showHistory = !showHistory">
+              <i class="fas fa-list"></i> 
+              {{ showHistory ? 'Hide' : 'Show' }} History
+            </button>
+          </div>
+        </div>
+        
+        <div class="card-body bg-white">
+          
+          <!-- Quick Templates -->
+          <div class="mb-4">
+            <label class="font-weight-bold text-secondary">Quick Templates</label>
+            <div class="d-flex flex-wrap">
+              <button *ngFor="let template of quickTemplates" 
+                      class="btn btn-outline-primary btn-sm mr-2 mb-2 rounded-pill px-3"
+                      (click)="applyTemplate(template)">
+                <i class="fas fa-file-alt mr-1"></i> {{ template.name }}
+              </button>
+            </div>
+          </div>
+          
+          <form [formGroup]="messageForm" (ngSubmit)="sendMessage()">
+            
+            <!-- Recipient Selection - Row 1 -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="font-weight-bold text-secondary">
+                    <i class="fas fa-users mr-1 text-primary"></i> Send To
+                  </label>
+                  <select class="form-control border-primary" formControlName="recipient_type" (change)="filterUsers()">
+                    <option *ngFor="let type of recipientTypes" [value]="type.value">
+                      {{ type.label }}
+                    </option>
+                  </select>
+                  <small class="text-muted">Select who receives this message</small>
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="font-weight-bold text-secondary">
+                    <i class="fas fa-envelope mr-1 text-primary"></i> Message Type
+                  </label>
+                  <select class="form-control border-primary" formControlName="message_type">
+                    <option *ngFor="let type of messageTypes" [value]="type.value">
+                      {{ type.label }}
+                    </option>
+                  </select>
+                  <small class="text-muted">Choose delivery method</small>
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label class="font-weight-bold text-secondary">
+                    <i class="fas fa-clock mr-1 text-primary"></i> Schedule
+                  </label>
+                  <select class="form-control border-primary" formControlName="schedule">
+                    <option *ngFor="let time of scheduledTimes" [value]="time.value">
+                      {{ time.label }}
+                    </option>
+                  </select>
+                  <small class="text-muted">When to send this message</small>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Recipients Info - Alert Box -->
+            <div class="alert alert-light border border-primary d-flex justify-content-between align-items-center">
+              <span>
+                <i class="fas fa-info-circle mr-2 text-primary"></i>
+                <strong class="text-primary">{{ getRecipientCount() }} {{ getRecipientTypeLabel() }}</strong> 
+                <span class="text-secondary">will receive this message</span>
+              </span>
+              <div>
+                <button type="button" class="btn btn-outline-primary btn-sm" (click)="copyRecipientsList()">
+                  <i class="fas fa-copy"></i> Copy List
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm ml-2" 
+                        (click)="filterUsers()">
+                  <i class="fas fa-sync"></i> Refresh
+                </button>
+              </div>
+            </div>
+            
+            <!-- Subject -->
+            <div class="form-group">
+              <label class="font-weight-bold text-secondary">
+                <i class="fas fa-tag mr-1 text-primary"></i> Subject
+              </label>
+              <input type="text" class="form-control border-primary" formControlName="subject" 
+                     placeholder="Enter message subject" maxlength="200">
+              <small class="text-muted">Max 200 characters</small>
+            </div>
+            
+            <!-- Message -->
+            <div class="form-group">
+              <label class="font-weight-bold text-secondary">
+                <i class="fas fa-comment mr-1 text-primary"></i> Message
+              </label>
+              <textarea class="form-control border-primary" formControlName="message" rows="6"
+                        placeholder="Type your message here..." 
+                        [class.is-invalid]="messageForm.get('message')?.invalid && messageForm.get('message')?.touched"></textarea>
+              
+              <div class="d-flex justify-content-between mt-1">
+                <small class="text-muted">
+                  Characters: {{ getMessageStats().chars }} 
+                  | SMS Parts: {{ getMessageStats().smsCount }}
+                </small>
+                <small class="text-danger" *ngIf="messageForm.get('message')?.invalid && messageForm.get('message')?.touched">
+                  Message must be at least 10 characters
+                </small>
+              </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="form-group mt-4">
+              <button type="submit" class="btn btn-success btn-lg btn-block rounded-pill py-3 font-weight-bold" 
+                      [disabled]="messageForm.invalid || getRecipientCount() === 0">
+                <i class="fas fa-paper-plane mr-2"></i>
+                {{ messageForm.get('schedule')?.value > 0 ? 'Schedule Message' : 'Send Message' }}
+              </button>
+            </div>
+            
+          </form>
+          
+          <hr class="my-4">
+          
+          <!-- Message History -->
+          <div *ngIf="showHistory">
+            <h5 class="mb-3 text-secondary">
+              <i class="fas fa-history mr-2 text-primary"></i> Message History
+            </h5>
+            
+            <div class="table-responsive">
+              <table class="table table-hover table-sm">
+                <thead class="thead-light">
+                  <tr>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Recipients</th>
+                    <th>Sent</th>
+                    <th>Failed</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of messageHistory">
+                    <td>{{ item.subject || 'N/A' }}</td>
+                    <td>
+                      <span class="badge badge-info">{{ item.message_type }}</span>
+                    </td>
+                    <td>{{ item.recipient_count }}</td>
+                    <td>{{ item.sent_count || 0 }}</td>
+                    <td>{{ item.failed_count || 0 }}</td>
+                    <td>
+                      <span class="badge {{ getStatusBadge(item.status) }}">
+                        {{ item.status }}
+                      </span>
+                    </td>
+                    <td>{{ formatDate(item.created_at) }}</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary" (click)="viewHistory(item)">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="messageHistory.length === 0">
+                    <td colspan="8" class="text-center text-muted">
+                      No message history found
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- History Detail Modal -->
+<div class="modal" [class.show]="showHistory && selectedHistory" 
+     style="display: {{ showHistory && selectedHistory ? 'block' : 'none' }}" 
+     *ngIf="selectedHistory">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-white border-bottom">
+        <h5 class="modal-title text-dark">
+          <i class="fas fa-envelope mr-2 text-primary"></i> Message Details
+        </h5>
+        <button type="button" class="close" (click)="closeHistory()">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body bg-white">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong class="text-secondary">Subject:</strong> {{ selectedHistory.subject || 'N/A' }}</p>
+            <p><strong class="text-secondary">Type:</strong> {{ selectedHistory.message_type }}</p>
+            <p><strong class="text-secondary">Recipients:</strong> {{ selectedHistory.recipient_count }}</p>
+            <p><strong class="text-secondary">Sent:</strong> {{ selectedHistory.sent_count || 0 }}</p>
+            <p><strong class="text-secondary">Failed:</strong> {{ selectedHistory.failed_count || 0 }}</p>
+            <p><strong class="text-secondary">Status:</strong> 
+              <span class="badge {{ getStatusBadge(selectedHistory.status) }}">
+                {{ selectedHistory.status }}
+              </span>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <p><strong class="text-secondary">Created:</strong> {{ formatDate(selectedHistory.created_at) }}</p>
+            <p><strong class="text-secondary">Sent At:</strong> {{ formatDate(selectedHistory.sent_at) }}</p>
+            <p><strong class="text-secondary">Created By:</strong> {{ selectedHistory.created_by || 'System' }}</p>
+          </div>
+        </div>
+        
+        <div class="mt-3" *ngIf="selectedHistory.recipients && selectedHistory.recipients.length > 0">
+          <h6 class="text-secondary">Recipients ({{ selectedHistory.recipients.length }} shown)</h6>
+          <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+            <table class="table table-sm table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Contact</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let recipient of selectedHistory.recipients">
+                  <td>{{ recipient.name || 'N/A' }}</td>
+                  <td>{{ recipient.phone || recipient.email || 'N/A' }}</td>
+                  <td>
+                    <span class="badge {{ recipient.status === 'sent' ? 'badge-success' : recipient.status === 'failed' ? 'badge-danger' : 'badge-warning' }}">
+                      {{ recipient.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="mt-3">
+          <h6 class="text-secondary">Message Content</h6>
+          <div class="card bg-light border-0 p-3">
+            <pre class="mb-0" style="white-space: pre-wrap;">{{ selectedHistory.message || 'No message content' }}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer bg-white border-top">
+        <button type="button" class="btn btn-secondary" (click)="closeHistory()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="applyTemplate(selectedHistory)">
+          <i class="fas fa-copy"></i> Use Template
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show" *ngIf="showHistory && selectedHistory"></div>

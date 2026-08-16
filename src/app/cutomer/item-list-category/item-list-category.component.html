@@ -1,0 +1,253 @@
+<!-- item-list-category.component.html (Updated modal with Base64 preview) -->
+<div class="item-list-container">
+  <!-- Header with Cart Icon -->
+  <div class="item-list-header">
+    <button class="back-btn" (click)="goBack()">←</button>
+    <h2 class="page-title">{{ categoryName || 'Products' }}</h2>
+    <div class="cart-badge-container" (click)="openCart()">
+      <span class="cart-icon">🛒</span>
+      <span class="cart-count" *ngIf="cartItems.length > 0">{{ cartItems.length }}</span>
+    </div>
+  </div>
+
+  <!-- Search Field -->
+  <div class="search-container">
+    <input
+      type="text"
+      class="search-input"
+      placeholder="🔍 Search products..."
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+    />
+  </div>
+
+  <!-- Product Cards Grid -->
+  <div class="product-grid">
+    <div 
+      class="product-card" 
+      *ngFor="let product of filteredItemList" 
+      [class.disabled]="+product.quantity === 0"
+    >
+      <!-- Product Image/Icon -->
+      <div class="product-image">
+        <span class="product-icon">{{ getProductIcon(product.name) }}</span>
+        <div *ngIf="+product.quantity === 0" class="out-of-stock-badge">OUT OF STOCK</div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <h4 class="product-name">{{ product.name }}</h4>
+        <p class="product-price">₵{{ product.price | number:'1.2-2' }}</p>
+        
+        <!-- Measurement Badge -->
+        <span *ngIf="requiresMeasurement(product)" class="measurement-badge">
+          📏 Needs Measurement
+        </span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="product-actions">
+        <!-- Measurement Inputs -->
+        <div *ngIf="requiresMeasurement(product) && product.showMeasurement" class="measurement-inputs" (click)="$event.stopPropagation()">
+          <div class="measurement-row">
+            <input 
+              type="number" 
+              [(ngModel)]="product.measurementWidth"
+              placeholder="Width"
+              class="measurement-input"
+              (click)="$event.stopPropagation()"
+            />
+            <input 
+              type="number" 
+              [(ngModel)]="product.measurementHeight"
+              placeholder="Height"
+              class="measurement-input"
+              (click)="$event.stopPropagation()"
+            />
+            <select 
+              [(ngModel)]="product.measurementUnit"
+              class="measurement-select"
+              (click)="$event.stopPropagation()"
+            >
+              <option value="inches">in</option>
+              <option value="feet">ft</option>
+            </select>
+          </div>
+          <div class="measurement-actions">
+            <button 
+              class="btn-add-measurement"
+              (click)="addWithMeasurement(product, $event)"
+              [disabled]="!product.measurementWidth || !product.measurementHeight"
+            >
+              Add to Cart
+            </button>
+            <button 
+              class="btn-cancel-measurement"
+              (click)="cancelMeasurement(product, $event)"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Regular Add to Cart with Description & Attachment -->
+        <ng-container *ngIf="!requiresMeasurement(product)">
+          <div *ngIf="getCartItem(product); else addButton" class="qty-controls">
+            <button (click)="decreaseQty(product); $event.stopPropagation()" class="qty-btn">−</button>
+            <span class="qty-count">{{ getCartItem(product)?.qty || 0 }}</span>
+            <button (click)="increaseQty(product); $event.stopPropagation()" class="qty-btn">+</button>
+            <button (click)="removeFromCart(product); $event.stopPropagation()" class="remove-btn">🗑️</button>
+          </div>
+          <ng-template #addButton>
+            <button 
+              class="add-to-cart-btn"
+              (click)="openAddToCartModal(product)"
+              [disabled]="+product.quantity === 0"
+            >
+              Add to Cart
+            </button>
+          </ng-template>
+        </ng-container>
+
+        <!-- Measurement Product Add Button -->
+        <ng-container *ngIf="requiresMeasurement(product) && !product.showMeasurement">
+          <button 
+            class="add-to-cart-btn measurement-btn"
+            (click)="showMeasurementInputs(product, $event)"
+            [disabled]="+product.quantity === 0"
+          >
+            📏 Enter Size
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredItemList.length === 0" class="empty-state">
+    <span>📭</span>
+    <p>No products found</p>
+  </div>
+
+  <!-- Add to Cart Modal with Description & Base64 Attachment -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add to Cart</h3>
+        <button class="modal-close" (click)="closeModal($event)">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="selected-product">
+          <span class="product-icon-large">{{ getProductIcon(selectedProduct?.name) }}</span>
+          <div>
+            <h4>{{ selectedProduct?.name }}</h4>
+            <p class="product-price-modal">₵{{ selectedProduct?.price | number:'1.2-2' }}</p>
+          </div>
+        </div>
+
+        <!-- Optional Description -->
+        <div class="form-group">
+          <label for="itemDescription">Description (Optional)</label>
+          <textarea
+            id="itemDescription"
+            class="form-control"
+            [(ngModel)]="itemDescription"
+            placeholder="Add a description for this item..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- Optional Attachment -->
+        <div class="form-group">
+          <label>Attachment (Optional)</label>
+          <div class="attachment-upload-area" (click)="triggerFileInput()">
+            <input 
+              type="file" 
+              #fileInput 
+              style="display:none" 
+              (change)="handleFileUpload($event)"
+              accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx"
+            />
+            <div *ngIf="!selectedFileBase64" class="upload-placeholder">
+              <span>📎</span>
+              <p>Click to upload image or PDF</p>
+              <small>Supported: JPG, PNG, GIF, PDF, DOC (Max 5MB)</small>
+            </div>
+            <div *ngIf="selectedFileBase64" class="file-preview">
+              <span class="file-icon">{{ getFileIcon(selectedFileType) }}</span>
+              <div class="file-info">
+                <p class="file-name">{{ selectedFileName }}</p>
+                <p class="file-size">{{ formatFileSize(selectedFileSize) }}</p>
+              </div>
+              <button class="remove-file" (click)="removeSelectedFile($event)">✕</button>
+            </div>
+          </div>
+          <!-- Show Base64 preview for images -->
+          <div *ngIf="selectedFileBase64 && selectedFileType.includes('image')" class="image-preview">
+            <img [src]="selectedFileBase64" alt="Attachment preview" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeModal($event)">Cancel</button>
+        <button class="btn-add" (click)="addToCartWithDetails()">
+          <span>🛒</span> Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Sidebar -->
+  <div class="cart-sidebar" [class.open]="isCartOpen">
+    <div class="cart-header">
+      <h3>🛒 Your Orders</h3>
+      <button class="close-cart" (click)="closeCart()">✕</button>
+    </div>
+    <div class="cart-items-list">
+      <div *ngIf="cartItems.length === 0" class="empty-cart">
+        <span>🛍️</span>
+        <p>Your cart is empty</p>
+      </div>
+      <div *ngFor="let item of cartItems" class="cart-item">
+        <div class="cart-item-info">
+          <h4>{{ item.name }}</h4>
+          <p class="cart-item-price">₵{{ item.price | number:'1.2-2' }}</p>
+          
+          <!-- Show Description if exists -->
+          <p *ngIf="item.description" class="cart-item-description">
+            📝 {{ item.description }}
+          </p>
+          
+          <!-- Show Attachment if exists -->
+          <div *ngIf="item.attachment" class="cart-item-attachment">
+            <span class="attach-icon">📎</span>
+            <span class="attach-name">{{ item.attachment.name }}</span>
+            <span class="attach-size">({{ formatFileSize(item.attachment.size) }})</span>
+            <button (click)="removeAttachmentFromCart(item)" class="remove-attach-btn">✕</button>
+          </div>
+          
+          <div class="cart-item-qty">
+            <button (click)="decreaseQty(item)" class="qty-btn">-</button>
+            <span>{{ item.qty || 1 }}</span>
+            <button (click)="increaseQty(item)" class="qty-btn">+</button>
+          </div>
+        </div>
+        <button (click)="removeFromCart(item)" class="remove-item">🗑️</button>
+      </div>
+    </div>
+    <div class="cart-footer" *ngIf="cartItems.length > 0">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span class="total-amount">₵{{ getCartTotal() | number:'1.2-2' }}</span>
+      </div>
+      <button class="checkout-btn" (click)="proceedToCheckout()">
+        Proceed to Checkout →
+      </button>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="cart-overlay" *ngIf="isCartOpen" (click)="closeCart()"></div>
+</div>

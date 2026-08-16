@@ -19,6 +19,8 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   cartItems: any[] = [];
   orderList: any[] = [];
   user: any;
+  userId: any;
+  costomer_data: any;
   customers: any[] = [];
   
   // UI State
@@ -68,6 +70,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Initial load
+    this.costomer_data = localStorage.getItem('user');
     this.loadCustomers();
     this.loadHeldOrders();
     this.loadProcessedOrders();
@@ -272,7 +275,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
           return { 
             ...order, 
             items, 
-            expanded: false,
+            expanded: true,
             customer_name: customerName,
             customer_details: this.getCustomerDetails(order.customer)
           };
@@ -336,11 +339,13 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
+
+  /**
+   * Accept order
+   */
   acceptOrder(orderId: any): void {
     if (!confirm(`Are you sure you want to accept Order #${orderId}?`)) {
       return;
-
-
     }
 
     this.guestService.acceptOrder(orderId).then(res => {
@@ -350,10 +355,25 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
       console.error("❌ Error accepting order:", err);
       this.toastr.error('Failed to accept order', 'Error');
     });
-    
-
-
   }
+
+  /**
+   * Take order
+   */
+  takeOrder(orderId: any): void {
+    if (!confirm(`Are you sure you want to take Order #${orderId}?`)) {
+      return;
+    }
+
+    this.guestService.takeOrder(orderId).then(res => {
+      this.toastr.success(`Order #${orderId} accepted`, 'Success');
+      this.loadHeldOrders();
+    }).catch(err => {
+      console.error("❌ Error accepting order:", err);
+      this.toastr.error('Failed to accept order', 'Error');
+    });
+  }
+
   /**
    * Load regular orders (if needed)
    */
@@ -367,6 +387,40 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     } catch (err) {
       console.error("❌ Error loading orders:", err);
     }
+  }
+
+  /**
+   * Check an individual item
+   */
+  async checkItem(orderId: number, itemId: number): Promise<void> {
+    if (!confirm(`Are you sure you want to mark this item as checked?`)) {
+      return;
+    }
+    
+    try {
+      const response = await this.guestService.checkOrderItem(orderId, itemId);
+      if (response) {
+        this.toastr.success(`Item #${itemId} checked successfully`, 'Success');
+        this.loadHeldOrders();
+      }
+    } catch (error) {
+      console.error('Error checking item:', error);
+      this.toastr.error('Failed to check item', 'Error');
+    }
+  }
+
+  /**
+   * Check if item is already checked
+   */
+  isItemChecked(item: any): boolean {
+    return item.is_checked === 'yes';
+  }
+
+  /**
+   * Get who checked the item
+   */
+  getCheckedBy(item: any): string {
+    return item.checked_by || 'Not checked';
   }
 
   /**
@@ -451,210 +505,450 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   // ===================== RECEIPT PRINTING =====================
 
   /**
-   * Print confirmed order receipt
+   * Print confirmed order sticker
    */
- /**
- * Print confirmed order as a small sticker label
- */
+  printConfirmedOrder(order: any, confirmedBy: string): void {
+    const currentDate = new Date().toLocaleString();
+    const customer = order.customer_details || null;
 
-printConfirmedOrder(order: any, confirmedBy: string): void {
-  const currentDate = new Date().toLocaleString();
-  const customer = order.customer_details || null;
+    const printWindow = window.open('', '', 'width=200,height=300');
 
-  const printWindow = window.open('', '', 'width=200,height=300');
-
-  if (printWindow) {
-    let stickerContent = `
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>ORDER STICKER</title>
-        <style>
-          @media print {
-            @page { 
-              size: 60mm 90mm; 
-              margin: 0; 
+    if (printWindow) {
+      let stickerContent = `
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>ORDER STICKER</title>
+          <style>
+            @media print {
+              @page { 
+                size: 60mm 90mm; 
+                margin: 0; 
+              }
+              body { margin: 0; }
             }
-            body { margin: 0; }
-          }
-          body {
-            font-family: 'Arial', 'Helvetica', sans-serif;
-            padding: 8px;
-            margin: 0;
-            width: 60mm;
-            min-height: 90mm;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-          }
-          .sticker-container {
-            text-align: center;
-            width: 100%;
-            padding: 5px;
-            border: 2px dashed #333;
-            border-radius: 8px;
-            background: #fafafa;
-          }
-          .logo-container {
-            text-align: center;
-            margin-bottom: 5px;
-          }
-          .logo {
-            max-width: 50px;
-            height: auto;
-            display: inline-block;
-          }
-          .order-number {
-            font-size: 32px;
-            font-weight: 900;
-            color: #1a1a1a;
-            margin: 5px 0;
-            letter-spacing: 2px;
-            background: #f0f0f0;
-            padding: 5px 10px;
-            border-radius: 5px;
-            display: inline-block;
-          }
-          .label-order {
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-          }
-          .working-on {
-            font-size: 13px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 5px 0;
-            padding: 3px 10px;
-            background: #e8f4f8;
-            border-radius: 12px;
-            display: inline-block;
-          }
-          .divider {
-            border: none;
-            border-top: 1px dashed #ccc;
-            margin: 6px 0;
-          }
-          .info-row {
-            font-size: 9px;
-            color: #555;
-            margin: 2px 0;
-          }
-          .info-row .label {
-            font-weight: bold;
-          }
-          .footer-text {
-            font-size: 8px;
-            color: #999;
-            margin-top: 5px;
-            border-top: 1px dotted #ddd;
-            padding-top: 5px;
-          }
-          .confirmed-by {
-            font-size: 10px;
-            color: #27ae60;
-            font-weight: bold;
-          }
-          .sticker-badge {
-            background: #27ae60;
-            color: white;
-            font-size: 8px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-top: 3px;
-          }
-        </style>
-      </head>
-      <body onload="window.print(); window.close();">
-        <div class="sticker-container">
-          <!-- Company Logo -->
-          <div class="logo-container">
-            <img src="../../assets/img/asempa.jpg" alt="Asempa Graphics" class="logo" />
+            body {
+              font-family: 'Arial', 'Helvetica', sans-serif;
+              padding: 8px;
+              margin: 0;
+              width: 60mm;
+              min-height: 90mm;
+              box-sizing: border-box;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              background: white;
+            }
+            .sticker-container {
+              text-align: center;
+              width: 100%;
+              padding: 5px;
+              border: 2px dashed #333;
+              border-radius: 8px;
+              background: #fafafa;
+            }
+            .logo-container {
+              text-align: center;
+              margin-bottom: 5px;
+            }
+            .logo {
+              max-width: 50px;
+              height: auto;
+              display: inline-block;
+            }
+            .order-number {
+              font-size: 32px;
+              font-weight: 900;
+              color: #1a1a1a;
+              margin: 5px 0;
+              letter-spacing: 2px;
+              background: #f0f0f0;
+              padding: 5px 10px;
+              border-radius: 5px;
+              display: inline-block;
+            }
+            .label-order {
+              font-size: 10px;
+              color: #666;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 2px;
+            }
+            .working-on {
+              font-size: 13px;
+              font-weight: bold;
+              color: #2c3e50;
+              margin: 5px 0;
+              padding: 3px 10px;
+              background: #e8f4f8;
+              border-radius: 12px;
+              display: inline-block;
+            }
+            .divider {
+              border: none;
+              border-top: 1px dashed #ccc;
+              margin: 6px 0;
+            }
+            .info-row {
+              font-size: 9px;
+              color: #555;
+              margin: 2px 0;
+            }
+            .info-row .label {
+              font-weight: bold;
+            }
+            .footer-text {
+              font-size: 8px;
+              color: #999;
+              margin-top: 5px;
+              border-top: 1px dotted #ddd;
+              padding-top: 5px;
+            }
+            .confirmed-by {
+              font-size: 10px;
+              color: #27ae60;
+              font-weight: bold;
+            }
+            .sticker-badge {
+              background: #27ae60;
+              color: white;
+              font-size: 8px;
+              padding: 2px 8px;
+              border-radius: 10px;
+              display: inline-block;
+              margin-top: 3px;
+            }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          <div class="sticker-container">
+            <div class="logo-container">
+              <img src="../../assets/img/asempa.jpg"  class="logo" />
+            </div>
+            
+            <div style="font-size: 8px; font-weight: bold; color: #2c3e50; margin-bottom: 3px;">
+              Digital Department
+            </div>
+            
+            <div class="label-order">ORDER STICKER</div>
+            
+            <div class="order-number">#${order.id}</div>
+            
+           
+            
+            <div class="divider"></div>
+            
+            <div class="info-row">
+              <span class="label">Customer:</span> ${customer ? (customer.firstname || '') + ' ' + (customer.lastname || '') : 'Walk-in'}
+            </div>
+            
+            <div class="info-row">
+              <span class="label">Items:</span> ${order.items?.length || 0} items
+            </div>
+            
+            <div class="info-row">
+              <span class="label">Total:</span> ₵${order.total}
+            </div>
+            
+            <div class="info-row">
+              <span class="label">Date:</span> ${new Date().toLocaleDateString()}
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="confirmed-by">
+              ✅ Confirmed by: ${confirmedBy}
+            </div>
+            
+            <div class="sticker-badge">CONFIRMED</div>
+            
+            <div class="footer-text">
+              Assempahfie Graphics • Kokomlemle, Accra
+            </div>
           </div>
-          
-          <div style="font-size: 8px; font-weight: bold; color: #2c3e50; margin-bottom: 3px;">
-            ASSEMPAHFIE GRAPHICS
-          </div>
-          
-          <div class="label-order">ORDER STICKER</div>
-          
-          <!-- ORDER NUMBER - VERY BIG -->
-          <div class="order-number">#${order.id}</div>
-          
-          <!-- Working On Status -->
-          <div class="working-on">
-            👤 ${order.working_on || 'Not Assigned'}
-          </div>
-          
-          <div class="divider"></div>
-          
-          <!-- Customer Info -->
-          <div class="info-row">
-            <span class="label">Customer:</span> ${customer ? (customer.firstname || '') + ' ' + (customer.lastname || '') : 'Walk-in'}
-          </div>
-          
-          <div class="info-row">
-            <span class="label">Items:</span> ${order.items?.length || 0} items
-          </div>
-          
-          <div class="info-row">
-            <span class="label">Total:</span> ₵${order.total}
-          </div>
-          
-          <div class="info-row">
-            <span class="label">Date:</span> ${new Date().toLocaleDateString()}
-          </div>
-          
-          <div class="divider"></div>
-          
-          <!-- Confirmed By -->
-          <div class="confirmed-by">
-            ✅ Confirmed by: ${confirmedBy}
-          </div>
-          
-          <div class="sticker-badge">CONFIRMED</div>
-          
-          <div class="footer-text">
-            Assempahfie Graphics • Kokomlemle, Accra
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+        </body>
+        </html>
+      `;
 
-    printWindow.document.open();
-    printWindow.document.write(stickerContent);
-    printWindow.document.close();
-  } else {
-    console.error('Failed to open print window');
-    this.toastr.error('Failed to print sticker', 'Error');
+      printWindow.document.open();
+      printWindow.document.write(stickerContent);
+      printWindow.document.close();
+    } else {
+      console.error('Failed to open print window');
+      this.toastr.error('Failed to print sticker', 'Error');
+    }
   }
-}
+   // <div class="working-on">
+            //   👤 ${order.working_on || 'Not Assigned'}
+            // </div>
+
   /**
-   * Print order receipt (for processed orders)
+   * Print order as sticker (for processed orders)
    */
-/**
- * Print order as sticker (for processed orders)
- */
-printOrder(order: any): void {
-  const confirmedBy = prompt('Enter your full name to print this sticker:');
-  
-  if (confirmedBy === null) return;
-  
-  if (!confirmedBy || confirmedBy.trim() === '') {
-    this.toastr.warning('Name is required to print sticker', 'Required');
-    this.printOrder(order);
-    return;
+  printOrder(order: any): void {
+    const confirmedBy = prompt('Enter your full name to print this sticker:');
+    
+    if (confirmedBy === null) return;
+    
+    if (!confirmedBy || confirmedBy.trim() === '') {
+      this.toastr.warning('Name is required to print sticker', 'Required');
+      this.printOrder(order);
+      return;
+    }
+
+    this.printConfirmedOrder(order, confirmedBy.trim());
   }
 
-  this.printConfirmedOrder(order, confirmedBy.trim());
-}
+  // ===================== ATTACHMENT METHODS =====================
+
+  /**
+   * Check if an item has an attachment
+   */
+  hasAttachment(item: any): boolean {
+    return item && item.attachment && (
+      item.attachment.base64 || 
+      item.attachment.data || 
+      item.attachment.url
+    );
+  }
+
+  /**
+   * Get attachment file name
+   */
+  getAttachmentName(item: any): string {
+    if (!item || !item.attachment) return 'No attachment';
+    return item.attachment.name || 'Attachment';
+  }
+
+  /**
+   * Get attachment file type
+   */
+  getAttachmentType(item: any): string {
+    if (!item || !item.attachment) return '';
+    return item.attachment.type || '';
+  }
+
+  /**
+   * Get attachment icon based on file type
+   */
+  getAttachmentIcon(item: any): string {
+    if (!item || !item.attachment) return '📎';
+    
+    const type = (item.attachment.type || '').toLowerCase();
+    const name = (item.attachment.name || '').toLowerCase();
+    
+    if (type.includes('image') || name.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/)) {
+      return '🖼️';
+    } else if (type.includes('pdf') || name.endsWith('.pdf')) {
+      return '📄';
+    } else if (type.includes('word') || type.includes('document') || name.endsWith('.doc') || name.endsWith('.docx')) {
+      return '📝';
+    } else if (type.includes('excel') || name.endsWith('.xls') || name.endsWith('.xlsx')) {
+      return '📊';
+    } else {
+      return '📎';
+    }
+  }
+
+  /**
+   * Get attachment file size formatted
+   */
+  getAttachmentSize(item: any): string {
+    if (!item || !item.attachment || !item.attachment.size) return '';
+    
+    const size = item.attachment.size;
+    if (size < 1024) return size + ' B';
+    if (size < 1024 * 1024) return (size / 1024).toFixed(1) + ' KB';
+    return (size / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  /**
+   * Get attachment preview URL (Base64 or direct URL)
+   */
+  getAttachmentUrl(item: any): string {
+    if (!item || !item.attachment) return '';
+    
+    if (item.attachment.base64) {
+      return item.attachment.base64;
+    }
+    if (item.attachment.url) {
+      return item.attachment.url;
+    }
+    if (item.attachment.data) {
+      return item.attachment.data;
+    }
+    return '';
+  }
+
+  /**
+   * Check if attachment is an image
+   */
+  isAttachmentImage(item: any): boolean {
+    if (!item || !item.attachment) return false;
+    
+    const type = (item.attachment.type || '').toLowerCase();
+    const name = (item.attachment.name || '').toLowerCase();
+    
+    return type.includes('image') || name.match(/\.(jpg|jpeg|png|gif|bmp|webp)$/) !== null;
+  }
+
+  /**
+   * Open attachment in new window or download
+   */
+  viewAttachment(item: any, event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    
+    if (!item || !this.hasAttachment(item)) {
+      this.toastr.warning('No attachment available for this item', 'Warning');
+      return;
+    }
+    
+    const url = this.getAttachmentUrl(item);
+    const name = this.getAttachmentName(item);
+    
+    if (!url) {
+      this.toastr.warning('Attachment data not available', 'Warning');
+      return;
+    }
+    
+    if (this.isAttachmentImage(item)) {
+      this.openImageModal(url, name);
+      return;
+    }
+    
+    try {
+      if (url.startsWith('data:')) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = name || 'attachment';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        window.open(url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error viewing attachment:', error);
+      this.toastr.error('Failed to view attachment', 'Error');
+    }
+  }
+
+  /**
+   * Open image in modal
+   */
+  openImageModal(imageUrl: string, imageName: string): void {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      cursor: pointer;
+    `;
+    
+    const container = document.createElement('div');
+    container.style.cssText = `
+      max-width: 90%;
+      max-height: 90%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    `;
+    
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.alt = imageName || 'Attachment';
+    img.style.cssText = `
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      object-fit: contain;
+      background: white;
+    `;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.style.cssText = `
+      position: absolute;
+      top: -40px;
+      right: -10px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    `;
+    closeBtn.onmouseover = () => {
+      closeBtn.style.background = 'rgba(255,255,255,0.3)';
+    };
+    closeBtn.onmouseout = () => {
+      closeBtn.style.background = 'rgba(255,255,255,0.2)';
+    };
+    
+    const downloadBtn = document.createElement('button');
+    downloadBtn.textContent = '⬇ Download';
+    downloadBtn.style.cssText = `
+      margin-top: 15px;
+      padding: 10px 24px;
+      background: #27ae60;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    downloadBtn.onmouseover = () => {
+      downloadBtn.style.background = '#219a52';
+    };
+    downloadBtn.onmouseout = () => {
+      downloadBtn.style.background = '#27ae60';
+    };
+    downloadBtn.onclick = (e) => {
+      e.stopPropagation();
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = imageName || 'attachment';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+    
+    overlay.onclick = () => {
+      document.body.removeChild(overlay);
+    };
+    
+    container.onclick = (e) => e.stopPropagation();
+    
+    container.appendChild(closeBtn);
+    container.appendChild(img);
+    container.appendChild(downloadBtn);
+    overlay.appendChild(container);
+    
+    document.body.appendChild(overlay);
+  }
+
   // ===================== TABLE INTERACTION METHODS =====================
 
   /**
@@ -846,8 +1140,6 @@ printOrder(order: any): void {
       this.toastr.error('Failed to cancel order', 'Error');
     }
   }
-
-  
 
   /**
    * Navigate to today's orders

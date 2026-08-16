@@ -86,7 +86,7 @@ export class SignInComponent implements OnInit {
     if(res) this.userService.setSession(res);
 
     var x = await this.userService.getUser();
-    if(x) this.user=x;
+    if(x) this.user=x; localStorage.setItem('user',user[0]?.id);
 
    }catch(error){
    this.toastr.error('',error.message)
@@ -105,6 +105,16 @@ export class SignInComponent implements OnInit {
 
 
     }
+
+    
+    else if(this.user[0]?.roles=="customer" ){
+      localStorage.setItem('iscustomer','true');
+      
+      this.router.navigate(["/customer-category"])
+
+
+    }
+
 
 
     

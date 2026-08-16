@@ -1,104 +1,159 @@
-<div class="page" style="text-align: center; padding-top: 50px;">
+<div class="page">
+  <!-- logo container -->
+  <div class="logo-container">
+    <img src="../../assets/img/asempa.jpg" alt="Asempa Graphics" class="logo" />
+  </div>
 
   <div class="row justify-content-center">
-    <div class="card card-block login-card" style="max-width: 600px; padding: 30px;">
-      <h3 class="form-label" style="margin-bottom: 20px; font-weight: bold;">Register</h3>
+    <div class="card card-block login-card">
+      <h3 class="form-title">
+        <i class="fas fa-pen-fancy"></i> Register
+      </h3>
       
       <form enctype="multipart/form-data" [formGroup]="createForm" (ngSubmit)="registerGuest(createForm.value)">
         
+        <!-- First Name -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="username">
-              <i class="fa fa-user fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-user fa-fw"></i>
+              <label for="firstname" class="form-label">First Name</label>
             </span>
-            <label for="firstname" class="form-label">First Name</label>
-            <input class="form-control" placeholder="First Name" type="text" formControlName="firstname">
+            <input 
+              class="form-control" 
+              placeholder="First Name" 
+              type="text" 
+              formControlName="firstname"
+              id="firstname"
+            >
           </div>
         </div>
 
+        <!-- Last Name -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="username">
-              <i class="fa fa-user fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-user-tag fa-fw"></i>
+              <label for="lastname" class="form-label">Last Name</label>
             </span>
-            <label for="lastname" class="form-label">Last Name</label>
-            <input class="form-control" placeholder="Last Name" type="text" formControlName="lastname">
+            <input 
+              class="form-control" 
+              placeholder="Last Name" 
+              type="text" 
+              formControlName="lastname"
+              id="lastname"
+            >
           </div>
         </div>
 
+        <!-- Address -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="address">
-              <i class="fa fa-address fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-home fa-fw"></i>
+              <label for="address" class="form-label">Address</label>
             </span>
-            <label for="address" class="form-label">Address</label>
-            <input class="form-control" placeholder="Street Address" type="text" formControlName="address">
+            <input 
+              class="form-control" 
+              placeholder="Street Address" 
+              type="text" 
+              formControlName="address"
+              id="address"
+            >
           </div>
         </div>
 
+        <!-- Phone -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="phone">
-              <i class="fa fa-phone fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-phone-alt fa-fw"></i>
+              <label for="phone" class="form-label">Phone Number</label>
             </span>
-            <label for="phone" class="form-label">Phone Number</label>
-            <input class="form-control" placeholder="Phone Number" type="text" formControlName="phone">
+            <input 
+              class="form-control" 
+              placeholder="Phone Number" 
+              type="text" 
+              formControlName="phone"
+              id="phone"
+            >
           </div>
         </div>
 
+        <!-- Email -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="email">
-              <i class="fa fa-envelope fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-envelope fa-fw"></i>
+              <label for="email" class="form-label">Email</label>
             </span>
-            <label for="email" class="form-label">Email</label>
-            <input class="form-control" placeholder="Email Address" type="email" formControlName="email">
+            <input 
+              class="form-control" 
+              placeholder="Email Address" 
+              type="email" 
+              formControlName="email"
+              id="email"
+            >
           </div>
         </div>
 
+        <!-- About -->
+   
+        <!-- City -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="about">
-              <i class="fa fa-info-circle fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-city fa-fw"></i>
+              <label for="city" class="form-label">City</label>
             </span>
-            <label for="about" class="form-label">About</label>
-            <input class="form-control" placeholder="Tell us about yourself" type="text" formControlName="about">
+            <input 
+              class="form-control" 
+              placeholder="City" 
+              type="text" 
+              formControlName="city"
+              id="city"
+            >
           </div>
         </div>
 
+        <!-- Username -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="city">
-              <i class="fa fa-city fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-user-circle fa-fw"></i>
+              <label for="username" class="form-label">Username</label>
             </span>
-            <label for="city" class="form-label">City</label>
-            <input class="form-control" placeholder="City" type="text" formControlName="city">
+            <input 
+              class="form-control" 
+              placeholder="User Account" 
+              type="text" 
+              formControlName="username"
+              id="username"
+            >
           </div>
         </div>
 
+        <!-- Password -->
         <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="username">
-              <i class="fa fa-user fa-fw"></i>
+          <div class="input-group">
+            <span class="input-group-addon addon-left">
+              <i class="fas fa-lock fa-fw"></i>
+              <label for="password" class="form-label">Password</label>
             </span>
-            <label for="username" class="form-label">Username</label>
-            <input class="form-control" placeholder="User Account" type="text" formControlName="username">
+            <input 
+              class="form-control" 
+              placeholder="Password" 
+              type="password" 
+              formControlName="password"
+              id="password"
+            >
           </div>
         </div>
 
-        <div class="form-group">
-          <div class="input-group mb-3">
-            <span class="input-group-addon addon-left" id="password">
-              <i class="fa fa-lock fa-fw"></i>
-            </span>
-            <label for="password" class="form-label">Password</label>
-            <input class="form-control" placeholder="Password" type="password" formControlName="password">
-          </div>
-        </div>
-
-        <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-top: 20px;">Register</button>
+        <button class="btn btn-register" type="submit">
+          <i class="fas fa-hand-peace"></i> Register
+        </button>
       </form>
     </div>
   </div>
 </div>
-

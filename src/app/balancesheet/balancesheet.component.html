@@ -2,9 +2,9 @@
   <div class="sheet-card">
 
     <!-- HEADER -->
-    <h2 class="company-title">Longford </h2>
+    <h2 class="company-title">AssempaFie Graphics</h2>
     <h3 class="sheet-title">Balance Sheet</h3>
-    <p class="sheet-date">As at {{ result?.date }}</p>
+    <p class="sheet-date">As at {{ result?.to_date | date:'mediumDate' }}</p>
 
     <hr class="divider">
 
@@ -34,12 +34,12 @@
       <h4 class="section-title">Assets</h4>
 
       <div class="row-item">
-        <span>Income</span>
+        <span>Income (Completed Sales)</span>
         <span>{{ result.income_total | number:'1.2-2' }}</span>
       </div>
 
       <div class="row-item">
-        <span>Accounts Receivable (Credit Sales Pending)</span>
+        <span>Accounts Receivable (Credit Sales)</span>
         <span>{{ result.accounts_receivable | number:'1.2-2' }}</span>
       </div>
 
@@ -49,13 +49,13 @@
       </div>
 
       <div class="row-item">
-        <span>Stock in Store</span>
+        <span>Stock in Store (Value)</span>
         <span>{{ result.stock_in_store | number:'1.2-2' }}</span>
       </div>
 
       <div class="grand-total">
         <span>Total Assets</span>
-        <span>{{ (result.income_total + result.accounts_receivable + result.stock_for_sale + result.stock_in_store) | number:'1.2-2' }}</span>
+        <span>{{ result.total_assets | number:'1.2-2' }}</span>
       </div>
 
       <br>
@@ -79,7 +79,7 @@
       </div>
 
       <div class="grand-total">
-        <span>Total — Current Liabilities</span>
+        <span>Total Current Liabilities</span>
         <span>{{ result.total_expenses | number:'1.2-2' }}</span>
       </div>
 
@@ -88,7 +88,7 @@
       <!-- NET ASSETS -->
       <h4 class="section-title">Net Assets</h4>
       <div class="grand-total">
-        <span>Net Assets</span>
+        <span>Net Assets (Assets - Liabilities)</span>
         <span>{{ result.net | number:'1.2-2' }}</span>
       </div>
 

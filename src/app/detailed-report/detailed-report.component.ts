@@ -170,7 +170,6 @@ async searchDates() {
       returnedRes,
       mostOrderedRes,
       refundRes,
-      posRes,
       roomRes,
       incomeRes,
       expenseRes,
@@ -188,7 +187,7 @@ async searchDates() {
       this.guestService.searchReturnDate(d),
       this.guestService.searchMostOrderedDate(d),
       this.paymentService.searchRefundDates(d),
-      this.paymentService.searchDatesPos(d),
+      // this.paymentService.searchDatesPos(d),
       // this.roomService.searchRoomDates(d),
       this.guestService.searchIncomeDates(d),
       this.guestService.searchExpenseDate(d),
@@ -207,7 +206,7 @@ async searchDates() {
     this.returnList = returnedRes || [];
     this.mostOrderedItems = mostOrderedRes || [];
     this.refundList = refundRes || [];
-    this.posList = posRes || [];
+    // this.posList = posRes || [];
     this.rooms = roomRes || [];
     this.incomeList = incomeRes || [];
     this.expenseList = expenseRes || [];

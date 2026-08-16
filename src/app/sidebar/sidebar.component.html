@@ -79,6 +79,7 @@
       </li>
       <div class="dropdown-container" id="userDropdown">
         <li><a id="fina" routerLink="all-users"><i class="fa fa-users">&nbsp;</i><span>Users&nbsp;</span></a></li>
+        <li><a id="fina" routerLink="bulk-message"><i class="fa fa-envelope">&nbsp;</i><span>Bulk Message&nbsp;</span></a></li>
         <li><a id="fina" routerLink="all-sessions"><i class="fa fa-users">&nbsp;</i><span>Sessions&nbsp;</span></a></li>
       </div>
 
@@ -138,28 +139,20 @@
         
         <!-- Accounts Receivable Submenu -->
         <li class="transparent">
-          <a id="fina" style="font-size: small;" class="dropdown-toggle-child" data-target="receivableDropdown">
+          <a id="fina" style="font-size: small;" class="dropdown-toggle-child" data-target="receivableDropdown" routerLink="/account-receivable-dates">
             <i class="fa fa-money">&nbsp;</i>Accounts Receiv.
           </a>
         </li>
-        <div class="dropdown-container-child" id="receivableDropdown">
-          <li><a id="fina" style="font-size: small;" routerLink="/account-receivable"><i class="fa fa-calendar-o">&nbsp;</i>Daily</a></li>
-          <li><a id="fina" style="font-size: small;" routerLink="/account-receivable-dates"><i class="fa fa-calendar-o">&nbsp;</i>Dates Between</a></li>
-        </div>
-
+      
         <li><a id="fina" style="font-size: small;" routerLink="/balance-sheet"><i class="fa fa-balance-scale">&nbsp;</i>Balance Sheet</a></li>
         
         <!-- General Ledger Submenu -->
         <li class="transparent">
-          <a id="fina" style="font-size: small;" class="dropdown-toggle-child" data-target="ledgerDropdown">
+          <a id="fina" style="font-size: small;" class="dropdown-toggle-child" data-target="ledgerDropdown" routerLink="/general-ledger-dates">
             <i class="fa fa-book">&nbsp;</i>General Ledger
           </a>
         </li>
-        <div class="dropdown-container-child" id="ledgerDropdown">
-          <li><a id="fina" style="font-size: small;" routerLink="/general-ledger"><i class="fa fa-calendar-o">&nbsp;</i>Daily</a></li>
-          <li><a id="fina" style="font-size: small;" routerLink="/general-ledger-dates"><i class="fa fa-calendar-o">&nbsp;</i>Different Dates</a></li>
-        </div>
-
+      
         <li><a id="fina" style="font-size: small;" routerLink="/financial-overview"><i class="fa fa-line-chart">&nbsp;</i>Financial Overview</a></li>
       </div>
 
@@ -172,8 +165,8 @@
       </li>
       <div class="dropdown-container" id="reportsDropdown">
         <li><a id="fina" style="font-size: small;" routerLink="/budget-report"><i class="fa fa-calendar">&nbsp;</i>Budget</a></li>
-        <li><a id="fina" style="font-size: small;" routerLink="/detailed-report"><i class="fa fa-calendar">&nbsp;</i>Detailed Summary</a></li>
-        <li><a id="fina" style="font-size: small;" routerLink="/detailed-report-week"><i class="fa fa-calendar">&nbsp;</i>Weekly Summary</a></li>
+        <!-- <li><a id="fina" style="font-size: small;" routerLink="/detailed-report"><i class="fa fa-calendar">&nbsp;</i> Summary</a></li> -->
+        <li><a id="fina" style="font-size: small;" routerLink="/detailed-report-week"><i class="fa fa-calendar">&nbsp;</i>Detailed Summary</a></li>
         <li><a id="fina" style="font-size: small;" routerLink="/daily-order-report"><i class="fa fa-calendar">&nbsp;</i>Daily Income</a></li>
         <li><a id="fina" routerLink="canceled-order"><i class="fa fa-close">&nbsp;</i><span>Canceled Order&nbsp;</span></a></li>
       </div>
@@ -329,9 +322,29 @@
       <div class="dropdown-container" id="accountantReportsDropdown">
         <li><a id="fina" style="font-size: small;" routerLink="/budget-report"><i class="fa fa-calendar">&nbsp;</i>Budget</a></li>
         <li><a id="fina" style="font-size: small;" routerLink="/detailed-report-week"><i class="fa fa-calendar">&nbsp;</i>Detailed Summary</a></li>
-        <li><a id="fina" style="font-size: small;" routerLink="/daily-order-report"><i class="fa fa-calendar">&nbsp;</i>Daily Income</a></li>
+        <li><a id="fina" style="font-size: small;" routerLink="/daily-order-report"><i class="fa fa-calendar">&nbsp;</i> Sales</a></li>
       </div>
 
+
+        <li class="transparent">
+        <a id="fina" class="dropdown-toggle" data-target="settingsDropdown">
+          <i class="fa fa-cog">&nbsp;</i><span>Settings &nbsp;</span>
+          <i class="fa fa-caret-down dropdown-arrow" style="float:right;"></i>
+        </a>
+      </li>
+      <div class="dropdown-container" id="settingsDropdown">
+        <!-- Accounts Settings -->
+        <li class="transparent">
+          <a id="fina" class="dropdown-toggle-child" data-target="accountsSettingsDropdown">
+            <i class="fa fa-calculator">&nbsp;</i><span>Accounts &nbsp;</span>
+            <i class="fa fa-caret-down dropdown-arrow" style="float:right;"></i>
+          </a>
+        </li>
+        <div class="dropdown-container-child" id="accountsSettingsDropdown">
+          <li><a id="fina" style="font-size: small;" routerLink="/account-group"><i class="fa fa-briefcase"></i> Account Groups</a></li>
+          <li><a id="fina" style="font-size: small;" routerLink="/add-account"><i class="fa fa-bank"></i> Account</a></li>
+        </div>
+      </div>
     </ng-container>
 
     <!-- ==================== HR ONLY SECTION ==================== -->

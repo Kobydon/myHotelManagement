@@ -1,0 +1,243 @@
+/* send-bulk-message.component.css */
+
+.card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 1rem 1.5rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Form Controls */
+.form-control {
+  border-radius: 8px;
+  border: 1.5px solid #e9ecef;
+  transition: all 0.3s ease;
+  padding: 10px 14px;
+}
+
+.form-control:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.form-control.border-primary {
+  border-color: #4a90e2;
+}
+
+/* Buttons */
+.btn-outline-primary {
+  color: #4a90e2;
+  border-color: #4a90e2;
+  border-radius: 20px;
+  padding: 6px 16px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4a90e2;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.btn-outline-secondary {
+  color: #6c757d;
+  border-color: #dee2e6;
+  border-radius: 20px;
+  padding: 6px 16px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5bd;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border: none;
+  border-radius: 30px;
+  padding: 14px 24px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.btn-success:disabled {
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+}
+
+.btn-outline-primary.btn-sm {
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+}
+
+/* Quick Templates */
+.btn-outline-primary.btn-sm.rounded-pill {
+  border-radius: 30px !important;
+  padding: 6px 18px;
+  background-color: #f8f9fa;
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
+.btn-outline-primary.btn-sm.rounded-pill:hover {
+  background-color: #4a90e2;
+  color: white;
+}
+
+/* Alert Box */
+.alert-light {
+  background-color: #f8f9fa;
+  border: 1.5px solid #4a90e2;
+  border-radius: 10px;
+  padding: 12px 20px;
+}
+
+/* Labels */
+.text-secondary {
+  color: #495057 !important;
+}
+
+/* Badges */
+.badge {
+  padding: 4px 12px;
+  font-weight: 500;
+  border-radius: 20px;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Modal */
+.modal-content {
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Table */
+.table {
+  font-size: 0.9rem;
+}
+
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.thead-light th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .btn-outline-primary.btn-sm.rounded-pill {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .modal-dialog {
+    margin: 10px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .bg-white {
+    background-color: #ffffff !important;
+  }
+  
+  .card {
+    background-color: #ffffff;
+  }
+  
+  .form-control {
+    background-color: #ffffff;
+  }
+  
+  .alert-light {
+    background-color: #f8f9fa;
+  }
+  
+  .modal-content {
+    background-color: #ffffff;
+  }
+  
+  .modal-body {
+    background-color: #ffffff;
+  }
+  
+  .modal-footer {
+    background-color: #ffffff;
+  }
+}

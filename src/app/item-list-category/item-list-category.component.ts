@@ -21,7 +21,7 @@ export class ItemListCategoryComponent implements OnInit {
   itemId: string | null = null;
   incomeDetails: any;
 
-  // Measurement Products List
+  // Measurement Products List - ADDED "LAMINATION"
   measurementProducts: string[] = [
     'SAV',
     'SAV WITH LAMINATION',
@@ -32,7 +32,8 @@ export class ItemListCategoryComponent implements OnInit {
     'SAV PRINT & CUT',
     'PP LABEL PRINT & CUT',
     'TRANSPARENT PRINT & CUT',
-    'BANNER WITH LAMINATION'
+    'BANNER WITH LAMINATION',
+    'LAMINATION'  // ← ADDED THIS
   ];
 
   constructor(
@@ -52,7 +53,6 @@ export class ItemListCategoryComponent implements OnInit {
       this.cartItems = items;
     });
 
-    // Subscribe to route params changes
     this.route.paramMap.subscribe(params => {
       this.itemId = params.get('id');
       console.log('Income ID:', this.itemId);
@@ -61,7 +61,6 @@ export class ItemListCategoryComponent implements OnInit {
         this.getIncomeDetails(this.itemId);
       } else {
         console.error('No income ID found in route.');
-        // Load all items if no ID
         this.getItemsList();
       }
     });
@@ -69,11 +68,12 @@ export class ItemListCategoryComponent implements OnInit {
     this.getUser();
   }
 
+  // ===================== FETCH DATA =====================
+
   async getIncomeDetails(id: string) {
     try {
       const res = await this.guestService.getFood(id);
       if (res) {
-        // Check if res is an array, if not, convert to array
         const data = Array.isArray(res) ? res : [res];
         this.itemList = data.map((product: any) => ({
           ...product,
@@ -82,14 +82,18 @@ export class ItemListCategoryComponent implements OnInit {
           measurementHeight: 0,
           measurementUnit: 'inches'
         }));
-        console.log('Fetched income details:', this.itemList);
+        this.sortItemsByName();
+        this.applyFilter();
+        console.log('Fetched income details:', this.itemList.length);
       } else {
         console.error('No data received for the given income ID');
         this.itemList = [];
+        this.filteredItemList = [];
       }
     } catch (error) {
       console.error('Error fetching income details:', error);
       this.itemList = [];
+      this.filteredItemList = [];
     }
   }
 
@@ -97,7 +101,6 @@ export class ItemListCategoryComponent implements OnInit {
     try {
       const res = await this.guestService.getItemsList();
       if (res) {
-        // Check if res is an array
         const data = Array.isArray(res) ? res : [];
         this.itemList = data.map((product: any) => ({
           ...product,
@@ -106,7 +109,8 @@ export class ItemListCategoryComponent implements OnInit {
           measurementHeight: 0,
           measurementUnit: 'inches'
         }));
-        this.filteredItemList = this.itemList;
+        this.sortItemsByName();
+        this.applyFilter();
         console.log('Items loaded:', this.itemList.length);
       } else {
         this.itemList = [];
@@ -119,8 +123,50 @@ export class ItemListCategoryComponent implements OnInit {
     }
   }
 
+  // ===================== SORTING =====================
+
+  sortItemsByName(): void {
+    this.itemList.sort((a, b) => {
+      const nameA = (a.name || '').toLowerCase();
+      const nameB = (b.name || '').toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }
+
+  // ===================== FRONTEND SEARCH =====================
+
+  onSearchChange(): void {
+    this.applyFilter();
+  }
+
+  applyFilter(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+    
+    if (!term) {
+      this.filteredItemList = [...this.itemList];
+    } else {
+      this.filteredItemList = this.itemList.filter(product => {
+        const name = (product.name || '').toLowerCase();
+        const category = (product.category || '').toLowerCase();
+        const description = (product.description || '').toLowerCase();
+        
+        return name.includes(term) || 
+               category.includes(term) || 
+               description.includes(term);
+      });
+    }
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.applyFilter();
+  }
+
+  // ===================== MEASUREMENT METHODS =====================
+
   /**
    * Check if product requires measurement
+   * Now includes LAMINATION
    */
   requiresMeasurement(product: any): boolean {
     if (!product || !product.name) return false;
@@ -156,14 +202,21 @@ export class ItemListCategoryComponent implements OnInit {
   }
 
   /**
+   * Update measurement preview when inputs change
+   */
+  updateMeasurementPreview(product: any): void {
+    // This triggers the price preview update
+  }
+
+  /**
    * Calculate price preview
    */
   calculatePricePreview(product: any): number {
     if (!product.measurementWidth || !product.measurementHeight) return 0;
     
-    const width = product.measurementWidth;
-    const height = product.measurementHeight;
-    const price = product.price;
+    const width = Number(product.measurementWidth);
+    const height = Number(product.measurementHeight);
+    const price = Number(product.price);
     const unit = product.measurementUnit || 'inches';
     
     if (unit === 'inches') {
@@ -183,16 +236,16 @@ export class ItemListCategoryComponent implements OnInit {
       return;
     }
 
-    const width = product.measurementWidth;
-    const height = product.measurementHeight;
+    const width = Number(product.measurementWidth);
+    const height = Number(product.measurementHeight);
     const unit = product.measurementUnit || 'inches';
     
     // Calculate price
-    let calculatedPrice = product.price;
+    let calculatedPrice = Number(product.price);
     if (unit === 'inches') {
-      calculatedPrice = (width * height * product.price) / 144;
+      calculatedPrice = (width * height * Number(product.price)) / 144;
     } else {
-      calculatedPrice = width * height * product.price;
+      calculatedPrice = width * height * Number(product.price);
     }
 
     // Create measurement data
@@ -220,12 +273,12 @@ export class ItemListCategoryComponent implements OnInit {
     product.measurementHeight = 0;
   }
 
-  handleCardClick(product: any) {
-    if (+product.quantity === 0) return;
+  // ===================== CART OPERATIONS =====================
 
-    // If product requires measurement, show inputs instead of adding directly
+  handleCardClick(product: any) {
+    if (Number(product.quantity) === 0) return;
+
     if (this.requiresMeasurement(product)) {
-      // Toggle measurement inputs
       product.showMeasurement = !product.showMeasurement;
       if (product.showMeasurement) {
         product.measurementWidth = 0;
@@ -249,80 +302,27 @@ export class ItemListCategoryComponent implements OnInit {
     }
   }
 
-  async searchItems(term: string) {
-    term = term.trim().toLowerCase();
-    if (!term) {
-      this.getItemsList();
-      return;
-    }
-
-    try {
-      const ad = {
-        find: term
-      };
-      const res = await this.guestService.searchItem(ad);
-      if (res) {
-        // Check if res is an array
-        const data = Array.isArray(res) ? res : [];
-        this.itemList = data.map((product: any) => ({
-          ...product,
-          showMeasurement: false,
-          measurementWidth: 0,
-          measurementHeight: 0,
-          measurementUnit: 'inches'
-        }));
-        console.log('Search results:', this.itemList.length);
-      } else {
-        this.itemList = [];
-      }
-    } catch (error) {
-      console.error('Error searching items:', error);
-      this.itemList = [];
-    }
-  }
-
-  onSearchChange() {
-    const term = this.searchTerm.trim().toLowerCase();
-
-    if (!term) {
-      this.filteredItemList = this.itemList;
-    } else {
-      this.filteredItemList = this.itemList.filter(product =>
-        product.name.toLowerCase().includes(term)
-      );
-    }
-  }
-
-  matchesSearch(product: any): boolean {
-    const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return true;
-    return product.name.toLowerCase().includes(term);
-  }
-
-  // Check if product is already in cart
   getCartItem(product: any) {
-    return this.cartItems.find(item => item.name === product.name);
+    return this.cartItems.find(item => item.id === product.id || item.name === product.name);
   }
 
-  // Add item to cart
   addToCart(product: any) {
     this.cartService.addToCart(product);
   }
 
-  // Increase quantity
   increaseQty(product: any) {
     this.cartService.increaseQty(product);
   }
 
-  // Decrease quantity
   decreaseQty(product: any) {
     this.cartService.decreaseQty(product);
   }
 
-  // Remove item from cart
   removeFromCart(product: any) {
     this.cartService.removeFromCart(product);
   }
+
+  // ===================== USER =====================
 
   async getUser() {
     try {

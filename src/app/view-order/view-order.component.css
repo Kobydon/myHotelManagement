@@ -1105,3 +1105,419 @@
   }
 }
 }
+/* Status badges for items */
+.status-checked {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.status-unchecked {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.checked-by-info {
+  display: block;
+  font-size: 9px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.check-item-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.check-item-btn:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+.checked-badge {
+  color: #28a745;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Add to your existing styles */
+.items-detail-table td {
+  vertical-align: middle;
+  padding: 8px 10px;
+}
+
+.items-detail-table .status-badge {
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+}
+/* Strike-through for checked items */
+.strikethrough {
+  text-decoration: line-through;
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+/* Checked item styling in preview */
+.item-name.checked-item {
+  opacity: 0.7;
+}
+
+.item-name.checked-item .strikethrough {
+  text-decoration: line-through;
+  color: #28a745;
+}
+
+/* Checked row styling in details table */
+.checked-row {
+  background-color: #f8fff8;
+  opacity: 0.85;
+}
+
+.checked-row td {
+  color: #6c757d;
+}
+
+.checked-row .strikethrough {
+  text-decoration: line-through;
+  color: #28a745;
+}
+
+/* Checkmark for checked items */
+.checked-checkmark {
+  color: #28a745;
+  font-weight: bold;
+  margin-left: 5px;
+  font-size: 14px;
+}
+
+/* Status badges for item check status */
+.status-checked {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.status-unchecked {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.checked-by-info {
+  display: block;
+  font-size: 9px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.check-item-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.check-item-btn:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+.checked-badge {
+  color: #28a745;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.locked-badge {
+  color: #6c757d;
+  font-size: 14px;
+  cursor: not-allowed;
+}
+
+/* VIP item styling */
+.vip-item {
+  background-color: #fff8e1 !important;
+}
+
+.vip-label {
+  background: #ffc107;
+  color: #000;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 5px;
+  font-weight: bold;
+}
+/* Printed by column in processed orders table */
+.printed-by {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.printed-by i {
+  color: #3498db;
+  margin-right: 4px;
+}
+
+/* Printed by field in expanded view */
+.order-printed-by {
+  background: #e8f4f8;
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #2c3e50;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.order-printed-by i {
+  color: #3498db;
+  margin-right: 4px;
+}
+
+/* Disabled print button */
+.print-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #95a5a6;
+}
+
+.print-btn:disabled:hover {
+  transform: none;
+  background: #95a5a6;
+}
+
+/* Status badges for item check status - INCOMING ORDERS ONLY */
+.status-checked {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.status-unchecked {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+/* Strike-through for checked items - INCOMING ORDERS ONLY */
+.strikethrough {
+  text-decoration: line-through;
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+.item-name.checked-item {
+  opacity: 0.7;
+}
+
+.item-name.checked-item .strikethrough {
+  text-decoration: line-through;
+  color: #28a745;
+}
+
+.checked-row {
+  background-color: #f8fff8;
+  opacity: 0.85;
+}
+
+.checked-row td {
+  color: #6c757d;
+}
+
+.checked-row .strikethrough {
+  text-decoration: line-through;
+  color: #28a745;
+}
+
+.checked-checkmark {
+  color: #28a745;
+  font-weight: bold;
+  margin-left: 5px;
+  font-size: 14px;
+}
+
+.checked-by-info {
+  display: block;
+  font-size: 9px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.check-item-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.check-item-btn:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+.checked-badge {
+  color: #28a745;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.locked-badge {
+  color: #6c757d;
+  font-size: 14px;
+  cursor: not-allowed;
+}
+
+/* VIP item styling */
+.vip-item {
+  background-color: #fff8e1 !important;
+}
+
+.vip-label {
+  background: #ffc107;
+  color: #000;
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+/* Print button styling */
+.print-btn {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.print-btn:hover:not(:disabled) {
+  background: #2980b9;
+  transform: scale(1.05);
+}/* ===================== ATTACHMENT STYLES ===================== */
+
+.attachment-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-attachment {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  background: #e8f4fd;
+  border: 1px solid #b8d4e8;
+  border-radius: 6px;
+  color: #2c3e50;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  touch-action: manipulation;
+  min-height: 32px;
+  white-space: nowrap;
+}
+
+.btn-attachment:hover {
+  background: #d4e8f7;
+  border-color: #8bb8d4;
+  transform: scale(1.02);
+}
+
+.btn-attachment:active {
+  transform: scale(0.95);
+}
+
+.attachment-icon {
+  font-size: 1rem;
+}
+
+.attachment-name {
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-size {
+  font-size: 0.65rem;
+  color: #7f8c8d;
+  margin-left: 0.1rem;
+}
+
+.no-attachment {
+  color: #bdc3c7;
+  font-size: 0.75rem;
+}
+
+/* Mobile responsive for attachment buttons */
+@media screen and (max-width: 768px) {
+  .btn-attachment {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+    min-height: 28px;
+  }
+  
+  .attachment-name {
+    max-width: 40px;
+  }
+  
+  .attachment-icon {
+    font-size: 0.85rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .btn-attachment {
+    padding: 0.1rem 0.3rem;
+    font-size: 0.65rem;
+    min-height: 24px;
+    gap: 0.15rem;
+  }
+  
+  .attachment-name {
+    max-width: 30px;
+  }
+  
+  .attachment-size {
+    display: none;
+  }
+}

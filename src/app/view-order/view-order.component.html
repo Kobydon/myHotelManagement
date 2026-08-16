@@ -12,7 +12,7 @@
     
     <div class="header-actions">
       <div class="action-buttons">
-        <button class="btn btn-info btn-sm" (click)="checkOrder()"  disable="">
+        <button class="btn btn-info btn-sm" (click)="checkOrder()" disable="">
           <i class="fa fa-calendar-check-o"></i> Check Today's Order
         </button>
         <button class="btn btn-primary btn-sm" (click)="refreshOrders()">
@@ -67,7 +67,7 @@
               <th class="col-items">Items</th>
               <th class="col-customer">Accepted by</th>
               <th class="col-total">Total</th>
-              <th class="col-status">Status</th>
+              <!-- <th class="col-status">Status</th> -->
               <th class="col-action">Action</th>
             </tr>
           </thead>
@@ -87,14 +87,14 @@
                   <span class="waiter-name">{{ order.waiter || 'N/A' }}</span>
                 </td>
                 <td class="customer-cell">
-                  <span class="customer-name">{{ order.customer_name || 'Walk-in' }}</span>
+                  <span class="customer-name">{{ order.customer || 'Walk-in' }}</span>
                 </td>
                 <td class="items-cell">
                   <div class="items-preview">
                     <span class="item-count">{{ getTotalItems(order) }} items</span>
                     <div class="item-names-list">
-                      <span *ngFor="let item of order.items | slice:0:2; let last = last" class="item-name">
-                        {{ item.name }}{{ !last ? ', ' : '' }}
+                      <span *ngFor="let item of order.items | slice:0:2; let last = last" class="item-name" [class.checked-item]="item.is_checked === 'yes'">
+                        <span [class.strikethrough]="item.is_checked === 'yes'">{{ item.name }}</span>{{ !last ? ', ' : '' }}
                       </span>
                       <span *ngIf="order.items?.length > 2" class="more-items">
                         +{{ order.items.length - 2 }} more
@@ -108,20 +108,20 @@
                 <td class="total-cell">
                   <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
                 </td>
-                <td class="status-cell">
+                <!-- <td class="status-cell">
                   <span class="status-badge" [ngClass]="getStatusClass(order)">
                     <span class="status-dot"></span>
                     {{ getStatusText(order) }}
                   </span>
-                </td>
+                </td> -->
                 <td class="action-cell">
-                  <button *ngIf="order.digital_printing_status !== 'no'" 
+                  <button *ngIf="order.digital_printing_status !== 'no' && order.working_on_id_digital_printing == user[0]?.id" 
                           class="btn-action confirm-btn" 
                           (click)="confirmOrder(order.id)"
                           title="Confirm Order">
                     <i class="fa fa-check"></i> Confirm
                   </button>
-                  <button *ngIf="order.working_on == 'not_started' "
+                  <button *ngIf="order.working_on_digital_printing == 'not_started' "
                           class="btn-action confirm-btn" 
                           (click)="acceptOrder(order.id)"
                           title="Accept Order">
@@ -134,14 +134,11 @@
                   <button class="btn-action view-btn" (click)="toggleOrderExpand(order, 'incoming')" title="View Details">
                     <i class="fa" [ngClass]="{'fa-eye': !order.expanded, 'fa-eye-slash': order.expanded}"></i>
                   </button>
-                  <!-- <button class="btn-action delete-btn" (click)="deleteOrder(order.id)" title="Delete Order">
-                    <i class="fa fa-trash"></i>
-                  </button> -->
                 </td>
               </tr>
-              <!-- Expanded Row -->
+              <!-- Expanded Row for Incoming Orders -->
               <tr *ngIf="order.expanded" class="expanded-row">
-                <td colspan="7">
+                <td colspan="8">
                   <div class="order-details">
                     <div class="details-header">
                       <h4>Order #{{ order.id }} Details</h4>
@@ -150,7 +147,7 @@
                           <i class="fa fa-clock-o"></i> {{ getFormattedDate(order.created_at) }}
                         </span>
                         <span class="order-customer">
-                          <i class="fa fa-user"></i> {{ order.customer_name || 'Walk-in' }}
+                          <i class="fa fa-user"></i> {{ order.customer || 'Walk-in' }}
                         </span>
                         <span class="order-note" *ngIf="order.note">
                           <i class="fa fa-sticky-note"></i> {{ order.note }}
@@ -165,23 +162,73 @@
                           <th>Qty</th>
                           <th>Price</th>
                           <th>Subtotal</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                          <th>Attachment</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr *ngFor="let item of order.items; trackBy: trackByItemId" [class.vip-item]="item.is_vip === 'yes'">
+                        <tr *ngFor="let item of order.items; trackBy: trackByItemId" [class.vip-item]="item.is_vip === 'yes'" [class.checked-row]="item.is_checked === 'yes'">
                           <td>
-                            <strong>{{ item.name }}</strong>
+                            <strong [class.strikethrough]="item.is_checked === 'yes'">{{ item.name }}</strong>
                             <span *ngIf="item.is_vip === 'yes'" class="vip-label">VIP</span>
+                            <span *ngIf="item.is_checked === 'yes'" class="checked-checkmark">✓</span>
                           </td>
-                          <td>{{ item.description || 'No description' }}</td>
-                          <td>{{ item.qty }}</td>
-                          <td>₵{{ item.price | number:'1.2-2' }}</td>
-                          <td>₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.description || 'No description' }}</td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.qty }}</td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ item.price | number:'1.2-2' }}</td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
+                          <td>
+                            <span class="status-badge" [ngClass]="{
+                              'status-checked': item.is_checked === 'yes',
+                              'status-unchecked': item.is_checked !== 'yes'
+                            }">
+                              <i class="fa" [ngClass]="{
+                                'fa-check-circle': item.is_checked === 'yes',
+                                'fa-clock-o': item.is_checked !== 'yes'
+                              }"></i>
+                              {{ item.is_checked === 'yes' ? 'Checked' : 'Pending' }}
+                            </span>
+                            <span *ngIf="item.is_checked === 'yes'" class="checked-by-info">
+                              <small>by {{ item.checked_by || 'Unknown' }}</small>
+                            </span>
+                          </td>
+                          <td>
+                            <button 
+                              *ngIf="item.is_checked != 'yes' && order.working_on_label == 'not_started'" 
+                              class="btn-action check-item-btn" 
+                              (click)="checkItem(order.id, item.id)"
+                              title="Mark item as checked">
+                              <i class="fa fa-check-circle"></i> Check
+                            </button>
+                            <span *ngIf="item.is_checked == 'yes'" class="checked-badge">
+                              <i class="fa fa-check-circle" style="color: #28a745;"></i> Done
+                            </span>
+                            <span *ngIf="item.is_checked != 'yes' && order.working_on_id_digital_printing != user[0]?.id" class="locked-badge" title="Only the accepted user can check items">
+                              <i class="fa fa-lock"></i>
+                            </span>
+                          </td>
+                          <td>
+                            <div *ngIf="hasAttachment(item)" class="attachment-cell">
+                              <button 
+                                class="btn-attachment" 
+                                (click)="viewAttachment(item, $event)"
+                                title="View attachment: {{ getAttachmentName(item) }}"
+                              >
+                                <span class="attachment-icon">{{ getAttachmentIcon(item) }}</span>
+                                <span class="attachment-name">{{ getAttachmentName(item) }}</span>
+                                <span class="attachment-size">{{ getAttachmentSize(item) }}</span>
+                              </button>
+                            </div>
+                            <span *ngIf="!hasAttachment(item)" class="no-attachment">
+                              <i class="fa fa-minus-circle"></i> None
+                            </span>
+                          </td>
                         </tr>
                       </tbody>
                       <tfoot>
                         <tr>
-                          <td colspan="4" class="total-label"><strong>Grand Total</strong></td>
+                          <td colspan="7" class="total-label"><strong>Grand Total</strong></td>
                           <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
                         </tr>
                       </tfoot>
@@ -191,7 +238,7 @@
               </tr>
             </ng-container>
             <tr *ngIf="(filteredOrders?.length === 0 && itemList?.length === 0) && !isLoading">
-              <td colspan="7">
+              <td colspan="8">
                 <div class="empty-state">
                   <i class="fa fa-inbox fa-3x"></i>
                   <p>No incoming orders</p>
@@ -286,9 +333,8 @@
                   <span class="waiter-name">{{ order.waiter || 'N/A' }}</span>
                 </td>
                 <td class="customer-cell">
-                  <span class="customer-name">{{ order.customer_name || 'Walk-in' }}</span>
+                  <span class="customer-name">{{ order.customer || 'Walk-in' }}</span>
                 </td>
-                 
                 <td class="items-cell">
                   <div class="items-preview">
                     <span class="item-count">{{ getTotalItems(order) }} items</span>
@@ -305,8 +351,8 @@
                 <td class="total-cell">
                   <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
                 </td>
-                 <td class="customer-cell">
-                  <span class="customer-name">{{ order.working_on || 'Not Yet Accepted' }}</span>
+                <td class="customer-cell">
+                  <span class="customer-name">{{ order.working_on_digital_printing || 'Not Yet Accepted' }}</span>
                 </td>
                 <td class="status-cell">
                   <span class="status-badge status-completed">
@@ -318,14 +364,14 @@
                   <button class="btn-action view-btn" (click)="toggleOrderExpand(order, 'processed')" title="View Details">
                     <i class="fa" [ngClass]="{'fa-eye': !order.expanded, 'fa-eye-slash': order.expanded}"></i>
                   </button>
-                  <button class="btn-action print-btn" (click)="printOrder(order)" title="Print Receipt" disabled="">
-                    <i class="fa fa-print"></i>
+                  <button class="btn-action print-btn" (click)="printOrder(order)" title="Print Receipt">
+                    <i class="fa fa-print"></i> Print
                   </button>
                 </td>
               </tr>
               <!-- Expanded Row for Processed Orders -->
               <tr *ngIf="order.expanded" class="expanded-row">
-                <td colspan="7">
+                <td colspan="8">
                   <div class="order-details">
                     <div class="details-header">
                       <h4>Order #{{ order.id }} Details</h4>
@@ -334,10 +380,10 @@
                           <i class="fa fa-clock-o"></i> {{ getFormattedDate(order.created_at) }}
                         </span>
                         <span class="order-customer">
-                          <i class="fa fa-user"></i> {{ order.customer_name || 'Walk-in' }}
+                          <i class="fa fa-user"></i> {{ order.customer || 'Walk-in' }}
                         </span>
                         <span class="order-note" *ngIf="order.note">
-                          <i class="fa fa-sticky-note"></i> {{ order.note }}
+                          <i class="fa fa-sticky-note"></i> <h5>{{ order.note }}</h5>
                         </span>
                       </div>
                     </div>
@@ -350,15 +396,22 @@
                           <th>Price</th>
                           <th>Subtotal</th>
                           <th>Status</th>
+                          <th>Checked</th>
+                          <th>Printed by</th>
+                          <th>Attachment</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr *ngFor="let item of order.items; trackBy: trackByItemId">
-                          <td><strong>{{ item.name }}</strong></td>
-                          <td>{{ item.description || 'No description' }}</td>
-                          <td>{{ item.qty }}</td>
-                          <td>₵{{ item.price | number:'1.2-2' }}</td>
-                          <td>₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
+                        <tr *ngFor="let item of order.items; trackBy: trackByItemId" [class.vip-item]="item.is_vip == 'yes'" [class.checked-row]="item.is_checked == 'yes'">
+                          <td>
+                            <strong [class.strikethrough]="item.is_checked === 'yes'">{{ item.name }}</strong>
+                            <span *ngIf="item.is_vip === 'yes'" class="vip-label">VIP</span>
+                            <span *ngIf="item.is_checked === 'yes'" class="checked-checkmark">✓</span>
+                          </td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.description || 'No description' }}</td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.qty }}</td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ item.price | number:'1.2-2' }}</td>
+                          <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
                           <td>
                             <span class="status-badge" [ngClass]="{
                               'status-finishing': item.confirmed === true,
@@ -368,11 +421,47 @@
                               {{ item.confirmed === true ? 'Finishing' : item.confirmed === false ? 'Processing' : 'N/A' }}
                             </span>
                           </td>
+                          <td>
+                            <span class="status-badge" [ngClass]="{
+                              'status-checked': item.is_checked === 'yes',
+                              'status-unchecked': item.is_checked !== 'yes'
+                            }">
+                              <i class="fa" [ngClass]="{
+                                'fa-check-circle': item.is_checked === 'yes',
+                                'fa-clock-o': item.is_checked !== 'yes'
+                              }"></i>
+                              {{ item.is_checked === 'yes' ? 'Checked' : 'Pending' }}
+                            </span>
+                            <span *ngIf="item.is_checked === 'yes'" class="checked-by-info">
+                              <small>by {{ item.checked_by || 'Unknown' }}</small>
+                            </span>
+                          </td>
+                          <td>
+                            <span class="printed-by-badge">
+                              <i class="fa fa-print"></i> {{ item.checked_by || 'Not Printed' }}
+                            </span>
+                          </td>
+                          <td>
+                            <div *ngIf="hasAttachment(item)" class="attachment-cell">
+                              <button 
+                                class="btn-attachment" 
+                                (click)="viewAttachment(item, $event)"
+                                title="View attachment: {{ getAttachmentName(item) }}"
+                              >
+                                <span class="attachment-icon">{{ getAttachmentIcon(item) }}</span>
+                                <span class="attachment-name">{{ getAttachmentName(item) }}</span>
+                                <span class="attachment-size">{{ getAttachmentSize(item) }}</span>
+                              </button>
+                            </div>
+                            <span *ngIf="!hasAttachment(item)" class="no-attachment">
+                              <i class="fa fa-minus-circle"></i> None
+                            </span>
+                          </td>
                         </tr>
                       </tbody>
                       <tfoot>
                         <tr>
-                          <td colspan="5" class="total-label"><strong>Grand Total</strong></td>
+                          <td colspan="8" class="total-label"><strong>Grand Total</strong></td>
                           <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
                         </tr>
                       </tfoot>
@@ -382,7 +471,7 @@
               </tr>
             </ng-container>
             <tr *ngIf="(filteredProcessedOrders?.length === 0 && processedOrders?.length === 0) && !isLoading">
-              <td colspan="7">
+              <td colspan="8">
                 <div class="empty-state">
                   <i class="fa fa-check-circle-o fa-3x"></i>
                   <p>No processed orders</p>
@@ -424,7 +513,7 @@
           </div>
           <div class="order-info-row">
             <span class="info-label">Customer:</span>
-            <span class="info-value">{{ orderToConfirm.customer_name || 'Walk-in' }}</span>
+            <span class="info-value">{{ orderToConfirm.customer || 'Walk-in' }}</span>
           </div>
           <div class="order-info-row">
             <span class="info-label">Total:</span>

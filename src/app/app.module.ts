@@ -1,3 +1,4 @@
+// app.module.ts - Updated with ChatModule
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -66,7 +67,7 @@ import { FinancialOverviewComponent } from './financial-overview/financial-overv
 import { AllSessionsComponent } from './all-sessions/all-sessions.component';
 import { PosModule } from "./pos/pos.module";
 import { PosLayoutComponent } from "./pos-layout/pos-layout.component";
-import { ItemListCategoryComponent } from './item-list-category/item-list-category.component';
+
 import { ViewOrderComponent } from './view-order/view-order.component';
 import { ViewDrinkOrderComponent } from './view-drink-order/view-drink-order.component';
 import { TodaysFoodChefComponent } from './todays-food-chef/todays-food-chef.component';
@@ -91,84 +92,49 @@ import { ViewDtfOrderComponent } from './view-dtf-order/view-dtf-order.component
 import { CustomersComponent } from './customers/customers.component';
 import { GiversTabComponent } from './givers-tab/givers-tab.component';
 import { HeldCartReportComponent } from './held-cart-report/held-cart-report.component';
+import { CustomerLayoutComponent } from './customer-layout/customer-layout.component';
+import { CategoryComponent } from './cutomer/category/category.component';
 
-// import { AllReservationsComponent } from './admin/all-reservations/all-reservations.component';
+// ✅ Import ChatModule
+import { ChatModule } from './chat/chat.module';
 
-
+// ✅ Import Chat Component (if needed for declarations)
+import { ChatComponent } from './chat/chat.component';
+import { SendBulkMessageComponent } from './send-bulk-message/send-bulk-message.component';
 
 @NgModule({
   declarations: [
-    AppComponent,PosLayoutComponent,
+    AppComponent,
+    PosLayoutComponent,
     AdminLayoutComponent,
     ResLayoutComponent,
-  
     VendorsComponent,
-        ViewOrderComponent,
-        ViewDrinkOrderComponent,
-        CheckTodaysOrdersComponent,
-        CheckDrinkOrdersComponent,
-        SearchPropertyComponent,
-        AllowanceComponent,
-        DeductionComponent,
-        ViewLabelOrderComponent,
-        ViewDtfOrderComponent,
-        GiversTabComponent,
-     
-     
-      
-      
-       
-       
-        
-       
-  
-       
-      
-      
-      
-
-     
-      
-     
-      
-       
-      
-     
-  
-   
- 
-
-  
-
-
-
-
-
-
-
-  
-   
-
- 
-
-
-
-    // RoomTypesComponent,
+    ViewOrderComponent,
+    ViewDrinkOrderComponent,
+    CheckTodaysOrdersComponent,
+    CheckDrinkOrdersComponent,
+    SearchPropertyComponent,
+    AllowanceComponent,
+    DeductionComponent,
+    ViewLabelOrderComponent,
+    ViewDtfOrderComponent,
+    GiversTabComponent,
+    CustomerLayoutComponent,
     
+    // ❌ Remove ChatComponent from declarations if it's already in ChatModule
   ],
   imports: [
     BrowserModule,
-  
     BrowserAnimationsModule,
     FeaturesModule,
     FormsModule,
     ReactiveFormsModule,
-  
     LoginModule,
     HttpClientModule,
     RestaurantModule,
     PosModule,
-    
+    // ✅ Add ChatModule here
+    ChatModule,
     RouterModule.forRoot(AppRoutes,{
       // useHash: true
     }),
@@ -178,24 +144,18 @@ import { HeldCartReportComponent } from './held-cart-report/held-cart-report.com
       // timeOut: 10000,
       // positionClass: 'toast-bottom-right',
       // preventDuplicates: true,
-  
-      }),
+    }),
     FooterModule,
     FixedPluginModule
   ],
   providers: [
     userService,
- 
-
-  
-      
-   {
-     
-     provide: HTTP_INTERCEPTORS,
-     useClass: AuthInterceptor,
-     multi: true
-   }
- ],
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

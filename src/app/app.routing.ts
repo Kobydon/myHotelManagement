@@ -18,6 +18,7 @@ import { CheckDrinkOrdersComponent } from './check-drink-orders/check-drink-orde
 import { ViewLabelOrderComponent } from './view-label-order/view-label-order.component';
 import { ViewDtfOrderComponent } from './view-dtf-order/view-dtf-order.component';
 import { GiversTabComponent } from './givers-tab/givers-tab.component';
+import { CustomerLayoutComponent } from './customer-layout/customer-layout.component';
 
 export const AppRoutes: Routes = [
   {
@@ -84,6 +85,16 @@ export const AppRoutes: Routes = [
   }]},
 
 
+    
+  {
+    path: '',canActivate:[AuthGuard],
+    component: CustomerLayoutComponent,
+    children: [
+        {
+      path: '',
+      loadChildren: () => import('../app/customer/customer.module').then(x => x.CustomerModule)
+        }]
+  },
 
   
   {

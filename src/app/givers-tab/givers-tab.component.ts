@@ -507,15 +507,15 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   async submitDelivery(): Promise<void> {
-    if (!this.deliveryName || this.deliveryName.trim() === '') {
-      this.toastr.warning('Please enter the delivery person\'s name', 'Required');
-      return;
-    }
+    // if (!this.deliveryName || this.deliveryName.trim() === '') {
+    //   this.toastr.warning('Please enter the delivery person\'s name', 'Required');
+    //   return;
+    // }
 
-    if (!this.deliveryContact || this.deliveryContact.trim() === '') {
-      this.toastr.warning('Please enter the delivery contact number', 'Required');
-      return;
-    }
+    // if (!this.deliveryContact || this.deliveryContact.trim() === '') {
+    //   this.toastr.warning('Please enter the delivery contact number', 'Required');
+    //   return;
+    // }
 
     try {
       const orderId = this.deliveryOrder.id;
@@ -762,4 +762,22 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
       default: return 'fa-circle-o';
     }
   }
+
+  
+cutting(orderId: any): void {
+   
+    
+
+    this.guestService.CuttingOrder(orderId).then(res => {
+      // this.toastr.success(`Order #${orderId} accepted`, 'Success');
+      this.refreshOrders();
+    }).catch(err => {
+      console.error("❌ Error accepting order:", err);
+      this.toastr.error('Failed to accept order', 'Error');
+    });
+    
+
+
+  }
+    
 }

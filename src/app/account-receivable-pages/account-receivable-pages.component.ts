@@ -176,47 +176,63 @@ export class AccountReceivablePagesComponent implements OnInit {
         this.loading.stop();
       }
     }
-    
-    
-     
 
     loadHeldOrders() {
-      const selectedDate = this.paymentForm.value.dates;
-       const d = { date: selectedDate,date_two:this.paymentForm.value.date_two };
-      this.guestService.getHeldReportOrdersTwo(d).subscribe((data) => {
-        console.log("API Response:", data); // Debugging: Check if data is received
-    
-        if (!Array.isArray(data) || data.length === 0) {
-          console.log("No held orders found.");
-          this.HeldList = []; // Set empty array if no data
-          this.totalHeldAmount = 0;
-          return;
-        }
-    
-        // Ensure 'items' is always an array and convert price to a number
-        this.HeldList = data.map((order: any) => ({
-          ...order,
-          items: Array.isArray(order.items)
-            ? order.items.map((item: any) => ({
-                ...item,
-                price: Number(item.price) || 0, // Convert price to a number
-                qty: Number(item.qty) || 0 // Ensure qty is a number
-              }))
-            : []
-        }));
-    
-        console.log("Processed HeldList:", this.HeldList);
-        this.calculateTotal();
-      });
+  const selectedDate = this.paymentForm.value.dates;
+  const d = { date: selectedDate, date_two: this.paymentForm.value.date_two };
+  
+  this.guestService.getHeldReportOrdersTwo(d).subscribe({
+    next: (response: any) => {
+      console.log("API Response:", response);
+
+      // Handle both response formats
+      let orders = [];
+      let total = 0;
+      
+      if (Array.isArray(response)) {
+        // If response is an array (old format)
+        orders = response;
+        total = this.calculateTotalFromList(orders);
+      } else if (response && response.HeldList) {
+        // If response has HeldList property (new format)
+        orders = response.HeldList;
+        total = response.totalHeldAmount || this.calculateTotalFromList(orders);
+      } else {
+        console.log("No held orders found.");
+        this.HeldList = [];
+        this.totalHeldAmount = 0;
+        return;
+      }
+
+      // Process orders
+      this.HeldList = orders.map((order: any) => ({
+        ...order,
+        items: Array.isArray(order.items)
+          ? order.items.map((item: any) => ({
+              ...item,
+              price: Number(item.price) || 0,
+              qty: Number(item.qty) || 0
+            }))
+          : []
+      }));
+
+      this.totalHeldAmount = total;
+      console.log("Processed HeldList:", this.HeldList);
+    },
+    error: (error) => {
+      console.error("Error fetching held orders:", error);
+      this.toastr.error("Failed to load held orders");
     }
-    
-    calculateTotal() {
-      this.totalHeldAmount = this.HeldList.reduce((sum, order) =>
-        sum + order.items.reduce((subSum, item) => subSum + (item.qty * item.price), 0)
-      , 0);
-    }
-    
-    
+  });
+}
+
+calculateTotalFromList(orders: any[]) {
+  return orders.reduce((sum, order) =>
+    sum + (order.items || []).reduce((subSum, item) => 
+      subSum + ((item.qty || 0) * (item.price || 0)), 0
+    ), 0
+  );
+}
     
     
     

@@ -32,6 +32,27 @@
       </div>
     </div>
 
+    <!-- Search Products -->
+    <div class="search-section mb-2">
+      <input 
+        type="text" 
+        class="form-control" 
+        placeholder="🔍 Search products..." 
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+      />
+      <div class="product-list mt-1" *ngIf="searchTerm">
+        <div *ngFor="let product of filteredItemList" 
+             class="product-item" 
+             (click)="handleProductClick(product)">
+          {{ product.item_name }} - ₵{{ product.price }}
+          <span *ngIf="getCartItem(product)" class="badge badge-success ms-2">
+            In Cart ({{ getCartItem(product).qty }})
+          </span>
+        </div>
+      </div>
+    </div>
+
     <!-- Cart Table -->
     <div class="table-responsive">
       <table class="table table-bordered">
@@ -110,7 +131,7 @@
             <td>
               <button 
                 class="btn btn-danger btn-sm"
-                (click)="removeFromCart(item, item.id)">
+                (click)="removeFromCart(item)">
                 🗑️
               </button>
             </td>
@@ -130,11 +151,26 @@
 
     <!-- Payment & Order Actions -->
     <div class="mt-3 d-flex gap-2 flex-wrap">
-      <button class="btn btn-danger" (click)="clearCart()" disabled>Cancel Order</button>
-      <button class="btn btn-warning" (click)="holdOrder()" [disabled]="cartItems.length === 0">
-        Hold Order
-      </button>
-      <button class="btn btn-primary" (click)="printBill()">
+      <button class="btn btn-danger" (click)="clearCart()" [disabled]="cartItems.length === 0">Clear Cart Order</button>
+      
+      <!-- HOLD & PAY BUTTONS -->
+      <div class="btn-group mt-2" role="group" style="width: 100%; flex-wrap: wrap; gap: 5px;">
+        <!-- <button class="btn btn-warning" 
+                (click)="quickHold()" 
+                [disabled]="cartItems.length === 0 || !(cashier || admin)"
+                style="flex: 1; min-width: 100px;">
+          <i class="fa fa-clock-o"></i> Hold Only
+        </button> -->
+        
+        <button class="btn btn-info" 
+                (click)="holdWithPartialPayment()" 
+                [disabled]="cartItems.length === 0 || !(cashier || admin)"
+                style="flex: 1; min-width: 100px;">
+          <i class="fa fa-money"></i> Hold & Pay
+        </button>
+      </div>
+      
+      <button class="btn btn-primary" (click)="printBill()" [disabled]="cartItems.length === 0">
         Print Bill 🖨️
       </button>
       <button 
@@ -161,21 +197,92 @@
       </button>
 
       <!-- Select Customer -->
-      <button class="btn btn-info" style="padding: 5px; display: inline-flex; align-items: center;">
-        <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
-          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Customer</label>
-          <select
-            formControlName="customer"
-            style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px;"
-            (change)="selectCustomer($event.target.value)">
-            <option value="">-- Select --</option>
-            <option *ngFor="let customer of customers" [value]="customer.id">
-              {{ customer.firstname }} {{ customer.lastname }} - {{ customer.customer_id }}
-            </option>
-          </select>
-        </form>
+      <!-- Searchable Select Customer -->
+<div class="customer-selector">
+
+  <label class="customer-label">
+    <i class="fa fa-user"></i>
+    Select Customer
+  </label>
+
+  <div class="customer-search-wrapper">
+
+    <!-- Search Input -->
+    <div class="input-group">
+
+      <input
+        type="text"
+        class="form-control customer-search-input"
+        placeholder="Search customer..."
+        [(ngModel)]="customerSearchTerm"
+        (input)="filterCustomers()"
+        (focus)="openCustomerDropdown()"
+        autocomplete="off"
+      />
+
+      <button
+        type="button"
+        class="btn btn-light"
+        *ngIf="customerSearchTerm"
+        (click)="clearCustomerSelection()">
+        <i class="fa fa-times"></i>
       </button>
 
+    </div>
+
+
+    <!-- Customer Dropdown -->
+    <div
+      class="customer-dropdown"
+      *ngIf="showCustomerDropdown">
+
+      <!-- No customers -->
+      <div
+        class="customer-dropdown-empty"
+        *ngIf="filteredCustomers.length === 0">
+
+        <i class="fa fa-user-times"></i>
+
+        <span>
+          No customer found
+        </span>
+
+      </div>
+
+
+      <!-- Customers -->
+      <div
+        class="customer-option"
+        *ngFor="let customer of filteredCustomers"
+        (mousedown)="selectCustomer(customer.id)">
+
+        <div class="customer-name">
+          <i class="fa fa-user-circle"></i>
+
+          <strong>
+            {{ customer.firstname }} {{ customer.lastname }}
+          </strong>
+        </div>
+
+        <div class="customer-details">
+
+          <span *ngIf="customer.customer_id">
+            ID: {{ customer.customer_id }}
+          </span>
+
+          <span *ngIf="customer.phone">
+            📱 {{ customer.phone }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
       <button class="btn btn-success" (click)="openPopup4()">Add New</button>
 
       <!-- Notes -->
@@ -217,7 +324,7 @@
       </button>
 
       <!-- Pay Buttons -->
-      <button class="btn btn-success"
+      <!-- <button class="btn btn-success"
         *ngIf="isHeldOrder"
         (click)="openPaymentModal('payOrderTwo')"
         [disabled]="cartItems.length === 0 || !(cashier || admin)">
@@ -230,21 +337,7 @@
         [disabled]="cartItems.length === 0 || !(cashier || admin)">
         Pay (₵{{ total | number:'1.2-2' }})
       </button>
-
-      <button class="btn btn-info"
-        *ngIf="isHeldOrder"
-        (click)="openPaymentModal('payOrderTwoAll')"
-        [disabled]="cartItems.length === 0 || !(cashier || admin)">
-        Pay All (₵{{ (existingBalance > 0 ? existingBalance : total) | number:'1.2-2' }})
-      </button>
-
-      <button class="btn btn-info"
-        *ngIf="!isHeldOrder"
-        (click)="openPaymentModal('payOrderAll')"
-        [disabled]="cartItems.length === 0 || !(cashier || admin)">
-        Pay All (₵{{ total | number:'1.2-2' }}) 
-      </button>
-    </div>
+    </div> -->
 
     <!-- Held Carts Section -->
     <h5 class="mt-4">Held Carts</h5>
@@ -256,6 +349,11 @@
           <span *ngIf="cart.balance && +cart.balance > 0" class="badge badge-warning ms-1">
             Balance: ₵{{ +cart.balance | number:'1.2-2' }}
           </span>
+          <span class="badge" [ngClass]="{
+            'badge-success': cart.paid_status === 'Success',
+            'badge-warning': cart.paid_status === 'Partial',
+            'badge-secondary': cart.paid_status === 'Pending'
+          }">{{ cart.paid_status || 'Pending' }}</span>
         </div>
         <div class="btn-group">
           <button 
@@ -264,6 +362,11 @@
             [disabled]="cartItems.length > 0">
             Load
           </button>
+          <!-- <button *ngIf="cart.balance && +cart.balance > 0" 
+                  class="btn btn-warning btn-sm" 
+                  (click)="loadHeldCart(cart.id); openPaymentModal('payOrder')">
+            Pay ₵{{ +cart.balance | number:'1.2-2' }}
+          </button> -->
         </div>
       </li>
     </ul>
@@ -433,6 +536,8 @@
                   <th>Total</th>
                   <th>Balance</th>
                   <th>Date</th>
+                  <th>Payment Status</th>
+                  <th>Attendant</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -454,6 +559,18 @@
                       'badge-warning': order.paid_status === 'Partial'
                     }">
                       {{ order.paid_status }}
+                    </span>
+                  </td>
+                  <td>{{ order.working_on || 'N/A' }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="{
+                      'badge-info': order.status === 'Printed',
+                      'badge-warning': order.status === 'Processing',
+                      'badge-secondary': order.status === 'Cutting',
+                      'badge-success': order.status === 'Delivered',
+                      'badge-danger': order.status === 'Cancelled'
+                    }">
+                      {{ order.status }}
                     </span>
                   </td>
                 </tr>
@@ -478,7 +595,8 @@
     </div>
   </div>
 
-  <!-- Modals -->
+  <!-- ===================== MODALS ===================== -->
+
   <!-- Cashier Modal -->
   <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': displayStyle }">
     <div class="modal-dialog" role="document">
@@ -698,14 +816,14 @@
     </div>
   </div>
 
-  <!-- Payment Modal -->
+  <!-- ===================== PAYMENT MODAL - FIXED ===================== -->
   <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': showPaymentModal ? 'block' : 'none' }">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
             <i class="fa fa-credit-card" style="color: #27ae60;"></i> 
-            Payment Details
+            {{ currentPaymentMethod === 'holdAndPay' ? 'Hold & Pay' : 'Payment Details' }}
           </h5>
           <i class="fa fa-close" (click)="closePaymentModal()"></i>
         </div>
@@ -739,6 +857,7 @@
             <span *ngIf="isBalancePayment" class="badge badge-info ms-2">Paying Balance Only</span>
           </div>
 
+          <!-- Amount Input -->
           <div class="form-group">
             <label>Amount to Pay</label>
             <div class="input-group">
@@ -751,35 +870,71 @@
                 placeholder="Enter amount"
                 min="0.01"
                 step="0.01"
+                id="amountPaidInput"
               />
             </div>
             <small class="text-muted">
               <i class="fa fa-info-circle"></i> 
-              {{ isBalancePayment ? 'Pay the outstanding balance' : 'Enter the amount you want to pay. Remaining balance will be tracked.' }}
+              {{ currentPaymentMethod === 'holdAndPay' ? 'Enter amount to pay. Remaining balance will be held.' : 'Enter the amount you want to pay. Remaining balance will be tracked.' }}
             </small>
           </div>
 
+          <!-- Quick Action Buttons -->
+          <div class="quick-actions">
+            <button class="btn btn-outline-success btn-sm" (click)="setFullPayment()">
+              <i class="fa fa-check-circle"></i> Full Payment
+            </button>
+            <button class="btn btn-outline-warning btn-sm" (click)="setHalfPayment()">
+              <i class="fa fa-percent"></i> Half Payment
+            </button>
+          </div>
+
+          <!-- Full Payment Checkbox -->
+          <div class="full-payment-checkbox">
+            <label>
+              <input 
+                type="checkbox" 
+                [checked]="isFullPayment"
+                (change)="toggleFullPayment($event)"
+              />
+              <span>Pay Full Amount</span>
+            </label>
+            <span class="badge badge-success" *ngIf="isFullPayment">✅ FULL PAYMENT</span>
+          </div>
+
+          <!-- Payment Status Messages -->
           <div *ngIf="isPartialPayment" class="partial-payment-info">
             <i class="fa fa-exclamation-triangle" style="color: #f39c12;"></i>
             <span>Partial payment of <strong>₵{{ amountPaid | number:'1.2-2' }}</strong>. 
             Remaining balance: <strong>₵{{ balance | number:'1.2-2' }}</strong></span>
+            <span *ngIf="currentPaymentMethod === 'holdAndPay'" class="badge badge-warning ms-2">Will be held</span>
           </div>
 
           <div *ngIf="!isPartialPayment && amountPaid > 0" class="full-payment-info">
             <i class="fa fa-check-circle" style="color: #27ae60;"></i>
             <span>Full payment of <strong>₵{{ amountPaid | number:'1.2-2' }}</strong></span>
+            <span class="badge badge-success ms-2">Paid in Full</span>
           </div>
 
           <div *ngIf="amountPaid <= 0" class="payment-hint">
             <i class="fa fa-info-circle" style="color: #3498db;"></i>
-            <span>Enter an amount to pay</span>
+            <span>{{ currentPaymentMethod === 'holdAndPay' ? 'Enter an amount to pay, or leave 0 to just hold the order' : 'Enter an amount to pay' }}</span>
           </div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" (click)="closePaymentModal()">
             <i class="fa fa-times"></i> Cancel
           </button>
-          <button class="btn btn-success" (click)="processPayment()" [disabled]="!amountPaid || amountPaid <= 0 || amountPaid > ((isBalancePayment && existingBalance > 0) ? existingBalance : (total + existingBalance))">
+          <button *ngIf="currentPaymentMethod === 'holdAndPay'" 
+                  class="btn btn-warning" 
+                  (click)="processHoldAndPayFromModal()" 
+                  [disabled]="amountPaid < 0 || amountPaid > (total + existingBalance)">
+            <i class="fa fa-clock-o"></i> Hold & Pay ₵{{ amountPaid | number:'1.2-2' }}
+          </button>
+          <button *ngIf="currentPaymentMethod !== 'holdAndPay'" 
+                  class="btn btn-success" 
+                  (click)="processPayment()" 
+                  [disabled]="!amountPaid || amountPaid <= 0 || amountPaid > ((isBalancePayment && existingBalance > 0) ? existingBalance : (total + existingBalance))">
             <i class="fa fa-check"></i> Pay ₵{{ amountPaid | number:'1.2-2' }}
           </button>
         </div>

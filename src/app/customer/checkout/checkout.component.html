@@ -1,0 +1,190 @@
+<!-- checkout.component.html -->
+<div class="checkout-container">
+  <!-- Header -->
+  <div class="checkout-header">
+    <button class="back-btn" (click)="goBack()">←</button>
+    <h2 class="page-title">Checkout</h2>
+    <span class="order-count">{{ cartItems.length }} items</span>
+  </div>
+
+  <!-- Order Summary -->
+  <div class="order-summary">
+    <h3 class="section-title">📋 Order Summary</h3>
+    <div class="order-items-list">
+      <div *ngFor="let item of cartItems" class="order-item">
+        <div class="item-icon">{{ getProductIcon(item.name) }}</div>
+        <div class="item-details">
+          <h4>{{ item.name }}</h4>
+          <p *ngIf="item.description" class="item-description">📝 {{ item.description }}</p>
+          <div *ngIf="item.attachment" class="item-attachment">
+            <span>📎</span>
+            <span>{{ item.attachment.name }}</span>
+          </div>
+          <div class="item-meta">
+            <span class="item-qty">Qty: {{ item.qty || 1 }}</span>
+            <span class="item-price">₵{{ item.price | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="item-total">₵{{ (item.price * (item.qty || 1)) | number:'1.2-2' }}</div>
+      </div>
+    </div>
+    
+    <div class="order-totals">
+      <div class="total-row">
+        <span>Subtotal</span>
+        <span>₵{{ getSubtotal() | number:'1.2-2' }}</span>
+      </div>
+      <div class="total-row" *ngIf="deliveryFee > 0">
+        <span>Delivery Fee</span>
+        <span>₵{{ deliveryFee | number:'1.2-2' }}</span>
+      </div>
+      <div class="total-row grand-total">
+        <span>Total</span>
+        <span>₵{{ getTotal() | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Details -->
+  <div class="customer-details">
+    <h3 class="section-title">👤 Customer Details</h3>
+    <div class="form-group">
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="customerName"
+        placeholder="Full Name *"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <input
+        type="email"
+        class="form-input"
+        [(ngModel)]="customerEmail"
+        placeholder="Email Address"
+      />
+    </div>
+    <div class="form-group">
+      <input
+        type="tel"
+        class="form-input"
+        [(ngModel)]="customerPhone"
+        placeholder="Phone Number *"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <textarea
+        class="form-input"
+        [(ngModel)]="orderNote"
+        placeholder="Special Instructions (Optional)"
+        rows="3"
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Payment Method Selection -->
+  <div class="payment-section">
+    <h3 class="section-title">💳 Payment Method</h3>
+    
+    <div 
+      class="payment-option" 
+      [class.selected]="selectedPayment === 'visa'"
+      (click)="selectPayment('visa')"
+    >
+      <div class="payment-icon">💳</div>
+      <div class="payment-info">
+        <h4>Visa / Mastercard</h4>
+        <p>Pay with credit or debit card</p>
+      </div>
+      <div class="payment-check" *ngIf="selectedPayment === 'visa'">✓</div>
+    </div>
+
+    <div 
+      class="payment-option" 
+      [class.selected]="selectedPayment === 'momo'"
+      (click)="selectPayment('momo')"
+    >
+      <div class="payment-icon">📱</div>
+      <div class="payment-info">
+        <h4>Mobile Money (MoMo)</h4>
+        <p>Pay with MTN MoMo, Vodafone Cash, or AirtelTigo Money</p>
+      </div>
+      <div class="payment-check" *ngIf="selectedPayment === 'momo'">✓</div>
+    </div>
+
+    <!-- MoMo Details -->
+    <div *ngIf="selectedPayment === 'momo'" class="momo-details">
+      <div class="form-group">
+        <select class="form-input" [(ngModel)]="momoNetwork">
+          <option value="">Select Network</option>
+          <option value="mtn">MTN MoMo</option>
+          <option value="vodafone">Vodafone Cash</option>
+          <option value="airtel">AirtelTigo Money</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input
+          type="tel"
+          class="form-input"
+          [(ngModel)]="momoNumber"
+          placeholder="MoMo Phone Number *"
+        />
+      </div>
+    </div>
+
+    <!-- Visa Details -->
+    <div *ngIf="selectedPayment === 'visa'" class="visa-details">
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-input"
+          [(ngModel)]="cardNumber"
+          placeholder="Card Number *"
+          maxlength="19"
+        />
+      </div>
+      <div class="card-row">
+        <div class="form-group half">
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="cardExpiry"
+            placeholder="MM/YY *"
+            maxlength="5"
+          />
+        </div>
+        <div class="form-group half">
+          <input
+            type="text"
+            class="form-input"
+            [(ngModel)]="cardCvv"
+            placeholder="CVV *"
+            maxlength="4"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-input"
+          [(ngModel)]="cardName"
+          placeholder="Name on Card *"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Place Order Button -->
+  <div class="order-actions">
+    <button 
+      class="place-order-btn"
+      (click)="placeOrder()"
+      [disabled]="!isValid() || isProcessing"
+    >
+      <span *ngIf="!isProcessing">🛒 Place Order</span>
+      <span *ngIf="isProcessing">⏳ Processing...</span>
+    </button>
+  </div>
+</div>

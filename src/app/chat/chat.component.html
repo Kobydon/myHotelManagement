@@ -1,0 +1,176 @@
+<!-- chat.component.html -->
+<!-- Chat Toggle Button -->
+<button class="chat-toggle-btn" (click)="toggleChat()" title="Live Chat">
+  💬
+  <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+</button>
+
+<!-- Chat Container -->
+<div class="chat-container" [class.open]="isOpen">
+  <!-- Chat Header -->
+  <div class="chat-header">
+    <div class="chat-header-content">
+      <span class="chat-icon">💬</span>
+      <span class="chat-title">Live Chat</span>
+      <span class="online-count" *ngIf="getonlineCount() > 0">
+        {{ getonlineCount() }} online
+      </span>
+    </div>
+    <button class="close-chat-btn" (click)="closeChat()">✕</button>
+  </div>
+
+  <!-- Chat Body -->
+  <div class="chat-body">
+    <!-- Users List -->
+    <div *ngIf="!selectedUser" class="users-list">
+      <div class="users-search">
+        <input 
+          type="text" 
+          placeholder="🔍 Search staff..." 
+          class="search-input"
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+      <div class="users-scroll">
+        <div 
+          *ngFor="let user of onlineUsers | filter:searchTerm:'firstname'"
+          class="user-item"
+          [class.online]="user.online"
+          (click)="selectUser(user)"
+        >
+          <div class="user-avatar">
+            <span class="avatar-icon">👤</span>
+            <span class="online-dot" *ngIf="user.online"></span>
+          </div>
+          <div class="user-info">
+            <span class="user-name">{{ user.firstname }} {{ user.lastname }}</span>
+            <span class="user-role">{{ user.role }}</span>
+            <span class="user-status" *ngIf="user.online">🟢 Online</span>
+            <span class="user-status offline" *ngIf="!user.online">⚪ Offline</span>
+          </div>
+          <span class="user-arrow">→</span>
+        </div>
+        <div *ngIf="(onlineUsers | filter:searchTerm:'firstname').length === 0" class="no-users">
+          <span>👤</span>
+          <p>No staff available</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat View -->
+    <div *ngIf="selectedUser" class="chat-view">
+      <!-- Chat View Header -->
+      <div class="chat-view-header" (click)="selectedUser = null">
+        <span class="back-arrow">←</span>
+        <span class="chat-user-name">
+          {{ selectedUser.firstname }} {{ selectedUser.lastname }}
+          <span class="chat-user-status" *ngIf="selectedUser.online">🟢</span>
+          <span class="chat-user-status offline" *ngIf="!selectedUser.online">⚪</span>
+        </span>
+        <span class="chat-user-typing" *ngIf="userTypingId">
+          typing...
+        </span>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-container" #messageContainer>
+        <div class="messages-scroll">
+          <!-- Date Separator -->
+          <div *ngIf="messages.length > 0" class="date-separator">
+            <span>{{ getMessageDate(messages[0]?.timestamp) }}</span>
+          </div>
+          
+          <!-- Messages -->
+          <div 
+            *ngFor="let message of messages; let i = index" 
+            class="message-wrapper"
+            [class.own]="isOwnMessage(message)"
+            [class.other]="!isOwnMessage(message)"
+          >
+            <div class="message-bubble">
+              <!-- Show attachment preview -->
+              <div *ngIf="message.is_attachment" class="attachment-preview">
+                <div *ngIf="isAttachmentImage(message.attachment_type)">
+                  <img 
+                    [src]="message.attachment_data" 
+                    [alt]="message.attachment_name"
+                    class="attachment-image"
+                    (click)="viewAttachment(message.attachment_data, message.attachment_name, message.attachment_type)"
+                  />
+                </div>
+                <div class="attachment-file" *ngIf="!isAttachmentImage(message.attachment_type)">
+                  <span class="file-icon">{{ getFileIcon(message.attachment_type) }}</span>
+                  <span class="file-name">{{ message.attachment_name }}</span>
+                  <span class="file-size">{{ formatFileSize(message.attachment_size) }}</span>
+                  <button 
+                    class="download-btn"
+                    (click)="viewAttachment(message.attachment_data, message.attachment_name, message.attachment_type)"
+                  >
+                    📥
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Message text -->
+              <span class="message-text" *ngIf="message.message">{{ message.message }}</span>
+              
+              <span class="message-time">{{ getMessageTime(message.timestamp) }}</span>
+              <span class="message-read" *ngIf="isOwnMessage(message) && message.read">✓✓</span>
+              <span class="message-read" *ngIf="isOwnMessage(message) && !message.read && !message.temp">✓</span>
+              <span class="message-sending" *ngIf="message.temp">⏳</span>
+            </div>
+          </div>
+          
+          <!-- Typing Indicator -->
+          <div *ngIf="userTypingId" class="typing-indicator">
+            <span>●</span><span>●</span><span>●</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Input -->
+      <div class="message-input-area">
+        <!-- File attachment preview -->
+        <div *ngIf="selectedFilePreview" class="file-preview">
+          <div class="file-preview-content">
+            <img *ngIf="selectedFile?.type?.includes('image')" [src]="selectedFilePreview" alt="Attachment preview" class="preview-thumb"/>
+            <span *ngIf="!selectedFile?.type?.includes('image')" class="file-preview-icon">{{ getFileIcon(selectedFile?.type) }}</span>
+            <span class="file-preview-name">{{ selectedFile?.name }}</span>
+            <span class="file-preview-size">{{ formatFileSize(selectedFile?.size || 0) }}</span>
+            <button class="remove-file-btn" (click)="removeFile()">✕</button>
+          </div>
+        </div>
+        
+        <div class="input-row">
+          <button class="attach-btn" (click)="triggerFileInput()" title="Attach file">
+            📎
+          </button>
+          <input 
+            type="file" 
+            #fileInput 
+            style="display:none" 
+            (change)="onFileSelected($event)"
+            accept="image/*,.pdf"
+          />
+          <textarea 
+            #messageInput
+            class="message-input"
+            placeholder="Type a message..."
+            [(ngModel)]="newMessage"
+            (keyup.enter)="sendMessage()"
+            (input)="onTyping()"
+            rows="1"
+            maxlength="500"
+          ></textarea>
+          <button 
+            class="send-btn" 
+            (click)="sendMessage()"
+            [disabled]="(!newMessage.trim() && !selectedFileData)"
+          >
+            📤
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

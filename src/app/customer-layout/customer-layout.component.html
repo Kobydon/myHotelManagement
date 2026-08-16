@@ -1,0 +1,44 @@
+<!-- customer-layout.component.html -->
+<div class="customer-app">
+  <!-- TOUCHY NAVBAR AT THE TOP -->
+  <nav class="touchy-navbar">
+    <div class="nav-brand">
+      <img src="../../assets/img/asempa.jpg" alt="Asempa Graphics" class="logo" style="width: 15%;border-radius: 50%;"/>
+    </div>
+    <div class="nav-links">
+      <a routerLink="/customer-category" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🍽️</span>
+        <span class="nav-label">Place Order</span>
+      </a>
+      <a routerLink="/my-orders" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📝</span>
+        <span class="nav-label">My Orders</span>
+      </a>
+      <a routerLink="/my-payments" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">💳</span>
+        <span class="nav-label">Payments</span>
+      </a>
+      <!-- ✅ Logout Button -->
+      <button class="nav-item logout-btn" (click)="logout()">
+        <span class="nav-icon">🚪</span>
+        <span class="nav-label">Logout</span>
+      </button>
+    </div>
+    <div class="nav-toggle" (click)="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ROUTING IN THE MIDDLE (main content) -->
+  <main class="content-area">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Live Chat Button (Static) -->
+  <app-chat></app-chat>
+
+  <!-- optional footer (keeps content centered) -->
+  <footer class="app-footer">
+    <small> Assempa Fie Graphics</small>
+  </footer>
+</div>

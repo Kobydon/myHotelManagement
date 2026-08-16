@@ -1,0 +1,263 @@
+<!-- my-orders.component.html -->
+<div class="orders-container">
+  <!-- Header -->
+  <div class="orders-header">
+    <h2 class="page-title">📋 My Orders</h2>
+    <button class="refresh-btn" (click)="refreshOrders()" [disabled]="isLoading">
+      <span class="refresh-icon" [class.spinning]="isLoading">🔄</span>
+    </button>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="filter-section">
+    <div class="search-container">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="🔍 Search orders..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+    
+    <div class="filter-tabs">
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'all'"
+        (click)="filterStatus = 'all'; applyFilters()"
+      >
+        All
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'processing'"
+        (click)="filterStatus = 'processing'; applyFilters()"
+      >
+        ⏳ Processing
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'confirmed'"
+        (click)="filterStatus = 'confirmed'; applyFilters()"
+      >
+        ✅ Confirmed
+      </button>
+      <button 
+        class="filter-tab" 
+        [class.active]="filterStatus === 'completed'"
+        (click)="filterStatus = 'completed'; applyFilters()"
+      >
+        🎉 Completed
+      </button>
+    </div>
+
+    <div class="type-filters">
+      <button 
+        class="type-btn" 
+        [class.active]="filterType === 'all'"
+        (click)="filterType = 'all'; applyFilters()"
+      >
+        All
+      </button>
+   
+      <button 
+        class="type-btn" 
+        [class.active]="filterType === 'dtf'"
+        (click)="filterType = 'dtf'; applyFilters()"
+      >
+        👕
+      </button>
+      <button 
+        class="type-btn" 
+        [class.active]="filterType === 'digital_printing'"
+        (click)="filterType = 'digital_printing'; applyFilters()"
+      >
+        🖨️
+      </button>
+      <button 
+        class="type-btn" 
+        [class.active]="filterType === 'large_format'"
+        (click)="filterType = 'large_format'; applyFilters()"
+      >
+        🖼️
+      </button>
+      <button 
+        class="type-btn" 
+        [class.active]="filterType === 'label'"
+        (click)="filterType = 'label'; applyFilters()"
+      >
+        🏷️
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Count -->
+  <div class="results-count" *ngIf="!isLoading">
+    <span>{{ totalItems }} order{{ totalItems !== 1 ? 's' : '' }} found</span>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <span class="loading-spinner">⏳</span>
+    <p>Loading your orders...</p>
+  </div>
+
+  <!-- Orders Grid -->
+  <div class="orders-grid" *ngIf="!isLoading">
+    <div *ngIf="filteredOrders.length === 0" class="empty-state">
+      <span>📭</span>
+      <p>No orders found</p>
+      <button class="browse-btn" (click)="router.navigate(['/customer-category'])">
+        Browse Products
+      </button>
+    </div>
+
+    <div 
+      class="order-card" 
+      *ngFor="let order of getPaginatedOrders()"
+      (click)="viewOrderDetail(order)"
+      (touchstart)="handleTouchStart($event)"
+      (touchend)="handleTouchEnd($event)"
+    >
+      <!-- Order Header -->
+      <div class="order-header">
+        <div class="order-id">
+          <span class="order-number">#{{ order.id }}</span>
+          <span class="order-date">{{ formatDate(order.created_at) }}</span>
+        </div>
+        <div class="order-status-badge" [style.background]="getStatusColor(order.status)">
+          {{ getStatusIcon(order.status) }} {{ order.status || 'Pending' }}
+        </div>
+      </div>
+
+      <!-- Order Progress -->
+      <div class="order-progress">
+        <div class="progress-bar">
+          <div 
+            class="progress-fill" 
+            [style.width.%]="getProgressPercentage(order)"
+            [style.background]="getStatusColor(order.status)"
+          ></div>
+        </div>
+        <span class="progress-text">{{ getProgressPercentage(order) }}%</span>
+      </div>
+
+      <!-- Order Info -->
+      <div class="order-info">
+        <div class="order-types">
+          <span *ngFor="let type of getOrderType(order)" class="type-tag">
+            {{ type }}
+          </span>
+        </div>
+        <div class="order-items">
+          <span class="item-count">📦 {{ order.items?.length || 0 }} items</span>
+          <span class="order-total">💰 ₵{{ getOrderTotal(order) | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Payment Status -->
+      <div class="order-payment">
+        <span class="payment-badge" [class.paid]="order.paid_status === 'Success'">
+          {{ getPaymentStatusText(order) }}
+        </span>
+        <span *ngIf="order.balance > 0" class="balance-text">
+          Balance: ₵{{ order.balance | number:'1.2-2' }}
+        </span>
+      </div>
+
+      <!-- Actions -->
+      <div class="order-actions" (click)="$event.stopPropagation()">
+        <button class="action-btn track-btn" (click)="trackOrder(order)">
+          📍 Track
+        </button>
+        <button class="action-btn reorder-btn" (click)="reorder(order)">
+          🔄 Reorder
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="totalItems > itemsPerPage">
+    <button 
+      class="page-btn" 
+      [disabled]="currentPage === 1"
+      (click)="changePage(currentPage - 1)"
+    >
+      ←
+    </button>
+    <button 
+      *ngFor="let page of getPages()"
+      class="page-btn"
+      [class.active]="page === currentPage"
+      (click)="changePage(page)"
+    >
+      {{ page }}
+    </button>
+    <button 
+      class="page-btn" 
+      [disabled]="currentPage === getTotalPages()"
+      (click)="changePage(currentPage + 1)"
+    >
+      →
+    </button>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" *ngIf="showOrderDetail" (click)="closeOrderDetail()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Order #{{ selectedOrder?.id }}</h3>
+      <button class="modal-close" (click)="closeOrderDetail()">✕</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="detail-status">
+        <span class="status-badge" [style.background]="getStatusColor(selectedOrder?.status)">
+          {{ getStatusIcon(selectedOrder?.status) }} {{ selectedOrder?.status || 'Pending' }}
+        </span>
+        <span class="payment-badge-detail" [class.paid]="selectedOrder?.paid_status === 'Success'">
+          {{ getPaymentStatusText(selectedOrder) }}
+        </span>
+      </div>
+
+      <div class="detail-info">
+        <p><strong>📅 Date:</strong> {{ formatDate(selectedOrder?.created_at) }}</p>
+        <p><strong>👤 Customer:</strong> {{ selectedOrder?.customer || 'Walk-in' }}</p>
+        <p><strong>📝 Note:</strong> {{ selectedOrder?.note || 'No notes' }}</p>
+        <p><strong>💰 Total:</strong> ₵{{ getOrderTotal(selectedOrder) | number:'1.2-2' }}</p>
+        <p *ngIf="selectedOrder?.balance > 0">
+          <strong>💳 Balance:</strong> ₵{{ selectedOrder?.balance | number:'1.2-2' }}
+        </p>
+      </div>
+
+      <div class="detail-items">
+        <h4>Items</h4>
+        <div class="items-list">
+          <div *ngFor="let item of selectedOrder?.items" class="detail-item">
+            <div class="item-info">
+              <span class="item-name">{{ item.name }}</span>
+              <span class="item-qty">×{{ item.qty || 1 }}</span>
+            </div>
+            <div class="item-status">
+              <span class="item-status-badge" [class]="getItemStatusBadge(item)">
+                {{ getStatusText(item) }}
+              </span>
+              <span class="item-price">₵{{ (item.price * (item.qty || 1)) | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button class="action-btn reorder-btn" (click)="reorder(selectedOrder); closeOrderDetail()">
+          🔄 Reorder
+        </button>
+        <button class="action-btn track-btn" (click)="trackOrder(selectedOrder); closeOrderDetail()">
+          📍 Track
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

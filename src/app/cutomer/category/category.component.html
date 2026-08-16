@@ -1,0 +1,30 @@
+<!-- category.component.html -->
+<div class="category-container">
+  <!-- Header -->
+  <div class="category-header">
+    <h2 class="category-title">📂 Categories</h2>
+  </div>
+
+  <!-- Category Cards Grid - Just Names -->
+  <div class="category-grid">
+    <div 
+      class="category-card" 
+      *ngFor="let category of categoryList" 
+      (click)="navigateToCategory(category)"
+      (touchstart)="handleTouchStart($event)"
+      (touchend)="handleTouchEnd($event)"
+    >
+      <div class="category-card-content">
+        <div class="category-icon">{{ getCategoryIcon(category.name) }}</div>
+        <h3 class="category-name">{{ category.name }}</h3>
+        <div class="category-arrow">→</div>
+      </div>
+      <div class="touch-ripple"></div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="categoryList.length === 0" class="loading-state">
+    <span>Loading categories...</span>
+  </div>
+</div>

@@ -29,6 +29,7 @@ export class AppComponent implements OnInit {
     const checkData = localStorage.getItem('checking');
     const labelData = localStorage.getItem('label');
      const giverData = localStorage.getItem('isgiver');
+    const customerData = localStorage.getItem('iscustomer');
      console.log('Giver status:', giverData);
 
     if (storeData === 'true') {
@@ -48,6 +49,10 @@ export class AppComponent implements OnInit {
         this.redirectAndLogout('/view-label-order');
       } else if (giverData === 'true') {
         this.redirectAndLogout('/view-all-order');
+      }
+
+       else if (customerData === 'true') {
+        this.redirectAndLogout('/customer-category');
       }
     } else {
       this.isUserLoggedIn = false;
