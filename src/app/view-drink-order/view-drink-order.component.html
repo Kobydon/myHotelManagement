@@ -12,9 +12,9 @@
     
     <div class="header-actions">
       <div class="action-buttons">
-        <button class="btn btn-info btn-sm" (click)="checkOrder()" disable="">
+        <!-- <button class="btn btn-info btn-sm" (click)="checkOrder()" disable="">
           <i class="fa fa-calendar-check-o"></i> Check Today's Order
-        </button>
+        </button> -->
         <button class="btn btn-primary btn-sm" (click)="refreshOrders()">
           <i class="fa fa-refresh"></i> Refresh
         </button>
@@ -195,7 +195,7 @@
                           </td>
                           <td>
                             <button 
-                              *ngIf="item.is_checked != 'yes' && order.working_on_large_format == 'not_started'" 
+                              *ngIf="item.is_checked != 'yes' && order.working_on_large_format != 'not_started'" 
                               class="btn-action check-item-btn" 
                               (click)="checkItem(order.id, item.id)"
                               title="Mark item as checked">
@@ -204,7 +204,7 @@
                             <span *ngIf="item.is_checked == 'yes'" class="checked-badge">
                               <i class="fa fa-check-circle" style="color: #28a745;"></i> Done
                             </span>
-                            <span *ngIf="item.is_checked != 'yes' && order.working_on_id_large_format != user[0]?.id" class="locked-badge" title="Only the accepted user can check items">
+                            <span *ngIf="item.is_checked != 'yes' && order.working_on_large_format =='not_started'" class="locked-badge" title="Only the accepted user can check items">
                               <i class="fa fa-lock"></i>
                             </span>
                           </td>
@@ -227,9 +227,9 @@
                         </tr>
                       </tbody>
                       <tfoot>
-                        <tr>
-                          <td colspan="7" class="total-label"><strong>Grand Total</strong></td>
-                          <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
+                         <tr>
+                          <!-- <td colspan="7" class="total-label"><strong>Grand Total</strong></td>
+                          <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>  -->
                         </tr>
                       </tfoot>
                     </table>
@@ -461,8 +461,8 @@
                       </tbody>
                       <tfoot>
                         <tr>
-                          <td colspan="8" class="total-label"><strong>Grand Total</strong></td>
-                          <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
+                          <!-- <td colspan="8" class="total-label"><strong>Grand Total</strong></td>
+                          <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td> -->
                         </tr>
                       </tfoot>
                     </table>

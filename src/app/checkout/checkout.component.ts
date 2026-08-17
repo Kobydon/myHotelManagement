@@ -400,6 +400,7 @@ selectedCustomer: any = null;
     else if (item.confirmed === 'cutting') return 'Cutting';
     else if (item.confirmed === 'delivered') return 'Delivered';
     else if (item.confirmed === 'in_delivery') return 'In Delivery';
+     else if (item.confirmed === 'ready for pickup') return 'Ready for Pickup';
     else return 'N/A';
   }
 
@@ -413,19 +414,19 @@ selectedCustomer: any = null;
 
   clearCart(): void {
     if (this.cartItems.length === 0) {
-      this.toastr.info('Cart is already empty', 'Info');
+      // this.toastr.info('Cart is already empty', 'Info');
       return;
     }
-    if (confirm('Are you sure you want to clear the cart?')) {
+
       this.cartService.clearCart();
       this.isHeldOrder = false;
       this.existingBalance = 0;
       this.holdOrderId = null;
       this.isBalancePayment = false;
       this.total = 0;
-      this.toastr.success('Cart cleared', 'Success');
+      // this.toastr.success('Cart cleared', 'Success');
       this.cdr.detectChanges();
-    }
+    
   }
 
   // ===================== MEASUREMENT MODAL =====================
@@ -479,15 +480,15 @@ selectedCustomer: any = null;
       amountPaid = totalDue;
     }
 
-    if (amountPaid < 0) {
-      this.toastr.warning('Amount cannot be negative', 'Warning');
-      return;
-    }
+    // if (amountPaid < 0) {
+    //   this.toastr.warning('Amount cannot be negative', 'Warning');
+    //   return;
+    // }
 
-    if (amountPaid > totalDue) {
-      this.toastr.warning('Amount cannot exceed total', 'Warning');
-      return;
-    }
+    // if (amountPaid > totalDue) {
+    //   this.toastr.warning('Amount cannot exceed total', 'Warning');
+    //   return;
+    // }
 
     const orderData = {
       id: this.holdOrderId || null,
@@ -530,10 +531,12 @@ selectedCustomer: any = null;
         this.holdOrderId = null;
         this.existingBalance = 0;
         this.total = 0;
+      
         this.closePaymentModal();
 
         if (response) {
           this.printHoldAndPayReceipt(response, orderId);
+            this.createForm.patchValue({ note: '' });
         }
 
         this.cdr.detectChanges();
@@ -1017,6 +1020,8 @@ selectedCustomer: any = null;
       const res = await this.userService.getUser();
       if (res && res.length > 0) {
         this.user = res;
+          this.createForm.patchValue({ cashier: this.user.username });
+        
         this.loadHeldCarts();
         this.clearCart();
       }

@@ -734,7 +734,7 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
   // ===================== ACTION METHODS =====================
 
   refreshOrders(): void {
-    this.toastr.info('Refreshing orders...', 'Loading');
+    // this.toastr.info('Refreshing orders...', 'Loading');
     this.loadGiversOrders();
     this.loadProcessedOrders();
   }
@@ -769,7 +769,7 @@ cutting(orderId: any): void {
     
 
     this.guestService.CuttingOrder(orderId).then(res => {
-      // this.toastr.success(`Order #${orderId} accepted`, 'Success');
+       this.toastr.success(`Order #${orderId}  pick up notification sent`, 'Success');
       this.refreshOrders();
     }).catch(err => {
       console.error("❌ Error accepting order:", err);

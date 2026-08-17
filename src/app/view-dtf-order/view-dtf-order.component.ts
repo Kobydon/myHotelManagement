@@ -1188,7 +1188,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
   logOut(): void {
     this.userService.logout();
     this.router.navigate(['/login']);
-    this.toastr.info('Logged out successfully', 'Goodbye');
+    // this.toastr.info('Logged out successfully', 'Goodbye');
   }
 
   /**

@@ -131,12 +131,7 @@ private userUrl = 'https://renderdemo-pnzm.onrender.com';
     this.http.put(`${this.userUrl}/user/update_logout`, {}, httpOptions).subscribe({
       next: () => {
         // Navigate to the signin page after successful logout
-        this.router.navigate(['/account/signin']);
-      },
-      error: (err) => {
-        console.error('Logout update failed:', err);
-        // Still navigate even if the backend update fails
-        localStorage.removeItem("id_token");
+          localStorage.removeItem("id_token");
     localStorage.removeItem("expires_at");
     localStorage.removeItem("isUserLoggedIn");
     localStorage.removeItem("isAdmin");
@@ -147,6 +142,12 @@ private userUrl = 'https://renderdemo-pnzm.onrender.com';
     localStorage.removeItem('checking');
    localStorage.removeItem('label');
   
+        this.router.navigate(['/account/signin']);
+      },
+      error: (err) => {
+        console.error('Logout update failed:', err);
+        // Still navigate even if the backend update fails
+      
     // Update local component state
     this.isUserLoggedIn = false;
         this.router.navigate(['/account/signin']);

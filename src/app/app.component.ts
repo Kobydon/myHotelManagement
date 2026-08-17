@@ -30,7 +30,7 @@ export class AppComponent implements OnInit {
     const labelData = localStorage.getItem('label');
      const giverData = localStorage.getItem('isgiver');
     const customerData = localStorage.getItem('iscustomer');
-     console.log('Giver status:', giverData);
+     console.log('is logged in', storeData);
 
     if (storeData === 'true') {
       this.isUserLoggedIn = true;
@@ -40,7 +40,7 @@ export class AppComponent implements OnInit {
       } else if (kitchenData === 'true') {
         this.redirectAndLogout('/view-order');
       } else if (waiterData === 'true') {
-        this.redirectAndLogout('/item-order');
+        this.redirectAndLogout('/item-list');
       } else if (barData === 'true') {
         this.redirectAndLogout('/view-large-format-order');
       } else if (dtfData === 'true') {
@@ -66,6 +66,6 @@ export class AppComponent implements OnInit {
 
   private redirectAndLogout(route: string) {
     this.router.navigate([route]);
-    this.userService.logout();
+    // this.userService.logout();
   }
 }

@@ -17,14 +17,14 @@
     <!-- User Controls -->
     <div class="btn-group">
       <div class="row">
-        <div class="col-sm-3">
+        <!-- <div class="col-sm-3">
           <button class="btn btn-info btn-xs" (click)="openPopup()">Cashier</button><br><br>
-        </div>
+        </div> -->
         <div class="col-sm-3">
           <button class="btn btn-info" (click)="openPopup2()">Manager</button><br><br>
         </div>
         <div class="col-sm-3">
-          <button class="btn btn-info btn-xs" (click)="openSales()" disabled>Sales</button><br><br>  
+          <!-- <button class="btn btn-info btn-xs" (click)="openSales()" disabled>Sales</button><br><br>   -->
         </div>
         <div class="col-sm-3">
           <button class="btn btn-xs" (click)="logOut()"><i class="fa fa-lock"></i> Lock Till</button><br><br>
@@ -151,37 +151,39 @@
 
     <!-- Payment & Order Actions -->
     <div class="mt-3 d-flex gap-2 flex-wrap">
-      <button class="btn btn-danger" (click)="clearCart()" [disabled]="cartItems.length === 0">Clear Cart Order</button>
-      
-      <!-- HOLD & PAY BUTTONS -->
-      <div class="btn-group mt-2" role="group" style="width: 100%; flex-wrap: wrap; gap: 5px;">
-        <!-- <button class="btn btn-warning" 
-                (click)="quickHold()" 
-                [disabled]="cartItems.length === 0 || !(cashier || admin)"
-                style="flex: 1; min-width: 100px;">
-          <i class="fa fa-clock-o"></i> Hold Only
-        </button> -->
-        
-        <button class="btn btn-info" 
-                (click)="holdWithPartialPayment()" 
-                [disabled]="cartItems.length === 0 || !(cashier || admin)"
-                style="flex: 1; min-width: 100px;">
-          <i class="fa fa-money"></i> Hold & Pay
-        </button>
-      </div>
-      
-      <button class="btn btn-primary" (click)="printBill()" [disabled]="cartItems.length === 0">
-        Print Bill 🖨️
-      </button>
-      <button 
+      <div style="display: flex; width: 100%; gap: 5px; flex-wrap: nowrap;">
+
+  <button class="btn btn-danger"
+          style="flex: 1; white-space: nowrap;"
+          (click)="clearCart()"
+          [disabled]="cartItems.length === 0">
+    Clear Cart
+  </button>
+<!-- || !(cashier || admin) -->
+  <button class="btn btn-info"
+          style="flex: 1; white-space: nowrap;"
+          (click)="holdWithPartialPayment()"
+          [disabled]="cartItems.length === 0 ">
+    <i class="fa fa-money"></i> Hold & Pay
+  </button>
+
+  <button class="btn btn-primary"
+          style="flex: 1; white-space: nowrap;"
+          (click)="printBill()"
+          [disabled]="cartItems.length === 0">
+    Print Bill 🖨️
+  </button>
+
+</div>
+      <!-- <button 
         (click)="loadHeldCartAll()"  
         class="btn btn-warning"
         [disabled]="!(cashier || admin)">
         Load All
-      </button>
+      </button> -->
 
       <!-- Customer ID -->
-      <button class="btn btn-info" style="padding: 5px; display: inline-flex; align-items: center;">
+      <button class="btn btn-info" style="padding: 5px; display: none; align-items: center;">
         <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
           <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Customer ID</label>
           <input formControlName="customer" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px; width: 100px;" type="text" placeholder="ID" class="form-control">
@@ -191,8 +193,8 @@
       <!-- Search Order -->
       <button class="btn btn-warning btn-sm" style="padding: 5px; display: inline-flex; align-items: center;">
         <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
-          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Search</label>
-          <input formControlName="search_order" type="text" placeholder="Order ID" class="form-control" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;" (change)="searchItemsOrder()">
+          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Track Order</label>
+          <input formControlName="search_order" type="text" placeholder="EnterOrder ID" class="form-control" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;" (change)="searchItemsOrder()">
         </form>
       </button>
 
@@ -291,20 +293,10 @@
       </form>
 
       <!-- Payment Method -->
-      <button class="btn btn-info" [disabled]="!(cashier || admin)" style="padding: 5px; display: inline-flex; align-items: center;">
-        <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
-          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Payment</label>
-          <select formControlName="method" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px;">
-            <option value="Cash">Cash</option>
-            <option value="Mobile Money">MoMo</option>
-            <option value="Mobile Money & Cash">MoMo & Cash</option>
-            <option value="Credit Card">Credit Card</option>
-          </select>
-        </form>
-      </button>
+      
 
       <!-- Discount -->
-      <button class="btn btn-info" [disabled]="!(cashier || admin)" style="padding: 5px; display: inline-flex; align-items: center;">
+      <button class="btn btn-info" [disabled]="!(cashier || admin)" style="padding: 5px; display: inline-flex; align-items: center;display: none;">
         <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
           <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Discount</label>
           <select formControlName="discount" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px;" (change)="calDiscount(createForm.value)">
@@ -542,7 +534,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let order of salesReport.orders | slice:0:10" class="order-row">
+                 <!-- | slice:0:10 -->
+                <tr *ngFor="let order of salesReport.orders" class="order-row">
                   <td>#{{ order.id }}</td>
                   <td>{{ order.customer || 'Walk-in' }}</td>
                   <td><strong>₵{{ order.total | number:'1.2-2' }}</strong></td>
@@ -567,6 +560,7 @@
                       'badge-info': order.status === 'Printed',
                       'badge-warning': order.status === 'Processing',
                       'badge-secondary': order.status === 'Cutting',
+                        'badge-primary': order.status === 'ready for pickup',
                       'badge-success': order.status === 'Delivered',
                       'badge-danger': order.status === 'Cancelled'
                     }">
@@ -710,11 +704,11 @@
                 <div class="form-group">
                   <input
                     type="text"
-                    formControlName="customer_new_id"
-                    disabled
+                    formControlName="customer_new_id" style="display: none;"
+                   
                     class="form-control"
                   />
-                  <button type="button" class="btn btn-info btn-sm mt-1" (click)="generateId()">Generate ID</button>
+                  <!-- <button type="button" class="btn btn-info btn-sm mt-1" (click)="generateId()">Generate ID</button> -->
                 </div>
               </div>
             </div>
@@ -873,6 +867,17 @@
                 id="amountPaidInput"
               />
             </div>
+            <button class="btn btn-info"  style="padding: 5px; display: inline-flex; align-items: center;">
+        <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
+          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Payment Method  </label>
+          <select formControlName="method" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px;">
+            <option value="Cash">Cash</option>
+            <option value="Mobile Money">MoMo</option>
+            <option value="Mobile Money & Cash">MoMo & Cash</option>
+            <option value="Credit Card">Credit Card</option>
+          </select>
+        </form>
+      </button>
             <small class="text-muted">
               <i class="fa fa-info-circle"></i> 
               {{ currentPaymentMethod === 'holdAndPay' ? 'Enter amount to pay. Remaining balance will be held.' : 'Enter the amount you want to pay. Remaining balance will be tracked.' }}

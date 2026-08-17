@@ -560,7 +560,7 @@ export class ViewDrinkOrderComponent implements OnInit, OnDestroy {
             </div>
             
             <div style="font-size: 8px; font-weight: bold; color: #2c3e50; margin-bottom: 3px;">
-              LARGE FORMAT / DRINK DEPARTMENT
+              LARGE FORMAT 
             </div>
             
             <div class="label-order">ORDER STICKER</div>
@@ -1187,7 +1187,7 @@ export class ViewDrinkOrderComponent implements OnInit, OnDestroy {
   logOut(): void {
     this.userService.logout();
     this.router.navigate(['/login']);
-    this.toastr.info('Logged out successfully', 'Goodbye');
+    // this.toastr.info('Logged out successfully', 'Goodbye');
   }
 
   /**
