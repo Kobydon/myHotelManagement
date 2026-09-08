@@ -21,143 +21,27 @@
         </p>
       </div>
       <div class="card-body">
-        <canvas id="paymentChart"></canvas>
-      </div>
+
+  <div
+    style="
+      position: relative;
+      width: 100%;
+      height: 400px;
+    "
+  >
+
+    <canvas id="paymentChart"></canvas>
+
+  </div>
+
+</div>
     </div>
   </div>
 </div>
 
 
-<div class="row">
-  <!-- Active Bookings moved to col-md-12 -->
-  <div class="col-md-12">
-    <div class="card">
-      <div class="card-header">
-        <p class="card-title">Active Bookings</p>
-      </div>
-      <div class="card-body">
-        <!-- <table class="table" style="width:80%;" id="myTable">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Check-in</th>
-              <th>Check-out</th>
-              <th>Room type</th>
-              <th>Country</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngFor="let booking of bookings | slice: (page - 1) * pageSize : page * pageSize">
-              <tr>
-                <td>{{ booking.name }}</td>
-                <td>{{ booking.arrival_date | date:'MMMM d, yyyy'}}</td>
-                <td>{{ booking.departure_date | date:'MMMM d, yyyy'}}</td>
-                <td>{{ booking.room_type }}</td>
-                <td>{{ booking.country }}</td>
-                <td>
-                  <span class="badge glow" style="cursor: pointer;" id="glower" (click)="checkOut(booking.id)">
-                    Checkout
-                  </span>
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table> -->
-      </div>
-      <div class="card-footer">
-        <hr>
-        <div class="stats">
-          <!-- <i class="fa fa-history"></i> Updated 3 minutes ago -->
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        <p class="card-title">Rooms Status</p>
-        <!-- <p class="card-category">Latest</p> -->
-      </div>
-      <div class="card-body">
-        <!-- <table class="table" style="width:80%;" id="myTable">
-          <thead>
-            <tr>
-              <th>Number</th>
-              <th>Category</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let room of rooms | slice: (page - 1) * pageSize : page * pageSize">
-              <td>{{ room.room_number }}</td>
-              <td>{{ room.room_type }}</td>
-              <td *ngIf="room.occupied_state != 'occupied'" class="text-success">Available</td>
-              <td *ngIf="room.occupied_state != 'available'" class="text-info">Occupied</td>
-            </tr>
-          </tbody>
-        </table> -->
-      </div>
-      <div class="card-footer">
-        <hr>
-        <div class="stats">
-          <!-- <i class="fa fa-calendar"></i> Number of emails sent -->
-        </div>
-      </div>
-    </div>
-  </div>
 
 
-
-
-
-  <div class="col-md-8" *ngIf="user[0]?.roles!='admin' || user[0]?.roles!='auditor' || user[0]?.roles!='accountant'">
-    <div class="card card-chart">
-      <div class="card-header">
-        <p class="card-title">Recent Pamyments</p>
-       
-      </div>
-      <div class="card-body">
-        <table class="table " style="width:80%; " id="myTable" >
-          <thead>
-            <tr  >
-             <th> Name</th>
-             <th>Amount</th>
-             <th>Status</th>
-             <!-- <th>Available</th> -->
-             
-             <!-- <th>Action</th> -->
-            </tr>
-          </thead>
-          
-          <tbody>
-            <tr  *ngFor="let item of paymentList| slice: (page-1) * pageSize : page * pageSize">
-              <td> {{item.name}}</td>
-              <td>GH₵{{item.amount}}</td>
-              <td > {{item.status}}</td>
- 
-             
-             
-              <!-- <td><i class="fa fa-eye text-danger"></i></td> -->
-            </tr>
-            
-          </tbody>
-          
-          </table>
-      </div>
-      <div class="card-footer">
-     
-        <hr/>
-        <div class="card-stats">
-       
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 

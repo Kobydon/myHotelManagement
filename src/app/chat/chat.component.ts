@@ -1,5 +1,5 @@
-// chat.component.ts - Updated with file attachment support
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+// chat.component.ts - Fixed message ordering (newest at bottom)
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
 import { ChatService } from '../../app/chat.service';
 import { userService } from 'app/user.service';
 import { ToastrService } from 'ngx-toastr';
@@ -36,8 +36,19 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   // Current user
   currentUser: any = null;
   
+  // User messages cache with last message preview
+  userMessagesCache: Map<number, {
+    messages: any[],
+    lastMessage: any | null,
+    unreadCount: number,
+    lastMessageTime: string | null
+  }> = new Map();
+  
+  unreadMessages: Map<number, number> = new Map();
+  
   // Subscriptions
   private subscriptions: Subscription[] = [];
+  private messageNotifications: any[] = [];
 
   // Allowed file types
   private allowedFileTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
@@ -46,12 +57,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   constructor(
     private chatService: ChatService,
     private userService: userService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadCurrentUser();
     this.setupChatListeners();
+    this.setupNotificationPermissions();
   }
 
   ngOnDestroy(): void {
@@ -63,6 +76,14 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.scrollToBottom();
   }
 
+  private setupNotificationPermissions(): void {
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+  }
+
   async loadCurrentUser(): Promise<void> {
     try {
       const res = await this.userService.getUser();
@@ -70,6 +91,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.currentUser = res[0];
         this.chatService.connect(this.currentUser.id);
         await this.loadOnlineUsers();
+        await this.loadAllMessages();
       }
     } catch (error) {
       console.error('Error loading user:', error);
@@ -77,22 +99,112 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+  async loadAllMessages(): Promise<void> {
+    try {
+      for (const user of this.onlineUsers) {
+        if (user.id !== this.currentUser?.id) {
+          await this.loadUserMessages(user.id);
+        }
+      }
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error loading all messages:', error);
+    }
+  }
+
+  async loadUserMessages(userId: number): Promise<void> {
+    try {
+      const messages = await this.chatService.getChatMessages(userId).toPromise();
+      
+      // ✅ SORT MESSAGES: Newest at bottom (ascending by timestamp)
+      const sortedMessages = messages ? this.sortMessagesByTime(messages) : [];
+      
+      const lastMessage = sortedMessages && sortedMessages.length > 0 ? sortedMessages[sortedMessages.length - 1] : null;
+      const unreadMessages = sortedMessages ? sortedMessages.filter((m: any) => !m.read && m.sender_id === userId) : [];
+      
+      this.userMessagesCache.set(userId, {
+        messages: sortedMessages || [],
+        lastMessage: lastMessage,
+        unreadCount: unreadMessages.length,
+        lastMessageTime: lastMessage?.timestamp || null
+      });
+      
+      if (unreadMessages.length > 0) {
+        this.unreadMessages.set(userId, unreadMessages.length);
+        this.unreadCount += unreadMessages.length;
+        
+        const user = this.onlineUsers.find(u => u.id === userId);
+        if (user) {
+          user.hasUnread = true;
+          user.unreadCount = unreadMessages.length;
+          user.lastMessagePreview = this.getMessagePreview(lastMessage);
+          user.lastMessageTime = this.getRelativeTime(lastMessage?.timestamp);
+        }
+      } else if (lastMessage) {
+        const user = this.onlineUsers.find(u => u.id === userId);
+        if (user) {
+          user.lastMessagePreview = this.getMessagePreview(lastMessage);
+          user.lastMessageTime = this.getRelativeTime(lastMessage.timestamp);
+        }
+      }
+    } catch (error) {
+      console.error(`Error loading messages for user ${userId}:`, error);
+    }
+  }
+
+  // ✅ Helper: Sort messages by time (oldest first, newest at bottom)
+  sortMessagesByTime(messages: any[]): any[] {
+    if (!messages || messages.length === 0) return [];
+    
+    return messages.sort((a, b) => {
+      const timeA = new Date(a.timestamp).getTime();
+      const timeB = new Date(b.timestamp).getTime();
+      return timeA - timeB; // Ascending: oldest first
+    });
+  }
+
   setupChatListeners(): void {
     this.subscriptions.push(
       this.chatService.messageReceived.subscribe((data) => {
-        if (this.selectedUser && data.sender_id === this.selectedUser.id) {
-          this.messages.push(data);
-          this.chatService.markAsRead(data.id, `chat_${this.currentUser.id}_${this.selectedUser.id}`);
-        } else if (data.sender_id !== this.currentUser?.id) {
-          this.unreadCount++;
+        const senderId = data.sender_id;
+        
+        // ✅ Update cache with sorted messages
+        if (this.userMessagesCache.has(senderId)) {
+          const cache = this.userMessagesCache.get(senderId)!;
+          cache.messages.push(data);
+          // ✅ Keep messages sorted
+          cache.messages = this.sortMessagesByTime(cache.messages);
+          cache.lastMessage = cache.messages[cache.messages.length - 1];
+          cache.lastMessageTime = data.timestamp;
+          this.userMessagesCache.set(senderId, cache);
         }
-        this.scrollToBottom();
+        
+        // If this is the selected user, add to current messages
+        if (this.selectedUser && senderId === this.selectedUser.id) {
+          // ✅ Add and sort messages
+          this.messages.push(data);
+          this.messages = this.sortMessagesByTime(this.messages);
+          this.chatService.markAsRead(data.id, `chat_${this.currentUser.id}_${this.selectedUser.id}`);
+          this.scrollToBottom();
+          this.cdr.detectChanges();
+        } else if (senderId !== this.currentUser?.id) {
+          this.showMessageNotification(data);
+          
+          const currentUnread = this.unreadMessages.get(senderId) || 0;
+          this.unreadMessages.set(senderId, currentUnread + 1);
+          this.unreadCount++;
+          
+          this.updateUserWithPreview(senderId, data);
+        }
+        
+        this.playNotificationSound();
       })
     );
 
     this.subscriptions.push(
       this.chatService.onlineUsersUpdated.subscribe((userIds) => {
         this.updateOnlineStatus(userIds);
+        this.cdr.detectChanges();
       })
     );
 
@@ -100,15 +212,25 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.chatService.userTyping.subscribe((data) => {
         if (data.user_id === this.selectedUser?.id) {
           this.userTypingId = data.is_typing ? data.user_id : null;
+          this.cdr.detectChanges();
         }
       })
     );
 
     this.subscriptions.push(
       this.chatService.messageRead.subscribe((data) => {
+        for (const [userId, cache] of this.userMessagesCache) {
+          const msg = cache.messages.find(m => m.id === data.message_id);
+          if (msg) {
+            msg.read = true;
+            break;
+          }
+        }
+        
         const msg = this.messages.find(m => m.id === data.message_id);
         if (msg) {
           msg.read = true;
+          this.cdr.detectChanges();
         }
       })
     );
@@ -116,10 +238,110 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.subscriptions.push(
       this.chatService.connectionStatus.subscribe((connected) => {
         if (!connected) {
-          // this.toastr?.warning('Chat disconnected. Reconnecting...', 'Warning');
+          console.log('Chat reconnecting...', 'Warning');
+        } else {
+           console.log('Chat connected', 'Success');
         }
       })
     );
+  }
+
+  updateUserWithPreview(userId: number, message: any): void {
+    const user = this.onlineUsers.find(u => u.id === userId);
+    if (user) {
+      user.hasUnread = true;
+      user.unreadCount = (user.unreadCount || 0) + 1;
+      user.lastMessagePreview = this.getMessagePreview(message);
+      user.lastMessageTime = this.getRelativeTime(message.timestamp);
+      
+      this.onlineUsers.sort((a, b) => {
+        if (a.hasUnread && !b.hasUnread) return -1;
+        if (!a.hasUnread && b.hasUnread) return 1;
+        if (a.online && !b.online) return -1;
+        if (!a.online && b.online) return 1;
+        return 0;
+      });
+      
+      this.cdr.detectChanges();
+    }
+  }
+
+  getMessagePreview(message: any): string {
+    if (!message) return 'No messages';
+    if (message.is_attachment) {
+      return `📎 ${message.attachment_name || 'Attachment'}`;
+    }
+    if (message.message) {
+      return message.message.length > 50 ? message.message.substring(0, 50) + '...' : message.message;
+    }
+    return 'New message';
+  }
+
+  getRelativeTime(timestamp: string): string {
+    if (!timestamp) return '';
+    
+    const now = new Date();
+    const messageTime = new Date(timestamp);
+    const diffMs = now.getTime() - messageTime.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    
+    return messageTime.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short'
+    });
+  }
+
+  showMessageNotification(message: any): void {
+    const sender = this.onlineUsers.find(u => u.id === message.sender_id);
+    if (!sender) return;
+
+    const senderName = `${sender.firstname} ${sender.lastname}`;
+    const messageText = this.getMessagePreview(message);
+
+    this.toastr?.info(
+      `<strong>${senderName}</strong><br>${messageText}`,
+      '💬 New Message',
+      {
+        enableHtml: true,
+        timeOut: 5000,
+        positionClass: 'toast-top-right',
+        tapToDismiss: true,
+        onActivateTick: true
+      }
+    );
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(`💬 ${senderName}`, {
+          body: messageText,
+          icon: '/assets/chat-icon.png',
+          vibrate: [200, 100, 200],
+          requireInteraction: true
+        });
+      } catch (e) {
+        console.log('Notification error:', e);
+      }
+    }
+
+    this.playNotificationSound();
+  }
+
+  playNotificationSound(): void {
+    try {
+      const audio = new Audio();
+      audio.src = 'data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0Y...';
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch (e) {
+      // Silently fail
+    }
   }
 
   getonlineCount(): number {
@@ -129,7 +351,13 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   async loadOnlineUsers(): Promise<void> {
     try {
       const users = await this.chatService.getOnlineUsers().toPromise();
-      this.onlineUsers = users;
+      this.onlineUsers = users.map(user => ({
+        ...user,
+        hasUnread: false,
+        unreadCount: 0,
+        lastMessagePreview: 'No messages',
+        lastMessageTime: ''
+      }));
       console.log('✅ Online users loaded:', users);
     } catch (error) {
       console.error('Error loading online users:', error);
@@ -141,46 +369,68 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       user.online = userIds.includes(user.id.toString());
     });
     this.onlineUsers.sort((a, b) => {
+      if (a.hasUnread && !b.hasUnread) return -1;
+      if (!a.hasUnread && b.hasUnread) return 1;
       if (a.online && !b.online) return -1;
       if (!a.online && b.online) return 1;
       return 0;
     });
+    this.cdr.detectChanges();
   }
 
   async selectUser(user: any): Promise<void> {
     if (this.selectedUser?.id === user.id) {
       this.selectedUser = null;
       this.messages = [];
+      this.cdr.detectChanges();
       return;
     }
 
     this.selectedUser = user;
-    this.messages = [];
     this.isLoading = true;
     this.userTypingId = null;
-    this.unreadCount = 0;
+    
+    this.unreadMessages.delete(user.id);
+    user.hasUnread = false;
+    user.unreadCount = 0;
+    this.unreadCount = Array.from(this.unreadMessages.values()).reduce((a, b) => a + b, 0);
+    
+    // ✅ Load from cache with sorted messages
+    if (this.userMessagesCache.has(user.id)) {
+      const cache = this.userMessagesCache.get(user.id)!;
+      this.messages = this.sortMessagesByTime(cache.messages); // ✅ Ensure sorted
+      this.isLoading = false;
+      this.scrollToBottom();
+      this.cdr.detectChanges();
+      
+      const unreadMessages = cache.messages.filter((m: any) => !m.read && m.sender_id === user.id);
+      if (unreadMessages.length > 0) {
+        const room = `chat_${this.currentUser.id}_${user.id}`;
+        unreadMessages.forEach((msg: any) => {
+          this.chatService.markAsRead(msg.id, room);
+          msg.read = true;
+        });
+      }
+    }
 
     const room = `chat_${this.currentUser.id}_${user.id}`;
     this.chatService.joinChatRoom(room, this.currentUser.id);
 
     try {
-      const messages = await this.chatService.getChatMessages(user.id).toPromise();
-      this.messages = messages;
+      await this.loadUserMessages(user.id);
+      const cache = this.userMessagesCache.get(user.id)!;
+      this.messages = this.sortMessagesByTime(cache.messages); // ✅ Ensure sorted
       this.isLoading = false;
       this.scrollToBottom();
-      
-      const unreadMessages = messages.filter((m: any) => !m.read && m.sender_id === user.id);
-      unreadMessages.forEach((msg: any) => {
-        this.chatService.markAsRead(msg.id, room);
-      });
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error loading messages:', error);
       this.isLoading = false;
-      this.toastr?.error('Failed to load messages');
+       console.log('Failed to load messages');
     }
   }
 
-  // ✅ File attachment methods
+  // File attachment methods
   triggerFileInput(): void {
     this.fileInput.nativeElement.click();
   }
@@ -191,14 +441,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     
     if (!file) return;
     
-    // Validate file type
     if (!this.allowedFileTypes.includes(file.type)) {
       this.toastr?.error('Only images and PDF files are allowed');
       input.value = '';
       return;
     }
     
-    // Validate file size
     if (file.size > this.maxFileSize) {
       this.toastr?.error('File size must be less than 5MB');
       input.value = '';
@@ -208,12 +456,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.selectedFile = file;
     this.selectedFileData = null;
     
-    // Convert to Base64
     const reader = new FileReader();
     reader.onload = (e: any) => {
       this.selectedFileData = e.target.result;
       this.selectedFilePreview = e.target.result;
       this.toastr?.success(`File "${file.name}" attached`);
+      this.cdr.detectChanges();
     };
     reader.onerror = (error) => {
       console.error('Error reading file:', error);
@@ -228,18 +476,18 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.selectedFile = null;
     this.selectedFileData = null;
     this.selectedFilePreview = null;
+    this.cdr.detectChanges();
   }
 
- getFileIcon(fileType: string | undefined): string {
-  if (!fileType) return '📎'; // ✅ Return default for undefined
-  
-  if (fileType.includes('image')) return '🖼️';
-  if (fileType.includes('pdf')) return '📄';
-  if (fileType.includes('word') || fileType.includes('document')) return '📝';
-  if (fileType.includes('excel') || fileType.includes('sheet')) return '📊';
-  if (fileType.includes('zip') || fileType.includes('rar')) return '📦';
-  return '📎';
-}
+  getFileIcon(fileType: string | undefined): string {
+    if (!fileType) return '📎';
+    if (fileType.includes('image')) return '🖼️';
+    if (fileType.includes('pdf')) return '📄';
+    if (fileType.includes('word') || fileType.includes('document')) return '📝';
+    if (fileType.includes('excel') || fileType.includes('sheet')) return '📊';
+    if (fileType.includes('zip') || fileType.includes('rar')) return '📦';
+    return '📎';
+  }
 
   formatFileSize(bytes: number): string {
     if (bytes < 1024) return bytes + ' B';
@@ -251,7 +499,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     return attachmentType?.includes('image') || false;
   }
 
-  // ✅ Updated sendMessage with file attachment
+  // ✅ FIXED: Send message and add to bottom
   sendMessage(): void {
     if (!this.selectedUser || !this.currentUser) return;
     if (!this.newMessage.trim() && !this.selectedFileData) return;
@@ -276,7 +524,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       attachment
     );
 
-    // Add message to local list
     const tempMessage: any = {
       id: Date.now(),
       sender_id: this.currentUser.id,
@@ -292,12 +539,38 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       attachment_size: attachment?.size
     };
     
+    // ✅ Add to messages (at the bottom)
     this.messages.push(tempMessage);
+    // ✅ Ensure sorting (though new message should be at bottom already)
+    this.messages = this.sortMessagesByTime(this.messages);
+    
+    // Update cache
+    if (this.userMessagesCache.has(this.selectedUser.id)) {
+      const cache = this.userMessagesCache.get(this.selectedUser.id)!;
+      cache.messages.push(tempMessage);
+      cache.messages = this.sortMessagesByTime(cache.messages);
+      cache.lastMessage = cache.messages[cache.messages.length - 1];
+      cache.lastMessageTime = tempMessage.timestamp;
+      this.userMessagesCache.set(this.selectedUser.id, cache);
+    }
+    
+    // Update user list preview
+    const user = this.onlineUsers.find(u => u.id === this.selectedUser?.id);
+    if (user) {
+      user.lastMessagePreview = this.getMessagePreview(tempMessage);
+      user.lastMessageTime = 'Just now';
+    }
+    
     this.newMessage = '';
     this.selectedFile = null;
     this.selectedFileData = null;
     this.selectedFilePreview = null;
-    this.scrollToBottom();
+    
+    // ✅ Scroll to bottom to show new message
+    setTimeout(() => {
+      this.scrollToBottom();
+      this.cdr.detectChanges();
+    }, 50);
   }
 
   onTyping(): void {
@@ -312,13 +585,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
   }
 
+  // ✅ FIXED: Scroll to bottom of messages
   scrollToBottom(): void {
     try {
       const element = this.messageContainer?.nativeElement;
       if (element) {
-        setTimeout(() => {
+        // Use requestAnimationFrame for smoother scrolling
+        requestAnimationFrame(() => {
           element.scrollTop = element.scrollHeight;
-        }, 100);
+        });
       }
     } catch (err) {
       // Ignore
@@ -362,6 +637,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (this.isOpen) {
       this.unreadCount = 0;
       this.loadOnlineUsers();
+      this.loadAllMessages();
+      // ✅ Scroll to bottom when opening chat
+      setTimeout(() => this.scrollToBottom(), 300);
     }
   }
 
@@ -372,17 +650,15 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.selectedFile = null;
     this.selectedFileData = null;
     this.selectedFilePreview = null;
+    this.cdr.detectChanges();
   }
 
-  // ✅ View attachment in modal
   viewAttachment(attachmentData: string, attachmentName: string, attachmentType: string): void {
     if (!attachmentData) return;
     
-    // If it's an image, open in modal
     if (this.isAttachmentImage(attachmentType)) {
       this.openImageModal(attachmentData, attachmentName);
     } else {
-      // For PDF and other files, download
       const link = document.createElement('a');
       link.href = attachmentData;
       link.download = attachmentName || 'attachment';

@@ -79,8 +79,21 @@
       </li>
       <div class="dropdown-container" id="userDropdown">
         <li><a id="fina" routerLink="all-users"><i class="fa fa-users">&nbsp;</i><span>Users&nbsp;</span></a></li>
-        <li><a id="fina" routerLink="bulk-message"><i class="fa fa-envelope">&nbsp;</i><span>Bulk Message&nbsp;</span></a></li>
+        <!-- <li><a id="fina" routerLink="bulk-message"><i class="fa fa-envelope">&nbsp;</i><span>Bulk Message&nbsp;</span></a></li> -->
         <li><a id="fina" routerLink="all-sessions"><i class="fa fa-users">&nbsp;</i><span>Sessions&nbsp;</span></a></li>
+      </div>
+
+       <li class="transparent">
+        <a id="fina" class="dropdown-toggle" data-target="smsDropdown">
+          <i id="fina" class="fa fa-envelope">&nbsp;</i>
+          <span>SMS Center&nbsp;</span>
+          <i id="fina" class="fa fa-caret-down dropdown-arrow" style="float:right;"></i>
+        </a>
+      </li>
+      <div class="dropdown-container" id="smsDropdown">
+        <!-- <li><a id="fina" routerLink="all-users"><i class="fa fa-users">&nbsp;</i><span>Users&nbsp;</span></a></li> -->
+        <li><a id="fina" routerLink="bulk-message"><i class="fa fa-envelope">&nbsp;</i><span>Bulk Message&nbsp;</span></a></li>
+        <li><a id="fina" routerLink="message-report"><i class="fa fa-file">&nbsp;</i><span>Report&nbsp;</span></a></li>
       </div>
 
       <!-- Customers -->
@@ -138,12 +151,12 @@
         <li><a id="fina" style="font-size: small;" routerLink="/gop-deduction"><i class="fa fa-minus">&nbsp;</i>GOP deductions</a></li>
         
         <!-- Accounts Receivable Submenu -->
-        <li class="transparent">
+        <!-- <li class="transparent">
           <a id="fina" style="font-size: small;" class="dropdown-toggle-child" data-target="receivableDropdown" routerLink="/account-receivable-dates">
             <i class="fa fa-money">&nbsp;</i>Accounts Receiv.
           </a>
         </li>
-      
+       -->
         <li><a id="fina" style="font-size: small;" routerLink="/balance-sheet"><i class="fa fa-balance-scale">&nbsp;</i>Balance Sheet</a></li>
         
         <!-- General Ledger Submenu -->
@@ -167,8 +180,8 @@
         <li><a id="fina" style="font-size: small;" routerLink="/budget-report"><i class="fa fa-calendar">&nbsp;</i>Budget</a></li>
         <!-- <li><a id="fina" style="font-size: small;" routerLink="/detailed-report"><i class="fa fa-calendar">&nbsp;</i> Summary</a></li> -->
         <li><a id="fina" style="font-size: small;" routerLink="/detailed-report-week"><i class="fa fa-calendar">&nbsp;</i>Detailed Summary</a></li>
-        <li><a id="fina" style="font-size: small;" routerLink="/daily-order-report"><i class="fa fa-calendar">&nbsp;</i>Daily Income</a></li>
-        <li><a id="fina" routerLink="canceled-order"><i class="fa fa-close">&nbsp;</i><span>Canceled Order&nbsp;</span></a></li>
+        <li><a id="fina" style="font-size: small;" routerLink="/daily-order-report"><i class="fa fa-calendar">&nbsp;</i>Sales</a></li>
+        <!-- <li><a id="fina" routerLink="canceled-order"><i class="fa fa-close">&nbsp;</i><span>Canceled Order&nbsp;</span></a></li> -->
       </div>
 
       <!-- Inventory -->
@@ -321,10 +334,21 @@
       </li>
       <div class="dropdown-container" id="accountantReportsDropdown">
         <li><a id="fina" style="font-size: small;" routerLink="/budget-report"><i class="fa fa-calendar">&nbsp;</i>Budget</a></li>
-        <li><a id="fina" style="font-size: small;" routerLink="/detailed-report-week"><i class="fa fa-calendar">&nbsp;</i>Detailed Summary</a></li>
+        <!-- <li><a id="fina" style="font-size: small;" routerLink="/detailed-report-week"><i class="fa fa-calendar">&nbsp;</i>Detailed Summary</a></li> -->
         <li><a id="fina" style="font-size: small;" routerLink="/daily-order-report"><i class="fa fa-calendar">&nbsp;</i> Sales</a></li>
       </div>
-
+ <li class="transparent">
+        <a id="fina" class="dropdown-toggle" data-target="smsDropdown">
+          <i id="fina" class="fa fa-envelope">&nbsp;</i>
+          <span>SMS Center&nbsp;</span>
+          <i id="fina" class="fa fa-caret-down dropdown-arrow" style="float:right;"></i>
+        </a>
+      </li>
+      <div class="dropdown-container" id="smsDropdown">
+        <!-- <li><a id="fina" routerLink="all-users"><i class="fa fa-users">&nbsp;</i><span>Users&nbsp;</span></a></li> -->
+        <li><a id="fina" routerLink="bulk-message"><i class="fa fa-envelope">&nbsp;</i><span>Bulk Message&nbsp;</span></a></li>
+        <li><a id="fina" routerLink="message-report"><i class="fa fa-file">&nbsp;</i><span>Report&nbsp;</span></a></li>
+      </div>
 
         <li class="transparent">
         <a id="fina" class="dropdown-toggle" data-target="settingsDropdown">
@@ -373,15 +397,25 @@
       <li><a id="fina" style="font-size: small;" routerLink="department"><i class="fa fa-building">&nbsp;</i>Department</a></li>
 
       <!-- Reports (HR Access) -->
-      <li class="transparent">
-        <a id="fina" class="dropdown-toggle" data-target="hrReportsDropdown">
-          <i id="fina" class="fa fa-file">&nbsp;</i><span>Reports &nbsp;</span>
+       <li class="transparent">
+        <a id="fina" class="dropdown-toggle" data-target="smsDropdown">
+          <i id="fina" class="fa fa-envelope">&nbsp;</i>
+          <span>SMS Center&nbsp;</span>
           <i id="fina" class="fa fa-caret-down dropdown-arrow" style="float:right;"></i>
         </a>
       </li>
-      <div class="dropdown-container" id="hrReportsDropdown">
-        <li><a id="fina" style="font-size: small;" routerLink="/detailed-report"><i class="fa fa-calendar">&nbsp;</i>Detailed Summary</a></li>
+      <div class="dropdown-container" id="smsDropdown">
+        <!-- <li><a id="fina" routerLink="all-users"><i class="fa fa-users">&nbsp;</i><span>Users&nbsp;</span></a></li> -->
+        <li><a id="fina" routerLink="bulk-message"><i class="fa fa-envelope">&nbsp;</i><span>Bulk Message&nbsp;</span></a></li>
+        <!-- <li><a id="fina" routerLink="message-report"><i class="fa fa-file">&nbsp;</i><span>Report&nbsp;</span></a></li> -->
       </div>
+      <!-- Customers -->
+      <li>
+        <a id="fina" routerLink="customers">
+          <i id="fina" class="fa fa-user-circle">&nbsp;</i><span>Customer&nbsp;</span>
+        </a>
+      </li>
+
 
     </ng-container>
 

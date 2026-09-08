@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { EmployeeService } from 'app/services/employee.service';
+import { userService } from 'app/user.service';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -13,11 +14,13 @@ export class SalaryTemplateComponent implements OnInit {
   salaryForm!: FormGroup;
   salaryTemplates: any[] = [];
   editingId: number | null = null;
+   users: any[] = [];
+  filteredUsers: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
-    private toastr: ToastrService
+    private toastr: ToastrService,private userService:userService
   ) {}
 
   ngOnInit(): void {
@@ -146,6 +149,23 @@ export class SalaryTemplateComponent implements OnInit {
     this.loadSalaryTemplates();
   }
 
+
+  
+  async loadUsers(): Promise<void> {
+    try {
+    
+      const res = await this.userService.getUsers();
+      if (res) {
+        this.users = res;
+      
+      }
+    } catch (err) {
+      console.error('Error loading users:', err);
+      this.toastr.error('Failed to load users');
+    } finally {
+      
+    }
+  }
 
   
 }

@@ -1,7 +1,7 @@
-// chat.service.ts
+// chat.service.ts - Enhanced with better reconnection
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 
 @Injectable({
@@ -9,16 +9,19 @@ import { io, Socket } from 'socket.io-client';
 })
 export class ChatService {
   private socket!: Socket;
-  private apiUrl = 'https://renderdemo-pnzm.onrender.com'
-  private socketUrl = 'https://renderdemo-pnzm.onrender.com'
+  private apiUrl = 'https://renderdemo-pnzm.onrender.com';
+  private socketUrl = 'https://renderdemo-pnzm.onrender.com';
   private isConnected: boolean = false;
+  private reconnectAttempts: number = 0;
+  private maxReconnectAttempts: number = 10;
+  private connectionStatusSubject = new BehaviorSubject<boolean>(false);
   
   // ✅ EventEmitters
   public messageReceived = new EventEmitter<any>();
   public onlineUsersUpdated = new EventEmitter<any>();
   public userTyping = new EventEmitter<any>();
   public messageRead = new EventEmitter<any>();
-  public connectionStatus = new EventEmitter<boolean>();
+  public connectionStatus = this.connectionStatusSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -33,34 +36,53 @@ export class ChatService {
         query: { user_id: userId.toString() },
         transports: ['websocket', 'polling'],
         reconnection: true,
-        reconnectionAttempts: 5,
+        reconnectionAttempts: this.maxReconnectAttempts,
         reconnectionDelay: 1000,
-        timeout: 10000
+        reconnectionDelayMax: 5000,
+        timeout: 10000,
+        forceNew: true,
+        path: '/socket.io/'
       });
 
       this.socket.on('connect', () => {
         console.log('✅ Chat connected successfully');
         this.isConnected = true;
-        this.connectionStatus.emit(true);
+        this.reconnectAttempts = 0;
+        this.connectionStatusSubject.next(true);
+        // Emit user online status
+        this.socket.emit('user_online', { user_id: userId });
       });
 
-      this.socket.on('disconnect', () => {
-        console.log('❌ Chat disconnected');
+      this.socket.on('disconnect', (reason) => {
+        console.log('❌ Chat disconnected:', reason);
         this.isConnected = false;
-        this.connectionStatus.emit(false);
+        this.connectionStatusSubject.next(false);
+        
+        // Attempt to reconnect if not intentional
+        if (reason !== 'io client disconnect') {
+          setTimeout(() => this.connect(userId), 2000);
+        }
       });
 
       this.socket.on('connect_error', (error) => {
         console.error('❌ Chat connection error:', error);
         this.isConnected = false;
-        this.connectionStatus.emit(false);
+        this.connectionStatusSubject.next(false);
+        
+        // Retry connection
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+          this.reconnectAttempts++;
+          setTimeout(() => this.connect(userId), 3000 * this.reconnectAttempts);
+        }
       });
 
       this.socket.on('new_message', (data) => {
+        console.log('📨 New message received:', data);
         this.messageReceived.emit(data);
       });
 
       this.socket.on('online_users', (data) => {
+        console.log('👥 Online users updated:', data);
         this.onlineUsersUpdated.emit(data);
       });
 
@@ -72,26 +94,44 @@ export class ChatService {
         this.messageRead.emit(data);
       });
 
+      this.socket.on('reconnect', () => {
+        console.log('🔄 Chat reconnected');
+        this.isConnected = true;
+        this.connectionStatusSubject.next(true);
+        this.socket.emit('user_online', { user_id: userId });
+      });
+
     } catch (error) {
       console.error('❌ Error connecting to chat:', error);
       this.isConnected = false;
-      this.connectionStatus.emit(false);
+      this.connectionStatusSubject.next(false);
+      
+      // Retry connection after delay
+      setTimeout(() => this.connect(userId), 5000);
     }
   }
 
   disconnect(): void {
     if (this.socket) {
       this.socket.disconnect();
-      // @ts-ignore - Ignore the type error since we're cleaning up
+      // @ts-ignore
       this.socket = null;
       this.isConnected = false;
-      this.connectionStatus.emit(false);
+      this.connectionStatusSubject.next(false);
     }
   }
 
   joinChatRoom(room: string, userId: number): void {
     if (this.socket && this.isConnected) {
       this.socket.emit('join_chat', { room, user_id: userId });
+    } else {
+      console.warn('⚠️ Cannot join room - socket not connected');
+      // Retry after connection
+      setTimeout(() => {
+        if (this.isConnected) {
+          this.joinChatRoom(room, userId);
+        }
+      }, 1000);
     }
   }
 
@@ -101,14 +141,6 @@ export class ChatService {
     }
   }
 
-  /**
-   * Send a message with optional attachment
-   * @param room - Chat room ID
-   * @param senderId - ID of the sender
-   * @param receiverId - ID of the receiver
-   * @param message - Text message
-   * @param attachment - Optional attachment object { data, name, type, size }
-   */
   sendMessage(room: string, senderId: number, receiverId: number, message: string, attachment?: any): void {
     if (this.socket && this.isConnected) {
       const payload: any = {
@@ -118,7 +150,6 @@ export class ChatService {
         message: message.trim()
       };
       
-      // ✅ Add attachment if present
       if (attachment) {
         payload.attachment_data = attachment.data;
         payload.attachment_name = attachment.name;
@@ -127,19 +158,26 @@ export class ChatService {
       }
       
       this.socket.emit('send_message', payload);
+      console.log('📤 Message sent:', payload);
     } else {
       console.warn('⚠️ Cannot send message - socket not connected');
-      // ✅ HTTP fallback with attachment
       this.sendMessageViaHttp(senderId, receiverId, message, attachment).subscribe({
-        next: (res) => console.log('✅ Message sent via HTTP fallback:', res),
+        next: (res) => {
+          console.log('✅ Message sent via HTTP fallback:', res);
+          // Emit the message locally
+          this.messageReceived.emit({
+            ...res,
+            sender_id: senderId,
+            receiver_id: receiverId,
+            message: message,
+            timestamp: new Date().toISOString()
+          });
+        },
         error: (err) => console.error('❌ Failed to send message:', err)
       });
     }
   }
 
-  /**
-   * HTTP fallback for sending messages with attachment
-   */
   private sendMessageViaHttp(senderId: number, receiverId: number, message: string, attachment?: any): Observable<any> {
     const payload: any = {
       sender_id: senderId,
@@ -147,7 +185,6 @@ export class ChatService {
       message: message.trim()
     };
     
-    // ✅ Add attachment if present
     if (attachment) {
       payload.attachment_data = attachment.data;
       payload.attachment_name = attachment.name;
@@ -175,7 +212,6 @@ export class ChatService {
         room
       });
     } else {
-      // ✅ HTTP fallback for marking as read
       this.markMessageAsReadViaHttp(messageId).subscribe({
         next: () => console.log('✅ Message marked as read via HTTP'),
         error: (err) => console.error('❌ Failed to mark as read:', err)
@@ -183,9 +219,6 @@ export class ChatService {
     }
   }
 
-  /**
-   * HTTP fallback for marking message as read
-   */
   private markMessageAsReadViaHttp(messageId: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/api/chat/messages/${messageId}/read`, {});
   }
@@ -198,9 +231,6 @@ export class ChatService {
     return this.http.get(`${this.apiUrl}/api/chat/messages/${receiverId}`);
   }
 
-  /**
-   * Check if socket is connected
-   */
   isSocketConnected(): boolean {
     return this.isConnected;
   }

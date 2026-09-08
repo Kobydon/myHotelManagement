@@ -1,4 +1,4 @@
-<!-- chat.component.html -->
+<!-- chat.component.html - Enhanced with message previews -->
 <!-- Chat Toggle Button -->
 <button class="chat-toggle-btn" (click)="toggleChat()" title="Live Chat">
   💬
@@ -36,17 +36,34 @@
           *ngFor="let user of onlineUsers | filter:searchTerm:'firstname'"
           class="user-item"
           [class.online]="user.online"
+          [class.has-unread]="user.hasUnread"
           (click)="selectUser(user)"
         >
           <div class="user-avatar">
             <span class="avatar-icon">👤</span>
             <span class="online-dot" *ngIf="user.online"></span>
+            <!-- ✅ Unread badge -->
+            <span class="unread-badge" *ngIf="user.hasUnread && user.unreadCount > 0">
+              {{ user.unreadCount }}
+            </span>
           </div>
           <div class="user-info">
-            <span class="user-name">{{ user.firstname }} {{ user.lastname }}</span>
-            <span class="user-role">{{ user.role }}</span>
-            <span class="user-status" *ngIf="user.online">🟢 Online</span>
-            <span class="user-status offline" *ngIf="!user.online">⚪ Offline</span>
+            <div class="user-name-row">
+              <span class="user-name">{{ user.firstname }} {{ user.lastname }}</span>
+              <span class="user-role">{{ user.role }}</span>
+            </div>
+            <!-- ✅ Message Preview -->
+            <div class="user-message-preview">
+              <span class="preview-text" [class.unread]="user.hasUnread">
+                {{ user.lastMessagePreview || 'No messages' }}
+              </span>
+              <span class="preview-time">{{ user.lastMessageTime || '' }}</span>
+            </div>
+            <div class="user-status-row">
+              <span class="user-status" *ngIf="user.online">🟢 Online</span>
+              <span class="user-status offline" *ngIf="!user.online">⚪ Offline</span>
+              <span class="unread-indicator" *ngIf="user.hasUnread">● New</span>
+            </div>
           </div>
           <span class="user-arrow">→</span>
         </div>

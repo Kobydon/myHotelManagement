@@ -1521,3 +1521,176 @@
     display: none;
   }
 }
+/* ============================================
+   MEASUREMENT DISPLAY STYLES
+   ============================================ */
+
+.measurement-details {
+  padding: 4px 0;
+  font-size: 13px;
+}
+
+.measurement-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border-left: 3px solid #007bff;
+}
+
+.measurement-icon {
+  font-size: 14px;
+}
+
+.measurement-value {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.measurement-unit {
+  font-weight: 400;
+  color: #6c757d;
+  font-size: 11px;
+  margin-left: 2px;
+}
+
+.measurement-area {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #495057;
+  padding-left: 4px;
+}
+
+.area-label {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.area-value {
+  font-weight: 600;
+  color: #28a745;
+}
+
+.no-measurement {
+  color: #adb5bd;
+  font-size: 14px;
+}
+
+/* VIP items with measurements */
+.vip-item .measurement-display {
+  border-left-color: #f1c40f;
+  background: #fff9e6;
+}
+
+/* Checked/processed items */
+.checked-row .measurement-display {
+  opacity: 0.7;
+  background: #e9ecef;
+}
+
+/* Measurement badge in preview */
+.measurement-badge {
+  font-size: 10px;
+  background: #e7f3ff;
+  color: #0066cc;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  white-space: nowrap;
+  display: inline-block;
+  font-weight: normal;
+}
+
+.measurement-badge:hover {
+  background: #d4e8ff;
+}
+
+/* Responsive styles for measurements */
+@media (max-width: 768px) {
+  .measurement-details {
+    font-size: 11px;
+  }
+  
+  .measurement-display {
+    flex-wrap: wrap;
+    padding: 3px 6px;
+  }
+  
+  .measurement-value {
+    font-size: 12px;
+  }
+  
+  .measurement-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+}
+
+/* For tables with measurement column */
+.items-detail-table th:nth-child(3),
+.items-detail-table td:nth-child(3) {
+  min-width: 120px;
+  max-width: 200px;
+}
+
+/* Print styles for measurements */
+@media print {
+  .measurement-display {
+    background: #f1f1f1 !important;
+    border-left-color: #333 !important;
+  }
+  
+  .measurement-badge {
+    background: #f1f1f1 !important;
+    color: #000 !important;
+  }
+}
+/* Force checkboxes to be visible */
+.form-check-input {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin-right: 8px !important;
+  -webkit-appearance: checkbox !important;
+  appearance: checkbox !important;
+  background: white !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 3px !important;
+  flex-shrink: 0 !important;
+  cursor: pointer !important;
+}
+
+.form-check-input:checked {
+  background: #28a745 !important;
+  border-color: #28a745 !important;
+}
+
+.form-check {
+  display: flex !important;
+  align-items: center !important;
+  padding-left: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.form-check-inline {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 6px 12px !important;
+  background: white !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 6px !important;
+  margin-right: 10px !important;
+}
+
+.form-check-label {
+  cursor: pointer !important;
+  margin-left: 0 !important;
+}
+/* ============================================
+   END OF MEASUREMENT STYLES
+   ============================================ */

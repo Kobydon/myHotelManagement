@@ -117,16 +117,16 @@
       <div *ngIf="getCartItem(product) && !requiresMeasurement(product); else addButton" class="cart-controls">
         <div class="d-flex align-items-center justify-content-between">
           <div class="qty-controls">
-            <button
+            <!-- <button
               class="btn btn-sm btn-light qty-btn"
-              (click)="decreaseQty(product); $event.stopPropagation()"
+              (click)="removeFromCart(product); $event.stopPropagation()"
             >
               <i class="fa fa-minus"></i>
-            </button>
+            </button> -->
             <span class="mx-2 qty-display">{{ getCartItem(product)?.qty }}</span>
             <button
               class="btn btn-sm btn-light qty-btn"
-              (click)="increaseQty(product); $event.stopPropagation()"
+              (click)="addToCart(product); $event.stopPropagation()"
             >
               <i class="fa fa-plus"></i>
             </button>

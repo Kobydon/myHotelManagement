@@ -239,5 +239,13 @@ updateUserProfile(ad: any) {
 	  }
 	  return of({});
   }
+
+  updateCustomer(data: any) {
+  return this.http.put(
+    `${this.userUrl}/guest/update_customer`,
+    data
+  );
+}
+
   
 }

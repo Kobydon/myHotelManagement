@@ -8,10 +8,11 @@
                 <div class="w-200">
                   <input
                     class="form-control"
-                    placeholder="Search for items..."
+                    placeholder="Search for categories..."
                     type="text"
                     id="myInput"
-                    (keyup)="searchItems()"
+                    [(ngModel)]="searchTerm"
+                    (ngModelChange)="onSearchChange()"
                     style="width: 350px;height: 40px;"
                   />
                 </div>
@@ -27,11 +28,11 @@
                 style="float: right;"
                 (click)="openPopup('Add New')"
               >
-                Add New Category
+                <i class="fa fa-plus"></i> Add New Category
               </button>
               <button
                 type="button"
-                class="btn btn-sm btn-warning"
+                class="btn btn-sm btn-success"
                 style="float: right;"
                 (click)="exportExcel()"
               >
@@ -47,24 +48,40 @@
                     <th scope="col">#</th>
                     <th scope="col">Category Name</th>
                     <th scope="col">Description</th>
+                    <th scope="col">Created At</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of categoryList| slice: (page-1) * pageSize : page * pageSize; index as i">
-                    <th>{{ i + 1 }}</th>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.description }}</td>
+                  <tr *ngFor="let item of categoryList | slice: (page-1) * pageSize : page * pageSize; index as i">
+                    <td>{{ i + 1 }}</td>
+                    <td>
+                      <strong>{{ item.name }}</strong>
+                      <span *ngIf="item.is_active === false" class="badge badge-danger ml-2">Inactive</span>
+                    </td>
+                    <td>{{ item.description || 'No description' }}</td>
+                    <td>{{ item.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
                     <td>
                       <i
-                        class="fa fa-edit fa-lg text-info"
+                        class="fa fa-edit fa-lg text-info mr-2"
+                        style="cursor: pointer;"
                         (click)="openPopup('Edit', item)"
+                        title="Edit category"
                       ></i>
                       <i
-                        *ngIf="user[0].roles === 'admin'"
-                        class="fa fa-close fa-lg text-danger"
+                        *ngIf="user[0]?.roles === 'admin'"
+                        class="fa fa-trash fa-lg text-danger"
+                        style="cursor: pointer;"
                         (click)="deleteCategory(item.id)"
+                        title="Delete category"
                       ></i>
+                      <span *ngIf="user[0]?.roles !== 'admin'" class="text-muted small">(Admin only)</span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="categoryList.length === 0">
+                    <td colspan="5" class="text-center text-muted py-3">
+                      <i class="fa fa-inbox fa-2x d-block mb-2"></i>
+                      No categories found. Click "Add New Category" to create one.
                     </td>
                   </tr>
                 </tbody>
@@ -72,10 +89,10 @@
             </div>
   
             <!-- Pagination -->
-            <div class="row pt-3">
+            <div class="row pt-3" *ngIf="categoryList.length > 0">
               <div class="col-md-9">
                 <ngb-pagination
-                  [collectionSize]="itemsList.length"
+                  [collectionSize]="categoryList.length"
                   [pageSize]="pageSize"
                   [(page)]="page"
                   (pageChange)="pageClick()"
@@ -92,19 +109,30 @@
                   <ng-template ngbPaginationNumber let-page>{{ page }}</ng-template>
                 </ngb-pagination>
               </div>
+              <div class="col-md-3 text-right">
+                <span class="badge badge-info">
+                  Total: {{ categoryList.length }} categories
+                </span>
+                <span class="badge badge-secondary ml-1">
+                  Page {{ page }} of {{ Math.ceil(categoryList.length / pageSize) }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   
-    <!-- Modal for adding/editing items -->
+    <!-- Modal for adding/editing categories -->
     <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': displayStyle }">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            {{ header }}
-            <i class="fa fa-close" (click)="closePopup()"></i>
+            <h5 class="modal-title">
+              <i class="fa" [ngClass]="{'fa-plus-circle': header === 'Add New', 'fa-edit': header === 'Edit'}"></i>
+              {{ header === 'Add New' ? 'Add New Category' : 'Edit Category' }}
+            </h5>
+            <i class="fa fa-close" (click)="closePopup()" style="cursor: pointer;"></i>
           </div>
           <div class="modal-body">
             <div class="col-md-12" style="width: 100%;">
@@ -112,41 +140,63 @@
                 <div class="card-header"></div>
                 <div class="card-body">
                   <form [formGroup]="itemForm" (ngSubmit)="saveCategory(itemForm.value)">
+                    <!-- Hidden ID field for editing -->
+                    <input type="hidden" formControlName="id" />
+                    
                     <div class="row">
-                      <div class="col-md-5 pr-1">
+                      <div class="col-md-12">
                         <div class="form-group">
-                          <label>Category Name</label>
+                          <label>
+                            <i class="fa fa-tag"></i> Category Name
+                            <span class="text-danger">*</span>
+                          </label>
                           <input
                             type="text"
                             formControlName="name"
                             class="form-control"
                             placeholder="Enter category name"
+                            [class.is-invalid]="itemForm.get('name')?.invalid && itemForm.get('name')?.touched"
                           />
+                          <div class="invalid-feedback">
+                            Category name is required
+                          </div>
                         </div>
                       </div>
+                    </div>
   
-                      
-                     
-  
-                      <div class="col-md-5 pr-1">
+                    <div class="row">
+                      <div class="col-md-12">
                         <div class="form-group">
-                          <label>Description</label>
+                          <label>
+                            <i class="fa fa-align-left"></i> Description
+                          </label>
                           <textarea
                             formControlName="description"
                             class="form-control"
-                            placeholder="Enter Category description"
+                            placeholder="Enter category description"
                             rows="4"
                           ></textarea>
                         </div>
                       </div>
                     </div>
   
-                    <div class="row">
-                      <div class="update ml-auto mr-auto" *ngIf="header === 'Add New'">
-                        <button type="submit" class="btn btn-primary btn-round">Save</button>
-                      </div>
-                      <div class="update ml-auto mr-auto" *ngIf="header === 'Edit'">
-                        <button type="submit" class="btn btn-primary btn-round">Update</button>
+                    <div class="row mt-3">
+                      <div class="update ml-auto mr-auto">
+                        <button 
+                          type="button" 
+                          class="btn btn-secondary btn-round mr-2" 
+                          (click)="closePopup()"
+                        >
+                          <i class="fa fa-times"></i> Cancel
+                        </button>
+                        <button 
+                          type="submit" 
+                          class="btn btn-primary btn-round"
+                          [disabled]="itemForm.invalid"
+                        >
+                          <i class="fa" [ngClass]="{'fa-save': header === 'Add New', 'fa-edit': header === 'Edit'}"></i>
+                          {{ header === 'Add New' ? 'Save' : 'Update' }}
+                        </button>
                       </div>
                     </div>
                   </form>
@@ -157,8 +207,4 @@
         </div>
       </div>
     </div>
-  
-    <!-- Hidden button for opening the modal -->
-    <!-- <button style="margin: 50px; padding: 10px; display: none;" type="button" class="btn btn-primary" (click)="openPopup()"></button> -->
   </div>
-  

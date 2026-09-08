@@ -21,7 +21,7 @@ userForm:FormGroup;
 user_info:any;
 
 page = 1;
-pageSize: number = 10;
+pageSize: number = 5000;
 
 @BlockUI('loading') loading!: NgBlockUI;
   constructor(private userService:userService,private toastr:ToastrService,private fb: FormBuilder

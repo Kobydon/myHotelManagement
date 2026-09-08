@@ -4,6 +4,19 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, lastValueFrom, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+interface SmsMessage {
+  id: number;
+  message: string;
+  receiver: number;
+  created_at: string;
+  status: 'sent' | 'failed';
+}
+
+interface BundleInfo {
+  size: number;
+  remaining: number;
+}
+
 
 // import { guest } from '../guest';
 
@@ -70,15 +83,36 @@ takeOrder(id: number) {
 }
 
 // In your service file (cart.service.ts or guest.service.ts)
-async checkOrderItem(orderId: number, itemId: number): Promise<any> {
+async checkOrderItem(
+  orderId: any,
+  itemId: any
+): Promise<any> {
+
   try {
-    const response = await this.http.put(`${this.guestUrl}/guest/check_order_item/${orderId}/${itemId}`, {}).toPromise();
+
+    const url =
+      `${this.guestUrl}/guest/check_order_item/` +
+      `${orderId}/${encodeURIComponent(itemId)}`;
+
+    console.log('CHECK ITEM URL:', url);
+
+    const response = await this.http
+      .put(url, {})
+      .toPromise();
+
     return response;
+
   } catch (error) {
-    console.error('Error checking item:', error);
+
+    console.error(
+      'Error checking item:',
+      error
+    );
+
     throw error;
   }
 }
+
  /* ================================
      🍹 COCKTAIL SETUP
   ================================= */
@@ -1408,6 +1442,26 @@ deleteBulkMessage(messageId: number): Promise<any> {
 resendBulkMessage(messageId: number): Promise<any> {
   return this.http.post(`${this.guestUrl}/guest/bulk_message/resend/${messageId}`, {}).toPromise();
 }
+
+// Add this method to your GuestService
+
+/**
+ * Update an existing customer
+ */
+updateCustomer(data: any){
+  return lastValueFrom ( this.http.put(`${this.guestUrl}/guest/update_customer`, data));
+}
+
+
+  getMessagesSent(): Observable<SmsMessage[]> {
+    return this.http.get<SmsMessage[]>(`${this.guestUrl}/guest/get_messages_sent`);
+  }
+
+  getRemainingBundle(): Observable<BundleInfo> {
+    return this.http.get<BundleInfo>(`${this.guestUrl}/guest/get_remaining_bundle`);
+  }
+
+  
 }
 
 

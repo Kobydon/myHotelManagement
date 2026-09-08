@@ -32,8 +32,7 @@ export class CartService {
     'SAV PRINT & CUT',
     'PP LABEL PRINT & CUT',
     'TRANSPARENT PRINT & CUT',
-    'BANNER WITH LAMINATION',
-    'LAMINATION'
+    'BANNER WITH LAMINATION'
   ];
 
   constructor(public http: HttpClient) {
@@ -60,10 +59,6 @@ export class CartService {
 
   // ===================== HOLD & PAY UNIFIED METHOD =====================
 
-  /**
-   * Unified Hold & Pay endpoint
-   * Holds the order and processes payment in one API call
-   */
   holdAndPay(data: any): Observable<any> {
     console.log("📤 Sending hold & pay request:", data);
     
@@ -94,9 +89,6 @@ export class CartService {
 
   // ===================== CART OPERATIONS =====================
 
-  /**
-   * Generate a unique key for measurement product variations
-   */
   private getMeasurementKey(product: any, width?: number, height?: number, unit?: string): string {
     const productId = product.id || product._id || product.name;
     if (this.requiresMeasurement(product) && width && height && unit) {
@@ -105,18 +97,12 @@ export class CartService {
     return productId;
   }
 
-  /**
-   * Check if product requires measurement (width/height)
-   */
   requiresMeasurement(product: any): boolean {
     if (!product) return false;
     const name = (product.name || product.item_name || '').toUpperCase();
     return this.measurementProducts.some(p => name.includes(p.toUpperCase()));
   }
 
-  /**
-   * Update item description
-   */
   updateItemDescription(item: any, description: string): void {
     const items = this.getCart();
     const cartItem = this.findCartItem(items, item);
@@ -127,9 +113,6 @@ export class CartService {
     }
   }
 
-  /**
-   * Calculate price based on product type, width, height, and unit
-   */
   calculateProductPrice(product: any, width: number, height: number, unit: string): number {
     const basePrice = product.price || 0;
     const name = (product.name || product.item_name || '').toUpperCase();
@@ -148,226 +131,128 @@ export class CartService {
     return basePrice;
   }
 
-  /**
-   * Find a cart item by product and measurement data
-   */
-  private findCartItem(items: any[], product: any, width?: number, height?: number, unit?: string): any | null {
-    const productId = product.id || product._id || product.name;
+  private findCartItem(
+    items: any[],
+    product: any,
+    width?: number,
+    height?: number,
+    unit?: string
+  ): any | null {
+    if (product?.cart_item_id) {
+      return items.find(
+        item => item.cart_item_id === product.cart_item_id
+      ) || null;
+    }
+
+    const productId = product.product_id || product.id || product._id || product.name;
     const needsMeasurement = this.requiresMeasurement(product);
-    
+
     return items.find(item => {
-      const itemId = item.id || item._id || item.name;
-      
-      // If IDs don't match, skip
-      if (itemId !== productId) return false;
-      
-      // For measurement products, check if measurements match
-      if (needsMeasurement && width && height && unit) {
-        // If item has measurement data, compare
-        if (item.measurement) {
-          return item.measurement.width === width && 
-                 item.measurement.height === height && 
-                 item.measurement.unit === unit;
-        }
-        // Item doesn't have measurement data but product does - don't match
-        return false;
+      const itemProductId = item.product_id || item.id || item._id || item.name;
+      if (itemProductId !== productId) return false;
+      if (needsMeasurement) {
+        if (!item.measurement) return false;
+        return (
+          item.measurement.width === width &&
+          item.measurement.height === height &&
+          item.measurement.unit === unit
+        );
       }
-      
-      // For non-measurement products, just match by ID
-      if (!needsMeasurement) {
-        return true;
-      }
-      
-      // If product needs measurement but no measurement data provided, don't match
-      return false;
-    });
+      return true;
+    }) || null;
   }
 
-  /**
-   * Add item to cart with measurement support
-   */
-  addToCart(product: any, width?: number, height?: number, unit?: string) {
+  addToCart(product: any, width?: number, height?: number, unit?: string): void {
     const items = this.getCart();
     const productName = product.name || product.item_name || '';
     const needsMeasurement = this.requiresMeasurement(product);
-    
+
     let calculatedPrice = product.price || 0;
     let measurementData = null;
     let uniqueKey = product.id || product._id || product.name;
 
     if (needsMeasurement && width && height && unit) {
       calculatedPrice = this.calculateProductPrice(product, width, height, unit);
-      measurementData = {
-        width: width,
-        height: height,
-        unit: unit,
-        area: width * height
-      };
+      measurementData = { width, height, unit, area: width * height };
       uniqueKey = this.getMeasurementKey(product, width, height, unit);
     }
 
-    // Find existing item with SAME measurement (if measurement product)
-    const existingItem = this.findCartItem(items, product, width, height, unit);
-    
-    if (existingItem) {
-      // Update existing item
-      existingItem.qty = (existingItem.qty || 0) + 1;
-      
-      if (needsMeasurement && measurementData) {
-        existingItem.price = calculatedPrice;
-        existingItem.measurement = measurementData;
-        existingItem.total = existingItem.price * existingItem.qty;
-        existingItem.is_measurement_product = true;
-        existingItem.original_price = product.price || 0;
-        existingItem._measurementKey = uniqueKey;
-      } else {
-        existingItem.total = (existingItem.price || 0) * existingItem.qty;
-      }
-      
-      console.log(`🔄 Updated existing item: ${productName} (${existingItem.qty}x)`);
+    const newItem: any = {
+      ...product,
+      id: product.id || product._id || product.name,
+      cart_item_id: this.generateCartItemId(),
+      qty: 1,
+      description: product.description || '',
+      confirmed: null,
+      is_checked: "no",
+      checked_by: "",
+      name: productName
+    };
+
+    if (needsMeasurement && measurementData) {
+      newItem.is_measurement_product = true;
+      newItem.measurement = measurementData;
+      newItem._measurementKey = uniqueKey;
+      console.log(`📏 Added measurement product: ${productName} (${width}x${height} ${unit})`);
     } else {
-      // Create new item
-      const newItem: any = { 
-        ...product, 
-        qty: 1, 
-        description: product.description || '', 
-        confirmed: null,
-        name: productName,
-        id: product.id || product._id || product.name
-      };
-      
-      if (needsMeasurement && measurementData) {
-        newItem.price = calculatedPrice;
-        newItem.original_price = product.price || 0;
-        newItem.total = calculatedPrice * 1;
-        newItem.is_measurement_product = true;
-        newItem.measurement = measurementData;
-        newItem._measurementKey = uniqueKey;
-        console.log(`📏 Added measurement product: ${productName} (${width}x${height} ${unit})`);
-      } else {
-        newItem.total = (product.price || 0) * 1;
-        console.log(`➕ Added new item: ${productName}`);
-      }
-      
-      items.push(newItem);
+      newItem.is_measurement_product = false;
+      console.log(`➕ Added new item: ${productName}`);
     }
-    
+
+    items.push(newItem);
     this.updateCart(items);
   }
 
-  /**
-   * Add measurement product to cart (convenience method)
-   */
   addMeasurementToCart(product: any, width: number, height: number, unit: string): void {
     this.addToCart(product, width, height, unit);
   }
 
-  /**
-   * Increase quantity of an item in cart
-   * For measurement products, this will increase the specific measurement variation
-   */
   increaseQty(product: any): void {
     this.updateItemQty(product, 1);
   }
 
-  /**
-   * Decrease quantity of an item in cart
-   */
   decreaseQty(product: any): void {
     this.updateItemQty(product, -1);
   }
 
-  /**
-   * Update item quantity by a specific amount
-   */
   public updateItemQty(product: any, change: number): void {
     const items = this.getCart();
-    
-    // Extract measurement data from product if it's a measurement product
     const width = product.measurement?.width;
     const height = product.measurement?.height;
     const unit = product.measurement?.unit;
-    
-    // Find the item - for measurement products, match by measurement too
     const item = this.findCartItem(items, product, width, height, unit);
 
     if (item) {
       item.qty = (item.qty || 0) + change;
-      
       if (item.is_measurement_product && item.measurement) {
         item.total = item.price * item.qty;
       }
-      
       if (item.qty <= 0) {
         this.removeFromCart(product);
         return;
       }
-      
       console.log(`🔄 Updated quantity: ${item.name} -> ${item.qty}`);
     } else {
       console.warn(`⚠️ Item not found in cart:`, product);
     }
-    
     this.updateCart(items);
   }
 
-  /**
-   * Remove an item from cart
-   * For measurement products, remove the specific measurement variation
-   */
   removeFromCart(product: any): void {
     const items = this.getCart();
-    
-    // If product has measurement data, extract it
-    const width = product.measurement?.width;
-    const height = product.measurement?.height;
-    const unit = product.measurement?.unit;
-    const productId = product.id || product._id || product.name;
-    const needsMeasurement = this.requiresMeasurement(product);
-    
-    const filteredItems = items.filter(item => {
-      const itemId = item.id || item._id || item.name;
-      
-      // If IDs don't match, keep the item
-      if (itemId !== productId) return true;
-      
-      // If product requires measurement and has measurement data
-      if (needsMeasurement && width && height && unit) {
-        // If item has measurement, compare
-        if (item.measurement) {
-          // Remove only if measurements match
-          return !(item.measurement.width === width && 
-                   item.measurement.height === height && 
-                   item.measurement.unit === unit);
-        }
-        // Item doesn't have measurement - keep it
-        return true;
-      }
-      
-      // For non-measurement products, remove by ID
-      if (!needsMeasurement) {
-        return false; // Remove the item
-      }
-      
-      // If product needs measurement but no measurement data provided, keep all
-      return true;
-    });
-    
-    console.log(`🗑️ Removed item from cart: ${product.name}`);
-    this.updateCart(filteredItems);
+    if (product?.cart_item_id) {
+      const filteredItems = items.filter(item => item.cart_item_id !== product.cart_item_id);
+      this.updateCart(filteredItems);
+      console.log(`🗑️ Removed cart item: ${product.cart_item_id}`);
+      return;
+    }
   }
 
-  /**
-   * Clear all items from cart
-   */
   clearCart(): void {
     this.updateCart([]);
     console.log('🧹 Cart cleared');
   }
 
-  /**
-   * Get total amount of all items in cart
-   */
   getTotal(): number {
     return this.getCart().reduce((sum, item) => {
       if (item.total !== undefined) {
@@ -377,61 +262,47 @@ export class CartService {
     }, 0);
   }
 
-  /**
-   * Get current cart items
-   */
   public getCart(): any[] {
     return this.safeParse(localStorage.getItem('cart'), []);
   }
 
-  /**
-   * Update cart with new items
-   */
   public updateCart(items: any[]): void {
     localStorage.setItem('cart', JSON.stringify(items));
     this.cartItems.next([...items]);
   }
 
-  /**
-   * Load cart from localStorage
-   */
   public loadCart(): void {
     this.cartItems.next(this.getCart());
   }
 
-  /**
-   * Update item price (for editable price)
-   */
   updateItemPrice(item: any, newPrice: number): void {
     const items = this.getCart();
-    
-    // Find the specific item (including measurement variations)
-    const width = item.measurement?.width;
-    const height = item.measurement?.height;
-    const unit = item.measurement?.unit;
-    
-    const existingItem = this.findCartItem(items, item, width, height, unit);
-    
-    if (existingItem) {
-      existingItem.price = newPrice;
-      existingItem.total = existingItem.price * existingItem.qty;
-      this.updateCart(items);
-      console.log(`💰 Updated price for ${item.name}: ${newPrice}`);
+    if (!item?.cart_item_id) {
+      console.warn('⚠️ Cannot update price: cart_item_id is missing', item);
+      return;
     }
+    const existingItem = items.find(cartItem => cartItem.cart_item_id === item.cart_item_id);
+    if (!existingItem) {
+      console.warn('⚠️ Cart item not found:', item.cart_item_id);
+      return;
+    }
+    const price = Number(newPrice);
+    if (!Number.isFinite(price) || price < 0) {
+      console.warn('⚠️ Invalid price:', newPrice);
+      return;
+    }
+    existingItem.price = price;
+    existingItem.total = price * (existingItem.qty || 1);
+    this.updateCart(items);
+    console.log(`💰 Updated ${existingItem.name} price=${price}`);
   }
 
-  /**
-   * Check if product is measurement type
-   */
   isMeasurementProduct(product: any): boolean {
     if (!product || !product.name && !product.item_name) return false;
     const name = (product.name || product.item_name || '').toUpperCase();
     return this.measurementProducts.some(p => name.includes(p.toUpperCase()));
   }
 
-  /**
-   * Check if a specific measurement variation exists in cart
-   */
   hasMeasurementVariant(product: any, width: number, height: number, unit: string): boolean {
     const items = this.getCart();
     const productId = product.id || product._id || product.name;
@@ -445,9 +316,6 @@ export class CartService {
     });
   }
 
-  /**
-   * Get all measurement variants of a product in cart
-   */
   getProductVariants(product: any): any[] {
     const items = this.getCart();
     const productId = product.id || product._id || product.name;
@@ -457,25 +325,16 @@ export class CartService {
     });
   }
 
-  /**
-   * Get cart item count (total quantity including all variations)
-   */
   getCartItemCount(): number {
     return this.getCart().reduce((total, item) => total + (item.qty || 1), 0);
   }
 
-  /**
-   * Get unique cart item count (number of distinct items/variations)
-   */
   getUniqueItemCount(): number {
     return this.getCart().length;
   }
 
   // ===================== HELD CART METHODS =====================
 
-  /**
-   * Hold cart with user details
-   */
   holdCart(userId: any, holdId: number, total: any, table: any, note: string, customer: string): Observable<any> {
     const holdPayload = {
       id: holdId,
@@ -486,7 +345,6 @@ export class CartService {
       total: total,
       customer: customer
     };
-
     return this.http.post(`${this.orderUrl}/hold_order`, holdPayload).pipe(
       tap({
         next: () => {
@@ -500,12 +358,8 @@ export class CartService {
     );
   }
 
-  /**
-   * Hold cart with amount paid
-   */
   holdCartWithAmount(payload: any): Observable<any> {
     console.log("📤 Sending hold request with amount to backend:", payload);
-    
     return this.http.post(`${this.orderUrl}/hold_order`, payload).pipe(
       tap({
         next: () => {
@@ -520,12 +374,8 @@ export class CartService {
     );
   }
 
-  /**
-   * Hold cart with payment for customer
-   */
   holdCartWithAmountCustomer(payload: any): Observable<any> {
     console.log("📤 Sending hold request with amount to backend:", payload);
-    
     return this.http.post(`${this.orderUrl}/hold_order_customer`, payload).pipe(
       tap({
         next: () => {
@@ -540,9 +390,6 @@ export class CartService {
     );
   }
 
-  /**
-   * Convenience method to hold cart with payment
-   */
   holdCartWithPayment(holdId: any, total: number, table: string, note: string, customer: string, amountPaid: number): Observable<any> {
     const payload = {
       id: holdId,
@@ -553,13 +400,9 @@ export class CartService {
       cartItems: this.getCart(),
       amount_paid: amountPaid
     };
-    
     return this.holdCartWithAmount(payload);
   }
 
-  /**
-   * Convenience method to hold cart with payment for customer
-   */
   holdCartWithPaymentCustomer(holdId: any, total: number, table: string, note: string, customer: string, amountPaid: number): Observable<any> {
     const payload = {
       id: holdId,
@@ -570,76 +413,245 @@ export class CartService {
       cartItems: this.getCart(),
       amount_paid: amountPaid
     };
-    
     return this.holdCartWithAmountCustomer(payload);
   }
 
-  /**
-   * Load all held carts
-   */
   loadHeldCartAll(): Observable<any> {
     return this.http.get(`${this.orderUrl}/load_held_order_all`);
   }
 
-  /**
-   * Load a specific held order
-   */
   loadHeldOrder(holdId: number): Observable<any> {
     return this.http.get(`${this.orderUrl}/load_held_order/${holdId}`);
   }
 
-  /**
-   * Get all held carts
-   */
   getHeldCarts(): Observable<any[]> {
     return this.http.get<any[]>(`${this.orderUrl}/held_orders`);
   }
 
-  /**
-   * Load a held cart
-   */
   loadHeldCart(holdId: number): Observable<any> {
     return this.http.get(`${this.orderUrl}/load_held_order/${holdId}`);
   }
 
-  /**
-   * Remove a held cart
-   */
   removeHeldCart(holdId: number): Observable<any> {
     return this.http.delete(`${this.orderUrl}/remove_held_order/${holdId}`);
   }
 
-  /**
-   * Merge selected orders
-   */
   mergeSelectedOrders(orderIds: number[]): Observable<any> {
     return this.http.post<any>(`${this.orderUrl}/merge_orders`, { order_ids: orderIds });
   }
 
-  /**
-   * Get all orders
-   */
   getOrders(): Observable<any[]> {
     return this.http.get<any[]>(`${this.orderUrl}/my_orders`);
   }
 
-  /**
-   * Update order status
-   */
   updateOrderStatus(orderId: number, newStatus: string): Observable<any> {
     return this.http.put(`${this.orderUrl}/update_order_status/${orderId}`, { status: newStatus });
   }
 
+  private generateCartItemId(): string {
+    return `${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  }
+
   // ===================== UTILITY METHODS =====================
 
-  /**
-   * Safely parse JSON data
-   */
   public safeParse<T>(data: string | null, fallback: T): T {
     try {
       return data ? JSON.parse(data) : fallback;
     } catch {
       return fallback;
     }
+  }
+
+  // ===================== MULTI-ORDER POS METHODS =====================
+
+  private multiOrderStorageKey = 'pos_multi_orders';
+  public activeOrderId: string | null = null;
+
+  public getMultiOrders(): any[] {
+    return this.safeParse(localStorage.getItem(this.multiOrderStorageKey), []);
+  }
+
+  private saveMultiOrders(orders: any[]): void {
+    localStorage.setItem(this.multiOrderStorageKey, JSON.stringify(orders));
+  }
+
+  private generateMultiOrderId(): string {
+    return `POS_${Date.now()}_${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+  }
+
+  public createMultiOrder(customer: any = '', note: string = '', table: string = ''): any {
+    const orders = this.getMultiOrders();
+    const order = {
+      local_id: this.generateMultiOrderId(),
+      customer: customer,
+      note: note,
+      table: table,
+      cartItems: [],
+      total: 0,
+      amount_paid: 0,
+      balance: 0,
+      method: 'Cash',
+      status: 'open',
+      created_at: new Date().toISOString()
+    };
+    orders.push(order);
+    this.saveMultiOrders(orders);
+    return order;
+  }
+
+  public saveActiveMultiOrder(): void {
+    if (!this.activeOrderId) return;
+    const orders = this.getMultiOrders();
+    const index = orders.findIndex(order => order.local_id === this.activeOrderId);
+    if (index === -1) return;
+    const cartItems = this.getCart();
+    orders[index].cartItems = [...cartItems];
+    orders[index].total = this.calculateItemsTotal(cartItems);
+    this.saveMultiOrders(orders);
+    console.log('💾 Active order saved:', orders[index]);
+  }
+
+  public switchMultiOrder(localId: string): any {
+    this.saveActiveMultiOrder();
+    const orders = this.getMultiOrders();
+    const order = orders.find(item => item.local_id === localId);
+    if (!order) {
+      console.warn('⚠️ Multi-order not found:', localId);
+      return null;
+    }
+    this.activeOrderId = localId;
+    this.updateCart(order.cartItems || []);
+    console.log('🔄 Switched to order:', order);
+    return order;
+  }
+
+  public startNewMultiOrder(customer: any = '', note: string = '', table: string = ''): any {
+    this.saveActiveMultiOrder();
+    const order = this.createMultiOrder(customer, note, table);
+    this.activeOrderId = order.local_id;
+    this.updateCart([]);
+    console.log('➕ New POS order started:', order);
+    return order;
+  }
+
+  public updateActiveMultiOrder(data: any): void {
+    if (!this.activeOrderId) return;
+    const orders = this.getMultiOrders();
+    const index = orders.findIndex(order => order.local_id === this.activeOrderId);
+    if (index === -1) return;
+    orders[index] = { ...orders[index], ...data };
+    this.saveMultiOrders(orders);
+  }
+
+  public getActiveMultiOrder(): any | null {
+    if (!this.activeOrderId) return null;
+    const orders = this.getMultiOrders();
+    return orders.find(order => order.local_id === this.activeOrderId) || null;
+  }
+
+  public getOpenMultiOrders(): any[] {
+    return this.getMultiOrders().filter(order => order.status === 'open');
+  }
+
+  private calculateItemsTotal(items: any[]): number {
+    return (items || []).reduce((sum: number, item: any) => {
+      const price = Number(item.price || 0);
+      const qty = Number(item.qty || 0);
+      return sum + (item.total !== undefined ? Number(item.total) : price * qty);
+    }, 0);
+  }
+
+  public completeMultiOrder(paymentResponse: any): any | null {
+    if (!this.activeOrderId) {
+      console.warn('⚠️ No active order ID to complete');
+      return null;
+    }
+    const orders = this.getMultiOrders();
+    const index = orders.findIndex(order => order.local_id === this.activeOrderId);
+    if (index === -1) {
+      console.warn('⚠️ Order not found:', this.activeOrderId);
+      this.activeOrderId = null;
+      return null;
+    }
+    const order = orders[index];
+    const receipt = {
+      ...order,
+      ...paymentResponse,
+      cartItems: [...(order.cartItems || [])],
+      local_id: order.local_id,
+      completed_at: new Date().toISOString(),
+      status: 'paid',
+      order_id: paymentResponse.id || paymentResponse.order_id || order.local_id,
+      amount_paid: paymentResponse.amount_paid || order.amount_paid || 0,
+      balance: paymentResponse.balance || 0,
+      total: paymentResponse.total || order.total || 0,
+      customer: paymentResponse.customer || order.customer || '',
+      method: paymentResponse.method || order.method || 'Cash',
+      note: paymentResponse.note || order.note || '',
+      table: paymentResponse.table || order.table || ''
+    };
+    orders.splice(index, 1);
+    this.saveMultiOrders(orders);
+    this.updateCart([]);
+    this.activeOrderId = null;
+    console.log('✅ Multi-order completed and removed:', receipt);
+    console.log(`📊 Remaining orders: ${orders.length}`);
+    return receipt;
+  }
+
+  public deleteMultiOrder(localId: string): boolean {
+    const orders = this.getMultiOrders();
+    const index = orders.findIndex(order => order.local_id === localId);
+    if (index === -1) return false;
+    orders.splice(index, 1);
+    this.saveMultiOrders(orders);
+    if (this.activeOrderId === localId) {
+      this.activeOrderId = null;
+      this.updateCart([]);
+    }
+    return true;
+  }
+
+  public getMultiOrderCount(): number {
+    return this.getOpenMultiOrders().length;
+  }
+
+  public clearAllMultiOrders(): void {
+    localStorage.removeItem(this.multiOrderStorageKey);
+    this.activeOrderId = null;
+    this.updateCart([]);
+    console.log('🧹 All multi-orders cleared');
+  }
+
+  // ===================== COMPLETED ORDERS FOR BATCH PRINTING =====================
+
+  public getCompletedMultiOrders(): any[] {
+    return this.safeParse(localStorage.getItem('pos_completed_orders'), []);
+  }
+
+  private saveCompletedMultiOrders(orders: any[]): void {
+    localStorage.setItem('pos_completed_orders', JSON.stringify(orders));
+  }
+
+  public addCompletedMultiOrder(order: any): void {
+    const completed = this.getCompletedMultiOrders();
+    const exists = completed.some(o => o.local_id === order.local_id);
+    if (!exists) {
+      completed.push({
+        ...order,
+        completed_at: new Date().toISOString()
+      });
+      this.saveCompletedMultiOrders(completed);
+    }
+  }
+
+  public clearCompletedMultiOrders(): void {
+    localStorage.removeItem('pos_completed_orders');
+  }
+
+  public removeCompletedMultiOrder(localId: string): void {
+    const completed = this.getCompletedMultiOrders();
+    const filtered = completed.filter(o => o.local_id !== localId);
+    this.saveCompletedMultiOrders(filtered);
   }
 }

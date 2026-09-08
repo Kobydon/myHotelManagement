@@ -94,7 +94,7 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
         this.loadGiversOrders();
         this.loadProcessedOrders();
       }
-    }, 30000);
+    }, 400000);
   }
 
   ngAfterViewInit(): void {
@@ -233,7 +233,7 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
 
   async loadGiversOrders() {
     try {
-      this.isLoading = true;
+      // this.isLoading = true;
       const res = await this.guestService.getHeldOrdersGivers();
       
       if (res && Array.isArray(res)) {
@@ -266,7 +266,7 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
       console.error("Error loading Givers orders:", error);
       this.toastr.error('Failed to load Givers orders', 'Error');
     } finally {
-      this.isLoading = false;
+      // this.isLoading = false;
       this.cdr.detectChanges();
     }
   }
@@ -737,6 +737,17 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
     // this.toastr.info('Refreshing orders...', 'Loading');
     this.loadGiversOrders();
     this.loadProcessedOrders();
+  }
+ 
+
+    getStatusText(item: any): string {
+    if (item.confirmed === true) return 'Printed';
+    else if (item.confirmed === false) return 'Processing';
+    else if (item.confirmed === 'cutting') return 'Cutting';
+    else if (item.confirmed === 'delivered') return 'Delivered';
+    else if (item.confirmed === 'in_delivery') return 'In Delivery';
+    else if (item.confirmed === 'ready for pickup') return 'Ready for Pickup';
+    else return 'N/A';
   }
 
   logOut(): void {

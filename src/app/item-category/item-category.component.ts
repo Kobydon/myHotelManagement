@@ -6,6 +6,7 @@ import * as XLSX from 'xlsx';
 
 import { GuestService } from 'app/services/guest.service';
 import { userService } from 'app/user.service';
+
 @Component({
   selector: 'item-category',
   templateUrl: './item-category.component.html',
@@ -13,161 +14,702 @@ import { userService } from 'app/user.service';
 })
 export class ItemCategoryComponent implements OnInit {
 
-  
   @BlockUI('loading') loading!: NgBlockUI;
+
+  // Make Math available in template
+  Math = Math;
+
+  // ============================================================
+  // DATA
+  // ============================================================
+
   itemsList: any[] = [];
   categoryList: any[] = [];
   groupList: any[] = [];
   familyList: any[] = [];
-unitList: any[] = [];
-  displayStyle = "none";
-  header = '';
-  page = 1;
-  pageSize: number = 100; // Change to whatever page size you need
+  unitList: any[] = [];
+
+  user: any[] = [];
+
+  // ============================================================
+  // UI
+  // ============================================================
+
+  displayStyle: string = 'none';
+  header: string = '';
+
+  // ============================================================
+  // PAGINATION
+  // ============================================================
+
+  page: number = 1;
+  pageSize: number = 100;
   totalAmount: number = 0;
+
+  // ============================================================
+  // FORM
+  // ============================================================
+
   itemForm!: FormGroup;
- user:any[]=[]
+
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
+  searchTerm: string = '';
+
   constructor(
-    private fb: FormBuilder,private userService:userService,
+    private fb: FormBuilder,
+    private userService: userService,
     private toastr: ToastrService,
-    private guestService:GuestService // AssumingGuestService handles your items
-  
+    private guestService: GuestService
   ) {
-    // Initialize the form
+
     this.itemForm = this.fb.group({
-      id: ['', Validators.required],
-      name: ['', Validators.required],
-      description: ['', Validators.required],
+
+      id: [''],
+
+      name: [
+        '',
+        Validators.required
+      ],
+
+      description: [
+        '',
+        Validators.required
+      ]
 
     });
   }
 
+  // ============================================================
+  // INIT
+  // ============================================================
+
   ngOnInit(): void {
-   
+
     this.getCategoryList();
+    this.getGroupList();
+    this.getFamilyList();
+    this.getUnitList();
     this.getUser();
-  
+
   }
 
+  // ============================================================
+  // GET USER
+  // ============================================================
 
-  
-  async getUser(){
-    try{
-        var res = await this.userService.getUser()
-        if (res) this.user=res;
+  async getUser(): Promise<void> {
 
-    }catch(err){console.log(err)}
-    finally{console.log("success");}
-  
-
-
- }
-
-  
-
-  async getCategoryList() {
     try {
-      // this.loading.start();
-      const res = await this.guestService.getCategoryList(); // Assuming getItemsList() fetches the items from the API
+
+      const res = await this.userService.getUser();
+
       if (res) {
-        this.categoryList = res;
+        this.user = res;
       }
+
     } catch (error) {
-      this.toastr.error('Error fetching category list');
-    } finally {
-      // this.loading.stop();
+
+      console.error(
+        'Error fetching user:',
+        error
+      );
+
     }
+
   }
 
+  // ============================================================
+  // GET CATEGORY LIST
+  // ============================================================
 
+  async getCategoryList(): Promise<void> {
 
-  // Open the modal for adding or editing
-  openPopup(action: string, item: any = null) {
+    try {
+
+      if (this.loading) {
+        this.loading.start();
+      }
+
+      const res = await this.guestService.getCategoryList();
+
+      if (res) {
+
+        this.categoryList = Array.isArray(res)
+          ? res
+          : [];
+
+      } else {
+
+        this.categoryList = [];
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Error fetching category list:',
+        error
+      );
+
+      this.categoryList = [];
+
+      this.toastr.error(
+        'Error fetching category list'
+      );
+
+    } finally {
+
+      if (this.loading) {
+        this.loading.stop();
+      }
+
+    }
+
+  }
+
+  // ============================================================
+  // GET GROUP LIST
+  // ============================================================
+
+  async getGroupList(): Promise<void> {
+
+    try {
+
+      const res = await this.guestService.getGroupList();
+
+      if (res) {
+
+        this.groupList = Array.isArray(res)
+          ? res
+          : [];
+
+      } else {
+
+        this.groupList = [];
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Error fetching group list:',
+        error
+      );
+
+      this.groupList = [];
+
+    }
+
+  }
+
+  // ============================================================
+  // GET FAMILY LIST
+  // ============================================================
+
+  async getFamilyList(): Promise<void> {
+
+    try {
+
+      const res = await this.guestService.getFamilyList();
+
+      if (res) {
+
+        this.familyList = Array.isArray(res)
+          ? res
+          : [];
+
+      } else {
+
+        this.familyList = [];
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Error fetching family list:',
+        error
+      );
+
+      this.familyList = [];
+
+    }
+
+  }
+
+  // ============================================================
+  // GET UNIT LIST
+  // ============================================================
+
+  async getUnitList(): Promise<void> {
+
+    try {
+
+      const res = await this.guestService.getUnitList();
+
+      if (res) {
+
+        this.unitList = Array.isArray(res)
+          ? res
+          : [];
+
+      } else {
+
+        this.unitList = [];
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Error fetching unit list:',
+        error
+      );
+
+      this.unitList = [];
+
+    }
+
+  }
+
+  // ============================================================
+  // OPEN POPUP
+  // ============================================================
+
+  openPopup(
+    action: string,
+    item: any = null
+  ): void {
+
     this.header = action;
+
+    // ----------------------------------------------------------
+    // ADD
+    // ----------------------------------------------------------
+
     if (action === 'Add New') {
+
       this.itemForm.reset();
-    } else if (action === 'Edit' && item) {
-      this.itemForm.patchValue(item);
+
+      this.itemForm.patchValue({
+        id: ''
+      });
+
     }
-    this.displayStyle = "block";
+
+    // ----------------------------------------------------------
+    // EDIT
+    // ----------------------------------------------------------
+
+    else if (
+      action === 'Edit' &&
+      item
+    ) {
+
+      this.itemForm.patchValue({
+
+        id: item.id || '',
+
+        name: item.name || '',
+
+        description:
+          item.description || ''
+
+      });
+
+    }
+
+    this.displayStyle = 'block';
+
   }
 
-  // Close the modal
-  closePopup() {
-    this.displayStyle = "none";
+  // ============================================================
+  // CLOSE POPUP
+  // ============================================================
+
+  closePopup(): void {
+
+    this.displayStyle = 'none';
+
+    this.itemForm.reset();
+
+    this.header = '';
+
   }
 
-  // Save new or updated item
-  async saveCategory(itemData: any) {
+  // ============================================================
+  // SAVE CATEGORY
+  // ============================================================
+
+  async saveCategory(
+    itemData?: any
+  ): Promise<void> {
+
+    const data =
+      itemData ||
+      this.itemForm.value;
+
+    if (
+      !data.name ||
+      !String(data.name).trim()
+    ) {
+
+      this.toastr.warning(
+        'Please enter category name'
+      );
+
+      return;
+
+    }
+
     try {
-      this.loading.start();
-      let res;
+
+      if (this.loading) {
+        this.loading.start();
+      }
+
+      let res: any = null;
+
+      // --------------------------------------------------------
+      // ADD
+      // --------------------------------------------------------
+
       if (this.header === 'Add New') {
-        res = await this.guestService.addCategory(itemData); // Assuming addItem() adds a new item
-        this.toastr.success('Category successfully added');
-      } else if (this.header === 'Edit') {
-        res = await this.guestService.updateCategory(itemData); // Assuming updateItem() updates an existing item
-        this.toastr.success('Category successfully updated');
-      }
-      if (res) {
-        this.getCategoryList(); // Refresh the item list
-        this.closePopup(); // Close the modal
-      }
-    } catch (error) {
-      this.toastr.error('Error saving item');
-    } finally {
-      this.loading.stop();
-    }
-  }
 
-  // Delete item
-  async deleteCategory(itemId: number) {
-    try {
-      this.loading.start();
-      const res = await this.guestService.deleteCategory(itemId); // Assuming deleteItem() deletes an item
-      if (res) {
-        this.toastr.success('Item successfully deleted');
-        this.getCategoryList(); // Refresh the item list
-      }
-    } catch (error) {
-      this.toastr.error('Error deleting item');
-    } finally {
-      this.loading.stop();
-    }
-  }
+        res =
+          await this.guestService.addCategory({
+            ...data,
+            name: String(data.name).trim()
+          });
 
-  // Export to Excel
-  exportExcel() {
-    const element = document.getElementById('excel-table');
-    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(element);
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-    XLSX.writeFile(wb, 'category_list.xlsx');
-  }
+        if (res) {
 
-  // Search items (filter based on input)
-  searchItems() {
-    const input = document.getElementById('myInput') as HTMLInputElement;
-    const filter = input.value.toUpperCase();
-    const table = document.getElementById('excel-table') as HTMLTableElement;
-    const tr = table.getElementsByTagName('tr');
-    for (let i = 0; i < tr.length; i++) {
-      const td = tr[i].getElementsByTagName('td')[0]; // Search by item name
-      if (td) {
-        const txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
+          this.toastr.success(
+            'Category successfully added'
+          );
+
         }
+
       }
+
+      // --------------------------------------------------------
+      // EDIT
+      // --------------------------------------------------------
+
+      else if (this.header === 'Edit') {
+
+        if (!data.id) {
+
+          this.toastr.warning(
+            'Category ID is missing'
+          );
+
+          return;
+
+        }
+
+        res =
+          await this.guestService.updateCategory(
+            data
+          );
+
+        if (res) {
+
+          this.toastr.success(
+            'Category successfully updated'
+          );
+
+        }
+
+      }
+
+      // --------------------------------------------------------
+      // REFRESH
+      // --------------------------------------------------------
+
+      if (res) {
+
+        await this.getCategoryList();
+
+        this.closePopup();
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Error saving category:',
+        error
+      );
+
+      this.toastr.error(
+        'Error saving category'
+      );
+
+    } finally {
+
+      if (this.loading) {
+        this.loading.stop();
+      }
+
     }
+
   }
 
-  // Handle page change for pagination
-  pageClick() {
-    // Logic for handling page change, if necessary
+  // ============================================================
+  // DELETE CATEGORY
+  // ============================================================
+
+  async deleteCategory(
+    itemId: number
+  ): Promise<void> {
+
+    if (!itemId) {
+
+      this.toastr.warning(
+        'Category ID is missing'
+      );
+
+      return;
+
+    }
+
+    // Confirm deletion
+    const confirmDelete = confirm(
+      'Are you sure you want to delete this category?'
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+
+    try {
+
+      if (this.loading) {
+        this.loading.start();
+      }
+
+      const res =
+        await this.guestService.deleteCategory(
+          itemId
+        );
+
+      if (res) {
+
+        this.toastr.success(
+          'Category successfully deleted'
+        );
+
+        await this.getCategoryList();
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Error deleting category:',
+        error
+      );
+
+      this.toastr.error(
+        'Error deleting category'
+      );
+
+    } finally {
+
+      if (this.loading) {
+        this.loading.stop();
+      }
+
+    }
+
   }
 
+  // ============================================================
+  // EXPORT EXCEL
+  // ============================================================
+
+  exportExcel(): void {
+
+    const element =
+      document.getElementById(
+        'excel-table'
+      );
+
+    if (!element) {
+
+      this.toastr.warning(
+        'Category table was not found'
+      );
+
+      return;
+
+    }
+
+    try {
+
+      const ws: XLSX.WorkSheet =
+        XLSX.utils.table_to_sheet(
+          element
+        );
+
+      const wb: XLSX.WorkBook =
+        XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        'Categories'
+      );
+
+      XLSX.writeFile(
+        wb,
+        'category_list.xlsx'
+      );
+
+      this.toastr.success(
+        'Category list exported successfully'
+      );
+
+    } catch (error) {
+
+      console.error(
+        'Excel export error:',
+        error
+      );
+
+      this.toastr.error(
+        'Unable to export category list'
+      );
+
+    }
+
+  }
+
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
+  onSearchChange(): void {
+
+    const term = this.searchTerm.trim().toLowerCase();
+
+    const table =
+      document.getElementById(
+        'excel-table'
+      ) as HTMLTableElement;
+
+    if (!table) {
+      return;
+    }
+
+    const rows =
+      table.getElementsByTagName('tr');
+
+    for (
+      let i = 1;
+      i < rows.length;
+      i++
+    ) {
+
+      const cells =
+        rows[i].getElementsByTagName('td');
+
+      if (!cells.length) {
+        continue;
+      }
+
+      // Search category name
+      const text =
+        cells[0]
+          ?.textContent
+          ?.toLowerCase() || '';
+
+      rows[i].style.display =
+        text.indexOf(term) > -1
+          ? ''
+          : 'none';
+
+    }
+
+  }
+
+  // ============================================================
+  // PAGINATION
+  // ============================================================
+
+  pageClick(): void {
+
+    // Optional: Add any logic when page changes
+    console.log('Page changed to:', this.page);
+
+  }
+
+  // ============================================================
+  // GET CATEGORY NAME BY ID
+  // ============================================================
+
+  getCategoryName(categoryId: number): string {
+
+    if (!categoryId || !this.categoryList) return 'N/A';
+
+    const category = this.categoryList.find(
+      (c: any) => c.id === categoryId
+    );
+
+    return category ? category.name : 'N/A';
+
+  }
+
+  // ============================================================
+  // GET GROUP NAME BY ID
+  // ============================================================
+
+  getGroupName(groupId: number): string {
+
+    if (!groupId || !this.groupList) return 'N/A';
+
+    const group = this.groupList.find(
+      (g: any) => g.id === groupId
+    );
+
+    return group ? group.name : 'N/A';
+
+  }
+
+  // ============================================================
+  // GET FAMILY NAME BY ID
+  // ============================================================
+
+  getFamilyName(familyId: number): string {
+
+    if (!familyId || !this.familyList) return 'N/A';
+
+    const family = this.familyList.find(
+      (f: any) => f.id === familyId
+    );
+
+    return family ? family.name : 'N/A';
+
+  }
+
+  // ============================================================
+  // GET UNIT NAME BY ID
+  // ============================================================
+
+  getUnitName(unitId: number): string {
+
+    if (!unitId || !this.unitList) return 'N/A';
+
+    const unit = this.unitList.find(
+      (u: any) => u.id === unitId
+    );
+
+    return unit ? unit.name : 'N/A';
+
+  }
 
 }

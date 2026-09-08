@@ -185,14 +185,9 @@
                   <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
                 </td>
                 <td class="status-cell">
-                  <span class="status-badge" [ngClass]="{
-                    'status-pending': order.delivery_status === 'pending' || !order.delivery_status,
-                    'status-in-delivery': order.delivery_status === 'in_delivery',
-                    'status-delivered': order.delivery_status === 'delivered'
-                  }">
-                    <span class="status-dot"></span>
-                    {{ getDeliveryStatusLabel(order.delivery_status) }}
-                  </span>
+                  
+                    {{ order.delivery_status}}
+                
                 </td>
                 <td class="action-cell">
                   <button class="btn-action deliver-btn" (click)="openDeliveryModal(order)" title="Start Delivery">
@@ -230,6 +225,8 @@
                           <th>Qty</th>
                           <th>Price</th>
                           <th>Subtotal</th>
+                          <th>work done by</th>
+                          <th>Status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -238,8 +235,12 @@
                           <td>{{ item.category || 'N/A' }}</td>
                           <td>{{ item.description || 'No description' }}</td>
                           <td>{{ item.qty }}</td>
+                         
                           <td>₵{{ item.price | number:'1.2-2' }}</td>
                           <td>₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
+                           <td>{{item.checked_by || 'Not Yet'}}</td>
+                        
+                            <td>{{item.status}}</td>
                         </tr>
                       </tbody>
                       <tfoot>
@@ -480,7 +481,7 @@
             </div>
             <div class="order-info-row">
               <span class="info-label">Customer:</span>
-              <span class="info-value">{{ deliveryOrder.customer || deliveryOrder.customer_name || 'Walk-in' }}</span>
+              <span class="info-value">{{ deliveryOrder.customer || deliveryOrder.customer || 'Walk-in' }}</span>
             </div>
             <div class="order-info-row">
               <span class="info-label">Total:</span>
@@ -521,17 +522,55 @@
                     <th class="text-center">Qty</th>
                     <th class="text-right">Price</th>
                     <th class="text-right">Subtotal</th>
+                        <th class="text-right">Work done by</th>
+                        <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of deliveryOrder.items; trackBy: trackByItemId">
-                    <td><strong>{{ item.name }}</strong></td>
-                    <td><span class="category-tag">{{ item.category || 'N/A' }}</span></td>
-                    <td>{{ item.description || 'No description' }}</td>
-                    <td class="text-center">{{ item.qty }}</td>
-                    <td class="text-right">₵{{ item.price | number:'1.2-2' }}</td>
-                    <td class="text-right subtotal">₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
-                  </tr>
+             <tr *ngFor="let item of deliveryOrder.items; trackBy: trackByItemId">
+
+  <td>
+    <strong>{{ item.name }}</strong>
+  </td>
+
+  <td>
+    <span class="category-tag">
+      {{ item.category || 'N/A' }}
+    </span>
+  </td>
+
+  <td>
+    {{ item.description || 'No description' }}
+  </td>
+
+  <td class="text-center">
+    {{ item.qty }}
+  </td>
+
+  <td class="text-right">
+    ₵{{ item.price | number:'1.2-2' }}
+  </td>
+
+  <td class="text-right subtotal">
+    ₵{{ (item.price * item.qty) | number:'1.2-2' }}
+  </td>
+
+  <td>
+    {{ item.checked_by }}
+  </td>
+
+<td>
+              <span class="badge" [ngClass]="{
+                'badge-success': item.confirmed === true,
+                'badge-warning': item.confirmed === false,
+                'badge-info': item.confirmed !== true && item.confirmed !== false
+              }">
+                {{ getStatusText(item) }}
+              </span>
+            </td>
+
+</tr>
+
                 </tbody>
                 <tfoot>
                   <tr>

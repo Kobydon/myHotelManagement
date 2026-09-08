@@ -39,6 +39,16 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
   orderToConfirm: any = null;
   showNameError: boolean = false;
   
+  // Process Selection Properties - ALL NEW OPTIONS
+  processCutting: boolean = false;
+  processTrimming: boolean = false;
+  processCreasing: boolean = false;
+  processMatteLaminationOneSide: boolean = false;
+  processMatteLaminationBothSides: boolean = false;
+  processGlossLaminationOneSide: boolean = false;
+  processGlossLaminationBothSides: boolean = false;
+  processPouchLamination: boolean = false;
+  
   // Subscriptions
   heldOrderSub: Subscription;
   intervalId: any;
@@ -68,7 +78,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Load customers first
-     this.getUser();
+    this.getUser();
     this.loadCustomers();
     
     // Initial load
@@ -83,13 +93,13 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
     this.setDefaultDateRange();
     
     // Auto-refresh every 60 seconds
-    this.intervalId = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        console.log("🕒 Auto-refreshing DTF orders...");
-        this.loadHeldOrders();
-        this.loadProcessedOrders();
-      }
-    }, 80000);
+    // this.intervalId = setInterval(() => {
+    //   if (document.visibilityState === 'visible') {
+    //     console.log("🕒 Auto-refreshing DTF orders...");
+    //     this.loadHeldOrders();
+    //     this.loadProcessedOrders();
+    //   }
+    // }, 80000);
     
     // Subscribe to cart updates
     this.cartService.cartItems$.subscribe(items => {
@@ -152,6 +162,101 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
     return this.customers.find((c: any) => c.id == customerId) || null;
   }
 
+  // ===================== MEASUREMENT HELPER METHODS =====================
+
+  /**
+   * Get measurement width from either nested or flat structure
+   */
+  getMeasurementWidth(item: any): string {
+    if (!item) return 'N/A';
+    // Check nested measurement object
+    if (item.measurement?.width !== undefined && item.measurement?.width !== null) {
+      return item.measurement.width.toString();
+    }
+    // Check flat measurement fields
+    if (item.measurementWidth !== undefined && item.measurementWidth !== null) {
+      return item.measurementWidth.toString();
+    }
+    return 'N/A';
+  }
+
+  /**
+   * Get measurement height from either nested or flat structure
+   */
+  getMeasurementHeight(item: any): string {
+    if (!item) return 'N/A';
+    if (item.measurement?.height !== undefined && item.measurement?.height !== null) {
+      return item.measurement.height.toString();
+    }
+    if (item.measurementHeight !== undefined && item.measurementHeight !== null) {
+      return item.measurementHeight.toString();
+    }
+    return 'N/A';
+  }
+
+  /**
+   * Get measurement unit from either nested or flat structure
+   */
+  getMeasurementUnit(item: any): string {
+    if (!item) return '';
+    if (item.measurement?.unit) return item.measurement.unit;
+    if (item.measurementUnit) return item.measurementUnit;
+    return '';
+  }
+
+  /**
+   * Get measurement area from either nested or flat structure
+   */
+  getMeasurementArea(item: any): number | null {
+    if (!item) return null;
+    if (item.measurement?.area !== undefined && item.measurement?.area !== null) {
+      return item.measurement.area;
+    }
+    if (item.measurementArea !== undefined && item.measurementArea !== null) {
+      return item.measurementArea;
+    }
+    return null;
+  }
+
+  /**
+   * Check if item has measurement data
+   */
+  hasMeasurementData(item: any): boolean {
+    if (!item) return false;
+    // Check if there's measurement data in either structure
+    const hasNested = item.measurement && (
+      item.measurement.width !== undefined || 
+      item.measurement.height !== undefined ||
+      item.measurement.area !== undefined
+    );
+    const hasFlat = (item.measurementWidth !== undefined && item.measurementWidth !== null) ||
+                    (item.measurementHeight !== undefined && item.measurementHeight !== null) ||
+                    (item.measurementArea !== undefined && item.measurementArea !== null);
+    return !!(hasNested || hasFlat);
+  }
+
+  /**
+   * Get formatted measurement display string
+   */
+  getMeasurementDisplay(item: any): string {
+    if (!this.hasMeasurementData(item)) return '';
+    const width = this.getMeasurementWidth(item);
+    const height = this.getMeasurementHeight(item);
+    const unit = this.getMeasurementUnit(item);
+    if (width === 'N/A' && height === 'N/A') return '';
+    return `${width}×${height}${unit}`;
+  }
+
+  /**
+   * Get formatted area display string
+   */
+  getAreaDisplay(item: any): string {
+    const area = this.getMeasurementArea(item);
+    if (area === null) return '';
+    const unit = this.getMeasurementUnit(item);
+    return `${area.toFixed(2)} sq ${unit}`;
+  }
+
   // ===================== DATE FILTER METHODS =====================
 
   /**
@@ -181,6 +286,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
    */
   filterProcessedOrders(): void {
     if (!this.processedOrders || this.processedOrders.length === 0) {
+      this.filteredProcessedOrders = [];
       return;
     }
 
@@ -188,19 +294,37 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
 
     if (this.dateFrom && this.dateTo) {
       const fromDate = new Date(this.dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+
       const toDate = new Date(this.dateTo);
-      toDate.setHours(23, 59, 59);
+      toDate.setHours(23, 59, 59, 999);
 
       filtered = filtered.filter(order => {
-        if (!order.created_at) return false;
+        if (!order.created_at) {
+          return false;
+        }
+
         const orderDate = new Date(order.created_at);
+
         return orderDate >= fromDate && orderDate <= toDate;
       });
     }
 
+    // Sort newest dates first
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+
+      return dateB - dateA;
+    });
+
     this.filteredProcessedOrders = filtered;
+
     this.cdr.detectChanges();
-    console.log(`📅 Filtered processed orders: ${filtered.length} of ${this.processedOrders.length}`);
+
+    console.log(
+      `📅 Filtered processed orders: ${filtered.length} of ${this.processedOrders.length}`
+    );
   }
 
   /**
@@ -259,7 +383,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
    */
   async loadHeldOrders() {
     try {
-      this.isLoading = true;
+      // this.isLoading = true;
       const res = await this.guestService.getHeldOrdersDtf();
       
       if (res && Array.isArray(res)) {
@@ -296,7 +420,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
       console.error("❌ Error loading DTF orders:", error);
       this.toastr.error('Failed to load DTF orders', 'Error');
     } finally {
-      this.isLoading = false;
+      // this.isLoading = false;
       this.cdr.detectChanges();
     }
   }
@@ -317,7 +441,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
           return { 
             ...order, 
             items, 
-            expanded: false,
+            expanded: true,
             customer_name: customerName,
             customer_details: this.getCustomerDetails(order.customer)
           };
@@ -374,7 +498,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
   // ===================== CONFIRM ORDER WITH RECEIPT =====================
 
   /**
-   * Confirm order with name prompt
+   * Confirm order with name prompt - Reset all checkboxes
    */
   confirmOrderWithName(orderId: any): void {
     const order = this.itemList.find(o => o.id === orderId);
@@ -386,11 +510,20 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
     this.orderToConfirm = order;
     this.showConfirmModal = true;
     this.confirmName = '';
+    // Reset ALL process checkboxes
+    this.processCutting = false;
+    this.processTrimming = false;
+    this.processCreasing = false;
+    this.processMatteLaminationOneSide = false;
+    this.processMatteLaminationBothSides = false;
+    this.processGlossLaminationOneSide = false;
+    this.processGlossLaminationBothSides = false;
+    this.processPouchLamination = false;
     this.showNameError = false;
   }
 
   /**
-   * Submit confirmation with name
+   * Submit confirmation - Processes are now OPTIONAL
    */
   async submitConfirmation(): Promise<void> {
     if (!this.confirmName || this.confirmName.trim() === '') {
@@ -399,20 +532,65 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Build selected processes from checkboxes - ALL OPTIONAL
+    const processes: string[] = [];
+
+    if (this.processCutting) {
+      processes.push('Cutting');
+    }
+
+    if (this.processTrimming) {
+      processes.push('Trimming');
+    }
+
+    if (this.processCreasing) {
+      processes.push('Creasing');
+    }
+
+    if (this.processMatteLaminationOneSide) {
+      processes.push('Matte Lamination (1 Side)');
+    }
+
+    if (this.processMatteLaminationBothSides) {
+      processes.push('Matte Lamination (Both Sides)');
+    }
+
+    if (this.processGlossLaminationOneSide) {
+      processes.push('Gloss Lamination (1 Side)');
+    }
+
+    if (this.processGlossLaminationBothSides) {
+      processes.push('Gloss Lamination (Both Sides)');
+    }
+
+    if (this.processPouchLamination) {
+      processes.push('Pouch Lamination');
+    }
+
+    // Process selection is now OPTIONAL - no validation required
+    // If no processes selected, just proceed with empty array
+
     this.showNameError = false;
 
     try {
       const orderId = this.orderToConfirm.id;
       const order = { 
         id: orderId,
-        confirmed_by: this.confirmName.trim()
+        confirmed_by: this.confirmName.trim(),
+        process: processes  // Can be empty array
       };
       
       const res = await this.guestService.confirmOrder(order);
       
       if (res) {
+        // Update local order with processes
+        const updatedOrder = this.itemList.find(o => o.id === orderId);
+        if (updatedOrder) {
+          updatedOrder.process = processes;
+        }
+
         this.toastr.success(`Order #${orderId} confirmed by ${this.confirmName}`, 'Success');
-        this.printConfirmedOrder(this.orderToConfirm, this.confirmName);
+        this.printConfirmedOrder(this.orderToConfirm, this.confirmName, processes);
         this.closeConfirmModal();
         this.loadHeldOrders();
         this.loadProcessedOrders();
@@ -425,13 +603,32 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Close confirm modal
+   * Close confirm modal - Reset all checkboxes
    */
   closeConfirmModal(): void {
     this.showConfirmModal = false;
     this.orderToConfirm = null;
     this.confirmName = '';
+    // Reset ALL process checkboxes
+    this.processCutting = false;
+    this.processTrimming = false;
+    this.processCreasing = false;
+    this.processMatteLaminationOneSide = false;
+    this.processMatteLaminationBothSides = false;
+    this.processGlossLaminationOneSide = false;
+    this.processGlossLaminationBothSides = false;
+    this.processPouchLamination = false;
     this.showNameError = false;
+  }
+
+  /**
+   * Get formatted process display
+   */
+  getProcessDisplay(processes: string[]): string {
+    if (!processes || processes.length === 0) {
+      return 'No processes selected';
+    }
+    return processes.join(' & ');
   }
 
   // ===================== RECEIPT PRINTING =====================
@@ -439,9 +636,12 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
   /**
    * Print confirmed order receipt
    */
-  printConfirmedOrder(order: any, confirmedBy: string): void {
+  printConfirmedOrder(order: any, confirmedBy: string, processes: string[]): void {
     const currentDate = new Date().toLocaleString();
     const customer = order.customer_details || null;
+
+    // Format processes for display
+    const processDisplay = processes.length > 0 ? processes.join(' & ') : 'No processes selected';
 
     const printWindow = window.open('', '', 'width=200,height=300');
 
@@ -551,6 +751,34 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
               display: inline-block;
               margin-top: 3px;
             }
+            .process-badge {
+              background: #3498db;
+              color: white;
+              font-size: 9px;
+              padding: 2px 10px;
+              border-radius: 12px;
+              display: inline-block;
+              margin-top: 3px;
+              font-weight: bold;
+            }
+            .process-badge-cutting {
+              background: #e67e22;
+            }
+            .process-badge-trimming {
+              background: #d35400;
+            }
+            .process-badge-creasing {
+              background: #2980b9;
+            }
+            .process-badge-matte {
+              background: #27ae60;
+            }
+            .process-badge-gloss {
+              background: #8e44ad;
+            }
+            .process-badge-pouch {
+              background: #1abc9c;
+            }
           </style>
         </head>
         <body onload="window.print(); window.close();">
@@ -575,9 +803,11 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
             
             <!-- Customer Info -->
             <div class="info-row">
-              <span class="label">Customer:</span> ${customer ? (customer.firstname || '') + ' ' + (customer.lastname || '') : 'Walk-in'}
+              <span class="label">Customer:</span> ${order.customer || 'Walk-in'}
             </div>
-            
+            <div class="info-row">
+              <span class="label">Attended by:</span> ${order.waiter || 'Not Assigned'}
+            </div>
             <div class="info-row">
               <span class="label">Items:</span> ${order.items?.length || 0} items
             </div>
@@ -588,6 +818,10 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
             
             <div class="info-row">
               <span class="label">Date:</span> ${new Date().toLocaleDateString()}
+            </div>
+            
+            <div class="process-badge">
+              🔧 ${processDisplay}
             </div>
             
             <div class="divider"></div>
@@ -870,20 +1104,46 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
   /**
    * Check an individual item
    */
-  async checkItem(orderId: number, itemId: number): Promise<void> {
-    if (!confirm(`Are you sure you want to mark this item as checked?`)) {
-      return;
-    }
-    
+  async checkItem(orderId: any, itemId: any): Promise<void> {
+
+    console.log('Checking item:', {
+      orderId: orderId,
+      cartItemId: itemId
+    });
+
     try {
-      const response = await this.guestService.checkOrderItem(orderId, itemId);
-      if (response) {
-        this.toastr.success(`Item #${itemId} checked successfully`, 'Success');
-        this.loadHeldOrders();
+      const response = await this.guestService.checkOrderItem(
+        orderId,
+        itemId
+      );
+
+      console.log('Check item response:', response);
+
+      if (response?.success) {
+        console.log(`Item ${itemId} in order ${orderId} checked successfully`);
+
+        // Reload the orders
+        await this.loadHeldOrders();
+
+      } else {
+        this.toastr.error(
+          response?.error || 'Failed to check item',
+          'Error'
+        );
       }
-    } catch (error) {
+
+    } catch (error: any) {
       console.error('Error checking item:', error);
-      this.toastr.error('Failed to check item', 'Error');
+
+      const message =
+        error?.error?.error ||
+        error?.message ||
+        'Failed to check item';
+
+      this.toastr.error(
+        message,
+        'Error'
+      );
     }
   }
 
@@ -906,16 +1166,35 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
    */
   printOrder(order: any): void {
     const confirmedBy = prompt('Enter your full name to print this sticker:');
-    
-    if (confirmedBy === null) return;
-    
-    if (!confirmedBy || confirmedBy.trim() === '') {
-      this.toastr.warning('Name is required to print sticker', 'Required');
-      this.printOrder(order);
+
+    if (confirmedBy === null) {
       return;
     }
 
-    this.printConfirmedOrder(order, confirmedBy.trim());
+    const name = confirmedBy.trim();
+
+    if (!name) {
+      this.toastr.warning(
+        'Name is required to print sticker',
+        'Required'
+      );
+      return;
+    }
+
+    const lamination = prompt(
+      'Enter process (optional): Cutting, Matte Lamination, Gloss Lamination'
+    );
+
+    if (lamination === null) {
+      return;
+    }
+
+    const process = lamination.trim();
+
+    // Optional process: pass an empty array if nothing was entered
+    const processes: string[] = process ? [process] : [];
+
+    this.printConfirmedOrder(order, name, processes);
   }
 
   // ===================== TABLE INTERACTION METHODS =====================
@@ -1054,6 +1333,7 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
     }
     
     this.filteredOrders = filtered;
+    this.filteredProcessedOrders = filtered;
     this.cdr.detectChanges();
   }
 
@@ -1188,7 +1468,6 @@ export class ViewDtfOrderComponent implements OnInit, OnDestroy {
   logOut(): void {
     this.userService.logout();
     this.router.navigate(['/login']);
-    // this.toastr.info('Logged out successfully', 'Goodbye');
   }
 
   /**

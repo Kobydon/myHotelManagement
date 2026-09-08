@@ -101,6 +101,7 @@ import { ChatModule } from './chat/chat.module';
 // ✅ Import Chat Component (if needed for declarations)
 import { ChatComponent } from './chat/chat.component';
 import { SendBulkMessageComponent } from './send-bulk-message/send-bulk-message.component';
+import { MessageReportComponent } from './message-report/message-report.component';
 
 @NgModule({
   declarations: [
@@ -120,6 +121,7 @@ import { SendBulkMessageComponent } from './send-bulk-message/send-bulk-message.
     ViewDtfOrderComponent,
     GiversTabComponent,
     CustomerLayoutComponent,
+   
     
     // ❌ Remove ChatComponent from declarations if it's already in ChatModule
   ],

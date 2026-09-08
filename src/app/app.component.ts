@@ -1,17 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { userService } from './user.service';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+
   isUserLoggedIn = false;
   isAdmin = false;
   checking = false;
+
+  private routerSubscription?: Subscription;
 
   constructor(
     private toastr: ToastrService,
@@ -19,53 +24,29 @@ export class AppComponent implements OnInit {
     private userService: userService
   ) {}
 
-  ngOnInit() {
-    const storeData = localStorage.getItem('isUserLoggedIn');
-    const adminData = localStorage.getItem('isAdmin');
-    const barData = localStorage.getItem('isBartender');
-    const waiterData = localStorage.getItem('isWaiter');
-    const kitchenData = localStorage.getItem('digital_printing');
-    const dtfData = localStorage.getItem('dtf');
-    const checkData = localStorage.getItem('checking');
-    const labelData = localStorage.getItem('label');
-     const giverData = localStorage.getItem('isgiver');
-    const customerData = localStorage.getItem('iscustomer');
-     console.log('is logged in', storeData);
+  ngOnInit(): void {
+    // Check login status when app starts
+    this.checkLoginStatus();
 
-    if (storeData === 'true') {
-      this.isUserLoggedIn = true;
-
-      if (adminData === 'true') {
-        this.redirectAndLogout('/dashboard');
-      } else if (kitchenData === 'true') {
-        this.redirectAndLogout('/view-order');
-      } else if (waiterData === 'true') {
-        this.redirectAndLogout('/item-list');
-      } else if (barData === 'true') {
-        this.redirectAndLogout('/view-large-format-order');
-      } else if (dtfData === 'true') {
-        this.redirectAndLogout('/view-dtf-order');
-      } else if (labelData === 'true') {
-        this.redirectAndLogout('/view-label-order');
-      } else if (giverData === 'true') {
-        this.redirectAndLogout('/view-all-order');
-      }
-
-       else if (customerData === 'true') {
-        this.redirectAndLogout('/customer-category');
-      }
-    } else {
-      this.isUserLoggedIn = false;
-      this.toastr.error(null, 'Session expired, kindly login again');
-      this.userService.logout();
-    }
-
-    this.checking = checkData === 'true';
-    console.log('Admin status:', adminData);
+    // Check login status whenever navigation finishes
+    this.routerSubscription = this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd)
+      )
+      .subscribe(() => {
+        this.checkLoginStatus();
+      });
   }
 
-  private redirectAndLogout(route: string) {
-    this.router.navigate([route]);
-    // this.userService.logout();
+  private checkLoginStatus(): void {
+    this.isUserLoggedIn =
+      localStorage.getItem('isUserLoggedIn') === 'true';
+
+    this.isAdmin =
+      localStorage.getItem('isAdmin') === 'true';
+  }
+
+  ngOnDestroy(): void {
+    this.routerSubscription?.unsubscribe();
   }
 }

@@ -42,6 +42,10 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
   expandedOrderId: number | null = null;
   selectedReportType: string = 'summary';
   
+  // Attendant Summary UI State
+  showAttendantSummary: boolean = true;
+  selectedAttendant: string = '';
+  
   // Stats
   totalSales: number = 0;
   totalBalance: number = 0;
@@ -127,37 +131,6 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
     return this.currentDateTime;
   }
 
-  // Helper method to get expanded order
-  getExpandedOrder(): any {
-    if (!this.expandedOrderId) return null;
-    return this.filteredData.find(o => o.id === this.expandedOrderId) || null;
-  }
-
-  // Helper method to get expanded order items
-  getExpandedOrderItems(): any[] {
-    const order = this.getExpandedOrder();
-    return order?.items || [];
-  }
-
-  // Helper method to get expanded order total
-  getExpandedOrderTotal(): number {
-    const order = this.getExpandedOrder();
-    return order?.total || 0;
-  }
-
-  // Helper method to get expanded order balance
-  getExpandedOrderBalance(): number {
-    const order = this.getExpandedOrder();
-    return order?.balance || 0;
-  }
-
-  // Helper method to get expanded order note
-  getExpandedOrderNote(): string {
-    const order = this.getExpandedOrder();
-    return order?.note || '';
-  }
-
-  // Helper method to check if order is expanded
   isOrderExpanded(orderId: number): boolean {
     return this.expandedOrderId === orderId;
   }
@@ -204,7 +177,7 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
     
-    this.dateFrom = this.formatDate(thirtyDaysAgo);
+    this.dateFrom = this.formatDate(today);
     this.dateTo = this.formatDate(today);
   }
 
@@ -253,7 +226,8 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
         cashier: this.reportForm.get('cashier')?.value || '',
         method: this.reportForm.get('method')?.value || '',
         department: this.reportForm.get('department')?.value || '',
-        status: this.reportForm.get('status')?.value || ''
+        status: this.reportForm.get('status')?.value || '',
+        user_id: this.user?.id || null
       };
 
       const res = await this.guestService.getHeldCartReport(payload);
@@ -262,14 +236,12 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
         this.reportData = res.data || [];
         this.summary = res.summary || {};
         
+        // Reset attendant filter
+        this.selectedAttendant = '';
+        this.selectedWaiter = '';
+        
         // Update stats
-        this.totalSales = this.summary.total_sales || 0;
-        this.totalBalance = this.summary.total_balance || 0;
-        this.totalCollected = this.summary.total_collected || 0;
-        this.totalOrders = this.summary.total_orders || 0;
-        this.totalItems = this.summary.total_items || 0;
-        this.averageOrder = this.summary.average_order || 0;
-        this.uniqueCustomers = this.summary.unique_customers || 0;
+        this.updateStats();
         
         this.filteredData = [...this.reportData];
         this.applyFilters();
@@ -286,6 +258,120 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
       this.blockUI.stop();
       this.cdr.detectChanges();
     }
+  }
+
+  // ===================== STATS METHODS =====================
+
+  updateStats(): void {
+    this.totalSales = this.summary.total_sales || 0;
+    this.totalBalance = this.summary.total_balance || 0;
+    this.totalCollected = this.summary.total_collected || 0;
+    this.totalOrders = this.summary.total_orders || 0;
+    this.totalItems = this.summary.total_items || 0;
+    this.averageOrder = this.summary.average_order || 0;
+    this.uniqueCustomers = this.summary.unique_customers || 0;
+  }
+
+  updateStatsFromFilteredData(): void {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      this.totalSales = 0;
+      this.totalCollected = 0;
+      this.totalBalance = 0;
+      this.totalOrders = 0;
+      this.totalItems = 0;
+      this.averageOrder = 0;
+      this.uniqueCustomers = 0;
+      return;
+    }
+    
+    this.totalOrders = this.filteredData.length;
+    this.totalSales = this.filteredData.reduce((sum, order) => sum + (order.total || 0), 0);
+    this.totalCollected = this.filteredData.reduce((sum, order) => sum + (order.collected || 0), 0);
+    this.totalBalance = this.filteredData.reduce((sum, order) => sum + (order.balance || 0), 0);
+    
+    this.totalItems = this.filteredData.reduce((sum, order) => sum + this.getTotalItems(order), 0);
+    this.averageOrder = this.totalOrders > 0 ? this.totalSales / this.totalOrders : 0;
+    
+    const uniqueCustomers = new Set();
+    this.filteredData.forEach(order => {
+      if (order.customer) uniqueCustomers.add(order.customer);
+    });
+    this.uniqueCustomers = uniqueCustomers.size;
+  }
+
+  // ===================== ATTENDANT SUMMARY METHODS =====================
+
+  toggleAttendantSummary(): void {
+    this.showAttendantSummary = !this.showAttendantSummary;
+  }
+
+  getAttendantCount(): number {
+    if (!this.filteredData || this.filteredData.length === 0) return 0;
+    const uniqueAttendants = new Set(this.filteredData.map(order => order.waiter || 'Unassigned'));
+    return uniqueAttendants.size;
+  }
+
+  getAttendantSummary(): any[] {
+    if (!this.filteredData || this.filteredData.length === 0) return [];
+    
+    const attendantMap = new Map();
+    
+    this.filteredData.forEach(order => {
+      const name = order.waiter || 'Unassigned';
+      if (!attendantMap.has(name)) {
+        attendantMap.set(name, {
+          name: name,
+          total_sales: 0,
+          total_collected: 0,
+          total_balance: 0,
+          order_count: 0,
+          orders: []
+        });
+      }
+      
+      const data = attendantMap.get(name);
+      data.total_sales += order.total || 0;
+      data.total_collected += order.collected || 0;
+      data.total_balance += order.balance || 0;
+      data.order_count += 1;
+      data.orders.push(order);
+    });
+    
+    const summary = Array.from(attendantMap.values()).map(attendant => {
+      const collection_rate = attendant.total_sales > 0 
+        ? (attendant.total_collected / attendant.total_sales) * 100 
+        : 0;
+      return {
+        ...attendant,
+        collection_rate: Math.min(collection_rate, 100)
+      };
+    });
+    
+    return summary.sort((a, b) => b.total_sales - a.total_sales);
+  }
+
+  filterByAttendant(attendantName: string): void {
+    if (!attendantName || attendantName === '') return;
+    
+    this.selectedAttendant = attendantName;
+    this.selectedWaiter = attendantName;
+    
+    this.filteredData = this.reportData.filter(order => 
+      (order.waiter || 'Unassigned') === attendantName
+    );
+    
+    this.updateStatsFromFilteredData();
+    this.toastr.success(`Showing orders for ${attendantName}`, 'Filter Applied');
+    this.cdr.detectChanges();
+  }
+
+  resetAttendantFilter(): void {
+    this.selectedAttendant = '';
+    this.selectedWaiter = '';
+    this.filteredData = [...this.reportData];
+    this.updateStatsFromFilteredData();
+    this.toastr.info('Filter cleared', 'Info');
+    this.cdr.detectChanges();
   }
 
   // ===================== FILTER METHODS =====================
@@ -311,7 +397,15 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
       });
     }
     
+    // Attendant filter
+    if (this.selectedWaiter && this.selectedWaiter !== '') {
+      filtered = filtered.filter(order => 
+        (order.waiter || 'Unassigned') === this.selectedWaiter
+      );
+    }
+    
     this.filteredData = filtered;
+    this.updateStatsFromFilteredData();
     this.cdr.detectChanges();
   }
 
@@ -322,12 +416,14 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
 
   clearFilters(): void {
     this.searchTerm = '';
+    this.selectedAttendant = '';
+    this.selectedWaiter = '';
     this.reportForm.reset();
-    this.dateFrom = '';
-    this.dateTo = '';
     this.setDefaultDateRange();
     this.filteredData = [...this.reportData];
+    this.updateStatsFromFilteredData();
     this.toastr.info('Filters cleared', 'Info');
+    this.cdr.detectChanges();
   }
 
   // ===================== TABLE INTERACTION =====================

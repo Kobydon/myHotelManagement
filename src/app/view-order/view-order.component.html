@@ -3,7 +3,9 @@
   <div class="header-section">
     <div class="header-top">
       <h3 class="form-kev">
-        <span>🧾 Assempahfie Graphics POS Orders</span>
+        <span>🧾Digital <span class="user-name">
+   [ {{ user[0]?.firstname + " " + user[0]?.lastname }}]  
+        </span></span>
         <button class="btn btn-danger logout-btn" (click)="logOut()">
           <i class="fa fa-sign-out"></i> Log Out
         </button>
@@ -12,9 +14,6 @@
     
     <div class="header-actions">
       <div class="action-buttons">
-        <!-- <button class="btn btn-info btn-sm" (click)="checkOrder()" disable="">
-          <i class="fa fa-calendar-check-o"></i> Check Today's Order
-        </button> -->
         <button class="btn btn-primary btn-sm" (click)="refreshOrders()">
           <i class="fa fa-refresh"></i> Refresh
         </button>
@@ -67,7 +66,6 @@
               <th class="col-items">Items</th>
               <th class="col-customer">Accepted by</th>
               <th class="col-total">Total</th>
-              <!-- <th class="col-status">Status</th> -->
               <th class="col-action">Action</th>
             </tr>
           </thead>
@@ -94,7 +92,14 @@
                     <span class="item-count">{{ getTotalItems(order) }} items</span>
                     <div class="item-names-list">
                       <span *ngFor="let item of order.items | slice:0:2; let last = last" class="item-name" [class.checked-item]="item.is_checked === 'yes'">
-                        <span [class.strikethrough]="item.is_checked === 'yes'">{{ item.name }}</span>{{ !last ? ', ' : '' }}
+                        <span [class.strikethrough]="item.is_checked === 'yes'">{{ item.name }}</span>
+                        <!-- Updated Measurement badge in preview -->
+                        <span *ngIf="hasMeasurementData(item)" 
+                              class="measurement-badge" 
+                              title="Size: {{ getMeasurementWidth(item) }} × {{ getMeasurementHeight(item) }} {{ getMeasurementUnit(item) }}">
+                          📏 {{ getMeasurementDisplay(item) }}
+                        </span>
+                        <span *ngIf="!last">, </span>
                       </span>
                       <span *ngIf="order.items?.length > 2" class="more-items">
                         +{{ order.items.length - 2 }} more
@@ -108,12 +113,6 @@
                 <td class="total-cell">
                   <span class="total-amount">₵{{ order.total | number:'1.2-2' }}</span>
                 </td>
-                <!-- <td class="status-cell">
-                  <span class="status-badge" [ngClass]="getStatusClass(order)">
-                    <span class="status-dot"></span>
-                    {{ getStatusText(order) }}
-                  </span>
-                </td> -->
                 <td class="action-cell">
                   <button *ngIf="order.digital_printing_status !== 'no' && order.working_on_id_digital_printing == user[0]?.id" 
                           class="btn-action confirm-btn" 
@@ -150,7 +149,7 @@
                           <i class="fa fa-user"></i> {{ order.customer || 'Walk-in' }}
                         </span>
                         <span class="order-note" *ngIf="order.note">
-                          <i class="fa fa-sticky-note"></i> {{ order.note }}
+                          <i class="fa fa-sticky-note"></i><h3>{{ order.note }}</h3> 
                         </span>
                       </div>
                     </div>
@@ -159,6 +158,7 @@
                         <tr>
                           <th>Item</th>
                           <th>Description</th>
+                          <th>Measurements</th>
                           <th>Qty</th>
                           <th>Price</th>
                           <th>Subtotal</th>
@@ -175,6 +175,28 @@
                             <span *ngIf="item.is_checked === 'yes'" class="checked-checkmark">✓</span>
                           </td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.description || 'No description' }}</td>
+                          <td>
+                            <!-- Updated Measurement Display -->
+                            <div *ngIf="hasMeasurementData(item)" class="measurement-details">
+                              <div class="measurement-display">
+                                <span class="measurement-icon">📏</span>
+                                <span class="measurement-value">
+                                  {{ getMeasurementWidth(item) }}
+                                  ×
+                                  {{ getMeasurementHeight(item) }}
+                                  <span class="measurement-unit">{{ getMeasurementUnit(item) }}</span>
+                                </span>
+                              </div>
+                              <div *ngIf="getMeasurementArea(item) !== null" class="measurement-area">
+                                <span class="area-label">Area:</span>
+                                <span class="area-value">
+                                  {{ getMeasurementArea(item) | number:'1.2-2' }}
+                                  sq {{ getMeasurementUnit(item) }}
+                                </span>
+                              </div>
+                            </div>
+                            <span *ngIf="!hasMeasurementData(item)" class="no-measurement">—</span>
+                          </td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.qty }}</td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ item.price | number:'1.2-2' }}</td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
@@ -197,7 +219,7 @@
                             <button 
                               *ngIf="item.is_checked != 'yes' && order.working_on_digital_printing != 'not_started'" 
                               class="btn-action check-item-btn" 
-                              (click)="checkItem(order.id, item.id)"
+                              (click)="checkItem(order.id, item.cart_item_id)"
                               title="Mark item as checked">
                               <i class="fa fa-check-circle"></i> Check
                             </button>
@@ -340,7 +362,14 @@
                     <span class="item-count">{{ getTotalItems(order) }} items</span>
                     <div class="item-names-list">
                       <span *ngFor="let item of order.items | slice:0:2; let last = last" class="item-name">
-                        {{ item.name }}{{ !last ? ', ' : '' }}
+                        {{ item.name }}
+                        <!-- Updated Measurement badge in preview for processed orders -->
+                        <span *ngIf="hasMeasurementData(item)" 
+                              class="measurement-badge" 
+                              title="Size: {{ getMeasurementWidth(item) }} × {{ getMeasurementHeight(item) }} {{ getMeasurementUnit(item) }}">
+                          📏 {{ getMeasurementDisplay(item) }}
+                        </span>
+                        <span *ngIf="!last">, </span>
                       </span>
                       <span *ngIf="order.items?.length > 2" class="more-items">
                         +{{ order.items.length - 2 }} more
@@ -383,7 +412,7 @@
                           <i class="fa fa-user"></i> {{ order.customer || 'Walk-in' }}
                         </span>
                         <span class="order-note" *ngIf="order.note">
-                          <i class="fa fa-sticky-note"></i> <h5>{{ order.note }}</h5>
+                          <i class="fa fa-sticky-note"></i> <h3>{{ order.note }}</h3> 
                         </span>
                       </div>
                     </div>
@@ -392,6 +421,7 @@
                         <tr>
                           <th>Item</th>
                           <th>Description</th>
+                          <th>Measurements</th>
                           <th>Qty</th>
                           <th>Price</th>
                           <th>Subtotal</th>
@@ -409,6 +439,28 @@
                             <span *ngIf="item.is_checked === 'yes'" class="checked-checkmark">✓</span>
                           </td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.description || 'No description' }}</td>
+                          <td>
+                            <!-- Updated Measurement Display for Processed Orders -->
+                            <div *ngIf="hasMeasurementData(item)" class="measurement-details">
+                              <div class="measurement-display">
+                                <span class="measurement-icon">📏</span>
+                                <span class="measurement-value">
+                                  {{ getMeasurementWidth(item) }}
+                                  ×
+                                  {{ getMeasurementHeight(item) }}
+                                  <span class="measurement-unit">{{ getMeasurementUnit(item) }}</span>
+                                </span>
+                              </div>
+                              <div *ngIf="getMeasurementArea(item) !== null" class="measurement-area">
+                                <span class="area-label">Area:</span>
+                                <span class="area-value">
+                                  {{ getMeasurementArea(item) | number:'1.2-2' }}
+                                  sq {{ getMeasurementUnit(item) }}
+                                </span>
+                              </div>
+                            </div>
+                            <span *ngIf="!hasMeasurementData(item)" class="no-measurement">—</span>
+                          </td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">{{ item.qty }}</td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ item.price | number:'1.2-2' }}</td>
                           <td [class.strikethrough]="item.is_checked === 'yes'">₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
@@ -550,6 +602,148 @@
         <div class="text-danger" *ngIf="showNameError">
           <i class="fa fa-exclamation-circle"></i> Name is required to confirm order
         </div>
+
+        <div class="mb-3">
+<!-- Process Selection - ALL Options (OPTIONAL) -->
+<div class="process-selection">
+  <label class="form-label fw-bold">
+    <i class="fa fa-cogs"></i> Select Processes <span class="text-muted">(Optional)</span>
+  </label>
+
+  <!-- Row 1: Cutting, Trimming, Creasing -->
+  <div class="checkbox-row">
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="cutting"
+        [(ngModel)]="processCutting"
+      />
+      <label class="form-check-label" for="cutting">
+        ✂️ Cutting
+      </label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="trimming"
+        [(ngModel)]="processTrimming"
+      />
+      <label class="form-check-label" for="trimming">
+        ✂️ Trimming
+      </label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="creasing"
+        [(ngModel)]="processCreasing"
+      />
+      <label class="form-check-label" for="creasing">
+        📐 Creasing
+      </label>
+    </div>
+  </div>
+
+  <!-- Row 2: Lamination Types -->
+  <div class="checkbox-row">
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="matteOneSide"
+        [(ngModel)]="processMatteLaminationOneSide"
+      />
+      <label class="form-check-label" for="matteOneSide">
+        📋 Matte Lamination (1 Side)
+      </label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="matteBothSides"
+        [(ngModel)]="processMatteLaminationBothSides"
+      />
+      <label class="form-check-label" for="matteBothSides">
+        📋 Matte Lamination (Both Sides)
+      </label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="glossOneSide"
+        [(ngModel)]="processGlossLaminationOneSide"
+      />
+      <label class="form-check-label" for="glossOneSide">
+        ✨ Gloss Lamination (1 Side)
+      </label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="glossBothSides"
+        [(ngModel)]="processGlossLaminationBothSides"
+      />
+      <label class="form-check-label" for="glossBothSides">
+        ✨ Gloss Lamination (Both Sides)
+      </label>
+    </div>
+  </div>
+
+  <!-- Row 3: Pouch Lamination -->
+  <div class="checkbox-row">
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="pouchLamination"
+        [(ngModel)]="processPouchLamination"
+      />
+      <label class="form-check-label" for="pouchLamination">
+        📁 Pouch Lamination
+      </label>
+    </div>
+  </div>
+  
+  <!-- Preview selected processes -->
+  <div class="selected-processes-preview mt-2" 
+       *ngIf="processCutting || processTrimming || processCreasing || 
+              processMatteLaminationOneSide || processMatteLaminationBothSides || 
+              processGlossLaminationOneSide || processGlossLaminationBothSides || 
+              processPouchLamination">
+    <small class="text-muted">Selected processes:</small>
+    <div class="mt-1">
+      <span class="process-tag process-tag-cutting" *ngIf="processCutting">✂️ Cutting</span>
+      <span class="process-tag process-tag-trimming" *ngIf="processTrimming">✂️ Trimming</span>
+      <span class="process-tag process-tag-creasing" *ngIf="processCreasing">📐 Creasing</span>
+      <span class="process-tag process-tag-matte" *ngIf="processMatteLaminationOneSide">📋 Matte (1 Side)</span>
+      <span class="process-tag process-tag-matte-both" *ngIf="processMatteLaminationBothSides">📋 Matte (Both)</span>
+      <span class="process-tag process-tag-gloss" *ngIf="processGlossLaminationOneSide">✨ Gloss (1 Side)</span>
+      <span class="process-tag process-tag-gloss-both" *ngIf="processGlossLaminationBothSides">✨ Gloss (Both)</span>
+      <span class="process-tag process-tag-pouch" *ngIf="processPouchLamination">📁 Pouch</span>
+    </div>
+  </div>
+  <div class="text-muted" *ngIf="!processCutting && !processTrimming && !processCreasing && 
+                               !processMatteLaminationOneSide && !processMatteLaminationBothSides && 
+                               !processGlossLaminationOneSide && !processGlossLaminationBothSides && 
+                               !processPouchLamination">
+    <small><i class="fa fa-info-circle"></i> No processes selected (optional)</small>
+  </div>
+</div>
+
+ 
+</div>
+
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" (click)="closeConfirmModal()">
@@ -562,3 +756,5 @@
     </div>
   </div>
 </div>
+
+<app-chat></app-chat>

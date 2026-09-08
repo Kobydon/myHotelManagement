@@ -41,6 +41,16 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   orderToConfirm: any = null;
   showNameError: boolean = false;
   
+  // Process Selection Properties - ALL NEW OPTIONS
+  processCutting: boolean = false;
+  processTrimming: boolean = false;
+  processCreasing: boolean = false;
+  processMatteLaminationOneSide: boolean = false;
+  processMatteLaminationBothSides: boolean = false;
+  processGlossLaminationOneSide: boolean = false;
+  processGlossLaminationBothSides: boolean = false;
+  processPouchLamination: boolean = false;
+  
   // Subscriptions
   heldOrderSub: Subscription;
   intervalId: any;
@@ -82,14 +92,13 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     // Set default date range (last 7 days)
     this.setDefaultDateRange();
     
-    // Auto-refresh every 60 seconds
-    this.intervalId = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        console.log("🕒 Auto-refreshing orders...");
-        this.loadHeldOrders();
-        this.loadProcessedOrders();
-      }
-    }, 80000);
+    // this.intervalId = setInterval(() => {
+    //   if (document.visibilityState === 'visible') {
+    //     console.log("🕒 Auto-refreshing orders...");
+    //     this.loadHeldOrders();
+    //     this.loadProcessedOrders();
+    //   }
+    // }, 80000);
     
     // Subscribe to cart updates
     this.cartService.cartItems$.subscribe(items => {
@@ -152,6 +161,101 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     return this.customers.find((c: any) => c.id == customerId) || null;
   }
 
+  // ===================== MEASUREMENT HELPER METHODS =====================
+
+  /**
+   * Get measurement width from either nested or flat structure
+   */
+  getMeasurementWidth(item: any): string {
+    if (!item) return 'N/A';
+    // Check nested measurement object
+    if (item.measurement?.width !== undefined && item.measurement?.width !== null) {
+      return item.measurement.width.toString();
+    }
+    // Check flat measurement fields
+    if (item.measurementWidth !== undefined && item.measurementWidth !== null) {
+      return item.measurementWidth.toString();
+    }
+    return 'N/A';
+  }
+
+  /**
+   * Get measurement height from either nested or flat structure
+   */
+  getMeasurementHeight(item: any): string {
+    if (!item) return 'N/A';
+    if (item.measurement?.height !== undefined && item.measurement?.height !== null) {
+      return item.measurement.height.toString();
+    }
+    if (item.measurementHeight !== undefined && item.measurementHeight !== null) {
+      return item.measurementHeight.toString();
+    }
+    return 'N/A';
+  }
+
+  /**
+   * Get measurement unit from either nested or flat structure
+   */
+  getMeasurementUnit(item: any): string {
+    if (!item) return '';
+    if (item.measurement?.unit) return item.measurement.unit;
+    if (item.measurementUnit) return item.measurementUnit;
+    return '';
+  }
+
+  /**
+   * Get measurement area from either nested or flat structure
+   */
+  getMeasurementArea(item: any): number | null {
+    if (!item) return null;
+    if (item.measurement?.area !== undefined && item.measurement?.area !== null) {
+      return item.measurement.area;
+    }
+    if (item.measurementArea !== undefined && item.measurementArea !== null) {
+      return item.measurementArea;
+    }
+    return null;
+  }
+
+  /**
+   * Check if item has measurement data
+   */
+  hasMeasurementData(item: any): boolean {
+    if (!item) return false;
+    // Check if there's measurement data in either structure
+    const hasNested = item.measurement && (
+      item.measurement.width !== undefined || 
+      item.measurement.height !== undefined ||
+      item.measurement.area !== undefined
+    );
+    const hasFlat = (item.measurementWidth !== undefined && item.measurementWidth !== null) ||
+                    (item.measurementHeight !== undefined && item.measurementHeight !== null) ||
+                    (item.measurementArea !== undefined && item.measurementArea !== null);
+    return !!(hasNested || hasFlat);
+  }
+
+  /**
+   * Get formatted measurement display string
+   */
+  getMeasurementDisplay(item: any): string {
+    if (!this.hasMeasurementData(item)) return '';
+    const width = this.getMeasurementWidth(item);
+    const height = this.getMeasurementHeight(item);
+    const unit = this.getMeasurementUnit(item);
+    if (width === 'N/A' && height === 'N/A') return '';
+    return `${width}×${height}${unit}`;
+  }
+
+  /**
+   * Get formatted area display string
+   */
+  getAreaDisplay(item: any): string {
+    const area = this.getMeasurementArea(item);
+    if (area === null) return '';
+    const unit = this.getMeasurementUnit(item);
+    return `${area.toFixed(2)} sq ${unit}`;
+  }
+
   // ===================== DATE FILTER METHODS =====================
 
   /**
@@ -180,27 +284,58 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
    * Filter processed orders by date range
    */
   filterProcessedOrders(): void {
-    if (!this.processedOrders || this.processedOrders.length === 0) {
+    if (!this.processedOrders?.length) {
+      this.filteredProcessedOrders = [];
       return;
     }
 
     let filtered = [...this.processedOrders];
 
-    if (this.dateFrom && this.dateTo) {
-      const fromDate = new Date(this.dateFrom);
-      const toDate = new Date(this.dateTo);
-      toDate.setHours(23, 59, 59);
+    if (this.dateFrom || this.dateTo) {
+      const from = this.dateFrom
+        ? new Date(this.dateFrom).toISOString().split('T')[0]
+        : null;
+
+      const to = this.dateTo
+        ? new Date(this.dateTo).toISOString().split('T')[0]
+        : null;
 
       filtered = filtered.filter(order => {
-        if (!order.created_at) return false;
-        const orderDate = new Date(order.created_at);
-        return orderDate >= fromDate && orderDate <= toDate;
+        if (!order.created_at) {
+          return false;
+        }
+
+        const orderDate = new Date(order.created_at)
+          .toISOString()
+          .split('T')[0];
+
+        if (from && orderDate < from) {
+          return false;
+        }
+
+        if (to && orderDate > to) {
+          return false;
+        }
+
+        return true;
       });
     }
 
+    // Newest first
+    filtered.sort((a, b) => {
+      return (
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
+      );
+    });
+
     this.filteredProcessedOrders = filtered;
+
     this.cdr.detectChanges();
-    console.log(`📅 Filtered processed orders: ${filtered.length} of ${this.processedOrders.length}`);
+
+    console.log(
+      `📅 Filtered processed orders: ${filtered.length} of ${this.processedOrders.length}`
+    );
   }
 
   /**
@@ -259,7 +394,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
    */
   async loadHeldOrders() {
     try {
-      this.isLoading = true;
+      // this.isLoading = true;
       const res = await this.guestService.getHeldOrders();
       
       if (res && Array.isArray(res)) {
@@ -296,7 +431,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
       console.error("❌ Error loading incoming orders:", error);
       this.toastr.error('Failed to load incoming orders', 'Error');
     } finally {
-      this.isLoading = false;
+      // this.isLoading = false;
       this.cdr.detectChanges();
     }
   }
@@ -317,7 +452,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
           return { 
             ...order, 
             items, 
-            expanded: false,
+            expanded: true,
             customer_name: customerName,
             customer_details: this.getCustomerDetails(order.customer)
           };
@@ -389,23 +524,34 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Check an individual item
-   */
-  async checkItem(orderId: number, itemId: number): Promise<void> {
-    if (!confirm(`Are you sure you want to mark this item as checked?`)) {
-      return;
-    }
-    
+  async checkItem(orderId: any, itemId: any): Promise<void> {
+    console.log('Checking item:', {
+      orderId: orderId,
+      cartItemId: itemId
+    });
+
     try {
-      const response = await this.guestService.checkOrderItem(orderId, itemId);
-      if (response) {
-        this.toastr.success(`Item #${itemId} checked successfully`, 'Success');
-        this.loadHeldOrders();
+      const response = await this.guestService.checkOrderItem(
+        orderId,
+        itemId
+      );
+
+      console.log('Check item response:', response);
+
+      if (response?.success) {
+        console.log(`Item ${itemId} in order ${orderId} checked successfully`);
+        // Reload the orders
+        await this.loadHeldOrders();
+      } else {
+        this.toastr.error(
+          response?.error || 'Failed to check item',
+          'Error'
+        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error checking item:', error);
-      this.toastr.error('Failed to check item', 'Error');
+      const message = error?.error?.error || error?.message || 'Failed to check item';
+      this.toastr.error(message, 'Error');
     }
   }
 
@@ -439,13 +585,14 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===================== CONFIRM ORDER WITH RECEIPT =====================
+  // ===================== CONFIRM ORDER METHODS =====================
 
   /**
-   * Confirm order with name prompt
+   * Confirm order with name - Reset all checkboxes
    */
   confirmOrderWithName(orderId: any): void {
     const order = this.itemList.find(o => o.id === orderId);
+
     if (!order) {
       this.toastr.error('Order not found', 'Error');
       return;
@@ -453,12 +600,22 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
 
     this.orderToConfirm = order;
     this.showConfirmModal = true;
+
     this.confirmName = '';
+    // Reset ALL process checkboxes
+    this.processCutting = false;
+    this.processTrimming = false;
+    this.processCreasing = false;
+    this.processMatteLaminationOneSide = false;
+    this.processMatteLaminationBothSides = false;
+    this.processGlossLaminationOneSide = false;
+    this.processGlossLaminationBothSides = false;
+    this.processPouchLamination = false;
     this.showNameError = false;
   }
 
   /**
-   * Submit confirmation with name
+   * Submit confirmation - Processes are now OPTIONAL
    */
   async submitConfirmation(): Promise<void> {
     if (!this.confirmName || this.confirmName.trim() === '') {
@@ -467,25 +624,81 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Build selected processes from checkboxes - ALL OPTIONAL
+    const processes: string[] = [];
+
+    if (this.processCutting) {
+      processes.push('Cutting');
+    }
+
+    if (this.processTrimming) {
+      processes.push('Trimming');
+    }
+
+    if (this.processCreasing) {
+      processes.push('Creasing');
+    }
+
+    if (this.processMatteLaminationOneSide) {
+      processes.push('Matte Lamination (1 Side)');
+    }
+
+    if (this.processMatteLaminationBothSides) {
+      processes.push('Matte Lamination (Both Sides)');
+    }
+
+    if (this.processGlossLaminationOneSide) {
+      processes.push('Gloss Lamination (1 Side)');
+    }
+
+    if (this.processGlossLaminationBothSides) {
+      processes.push('Gloss Lamination (Both Sides)');
+    }
+
+    if (this.processPouchLamination) {
+      processes.push('Pouch Lamination');
+    }
+
+    // Process selection is now OPTIONAL - no validation required
+    // If no processes selected, just proceed with empty array
+
     this.showNameError = false;
 
     try {
       const orderId = this.orderToConfirm.id;
-      const order = { 
+
+      const order = {
         id: orderId,
-        confirmed_by: this.confirmName.trim()
+        confirmed_by: this.confirmName.trim(),
+        process: processes  // Can be empty array
       };
-      
+
       const res = await this.guestService.confirmOrder(order);
-      
+
       if (res) {
-        this.toastr.success(`Order #${orderId} confirmed by ${this.confirmName}`, 'Success');
-        this.printConfirmedOrder(this.orderToConfirm, this.confirmName);
+        // Update local order with processes
+        const updatedOrder = this.itemList.find(o => o.id === orderId);
+        if (updatedOrder) {
+          updatedOrder.process = processes;
+        }
+
+        this.toastr.success(
+          `Order #${orderId} confirmed by ${this.confirmName}`,
+          'Success'
+        );
+
+        this.printConfirmedOrder(
+          this.orderToConfirm,
+          this.confirmName,
+          processes
+        );
+
         this.closeConfirmModal();
         this.loadHeldOrders();
         this.loadProcessedOrders();
         this.getOrders();
       }
+
     } catch (err) {
       console.error("❌ Error confirming order:", err);
       this.toastr.error('Failed to confirm order', 'Error');
@@ -493,13 +706,32 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Close confirm modal
+   * Close confirm modal - Reset all checkboxes
    */
   closeConfirmModal(): void {
     this.showConfirmModal = false;
     this.orderToConfirm = null;
     this.confirmName = '';
+    // Reset ALL process checkboxes
+    this.processCutting = false;
+    this.processTrimming = false;
+    this.processCreasing = false;
+    this.processMatteLaminationOneSide = false;
+    this.processMatteLaminationBothSides = false;
+    this.processGlossLaminationOneSide = false;
+    this.processGlossLaminationBothSides = false;
+    this.processPouchLamination = false;
     this.showNameError = false;
+  }
+
+  /**
+   * Get formatted process display
+   */
+  getProcessDisplay(processes: string[]): string {
+    if (!processes || processes.length === 0) {
+      return 'No processes selected';
+    }
+    return processes.join(' & ');
   }
 
   // ===================== RECEIPT PRINTING =====================
@@ -507,9 +739,12 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   /**
    * Print confirmed order sticker
    */
-  printConfirmedOrder(order: any, confirmedBy: string): void {
+  printConfirmedOrder(order: any, confirmedBy: string, processes: string[]): void {
     const currentDate = new Date().toLocaleString();
     const customer = order.customer_details || null;
+
+    // Format processes for display
+    const processDisplay = processes.length > 0 ? processes.join(' & ') : 'No processes selected';
 
     const printWindow = window.open('', '', 'width=200,height=300');
 
@@ -619,12 +854,40 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
               display: inline-block;
               margin-top: 3px;
             }
+            .process-badge {
+              background: #3498db;
+              color: white;
+              font-size: 9px;
+              padding: 2px 10px;
+              border-radius: 12px;
+              display: inline-block;
+              margin-top: 3px;
+              font-weight: bold;
+            }
+            .process-badge-cutting {
+              background: #e67e22;
+            }
+            .process-badge-trimming {
+              background: #d35400;
+            }
+            .process-badge-creasing {
+              background: #2980b9;
+            }
+            .process-badge-matte {
+              background: #27ae60;
+            }
+            .process-badge-gloss {
+              background: #8e44ad;
+            }
+            .process-badge-pouch {
+              background: #1abc9c;
+            }
           </style>
         </head>
         <body onload="window.print(); window.close();">
           <div class="sticker-container">
             <div class="logo-container">
-              <img src="../../assets/img/asempa.jpg"  class="logo" />
+              <img src="../../assets/img/asempa.jpg" class="logo" />
             </div>
             
             <div style="font-size: 8px; font-weight: bold; color: #2c3e50; margin-bottom: 3px;">
@@ -635,12 +898,14 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
             
             <div class="order-number">#${order.id}</div>
             
-           
-            
             <div class="divider"></div>
             
             <div class="info-row">
-              <span class="label">Customer:</span> ${customer ? (customer.firstname || '') + ' ' + (customer.lastname || '') : 'Walk-in'}
+              <span class="label">Customer:</span> ${order.customer || 'Walk-in'}
+            </div>
+                 
+            <div class="info-row">
+              <span class="label">Attended by:</span> ${order.waiter || 'Not Assigned'}
             </div>
             
             <div class="info-row">
@@ -653,6 +918,10 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
             
             <div class="info-row">
               <span class="label">Date:</span> ${new Date().toLocaleDateString()}
+            </div>
+            
+            <div class="process-badge">
+              🔧 ${processDisplay}
             </div>
             
             <div class="divider"></div>
@@ -679,25 +948,41 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
       this.toastr.error('Failed to print sticker', 'Error');
     }
   }
-   // <div class="working-on">
-            //   👤 ${order.working_on || 'Not Assigned'}
-            // </div>
 
   /**
    * Print order as sticker (for processed orders)
    */
   printOrder(order: any): void {
     const confirmedBy = prompt('Enter your full name to print this sticker:');
-    
-    if (confirmedBy === null) return;
-    
-    if (!confirmedBy || confirmedBy.trim() === '') {
-      this.toastr.warning('Name is required to print sticker', 'Required');
-      this.printOrder(order);
+
+    if (confirmedBy === null) {
       return;
     }
 
-    this.printConfirmedOrder(order, confirmedBy.trim());
+    const name = confirmedBy.trim();
+
+    if (!name) {
+      this.toastr.warning(
+        'Name is required to print sticker',
+        'Required'
+      );
+      return;
+    }
+
+    const lamination = prompt(
+      'Enter process (optional): Cutting, Matte Lamination, Gloss Lamination'
+    );
+
+    if (lamination === null) {
+      return;
+    }
+
+    const process = lamination.trim();
+
+    // Optional process: pass an empty array if nothing was entered
+    const processes: string[] = process ? [process] : [];
+
+    this.printConfirmedOrder(order, name, processes);
   }
 
   // ===================== ATTACHMENT METHODS =====================
@@ -1086,6 +1371,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     }
     
     this.filteredOrders = filtered;
+    this.filteredProcessedOrders = filtered;
     this.cdr.detectChanges();
   }
 
@@ -1203,7 +1489,6 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   logOut(): void {
     this.userService.logout();
     this.router.navigate(['/login']);
-    // this.toastr.info('Logged out successfully', 'Goodbye');
   }
 
   /**

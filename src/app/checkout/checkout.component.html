@@ -1,36 +1,30 @@
 <div class="main-container">
   <!-- Left Side: Checkout Area with Scroll -->
   <div class="checkout-scroll-container">
-    <!-- Session Controls -->
-    <div class="session-controls">
-      <button class="btn btn-success btn-sm" id="newSession" (click)="startSession()" *ngIf="status !== 'current'">
-        <i class="fa fa-play"></i> Start Session
-      </button>
-      <button class="btn btn-warning btn-sm" id="closeSession" (click)="closeSession(id)" *ngIf="status === 'current'">
-        <i class="fa fa-stop"></i> Close Session
-      </button>
-      <span class="session-status" *ngIf="status">
-        Status: <strong>{{ status === 'current' ? '🟢 Active' : '🔴 Closed' }}</strong>
-      </span>
-    </div>
-
     <!-- User Controls -->
     <div class="btn-group">
       <div class="row">
-        <!-- <div class="col-sm-3">
-          <button class="btn btn-info btn-xs" (click)="openPopup()">Cashier</button><br><br>
-        </div> -->
+
         <div class="col-sm-3">
-          <button class="btn btn-info" (click)="openPopup2()">Manager</button><br><br>
+          <h3 class="user-name">
+            {{ user?.[0]?.firstname }} {{ user?.[0]?.lastname }}
+          </h3>
         </div>
+
+        <!-- <div class="col-sm-3">
+          <button class="btn btn-info" (click)="openPopup2()">Manager</button><br><br>
+        </div> -->
         <div class="col-sm-3">
           <!-- <button class="btn btn-info btn-xs" (click)="openSales()" disabled>Sales</button><br><br>   -->
         </div>
         <div class="col-sm-3">
-          <button class="btn btn-xs" (click)="logOut()"><i class="fa fa-lock"></i> Lock Till</button><br><br>
+          <button class="btn btn-xs" (click)="logOut()"><i class="fa fa-lock"></i> Log out</button><br><br>
         </div>
       </div>
     </div>
+
+    <!-- ===================== MULTI-ORDER PANEL ===================== -->
+   
 
     <!-- Search Products -->
     <div class="search-section mb-2">
@@ -152,438 +146,528 @@
     <!-- Payment & Order Actions -->
     <div class="mt-3 d-flex gap-2 flex-wrap">
       <div style="display: flex; width: 100%; gap: 5px; flex-wrap: nowrap;">
-
-  <button class="btn btn-danger"
+        <button class="btn btn-danger"
+                style="flex: 1; white-space: nowrap;"
+                (click)="clearCart()"
+                [disabled]="cartItems.length === 0">
+          Clear Cart
+        </button>
+        <button class="btn btn-info"
+                style="flex: 1; white-space: nowrap;"
+                (click)="holdWithPartialPayment()"
+                [disabled]="cartItems.length === 0 ">
+          <i class="fa fa-money"></i> Hold & Pay
+        </button>
+        <!-- Add to Payment Cart Button -->
+        <button 
+          class="btn btn-primary" 
           style="flex: 1; white-space: nowrap;"
-          (click)="clearCart()"
+          (click)="addToPaymentCart()"
           [disabled]="cartItems.length === 0">
-    Clear Cart
-  </button>
-<!-- || !(cashier || admin) -->
-  <button class="btn btn-info"
-          style="flex: 1; white-space: nowrap;"
-          (click)="holdWithPartialPayment()"
-          [disabled]="cartItems.length === 0 ">
-    <i class="fa fa-money"></i> Hold & Pay
-  </button>
+          <i class="fa fa-shopping-bag"></i> 
+          Add to Payment Cart 
+          <span *ngIf="getPaymentCartCount() > 0" class="badge badge-light" style="background: white; color: #007bff; font-weight: bold; margin-left: 4px;">
+            {{ getPaymentCartCount() }}
+          </span>
+        </button>
+      </div>
 
-  <button class="btn btn-primary"
-          style="flex: 1; white-space: nowrap;"
-          (click)="printBill()"
-          [disabled]="cartItems.length === 0">
-    Print Bill 🖨️
-  </button>
+      <!-- Payment Cart Section -->
+      <div class="payment-cart-section mt-3" *ngIf="getPaymentCartCount() > 0 || showPaymentCart" style="width: 100%;">
+        <div class="payment-cart-header" (click)="togglePaymentCart()" style="cursor: pointer; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+          <h5 class="d-flex justify-content-between align-items-center" style="margin: 0;">
+            <span>
+              <i class="fa fa-shopping-bag"></i> Payment Cart
+              <span class="badge badge-primary">{{ getPaymentCartCount() }}</span>
+            </span>
+            <span>
+              Total: ₵{{ paymentCartTotal | number:'1.2-2' }}
+              <i class="fa" [ngClass]="{'fa-chevron-down': !showPaymentCart, 'fa-chevron-up': showPaymentCart}"></i>
+            </span>
+          </h5>
+        </div>
 
-</div>
-      <!-- <button 
-        (click)="loadHeldCartAll()"  
-        class="btn btn-warning"
-        [disabled]="!(cashier || admin)">
-        Load All
-      </button> -->
+        <div *ngIf="showPaymentCart" class="payment-cart-body" style="padding: 10px 5px; border: 1px solid #dee2e6; border-top: none; border-radius: 0 0 6px 6px; background: white;">
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of paymentCart; let i = index">
+                  <td>{{ i + 1 }}</td>
+                   {{ getCustomerName(order.customer) || 'Walk-in' }}
+                  <td>{{ order.cartItems.length }} item(s)</td>
+                  <td>₵{{ order.total | number:'1.2-2' }}</td>
+                  <td>
+                    <button 
+                      class="btn btn-danger btn-sm" 
+                      (click)="removeFromPaymentCart(i)"
+                      title="Remove from payment cart">
+                      <i class="fa fa-times"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr class="table-active">
+                  <td colspan="3"><strong>Total</strong></td>
+                  <td colspan="2"><strong>₵{{ paymentCartTotal | number:'1.2-2' }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-      <!-- Customer ID -->
-      <button class="btn btn-info" style="padding: 5px; display: none; align-items: center;">
-        <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
-          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Customer ID</label>
-          <input formControlName="customer" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px; width: 100px;" type="text" placeholder="ID" class="form-control">
-        </form>
-      </button>
+          <div class="payment-cart-actions" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+            <button 
+              class="btn btn-success" 
+              style="flex: 1; min-width: 120px;"
+              (click)="processPaymentCart()"
+              [disabled]="paymentCart.length === 0 || isProcessingPaymentCart">
+              <i class="fa" [ngClass]="{'fa-spinner fa-spin': isProcessingPaymentCart, 'fa-credit-card': !isProcessingPaymentCart}"></i>
+              {{ isProcessingPaymentCart ? 'Processing...' : 'Pay All Orders' }}
+            </button>
+            <button 
+              class="btn btn-danger" 
+              style="flex: 1; min-width: 120px;"
+              (click)="clearPaymentCart()"
+              [disabled]="paymentCart.length === 0">
+              <i class="fa fa-trash"></i> Clear All
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Search Order -->
-      <button class="btn btn-warning btn-sm" style="padding: 5px; display: inline-flex; align-items: center;">
+      <button class="btn btn-warning btn-sm" style="padding: 5px; display: inline-flex; align-items: center; margin-top: 10px;">
         <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
           <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Track Order</label>
-          <input formControlName="search_order" type="text" placeholder="EnterOrder ID" class="form-control" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;" (change)="searchItemsOrder()">
+          <input formControlName="search_order" type="text" placeholder="Enter Order ID" class="form-control" style="width: 80px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px;" (change)="searchItemsOrder()">
+        
+          <button
+            class="btn btn-info"
+            style="padding: 5px; display: inline-flex; align-items: center;"
+            type="button">
+
+            <label
+              style="margin: 0 6px 0 0; font-size: 12px; font-weight: 600; color: #333;">
+              Discount
+            </label>
+
+            <div style="display: flex; align-items: center;">
+              <input
+                type="number"
+                formControlName="discount"
+                min="0"
+                max="100"
+                step="0.01"
+                placeholder="0"
+                style="
+                  color: black;
+                  border: 1px solid #ddd;
+                  border-radius: 4px;
+                  background: white;
+                  padding: 4px 8px;
+                  width: 70px;
+                  font-size: 12px;
+                "
+                (input)="calDiscount(createForm.value)"
+              />
+
+              <span
+                style="
+                  color: #333;
+                  font-size: 12px;
+                  margin-left: 3px;
+                ">
+                %
+              </span>
+            </div>
+
+          </button>
+
         </form>
       </button>
 
       <!-- Select Customer -->
-      <!-- Searchable Select Customer -->
-<div class="customer-selector">
-
-  <label class="customer-label">
-    <i class="fa fa-user"></i>
-    Select Customer
-  </label>
-
-  <div class="customer-search-wrapper">
-
-    <!-- Search Input -->
-    <div class="input-group">
-
-      <input
-        type="text"
-        class="form-control customer-search-input"
-        placeholder="Search customer..."
-        [(ngModel)]="customerSearchTerm"
-        (input)="filterCustomers()"
-        (focus)="openCustomerDropdown()"
-        autocomplete="off"
-      />
-
-      <button
-        type="button"
-        class="btn btn-light"
-        *ngIf="customerSearchTerm"
-        (click)="clearCustomerSelection()">
-        <i class="fa fa-times"></i>
-      </button>
-
-    </div>
-
-
-    <!-- Customer Dropdown -->
-    <div
-      class="customer-dropdown"
-      *ngIf="showCustomerDropdown">
-
-      <!-- No customers -->
-      <div
-        class="customer-dropdown-empty"
-        *ngIf="filteredCustomers.length === 0">
-
-        <i class="fa fa-user-times"></i>
-
-        <span>
-          No customer found
-        </span>
-
-      </div>
-
-
-      <!-- Customers -->
-      <div
-        class="customer-option"
-        *ngFor="let customer of filteredCustomers"
-        (mousedown)="selectCustomer(customer.id)">
-
-        <div class="customer-name">
-          <i class="fa fa-user-circle"></i>
-
-          <strong>
-            {{ customer.firstname }} {{ customer.lastname }}
-          </strong>
+      <div class="customer-selector" style="margin-top: 10px; width: 100%;">
+        <label class="customer-label">
+          <i class="fa fa-user"></i>
+          Select Customer
+        </label>
+        <div class="customer-search-wrapper">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control customer-search-input"
+              placeholder="Search customer..."
+              [(ngModel)]="customerSearchTerm"
+              (input)="filterCustomers()"
+              (focus)="openCustomerDropdown()"
+              autocomplete="off"
+            />
+            <button
+              type="button"
+              class="btn btn-light"
+              *ngIf="customerSearchTerm"
+              (click)="clearCustomerSelection()">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <div
+            class="customer-dropdown"
+            *ngIf="showCustomerDropdown">
+            <div
+              class="customer-dropdown-empty"
+              *ngIf="filteredCustomers.length === 0">
+              <i class="fa fa-user-times"></i>
+              <span>No customer found</span>
+            </div>
+            <div
+              class="customer-option"
+              *ngFor="let customer of filteredCustomers"
+              (mousedown)="selectCustomer(customer.id)">
+              <div class="customer-name">
+                <i class="fa fa-user-circle"></i>
+                <strong>{{ customer.firstname }} {{ customer.lastname }}</strong>
+              </div>
+              <div class="customer-details">
+                <span *ngIf="customer.customer_id">ID: {{ customer.customer_id }}</span>
+                <span *ngIf="customer.phone">📱 {{ customer.phone }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div class="customer-details">
-
-          <span *ngIf="customer.customer_id">
-            ID: {{ customer.customer_id }}
-          </span>
-
-          <span *ngIf="customer.phone">
-            📱 {{ customer.phone }}
-          </span>
-
-        </div>
-
       </div>
-
-    </div>
-
-  </div>
-
-</div>
-      <button class="btn btn-success" (click)="openPopup4()">Add New</button>
-
+      <button class="btn btn-success" (click)="openPopup4()" style="margin-top: 10px;">Add New</button>
+      
       <!-- Notes -->
-      <form [formGroup]="createForm" style="width: 100%;">
+      <form [formGroup]="createForm" style="width: 100%; margin-top: 10px;">
         <textarea formControlName="note" placeholder="Add notes..." class="form-control" rows="2" style="margin-top: 10px; color: black;"></textarea>
+     
+     
       </form>
 
-      <!-- Payment Method -->
-      
+      <!-- Held Carts Section -->
+      <h5 class="mt-4">Held Carts</h5>
+      <ul class="list-group" *ngIf="heldCarts.length > 0; else noHeldCarts">
+        <li *ngFor="let cart of heldCarts" class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <input type="checkbox" (change)="toggleSelection(cart.id)" *ngIf="admin">
+            <span class="ms-2">Cart #{{ cart.id }} - ₵{{ cart.total | number: '1.2-2' }}</span>
+            <span *ngIf="cart.balance && +cart.balance > 0" class="badge badge-warning ms-1">
+              Balance: ₵{{ +cart.balance | number:'1.2-2' }}
+            </span>
+            <span class="badge">{{ cart.customer }}</span>
+          </div>
+          <div class="btn-group">
+            <button 
+              class="btn btn-info btn-sm" 
+              (click)="loadHeldCart(cart.id)" 
+              [disabled]="cartItems.length > 0">
+              Load
+            </button>
+            <button 
+              class="btn btn-warning btn-sm" 
+              (click)="printBill(cart.id)">
+              Print bill
+            </button>
+          </div>
+        </li>
+      </ul>
 
-      <!-- Discount -->
-      <button class="btn btn-info" [disabled]="!(cashier || admin)" style="padding: 5px; display: inline-flex; align-items: center;display: none;">
-        <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
-          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Discount</label>
-          <select formControlName="discount" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px;" (change)="calDiscount(createForm.value)">
-            <option value="0">0%</option>
-            <option value="1">1%</option>
-            <option value="2">2%</option>
-            <option value="3">3%</option>
-            <option value="4">4%</option>
-            <option value="5">5%</option>
-            <option value="6">6%</option>
-            <option value="7">7%</option>
-            <option value="8">8%</option>
-            <option value="9">9%</option>
-            <option value="10">10%</option>
-          </select>
-        </form>
+      <!-- Merge Selected Orders -->
+      <button class="btn btn-primary mt-3" (click)="mergeSelectedOrders()" [disabled]="selectedCartIds.length === 0" *ngIf="admin">
+        Merge Selected Orders
       </button>
 
-      <!-- Pay Buttons -->
-      <!-- <button class="btn btn-success"
-        *ngIf="isHeldOrder"
-        (click)="openPaymentModal('payOrderTwo')"
-        [disabled]="cartItems.length === 0 || !(cashier || admin)">
-        Pay (₵{{ (existingBalance > 0 ? existingBalance : total) | number:'1.2-2' }})
-      </button>
+      <ng-template #noHeldCarts>
+        <p class="text-muted">No held carts available.</p>
+      </ng-template>
 
-      <button class="btn btn-success"
-        *ngIf="!isHeldOrder"
-        (click)="openPaymentModal('payOrder')"
-        [disabled]="cartItems.length === 0 || !(cashier || admin)">
-        Pay (₵{{ total | number:'1.2-2' }})
-      </button>
-    </div> -->
-
-    <!-- Held Carts Section -->
-    <h5 class="mt-4">Held Carts</h5>
-    <ul class="list-group" *ngIf="heldCarts.length > 0; else noHeldCarts">
-      <li *ngFor="let cart of heldCarts" class="list-group-item d-flex justify-content-between align-items-center">
-        <div>
-          <input type="checkbox" (change)="toggleSelection(cart.id)" *ngIf="admin">
-          <span class="ms-2">Cart #{{ cart.id }} - ₵{{ cart.total | number: '1.2-2' }}</span>
-          <span *ngIf="cart.balance && +cart.balance > 0" class="badge badge-warning ms-1">
-            Balance: ₵{{ +cart.balance | number:'1.2-2' }}
-          </span>
-          <span class="badge" [ngClass]="{
-            'badge-success': cart.paid_status === 'Success',
-            'badge-warning': cart.paid_status === 'Partial',
-            'badge-secondary': cart.paid_status === 'Pending'
-          }">{{ cart.paid_status || 'Pending' }}</span>
-        </div>
-        <div class="btn-group">
-          <button 
-            class="btn btn-info btn-sm" 
-            (click)="loadHeldCart(cart.id)" 
-            [disabled]="cartItems.length > 0">
-            Load
+      <!-- Sales Report Section -->
+      <div class="sales-report-section mt-4">
+        <div class="sales-header">
+          <h4><i class="fa fa-bar-chart"></i> Sales Report</h4>
+          <button class="btn btn-info btn-sm" (click)="toggleSalesReport()">
+            <i class="fa" [ngClass]="{'fa-chevron-down': !showSalesReport, 'fa-chevron-up': showSalesReport}"></i>
+            {{ showSalesReport ? 'Hide' : 'Show' }} Report
           </button>
-          <!-- <button *ngIf="cart.balance && +cart.balance > 0" 
-                  class="btn btn-warning btn-sm" 
-                  (click)="loadHeldCart(cart.id); openPaymentModal('payOrder')">
-            Pay ₵{{ +cart.balance | number:'1.2-2' }}
-          </button> -->
-        </div>
-      </li>
-    </ul>
-
-    <!-- Merge Selected Orders -->
-    <button class="btn btn-primary mt-3" (click)="mergeSelectedOrders()" [disabled]="selectedCartIds.length === 0" *ngIf="admin">
-      Merge Selected Orders
-    </button>
-
-    <ng-template #noHeldCarts>
-      <p class="text-muted">No held carts available.</p>
-    </ng-template>
-
-    <!-- Orders List -->
-    <ul class="list-group" *ngIf="showOrders && orders.length > 0; else noOrders">
-      <li *ngFor="let order of orders" class="list-group-item d-flex justify-content-between">
-        <span>Order #{{ order.id }} - Status: <strong>{{ order.order_status }}</strong></span>
-      </li>
-    </ul>
-
-    <ng-template #noOrders>
-      <!-- No orders message -->
-    </ng-template>
-
-    <!-- Sales Report Section -->
-    <div class="sales-report-section mt-4">
-      <div class="sales-header">
-        <h4><i class="fa fa-bar-chart"></i> Sales Report</h4>
-        <button class="btn btn-info btn-sm" (click)="toggleSalesReport()">
-          <i class="fa" [ngClass]="{'fa-chevron-down': !showSalesReport, 'fa-chevron-up': showSalesReport}"></i>
-          {{ showSalesReport ? 'Hide' : 'Show' }} Report
-        </button>
-      </div>
-
-      <div *ngIf="showSalesReport">
-        <div class="date-filter-group">
-          <div class="quick-filters">
-            <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('today')" [class.active]="salesFilterType === 'today'">
-              <i class="fa fa-calendar"></i> Today
-            </button>
-            <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('yesterday')" [class.active]="salesFilterType === 'yesterday'">
-              <i class="fa fa-calendar-minus-o"></i> Yesterday
-            </button>
-            <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('week')" [class.active]="salesFilterType === 'week'">
-              <i class="fa fa-calendar-week"></i> This Week
-            </button>
-            <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('month')" [class.active]="salesFilterType === 'month'">
-              <i class="fa fa-calendar"></i> This Month
-            </button>
-          </div>
-
-          <div class="custom-date-range">
-            <div class="date-input-group">
-              <label><i class="fa fa-calendar"></i> From:</label>
-              <input type="date" [(ngModel)]="salesDateFrom" class="form-control form-control-sm" />
-            </div>
-            <div class="date-input-group">
-              <label><i class="fa fa-calendar"></i> To:</label>
-              <input type="date" [(ngModel)]="salesDateTo" class="form-control form-control-sm" />
-            </div>
-            <button class="btn btn-success btn-sm" (click)="getSalesReport()" [disabled]="isLoadingSales">
-              <i class="fa" [ngClass]="{'fa-spinner fa-spin': isLoadingSales, 'fa-search': !isLoadingSales}"></i>
-              {{ isLoadingSales ? 'Loading...' : 'Generate Report' }}
-            </button>
-            <button class="btn btn-primary btn-sm" (click)="printSalesReport()" [disabled]="!salesReport">
-              <i class="fa fa-print"></i> Print
-            </button>
-          </div>
         </div>
 
-        <!-- Summary Cards -->
-        <div *ngIf="salesReport && !isLoadingSales" class="summary-cards">
-          <div class="summary-card" style="border-left-color: #27ae60;">
-            <div class="card-icon"><i class="fa fa-credit-card" style="color: #27ae60;"></i></div>
-            <div class="card-content">
-              <div class="card-label">Total Sales</div>
-              <div class="card-value">₵{{ totalSales | number:'1.2-2' }}</div>
+        <div *ngIf="showSalesReport">
+          <div class="date-filter-group">
+            <div class="quick-filters">
+              <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('today')" [class.active]="salesFilterType === 'today'">
+                <i class="fa fa-calendar"></i> Today
+              </button>
+              <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('yesterday')" [class.active]="salesFilterType === 'yesterday'">
+                <i class="fa fa-calendar-minus-o"></i> Yesterday
+              </button>
+              <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('week')" [class.active]="salesFilterType === 'week'">
+                <i class="fa fa-calendar-week"></i> This Week
+              </button>
+              <button class="btn btn-outline-primary btn-sm" (click)="setSalesDateFilter('month')" [class.active]="salesFilterType === 'month'">
+                <i class="fa fa-calendar"></i> This Month
+              </button>
             </div>
-          </div>
-          <div class="summary-card" style="border-left-color: #3498db;">
-            <div class="card-icon"><i class="fa fa-shopping-cart" style="color: #3498db;"></i></div>
-            <div class="card-content">
-              <div class="card-label">Total Orders</div>
-              <div class="card-value">{{ totalOrders }}</div>
-            </div>
-          </div>
-          <div class="summary-card" style="border-left-color: #f39c12;">
-            <div class="card-icon"><i class="fa fa-calculator" style="color: #f39c12;"></i></div>
-            <div class="card-content">
-              <div class="card-label">Average Order</div>
-              <div class="card-value">₵{{ averageOrder | number:'1.2-2' }}</div>
-            </div>
-          </div>
-          <div class="summary-card" style="border-left-color: #9b59b6;">
-            <div class="card-icon"><i class="fa fa-users" style="color: #9b59b6;"></i></div>
-            <div class="card-content">
-              <div class="card-label">Unique Customers</div>
-              <div class="card-value">{{ uniqueCustomers }}</div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Balance Summary -->
-        <div *ngIf="salesReport && !isLoadingSales" class="balance-summary-cards">
-          <div class="summary-card" style="border-left-color: #e74c3c;">
-            <div class="card-icon"><i class="fa fa-exclamation-triangle" style="color: #e74c3c;"></i></div>
-            <div class="card-content">
-              <div class="card-label">Total Balance</div>
-              <div class="card-value" style="color: #e74c3c;">₵{{ totalBalance | number:'1.2-2' }}</div>
+            <div class="custom-date-range">
+              <div class="date-input-group">
+                <label><i class="fa fa-calendar"></i> From:</label>
+                <input type="date" [(ngModel)]="salesDateFrom" class="form-control form-control-sm" />
+              </div>
+              <div class="date-input-group">
+                <label><i class="fa fa-calendar"></i> To:</label>
+                <input type="date" [(ngModel)]="salesDateTo" class="form-control form-control-sm" />
+              </div>
+              <button class="btn btn-success btn-sm" (click)="getSalesReport()" [disabled]="isLoadingSales">
+                <i class="fa" [ngClass]="{'fa-spinner fa-spin': isLoadingSales, 'fa-search': !isLoadingSales}"></i>
+                {{ isLoadingSales ? 'Loading...' : 'Generate Report' }}
+              </button>
+              <button class="btn btn-primary btn-sm" (click)="printSalesReport()" [disabled]="!salesReport">
+                <i class="fa fa-print"></i> Print
+              </button>
             </div>
           </div>
-          <div class="summary-card" style="border-left-color: #27ae60;">
-            <div class="card-icon"><i class="fa fa-check-circle" style="color: #27ae60;"></i></div>
-            <div class="card-content">
-              <div class="card-label">Total Collected</div>
-              <div class="card-value" style="color: #27ae60;">₵{{ totalCollected | number:'1.2-2' }}</div>
+
+          <!-- Customer Filter -->
+          <div class="customer-filter-section">
+            <div class="customer-filter-wrapper">
+              <label class="filter-label">
+                <i class="fa fa-user"></i> Filter by Customer
+              </label>
+              <div class="customer-search-wrapper">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm customer-search-input"
+                    placeholder="Search customer..."
+                    [(ngModel)]="salesCustomerSearchTerm"
+                    (input)="filterSalesCustomers()"
+                    (focus)="openSalesCustomerDropdown()"
+                    autocomplete="off"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-light btn-sm"
+                    *ngIf="salesCustomerSearchTerm"
+                    (click)="clearSalesCustomerFilter()">
+                    <i class="fa fa-times"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    *ngIf="salesCustomerFilter"
+                    (click)="clearSalesCustomerFilter()">
+                    <i class="fa fa-filter"></i> Clear
+                  </button>
+                </div>
+                <div
+                  class="customer-dropdown"
+                  *ngIf="showSalesCustomerDropdown">
+                  <div
+                    class="customer-dropdown-empty"
+                    *ngIf="filteredSalesCustomers.length === 0">
+                    <i class="fa fa-user-times"></i>
+                    <span>No customer found</span>
+                  </div>
+                  <div
+                    class="customer-option"
+                    *ngFor="let customer of filteredSalesCustomers"
+                    (mousedown)="selectSalesCustomer(customer)">
+                    <div class="customer-name">
+                      <i class="fa fa-user-circle"></i>
+                      <strong>{{ customer.firstname }} {{ customer.lastname }}</strong>
+                    </div>
+                    <div class="customer-details">
+                      <span *ngIf="customer.customer_id">ID: {{ customer.customer_id }}</span>
+                      <span *ngIf="customer.phone">📱 {{ customer.phone }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="salesCustomerFilter" class="active-filter-badge">
+                <span class="badge badge-info">
+                  <i class="fa fa-user"></i> 
+                  {{ getCustomerName(salesCustomerFilter) }}
+                  <button class="btn-remove-filter" (click)="clearSalesCustomerFilter()">✕</button>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Daily Breakdown -->
-        <div *ngIf="salesReport && !isLoadingSales" class="daily-breakdown">
-          <div class="breakdown-header">
-            <h6><i class="fa fa-calendar"></i> Daily Breakdown</h6>
-            <span class="breakdown-total">Total: ₵{{ totalSales | number:'1.2-2' }}</span>
+          <!-- Summary Cards -->
+          <div *ngIf="salesReport && !isLoadingSales" class="summary-cards">
+            <div class="summary-card" style="border-left-color: #27ae60;">
+              <div class="card-icon"><i class="fa fa-credit-card" style="color: #27ae60;"></i></div>
+              <div class="card-content">
+                <div class="card-label">Total Sales</div>
+                <div class="card-value">₵{{ totalSales | number:'1.2-2' }}</div>
+              </div>
+            </div>
+            <div class="summary-card" style="border-left-color: #3498db;">
+              <div class="card-icon"><i class="fa fa-shopping-cart" style="color: #3498db;"></i></div>
+              <div class="card-content">
+                <div class="card-label">Total Orders</div>
+                <div class="card-value">{{ totalOrders }}</div>
+              </div>
+            </div>
+            <div class="summary-card" style="border-left-color: #f39c12;">
+              <div class="card-icon"><i class="fa fa-calculator" style="color: #f39c12;"></i></div>
+              <div class="card-content">
+                <div class="card-label">Average Order</div>
+                <div class="card-value">₵{{ averageOrder | number:'1.2-2' }}</div>
+              </div>
+            </div>
+            <div class="summary-card" style="border-left-color: #9b59b6;">
+              <div class="card-icon"><i class="fa fa-users" style="color: #9b59b6;"></i></div>
+              <div class="card-content">
+                <div class="card-label">Unique Customers</div>
+                <div class="card-value">{{ uniqueCustomers }}</div>
+              </div>
+            </div>
           </div>
-          <div class="table-responsive">
-            <table class="table table-sm table-bordered">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Orders</th>
-                  <th>Total Sales</th>
-                  <th>Balance</th>
-                  <th>Collected</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let day of salesReport.daily_breakdown | keyvalue" class="daily-row">
-                  <td>{{ day.key }}</td>
-                  <td><span class="badge badge-info">{{ day.value.count }}</span></td>
-                  <td><strong>₵{{ day.value.total | number:'1.2-2' }}</strong></td>
-                  <td><span class="badge badge-warning">₵{{ day.value.balance | number:'1.2-2' }}</span></td>
-                  <td><span class="badge badge-success">₵{{ day.value.collected | number:'1.2-2' }}</span></td>
-                </tr>
-                <tr class="total-row" *ngIf="(salesReport.daily_breakdown | keyvalue).length > 0">
-                  <td><strong>Total</strong></td>
-                  <td><strong>{{ totalOrders }}</strong></td>
-                  <td><strong>₵{{ totalSales | number:'1.2-2' }}</strong></td>
-                  <td><strong>₵{{ totalBalance | number:'1.2-2' }}</strong></td>
-                  <td><strong>₵{{ totalCollected | number:'1.2-2' }}</strong></td>
-                </tr>
-              </tbody>
-            </table>
+
+          <!-- Balance Summary -->
+          <div *ngIf="salesReport && !isLoadingSales" class="balance-summary-cards">
+            <div class="summary-card" style="border-left-color: #e74c3c;">
+              <div class="card-icon"><i class="fa fa-exclamation-triangle" style="color: #e74c3c;"></i></div>
+              <div class="card-content">
+                <div class="card-label">Total Balance</div>
+                <div class="card-value" style="color: #e74c3c;">₵{{ totalBalance | number:'1.2-2' }}</div>
+              </div>
+            </div>
+            <div class="summary-card" style="border-left-color: #27ae60;">
+              <div class="card-icon"><i class="fa fa-check-circle" style="color: #27ae60;"></i></div>
+              <div class="card-content">
+                <div class="card-label">Total Collected</div>
+                <div class="card-value" style="color: #27ae60;">₵{{ totalCollected | number:'1.2-2' }}</div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <!-- Recent Orders -->
-        <div *ngIf="salesReport && !isLoadingSales" class="recent-orders">
-          <h6><i class="fa fa-list"></i> Recent Orders</h6>
-          <div class="table-responsive">
-            <table class="table table-sm table-bordered">
-              <thead>
-                <tr>
-                  <th>Order #</th>
-                  <th>Customer</th>
-                  <th>Total</th>
-                  <th>Balance</th>
-                  <th>Date</th>
-                  <th>Payment Status</th>
-                  <th>Attendant</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                 <!-- | slice:0:10 -->
-                <tr *ngFor="let order of salesReport.orders" class="order-row">
-                  <td>#{{ order.id }}</td>
-                  <td>{{ order.customer || 'Walk-in' }}</td>
-                  <td><strong>₵{{ order.total | number:'1.2-2' }}</strong></td>
-                  <td *ngIf="order.balance && +order.balance > 0; else noBalance">
-                    <span class="badge badge-warning">₵{{ +order.balance | number:'1.2-2' }}</span>
-                  </td>
-                  <ng-template #noBalance>
-                    <td><span class="badge badge-success">Paid</span></td>
-                  </ng-template>
-                  <td>{{ order.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-                  <td>
-                    <span class="badge" [ngClass]="{
-                      'badge-success': order.paid_status === 'Success',
-                      'badge-warning': order.paid_status === 'Partial'
-                    }">
-                      {{ order.paid_status }}
-                    </span>
-                  </td>
-                  <td>{{ order.working_on || 'N/A' }}</td>
-                  <td>
-                    <span class="badge" [ngClass]="{
-                      'badge-info': order.status === 'Printed',
-                      'badge-warning': order.status === 'Processing',
-                      'badge-secondary': order.status === 'Cutting',
-                        'badge-primary': order.status === 'ready for pickup',
-                      'badge-success': order.status === 'Delivered',
-                      'badge-danger': order.status === 'Cancelled'
-                    }">
-                      {{ order.status }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <small class="text-muted" *ngIf="salesReport.orders.length > 10">
-              Showing 10 of {{ salesReport.orders.length }} orders
-            </small>
+          <!-- Daily Breakdown -->
+          <div *ngIf="salesReport && !isLoadingSales" class="daily-breakdown">
+            <div class="breakdown-header">
+              <h6><i class="fa fa-calendar"></i> Daily Breakdown</h6>
+              <span class="breakdown-total">Total: ₵{{ totalSales | number:'1.2-2' }}</span>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Orders</th>
+                    <th>Total Sales</th>
+                    <th>Balance</th>
+                    <th>Collected</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="salesReport?.daily_breakdown && getSortedDateKeys(salesReport.daily_breakdown).length > 0">
+                    <tr *ngFor="let day of getSortedDateKeys(salesReport.daily_breakdown)" class="daily-row">
+                      <td>{{ day }}</td>
+                      <td><span class="badge badge-info">{{ salesReport.daily_breakdown[day]?.count || 0 }}</span></td>
+                      <td><strong>₵{{ salesReport.daily_breakdown[day]?.total || 0 | number:'1.2-2' }}</strong></td>
+                      <td><span class="badge badge-warning">₵{{ salesReport.daily_breakdown[day]?.balance || 0 | number:'1.2-2' }}</span></td>
+                      <td><span class="badge badge-success">₵{{ salesReport.daily_breakdown[day]?.collected || 0 | number:'1.2-2' }}</span></td>
+                    </tr>
+                  </ng-container>
+                  <tr *ngIf="!salesReport?.daily_breakdown || getSortedDateKeys(salesReport.daily_breakdown).length === 0">
+                    <td colspan="5" class="text-center text-muted">No daily data available</td>
+                  </tr>
+                  <tr class="total-row" *ngIf="salesReport?.daily_breakdown && getSortedDateKeys(salesReport.daily_breakdown).length > 0">
+                    <td><strong>Total</strong></td>
+                    <td><strong>{{ totalOrders }}</strong></td>
+                    <td><strong>₵{{ totalSales | number:'1.2-2' }}</strong></td>
+                    <td><strong>₵{{ totalBalance | number:'1.2-2' }}</strong></td>
+                    <td><strong>₵{{ totalCollected | number:'1.2-2' }}</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-        <div *ngIf="!salesReport && !isLoadingSales" class="no-data">
-          <i class="fa fa-inbox fa-3x" style="color: #bdc3c7;"></i>
-          <p>No sales data available. Select a date range and generate report.</p>
-        </div>
+          <!-- Recent Orders -->
+          <div *ngIf="salesReport && !isLoadingSales" class="recent-orders">
+            <h6><i class="fa fa-list"></i> Recent Orders</h6>
+            <div class="table-responsive">
+              <table class="table table-sm table-bordered">
+                <thead>
+                  <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Balance</th>
+                    <th>Date</th>
+                    <th>Payment Status</th>
+                    <th>Attendant</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="salesReport?.orders && salesReport.orders.length > 0">
+                    <tr *ngFor="let order of getSortedOrders()" class="order-row">
+                      <td>#{{ order.id }}  <button 
+                          class="btn btn-warning btn-group btn-sm" 
+                          (click)="printBill(order.id)">
+                          Print bill
+                        </button></td>
+                       {{ order.customer || 'Walk-in' }}
+                      <td><strong>₵{{ order.total | number:'1.2-2' }}</strong></td>
+                      <td *ngIf="order.balance && +order.balance > 0; else noBalance">
+                        <span class="badge badge-warning">₵{{ +order.balance | number:'1.2-2' }}</span>
+                      </td>
+                      <ng-template #noBalance>
+                        <td><span class="badge badge-success">Paid</span></td>
+                      </ng-template>
+                      <td>{{ order.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+                      <td>
+                        <span class="badge" [ngClass]="{
+                          'badge-success': order.paid_status === 'Success',
+                          'badge-warning': order.paid_status === 'Partial'
+                        }">
+                          {{ order.paid_status }}
+                        </span>
+                      </td>
+                      <td>{{ order.waiter || 'N/A' }}</td>
+                      <td>
+                        <span class="badge" [ngClass]="{
+                          'badge-info': order.status === 'Printed',
+                          'badge-warning': order.status === 'Processing',
+                          'badge-secondary': order.status === 'Cutting',
+                          'badge-primary': order.status === 'ready for pickup',
+                          'badge-success': order.status === 'Delivered',
+                          'badge-danger': order.status === 'Cancelled'
+                        }">
+                          {{ order.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  <tr *ngIf="!salesReport?.orders || salesReport.orders.length === 0">
+                    <td colspan="9" class="text-center text-muted">No orders found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-        <div *ngIf="salesReport && salesReport.orders.length === 0 && !isLoadingSales" class="no-data">
-          <i class="fa fa-inbox fa-3x" style="color: #bdc3c7;"></i>
-          <p>No orders found for the selected date range.</p>
+          <div *ngIf="!salesReport && !isLoadingSales" class="no-data">
+            <i class="fa fa-inbox fa-3x" style="color: #bdc3c7;"></i>
+            <p>No sales data available. Select a date range and generate report.</p>
+          </div>
+
+          <div *ngIf="salesReport && salesReport.orders && salesReport.orders.length === 0 && !isLoadingSales" class="no-data">
+            <i class="fa fa-inbox fa-3x" style="color: #bdc3c7;"></i>
+            <p>No orders found for the selected date range.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -662,59 +746,106 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Add Customer</h5>
+          <h5 class="modal-title">Add / Update Customer</h5>
           <i class="fa fa-close" (click)="closePopup()"></i>
         </div>
         <div class="modal-body">
+          <!-- Customer Exists Alert -->
+          <div *ngIf="customerExists && existingCustomer" class="customer-exists-alert">
+            <div class="check-icon">✓</div>
+            <div>
+              <strong>Customer already exists!</strong>
+              <div class="existing-customer-name">
+                {{ existingCustomer.firstname || '' }} {{ existingCustomer.lastname || '' }}
+              </div>
+              <small>Phone: {{ existingCustomer.phone || 'N/A' }} | Email: {{ existingCustomer.email || 'N/A' }}</small>
+            </div>
+          </div>
+
           <form [formGroup]="createForm" (ngSubmit)="addCustomer(createForm.value)">
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group">
+                  <label>Customer ID</label>
+                  <input
+                    type="text"
+                    formControlName="customer_new_id"
+                    class="form-control"
+                    placeholder="Auto-generated"
+                    readonly
+                    style="background: #f5f5f5;"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>First Name *</label>
                   <input
                     type="text"
                     formControlName="firstname"
                     class="form-control"
                     placeholder="Enter first name"
+               
+                    required
                   />
                 </div>
                 <div class="form-group">
+                  <label>Last Name *</label>
                   <input
                     type="text"
                     formControlName="lastname"
                     class="form-control"
                     placeholder="Enter last name"
+             
+                    required
                   />
                 </div>
                 <div class="form-group">
-                  <input
-                    type="text"
-                    formControlName="email"
-                    class="form-control"
-                    placeholder="Enter email"
-                  />
-                </div>
-                <div class="form-group">
+                  <label>Phone Number *</label>
                   <input
                     type="text"
                     formControlName="phone"
                     class="form-control"
                     placeholder="Enter phone number"
+                    (input)="onCustomerFieldChange()"
+                    required
                   />
                 </div>
                 <div class="form-group">
+                  <label>Email</label>
                   <input
-                    type="text"
-                    formControlName="customer_new_id" style="display: none;"
-                   
+                    type="email"
+                    formControlName="email"
                     class="form-control"
+                    placeholder="Enter email"
+                    (input)="onCustomerFieldChange()"
                   />
-                  <!-- <button type="button" class="btn btn-info btn-sm mt-1" (click)="generateId()">Generate ID</button> -->
                 </div>
               </div>
             </div>
             <div class="row">
               <div class="update ml-auto mr-auto">
-                <button type="submit" class="btn btn-primary btn-round">Submit</button>
+       <button
+  type="submit"
+  class="btn btn-primary btn-round"
+  [disabled]="isUpdatingCustomer"
+>
+  <i
+    class="fa"
+    [ngClass]="{
+      'fa-spinner fa-spin': isUpdatingCustomer,
+      'fa-user-plus': !isUpdatingCustomer
+    }"
+  ></i>
+
+  {{ customerExists ? 'Update Customer' : 'Add Customer' }}
+</button>
+
+                <button 
+                  *ngIf="customerExists" 
+                  type="button" 
+                  class="btn btn-danger btn-round ml-2" 
+                  (click)="resetCustomerForm()">
+                  <i class="fa fa-times"></i> Cancel
+                </button>
               </div>
             </div>
           </form>
@@ -810,20 +941,154 @@
     </div>
   </div>
 
-  <!-- ===================== PAYMENT MODAL - FIXED ===================== -->
+  <!-- Payment Modal -->
   <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{ 'display': showPaymentModal ? 'block' : 'none' }">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">
             <i class="fa fa-credit-card" style="color: #27ae60;"></i> 
-            {{ currentPaymentMethod === 'holdAndPay' ? 'Hold & Pay' : 'Payment Details' }}
+            {{ currentPaymentMethod === 'holdAndPay' ? 'Hold & Pay' : 
+               currentPaymentMethod === 'paymentCart' ? 'Payment Cart Checkout' : 'Payment Details' }}
           </h5>
           <i class="fa fa-close" (click)="closePaymentModal()"></i>
         </div>
         <div class="modal-body">
+          <!-- Payment Cart Summary -->
+      <!-- Payment Cart Section -->
+<div class="payment-cart-section mt-3" *ngIf="getPaymentCartCount() > 0 || showPaymentCart" style="width: 100%;">
+  <div class="payment-cart-header" (click)="togglePaymentCart()" style="cursor: pointer; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; border: 1px solid #dee2e6;">
+    <h5 class="d-flex justify-content-between align-items-center" style="margin: 0;">
+      <span>
+        <i class="fa fa-shopping-bag"></i> Payment Cart
+        <span class="badge badge-primary">{{ getPaymentCartCount() }}</span>
+      </span>
+      <span>
+        Total: ₵{{ paymentCartTotal | number:'1.2-2' }}
+        <i class="fa" [ngClass]="{'fa-chevron-down': !showPaymentCart, 'fa-chevron-up': showPaymentCart}"></i>
+      </span>
+    </h5>
+  </div>
+
+  <div *ngIf="showPaymentCart" class="payment-cart-body" style="padding: 10px 5px; border: 1px solid #dee2e6; border-top: none; border-radius: 0 0 6px 6px; background: white;">
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Amount to Pay</th>
+            <th>Balance</th>
+            <th>Quick Actions</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of paymentCart; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>
+              {{ getCustomerName(order.customer) || 'Walk-in' }}
+              <small *ngIf="order.note" class="d-block text-muted" style="font-size: 10px;">
+                📝 {{ order.note }}
+              </small>
+              <small *ngIf="order.existingBalance > 0" class="d-block text-warning" style="font-size: 10px;">
+                Balance Due: ₵{{ order.existingBalance | number:'1.2-2' }}
+              </small>
+            </td>
+            <td>
+              {{ order.cartItems.length }} item(s)
+              <span *ngIf="order.discount > 0" class="badge badge-info" style="font-size: 9px;">
+                {{ order.discount }}% off
+              </span>
+            </td>
+            <td>₵{{ order.total | number:'1.2-2' }}</td>
+            <td>
+              <div class="input-group input-group-sm">
+                <span class="input-group-addon">₵</span>
+                <input 
+                  type="number" 
+                  class="form-control form-control-sm" 
+                  [value]="getOrderAmountToPay(order.id)"
+                  (input)="updatePaymentCartOrderAmount(order.id, $event.target.value)"
+                  min="0.01"
+                  step="0.01"
+                  style="width: 80px;"
+                  [max]="order.total"
+                />
+              </div>
+            </td>
+            <td>
+              <span *ngIf="getOrderBalance(order.id) > 0" class="badge badge-warning">
+                ₵{{ getOrderBalance(order.id) | number:'1.2-2' }}
+              </span>
+              <!-- <span *ngIf="getOrderBalance(order.id) <= 0" class="badge badge-success">
+                ✅ Paid
+              </span> -->
+            </td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <button 
+                  class="btn btn-outline-success" 
+                  (click)="setOrderFullPayment(order.id)"
+        
+                  title="Set full payment">
+                  Full
+                </button>
+                <button 
+                  class="btn btn-outline-warning" 
+                  (click)="setOrderHalfPayment(order.id)"
+        
+                  title="Set half payment">
+                  Half
+                </button>
+              </div>
+            </td>
+            <td>
+              <button 
+                class="btn btn-danger btn-sm" 
+                (click)="removeFromPaymentCart(i)"
+                title="Remove from payment cart">
+                <i class="fa fa-times"></i>
+              </button>
+            </td>
+          </tr>
+          <tr class="table-active">
+            <td colspan="3"><strong>Total</strong></td>
+            <td><strong>₵{{ paymentCartTotal | number:'1.2-2' }}</strong></td>
+            <td colspan="4">
+              <strong>Total to Pay: ₵{{ getPaymentCartTotalToPay() | number:'1.2-2' }}</strong>
+              <span *ngIf="getPaymentCartTotalBalance() > 0" class="badge badge-warning ms-2">
+                Balance: ₵{{ getPaymentCartTotalBalance() | number:'1.2-2' }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="payment-cart-actions" style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+      <!-- <button 
+        class="btn btn-success" 
+        style="flex: 1; min-width: 120px;"
+        (click)="processPaymentCart()"
+        [disabled]="paymentCart.length === 0 || isProcessingPaymentCart || getPaymentCartTotalToPay() <= 0">
+        <i class="fa" [ngClass]="{'fa-spinner fa-spin': isProcessingPaymentCart, 'fa-credit-card': !isProcessingPaymentCart}"></i>
+        {{ isProcessingPaymentCart ? 'Processing...' : 'Pay All Orders' }}
+      </button> -->
+      <button 
+        class="btn btn-danger" 
+        style="flex: 1; min-width: 120px;"
+        (click)="clearPaymentCart()"
+        [disabled]="paymentCart.length === 0">
+        <i class="fa fa-trash"></i> Clear All
+      </button>
+    </div>
+  </div>
+</div>
           <!-- Order Summary -->
-          <div class="payment-summary">
+          <div class="payment-summary" *ngIf="currentPaymentMethod !== 'paymentCart'">
             <div class="summary-row">
               <span class="summary-label">Cart Total:</span>
               <span class="summary-value">₵{{ total | number:'1.2-2' }}</span>
@@ -862,25 +1127,26 @@
                 [(ngModel)]="amountPaid"
                 (ngModelChange)="calculateBalance()"
                 placeholder="Enter amount"
-                min="0.01"
-                step="0.01"
+                
                 id="amountPaidInput"
               />
             </div>
-            <button class="btn btn-info"  style="padding: 5px; display: inline-flex; align-items: center;">
-        <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
-          <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Payment Method  </label>
-          <select formControlName="method" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px;">
-            <option value="Cash">Cash</option>
-            <option value="Mobile Money">MoMo</option>
-            <option value="Mobile Money & Cash">MoMo & Cash</option>
-            <option value="Credit Card">Credit Card</option>
-          </select>
-        </form>
-      </button>
+            <button class="btn btn-info" style="padding: 5px; display: inline-flex; align-items: center; margin-top: 5px;">
+              <form [formGroup]="createForm" style="margin: 0; display: flex; align-items: center; gap: 5px;">
+                <label style="margin: 0; font-size: 12px; font-weight: 600; color: #333;">Payment Method</label>
+                <select formControlName="method" style="color: black; border: 1px solid #ddd; border-radius: 4px; background: white; padding: 4px 8px;">
+                  <option value="Cash">Cash</option>
+                  <option value="Mobile Money">MoMo</option>
+                  <option value="Mobile Money & Cash">MoMo & Cash</option>
+                  <option value="Credit Card">Credit Card</option>
+                </select>
+              </form>
+            </button>
             <small class="text-muted">
               <i class="fa fa-info-circle"></i> 
-              {{ currentPaymentMethod === 'holdAndPay' ? 'Enter amount to pay. Remaining balance will be held.' : 'Enter the amount you want to pay. Remaining balance will be tracked.' }}
+              {{ currentPaymentMethod === 'holdAndPay' ? 'Enter amount to pay. Remaining balance will be held.' : 
+                 currentPaymentMethod === 'paymentCart' ? 'Enter the total amount to pay for all orders.' :
+                 'Enter the amount you want to pay. Remaining balance will be tracked.' }}
             </small>
           </div>
 
@@ -895,7 +1161,7 @@
           </div>
 
           <!-- Full Payment Checkbox -->
-          <div class="full-payment-checkbox">
+          <!-- <div class="full-payment-checkbox">
             <label>
               <input 
                 type="checkbox" 
@@ -905,21 +1171,21 @@
               <span>Pay Full Amount</span>
             </label>
             <span class="badge badge-success" *ngIf="isFullPayment">✅ FULL PAYMENT</span>
-          </div>
+          </div> -->
 
           <!-- Payment Status Messages -->
-          <div *ngIf="isPartialPayment" class="partial-payment-info">
+          <!-- <div *ngIf="isPartialPayment" class="partial-payment-info">
             <i class="fa fa-exclamation-triangle" style="color: #f39c12;"></i>
             <span>Partial payment of <strong>₵{{ amountPaid | number:'1.2-2' }}</strong>. 
             Remaining balance: <strong>₵{{ balance | number:'1.2-2' }}</strong></span>
             <span *ngIf="currentPaymentMethod === 'holdAndPay'" class="badge badge-warning ms-2">Will be held</span>
-          </div>
+          </div> -->
 
-          <div *ngIf="!isPartialPayment && amountPaid > 0" class="full-payment-info">
+          <!-- <div *ngIf="!isPartialPayment && amountPaid > 0" class="full-payment-info">
             <i class="fa fa-check-circle" style="color: #27ae60;"></i>
             <span>Full payment of <strong>₵{{ amountPaid | number:'1.2-2' }}</strong></span>
             <span class="badge badge-success ms-2">Paid in Full</span>
-          </div>
+          </div> -->
 
           <div *ngIf="amountPaid <= 0" class="payment-hint">
             <i class="fa fa-info-circle" style="color: #3498db;"></i>
@@ -930,13 +1196,20 @@
           <button class="btn btn-secondary" (click)="closePaymentModal()">
             <i class="fa fa-times"></i> Cancel
           </button>
+          <button *ngIf="currentPaymentMethod === 'paymentCart'" 
+                  class="btn btn-success" 
+                  (click)="processPaymentCartFromModal()" 
+                  [disabled]="amountPaid <= 0 || amountPaid > paymentCartTotal || isProcessingPaymentCart">
+            <i class="fa" [ngClass]="{'fa-spinner fa-spin': isProcessingPaymentCart, 'fa-check': !isProcessingPaymentCart}"></i>
+            {{ isProcessingPaymentCart ? 'Processing...' : 'Pay All ₵' + (amountPaid | number:'1.2-2') }}
+          </button>
           <button *ngIf="currentPaymentMethod === 'holdAndPay'" 
                   class="btn btn-warning" 
                   (click)="processHoldAndPayFromModal()" 
                   [disabled]="amountPaid < 0 || amountPaid > (total + existingBalance)">
             <i class="fa fa-clock-o"></i> Hold & Pay ₵{{ amountPaid | number:'1.2-2' }}
           </button>
-          <button *ngIf="currentPaymentMethod !== 'holdAndPay'" 
+          <button *ngIf="currentPaymentMethod !== 'holdAndPay' && currentPaymentMethod !== 'paymentCart'" 
                   class="btn btn-success" 
                   (click)="processPayment()" 
                   [disabled]="!amountPaid || amountPaid <= 0 || amountPaid > ((isBalancePayment && existingBalance > 0) ? existingBalance : (total + existingBalance))">

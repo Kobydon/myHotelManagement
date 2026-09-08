@@ -69,6 +69,7 @@ import { SalaryPaymentComponent } from 'app/salary-payment/salary-payment.compon
 import { CustomersComponent } from 'app/customers/customers.component';
 import { HeldCartReportComponent } from 'app/held-cart-report/held-cart-report.component';
 import { SendBulkMessageComponent } from 'app/send-bulk-message/send-bulk-message.component';
+import { MessageReportComponent } from 'app/message-report/message-report.component';
 
 
 
@@ -142,5 +143,6 @@ export const AdminLayoutRoutes: Routes = [
             {path:'salary-template',component:SalaryTemplateComponent},
              {path:'salary-payment',component:SalaryPaymentComponent},
    {path:'bulk-message',component:SendBulkMessageComponent},
+      {path:'message-report',component:MessageReportComponent},
 
 ]

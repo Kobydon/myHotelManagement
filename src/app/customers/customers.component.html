@@ -1,6 +1,7 @@
 <div>
-  <h1>Customer List</h1>
-  <table  class="table table-bordered table-striped">
+  <h1>Customer List total: {{ customers.length }}</h1>
+
+  <table class="table table-bordered table-striped">
     <thead>
       <tr>
         <th>ID</th>
@@ -10,9 +11,11 @@
         <th>Email</th>
         <th>Phone</th>
         <th>Created Date</th>
+        <th>Created by</th>
         <th>Actions</th>
       </tr>
     </thead>
+
     <tbody>
       <tr *ngFor="let customer of customers">
         <td>{{ customer.customer_id }}</td>
@@ -21,24 +24,169 @@
         <td>{{ customer.company_name }}</td>
         <td>{{ customer.email }}</td>
         <td>{{ customer.phone }}</td>
-        <td>{{ customer.created_date }}</td>
+         <td>{{ customer.created_date }}</td>
+        <td>{{ customer.created_by }}</td>
+       
+
         <td>
-          <button (click)="editCustomer(customer.id)" class="btn btn-info btn sm">Edit</button>
-          <button (click)="deleteCustomer(customer.id)" class="btn btn-danger btn-sm">Delete</button>
-          <button (click)="openCouponModal(customer.id)" class="btn btn-primary btn-sm">Apply Coupon</button>
+          <button
+            (click)="editCustomer(customer.id)"
+            class="btn btn-info btn-sm">
+            Edit
+          </button>
+
+          <button
+            (click)="deleteCustomer(customer.id)"
+            class="btn btn-danger btn-sm">
+            Delete
+          </button>
+
+          <button
+            (click)="openCouponModal(customer.id)"
+            class="btn btn-primary btn-sm">
+            Apply Coupon
+          </button>
         </td>
       </tr>
     </tbody>
   </table>
 
-  <!-- Coupon Modal -->
-<div class="modal" *ngIf="isCouponModalOpen">
-  <div class="modal-content">
-    <span class="close" (click)="closeCouponModal()">&times;</span>
-    <h2>Enter Discount Value</h2>
-    <label for="discount">Discount (%): </label>
-    <input type="number" id="discount" [(ngModel)]="discountValue" min="0" max="100" />
-    <button (click)="applyCoupon()">Apply Coupon</button>
+
+  <!-- ========================= -->
+  <!-- EDIT CUSTOMER MODAL       -->
+  <!-- ========================= -->
+
+  <div class="modal" *ngIf="isEditModalOpen">
+
+    <div class="modal-content">
+
+      <span
+        class="close"
+        (click)="closeEditModal()">
+        &times;
+      </span>
+
+      <h2>Edit Customer</h2>
+
+      <div class="form-group">
+        <label for="firstname">First Name</label>
+
+        <input
+          type="text"
+          id="firstname"
+          class="form-control"
+          [(ngModel)]="editingCustomer.firstname"
+        />
+      </div>
+
+
+      <div class="form-group">
+        <label for="lastname">Last Name</label>
+
+        <input
+          type="text"
+          id="lastname"
+          class="form-control"
+          [(ngModel)]="editingCustomer.lastname"
+        />
+      </div>
+
+
+      <div class="form-group">
+        <label for="phone">Phone</label>
+
+        <input
+          type="text"
+          id="phone"
+          class="form-control"
+          [(ngModel)]="editingCustomer.phone"
+        />
+      </div>
+
+
+      <div class="form-group">
+        <label for="email">Email</label>
+
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          [(ngModel)]="editingCustomer.email"
+        />
+      </div>
+
+
+      <div class="form-group">
+        <label for="dob">Date of Birth</label>
+
+        <input
+          type="date"
+          id="dob"
+          class="form-control"
+          [(ngModel)]="editingCustomer.dob"
+        />
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeEditModal()">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="isUpdating"
+          (click)="updateCustomer()">
+
+          {{ isUpdating ? 'Updating...' : 'Update' }}
+
+        </button>
+
+      </div>
+
+    </div>
   </div>
-</div>
+
+
+  <!-- ========================= -->
+  <!-- COUPON MODAL              -->
+  <!-- ========================= -->
+
+  <div class="modal" *ngIf="isCouponModalOpen">
+
+    <div class="modal-content">
+
+      <span
+        class="close"
+        (click)="closeCouponModal()">
+        &times;
+      </span>
+
+      <h2>Enter Discount Value</h2>
+
+      <label for="discount">
+        Discount (%):
+      </label>
+
+      <input
+        type="number"
+        id="discount"
+        [(ngModel)]="discountValue"
+        min="0"
+        max="100"
+      />
+
+      <button
+        (click)="applyCoupon()">
+        Apply Coupon
+      </button>
+
+    </div>
+  </div>
+
 </div>

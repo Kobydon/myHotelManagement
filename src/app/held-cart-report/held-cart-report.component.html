@@ -42,15 +42,6 @@
           </div>
         </div>
         <div class="form-row">
-          <!-- <div class="form-group">
-            <label><i class="fa fa-user-circle"></i> Cashier</label>
-            <select class="form-control" formControlName="cashier" [(ngModel)]="selectedCashier">
-              <option value="">All Cashiers</option>
-              <option *ngFor="let cashier of cashiers" [value]="cashier.firstname + ' ' + cashier.lastname">
-                {{ cashier.firstname }} {{ cashier.lastname }}
-              </option>
-            </select>
-          </div> -->
           <div class="form-group">
             <label><i class="fa fa-building"></i> Department</label>
             <select class="form-control" formControlName="department" [(ngModel)]="selectedDepartment">
@@ -70,6 +61,9 @@
           </button>
           <button class="btn btn-secondary" (click)="clearFilters()">
             <i class="fa fa-times"></i> Clear
+          </button>
+          <button class="btn btn-secondary" (click)="goBack()">
+            <i class="fa fa-arrow-left"></i> Back
           </button>
         </div>
       </form>
@@ -146,6 +140,126 @@
     </div>
   </div>
 
+  <!-- Attendant Breakdown Section -->
+  <div class="attendant-breakdown" *ngIf="filteredData.length > 0">
+    <div class="attendant-header" (click)="toggleAttendantSummary()">
+      <div class="header-left">
+        <i class="fa fa-users"></i>
+        <h4>👥 Attendant Performance</h4>
+        <span class="badge">{{ getAttendantCount() }} Attendants</span>
+        <span class="badge-secondary" *ngIf="selectedAttendant">
+          Filtered: {{ selectedAttendant }}
+          <i class="fa fa-times-circle" (click)="resetAttendantFilter(); $event.stopPropagation()" style="cursor:pointer;margin-left:5px;"></i>
+        </span>
+      </div>
+      <div class="header-right">
+        <span class="total-badge">₵{{ totalCollected | number:'1.2-2' }} Collected</span>
+        <i class="fa" [ngClass]="{'fa-chevron-down': !showAttendantSummary, 'fa-chevron-up': showAttendantSummary}"></i>
+      </div>
+    </div>
+    
+    <div class="attendant-body" *ngIf="showAttendantSummary">
+      <!-- Summary Stats Row -->
+      <div class="attendant-stats-row">
+        <div class="stat-item">
+          <span class="stat-label">Total Attendants</span>
+          <span class="stat-value">{{ getAttendantCount() }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Sales</span>
+          <span class="stat-value">₵{{ totalSales | number:'1.2-2' }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Collected</span>
+          <span class="stat-value text-success">₵{{ totalCollected | number:'1.2-2' }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Total Balance</span>
+          <span class="stat-value text-danger">₵{{ totalBalance | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Attendant Cards Grid -->
+      <div class="attendant-grid">
+        <div *ngFor="let attendant of getAttendantSummary()" 
+             class="attendant-card" 
+             [class.high-performing]="attendant.collection_rate >= 90"
+             [class.medium-performing]="attendant.collection_rate >= 70 && attendant.collection_rate < 90"
+             [class.low-performing]="attendant.collection_rate < 70">
+          
+          <div class="attendant-card-header">
+            <div class="avatar">
+              <i class="fa fa-user-circle"></i>
+            </div>
+            <div class="attendant-info">
+              <h5 class="attendant-name">{{ attendant.name || 'Unassigned' }}</h5>
+              <span class="order-count">{{ attendant.order_count }} orders</span>
+            </div>
+            <div class="performance-badge" [ngClass]="{
+              'excellent': attendant.collection_rate >= 90,
+              'good': attendant.collection_rate >= 70 && attendant.collection_rate < 90,
+              'needs-improvement': attendant.collection_rate < 70
+            }">
+              {{ attendant.collection_rate | number:'1.0-0' }}%
+            </div>
+          </div>
+
+          <div class="attendant-stats">
+            <div class="stat-row">
+              <div class="stat">
+                <span class="stat-icon">💰</span>
+                <div>
+                  <span class="stat-label-small">Sales</span>
+                  <span class="stat-amount">₵{{ attendant.total_sales | number:'1.2-2' }}</span>
+                </div>
+              </div>
+              <div class="stat">
+                <span class="stat-icon">✅</span>
+                <div>
+                  <span class="stat-label-small">Collected</span>
+                  <span class="stat-amount text-success">₵{{ attendant.total_collected | number:'1.2-2' }}</span>
+                </div>
+              </div>
+              <div class="stat">
+                <span class="stat-icon">⚠️</span>
+                <div>
+                  <span class="stat-label-small">Balance</span>
+                  <span class="stat-amount text-danger">₵{{ attendant.total_balance | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Collection Rate</span>
+              <span>{{ attendant.collection_rate | number:'1.0-0' }}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" 
+                   [style.width.%]="attendant.collection_rate"
+                   [ngClass]="{
+                     'fill-excellent': attendant.collection_rate >= 90,
+                     'fill-good': attendant.collection_rate >= 70 && attendant.collection_rate < 90,
+                     'fill-needs-improvement': attendant.collection_rate < 70
+                   }">
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-view-details" (click)="filterByAttendant(attendant.name)">
+            <i class="fa fa-eye"></i> View Orders
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="getAttendantCount() === 0" class="no-attendants">
+        <i class="fa fa-users fa-3x"></i>
+        <p>No attendant data available for this period</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Report Content -->
   <div id="reportContent" *ngIf="filteredData.length > 0; else noData">
     <!-- Report Header (for print/PDF) -->
@@ -197,79 +311,89 @@
             <th>Total</th>
             <th>Collected</th>
             <th>Balance</th>
-            <th>Status</th>
+            <th>Payment Status</th>
+            <th>Job Status</th>
             <th>Department</th>
             <th>Date</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let order of filteredData; trackBy: trackByOrderId" 
-              (click)="toggleOrderExpand(order.id)" 
-              [class.expanded]="isOrderExpanded(order.id)">
-            <td><strong>#{{ order.id }}</strong></td>
-            <td>{{ order.customer || 'Walk-in' }}</td>
-            <td>{{ order.waiter || 'N/A' }}</td>
-            <td>{{ getTotalItems(order) }}</td>
-            <td class="amount">₵{{ order.total | number:'1.2-2' }}</td>
-            <td class="amount collected">₵{{ order.collected | number:'1.2-2' }}</td>
-            <td class="amount balance" [class.has-balance]="order.balance > 0">
-              ₵{{ order.balance | number:'1.2-2' }}
-              <span *ngIf="order.balance > 0" class="balance-badge">⚠️</span>
-            </td>
-            <td>
-              <span class="status-badge" [ngClass]="getStatusClass(order)">
-                <i class="fa" [ngClass]="getStatusIcon(order.paid_status || order.status)"></i>
-                {{ order.paid_status || order.status || 'N/A' }}
-              </span>
-            </td>
-            <td>
-              <span *ngFor="let dept of getDepartmentBadges(order)" class="dept-badge">
-                {{ dept }}
-              </span>
-            </td>
-            <td>{{ order.created_at | date:'dd/MM/yy HH:mm' }}</td>
-          </tr>
-          <!-- Expanded Row using helper methods -->
-          <tr *ngIf="expandedOrderId && getExpandedOrder()" class="expanded-row">
-            <td colspan="10">
-              <div class="expanded-content">
-                <h5>Order #{{ expandedOrderId }} - Items</h5>
-                <table class="items-detail-table">
-                  <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th>Description</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <th>Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let item of getExpandedOrderItems(); trackBy: trackByItemId">
-                      <td>{{ item.name }}</td>
-                      <td>{{ item.description || 'N/A' }}</td>
-                      <td>{{ item.qty }}</td>
-                      <td>₵{{ item.price | number:'1.2-2' }}</td>
-                      <td>₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colspan="4" class="total-label">Total</td>
-                      <td class="total-value">₵{{ getExpandedOrderTotal() | number:'1.2-2' }}</td>
-                    </tr>
-                    <tr>
-                      <td colspan="4" class="total-label">Balance</td>
-                      <td class="total-value balance">₵{{ getExpandedOrderBalance() | number:'1.2-2' }}</td>
-                    </tr>
-                  </tfoot>
-                </table>
-                <div class="order-note" *ngIf="getExpandedOrderNote()">
-                  <strong>Note:</strong> {{ getExpandedOrderNote() }}
+          <ng-container *ngFor="let order of filteredData; trackBy: trackByOrderId">
+            <!-- Main Order Row -->
+            <tr
+              (click)="toggleOrderExpand(order.id)"
+              [class.expanded]="isOrderExpanded(order.id)"
+              class="order-row"
+            >
+              <td><strong>#{{ order.id }}</strong></td>
+              <td>{{ order.customer || 'Walk-in' }}</td>
+              <td>{{ order.waiter || 'N/A' }}</td>
+              <td>{{ getTotalItems(order) }}</td>
+              <td class="amount">₵{{ order.total | number:'1.2-2' }}</td>
+              <td class="amount collected">₵{{ order.collected | number:'1.2-2' }}</td>
+              <td class="amount balance" [class.has-balance]="order.balance > 0">
+                ₵{{ order.balance | number:'1.2-2' }}
+                <span *ngIf="order.balance > 0" class="balance-badge">⚠️</span>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusClass(order)">
+                  <i class="fa" [ngClass]="getStatusIcon(order.paid_status)"></i>
+                  {{ order.paid_status || 'N/A' }}
+                </span>
+              </td>
+              <td>{{ order.status || 'N/A' }}</td>
+              <td>
+                <span *ngFor="let dept of getDepartmentBadges(order)" class="dept-badge">
+                  {{ dept }}
+                </span>
+              </td>
+              <td>{{ order.created_at | date:'dd/MM/yy HH:mm' }}</td>
+            </tr>
+
+            <!-- Expanded Order Row -->
+            <tr *ngIf="isOrderExpanded(order.id)" class="expanded-row">
+              <td colspan="11">
+                <div class="expanded-content">
+                  <h5>Order #{{ order.id }} - Items</h5>
+                  <table class="items-detail-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Description</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Work done by</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of order.items; trackBy: trackByItemId">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.description || 'N/A' }}</td>
+                        <td>{{ item.qty }}</td>
+                        <td>₵{{ item.price | number:'1.2-2' }}</td>
+                        <td>{{ item.checked_by || 'N/A' }}</td>
+                        <td>₵{{ (item.price * item.qty) | number:'1.2-2' }}</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="5" class="total-label">Total</td>
+                        <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="5" class="total-label">Balance</td>
+                        <td class="total-value balance">₵{{ order.balance | number:'1.2-2' }}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                  <div class="order-note" *ngIf="order.note">
+                    <strong>Note:</strong> {{ order.note }}
+                  </div>
                 </div>
-              </div>
-            </td>
-          </tr>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
         <tfoot>
           <tr class="total-row">
@@ -278,7 +402,7 @@
             <td><strong>₵{{ totalSales | number:'1.2-2' }}</strong></td>
             <td><strong>₵{{ totalCollected | number:'1.2-2' }}</strong></td>
             <td><strong>₵{{ totalBalance | number:'1.2-2' }}</strong></td>
-            <td colspan="3"></td>
+            <td colspan="4"></td>
           </tr>
         </tfoot>
       </table>
@@ -289,7 +413,6 @@
       <p>Generated by: <strong>{{ user?.[0]?.firstname || '' }} {{ user?.[0]?.lastname || '' }}</strong></p>
       <p>Date: {{ getCurrentDateTime() }}</p>
       <p class="signature">Signature: __________________________</p>
-      <!-- <p class="copyright">© {{ getCurrentYear() }} Assempahfie Graphics - All Rights Reserved</p> -->
     </div>
   </div>
 

@@ -33,7 +33,7 @@ export class ItemListCategoryComponent implements OnInit {
     'PP LABEL PRINT & CUT',
     'TRANSPARENT PRINT & CUT',
     'BANNER WITH LAMINATION',
-    'LAMINATION'  // ← ADDED THIS
+    // 'LAMINATION'  // ← ADDED THIS
   ];
 
   constructor(

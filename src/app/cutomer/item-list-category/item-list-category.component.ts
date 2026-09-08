@@ -1,4 +1,4 @@
-// item-list-category.component.ts - Fixed version
+// item-list-category.component.ts - Fixed version with always new items
 
 import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -237,13 +237,60 @@ export class ItemListCategoryComponent implements OnInit, OnDestroy {
     console.log(`📏 Adding measurement product: ${product.name}`);
     console.log(`   Width: ${width}${unit}, Height: ${height}${unit}`);
     
-    // Add to cart with measurement
-    this.cartService.addMeasurementToCart(product, width, height, unit);
+    // Add to cart with measurement - ALWAYS NEW ITEM
+    this.addMeasurementToCart(product, width, height, unit);
     
     this.toastr.success(`${product.name} added to cart with measurements`);
     product.showMeasurement = false;
     product.measurementWidth = 0;
     product.measurementHeight = 0;
+  }
+
+  // ===================== ADD MEASUREMENT TO CART (Always New) =====================
+
+  addMeasurementToCart(product: any, width: number, height: number, unit: string): void {
+    // Generate a unique ID for this cart item
+    const uniqueId = `${product.id || product.name}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+    
+    // Create measurement object
+    const measurement = {
+      width: width,
+      height: height,
+      unit: unit,
+      area: width * height
+    };
+
+    const cartItem = {
+      id: uniqueId, // Unique ID for this cart item
+      productId: product.id || product._id || product.name, // Reference to original product
+      name: product.name,
+      price: product.price || 0,
+      family: product.family || '',
+      category: product.category || '',
+      quantity: product.quantity || 0,
+      description: '',
+      attachment: null,
+      qty: 1,
+      total: product.price || 0,
+      // Measurement fields
+      is_measurement_product: true,
+      measurement: measurement,
+      measurementWidth: width,
+      measurementHeight: height,
+      measurementUnit: unit,
+      measurementArea: width * height,
+      showMeasurement: true
+    };
+
+    console.log('📏 Adding measurement product as new item:', cartItem);
+    
+    // Get current cart
+    const currentCart = this.cartService.getCart();
+    // Add new item (not updating existing)
+    currentCart.push(cartItem);
+    // Update cart
+    this.cartService.updateCart(currentCart);
+    this.toastr.success(`${product.name} added to cart`);
   }
 
   // ===================== MODAL METHODS =====================
@@ -354,7 +401,7 @@ export class ItemListCategoryComponent implements OnInit, OnDestroy {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
-  // ===================== ADD TO CART =====================
+  // ===================== ADD TO CART (Always New) =====================
 
   addToCartWithDetails() {
     if (!this.selectedProduct) {
@@ -366,16 +413,17 @@ export class ItemListCategoryComponent implements OnInit, OnDestroy {
     console.log('📝 Description:', this.itemDescription);
     console.log('📎 Attachment:', this.selectedFileBase64 ? 'Yes' : 'No');
 
-    // Use the product's ID, fallback to name if ID is missing
-    const productId = this.selectedProduct.id || this.selectedProduct._id || this.selectedProduct.name;
+    // Generate a unique ID for this cart item
+    const uniqueId = `${this.selectedProduct.id || this.selectedProduct.name}_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
 
-    // Create a clean copy of the product for cart
-    const productToAdd = {
-      id: productId,
+    // Create the cart item with unique ID
+    const cartItem = {
+      id: uniqueId, // Unique ID for this cart item
+      productId: this.selectedProduct.id || this.selectedProduct._id || this.selectedProduct.name, // Reference to original product
       name: this.selectedProduct.name,
       price: this.selectedProduct.price || 0,
-      family  : this.selectedProduct.family ,
-      category:this.selectedProduct.category, 
+      family: this.selectedProduct.family || '',
+      category: this.selectedProduct.category || '',
       quantity: this.selectedProduct.quantity || 0,
       description: this.itemDescription.trim() || '',
       attachment: this.selectedFileBase64 ? {
@@ -385,21 +433,26 @@ export class ItemListCategoryComponent implements OnInit, OnDestroy {
         size: this.selectedFileSize
       } : null,
       qty: 1,
-      total: this.selectedProduct.price || 0
+      total: this.selectedProduct.price || 0,
+      // Add measurement fields if applicable
+      is_measurement_product: this.requiresMeasurement(this.selectedProduct),
+      measurement: null,
+      measurementWidth: null,
+      measurementHeight: null,
+      measurementUnit: null,
+      measurementArea: null,
+      showMeasurement: false
     };
 
-    // Remove temporary UI properties
-    const cleanProduct = { ...productToAdd };
-    delete (cleanProduct as any).showMeasurement;
-    delete (cleanProduct as any).measurementWidth;
-    delete (cleanProduct as any).measurementHeight;
-    delete (cleanProduct as any).measurementUnit;
-
-    console.log('📦 Clean product to add:', cleanProduct);
+    console.log('📦 New cart item (unique):', cartItem);
 
     try {
-      // Add to cart using the service
-      this.cartService.addToCart(cleanProduct);
+      // Get current cart
+      const currentCart = this.cartService.getCart();
+      // Add new item (not updating existing)
+      currentCart.push(cartItem);
+      // Update cart
+      this.cartService.updateCart(currentCart);
       
       // Show success message
       let message = `${this.selectedProduct.name} added to cart`;
@@ -424,12 +477,13 @@ export class ItemListCategoryComponent implements OnInit, OnDestroy {
 
   getCartItem(product: any) {
     if (!product) return null;
-    // Try to match by ID first, then by name
-    const productId = product.id || product._id || product.name;
-    return this.cartItems.find(item => {
-      const itemId = item.id || item._id || item.name;
-      return itemId === productId;
-    });
+    // Match by unique ID only, not by product name
+    return this.cartItems.find(item => item.id === product.id);
+  }
+
+  getCartItemCount(productName: string): number {
+    // Count how many of this product are in cart (by name)
+    return this.cartItems.filter(item => item.name === productName).length;
   }
 
   addToCart(product: any) {
@@ -442,18 +496,33 @@ export class ItemListCategoryComponent implements OnInit, OnDestroy {
 
   increaseQty(product: any) {
     if (!product) return;
-    this.cartService.increaseQty(product);
+    // Find the specific cart item by its unique ID
+    const cartItem = this.cartItems.find(item => item.id === product.id);
+    if (cartItem) {
+      this.cartService.increaseQty(cartItem);
+    } else {
+      // If not found, add as new
+      this.addToCart(product);
+    }
   }
 
   decreaseQty(product: any) {
     if (!product) return;
-    this.cartService.decreaseQty(product);
+    // Find the specific cart item by its unique ID
+    const cartItem = this.cartItems.find(item => item.id === product.id);
+    if (cartItem) {
+      this.cartService.decreaseQty(cartItem);
+    }
   }
 
   removeFromCart(product: any) {
     if (!product) return;
-    this.cartService.removeFromCart(product);
-    this.toastr.info(`${product.name} removed from cart`);
+    // Remove the specific cart item by its unique ID
+    const cartItem = this.cartItems.find(item => item.id === product.id);
+    if (cartItem) {
+      this.cartService.removeFromCart(cartItem);
+      this.toastr.info(`${cartItem.name} removed from cart`);
+    }
   }
 
   removeAttachmentFromCart(item: any) {
@@ -489,6 +558,12 @@ export class ItemListCategoryComponent implements OnInit, OnDestroy {
       const price = item.price || 0;
       const qty = item.qty || 1;
       return total + (price * qty);
+    }, 0);
+  }
+
+  getTotalItems(): number {
+    return this.cartItems.reduce((total, item) => {
+      return total + (item.qty || 1);
     }, 0);
   }
 

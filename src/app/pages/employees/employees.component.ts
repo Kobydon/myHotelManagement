@@ -34,7 +34,7 @@ export class EmployeesComponent implements OnInit {
   employeeList:any;
   emmp_info:any;
 page = 1;
-pageSize: number = 10;
+pageSize: number = 100;
 constructor(
   private roomService:RoomService,private router:Router,
     private fb:FormBuilder,private route:ActivatedRoute,private guestService:GuestService,
