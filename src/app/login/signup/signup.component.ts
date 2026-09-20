@@ -58,15 +58,17 @@ export class SignupComponent implements OnInit {
     }
     try{
    
-     var res = await this.userService.addUser(gust);
-     if(res) this.toastr.success(null,"registration successfull,kindly login");
+     var res = await this.userService.addUserCustomer(gust);
+     if(res)  alert("registration successfull,kindly login");  this.router.navigate(["/account/signin"]);
      
 
     }catch(error){
-      
+      alert("registration failed,kindly try again"); this.router.navigate(["/account/signup"]);
+     
     }
     finally{
-      this.router.navigate(["/account/signin"]);
+     
+    
     }
   }
 

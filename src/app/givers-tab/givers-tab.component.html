@@ -145,6 +145,7 @@
               <th class="col-items">Items</th>
               <th class="col-total">Total</th>
               <th class="col-status">Status</th>
+              <th class="col-date">Date</th>
               <th class="col-action">Action</th>
             </tr>
           </thead>
@@ -188,6 +189,9 @@
                   
                     {{ order.delivery_status}}
                 
+                </td>
+                <td class="date-cell">
+               {{ getFormattedDate(order.created_at) }}
                 </td>
                 <td class="action-cell">
                   <button class="btn-action deliver-btn" (click)="openDeliveryModal(order)" title="Start Delivery">

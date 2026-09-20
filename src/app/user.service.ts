@@ -75,6 +75,14 @@ private userUrl = 'https://renderdemo-pnzm.onrender.com';
 
         
   }
+  
+  addUserCustomer(ad:any){
+    return lastValueFrom(this.http.post(this.userUrl + '/user/register_quick_two',ad,httpOptions));
+
+        
+  }
+
+  
 
   
   loginUser(user,password:any,username:any) {

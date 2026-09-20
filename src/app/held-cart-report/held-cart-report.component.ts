@@ -22,6 +22,10 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
   reportData: any[] = [];
   summary: any = {};
   filteredData: any[] = [];
+showPaymentAlert: boolean = false;
+paymentDaysRemaining: number = 0;
+paymentDueDate: string = '1 October';
+paymentDeadlinePassed: boolean = false;
   
   // Form
   reportForm: FormGroup;
@@ -104,19 +108,24 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    this.getUser();
-    this.loadWaiters();
-    this.loadCashiers();
-    this.setDefaultDateRange();
-    
-    // Update date every minute
-    setInterval(() => {
-      this.currentDate = new Date();
-      this.currentDateTime = new Date().toLocaleString();
-    }, 60000);
-  }
 
+  ngOnInit(): void {
+  this.getUser();
+  this.loadWaiters();
+  this.loadCashiers();
+  this.setDefaultDateRange();
+
+  // Show payment deadline alert
+  this.checkPaymentDeadline();
+
+  // Update date every minute
+  setInterval(() => {
+    this.currentDate = new Date();
+    this.currentDateTime = new Date().toLocaleString();
+  }, 60000);
+}
+
+  
   ngOnDestroy(): void {
     // Cleanup
   }
@@ -374,6 +383,8 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+
+  
   // ===================== FILTER METHODS =====================
 
   applyFilters(): void {
@@ -650,4 +661,56 @@ export class HeldCartReportComponent implements OnInit, OnDestroy {
   trackByItemId(index: number, item: any): number {
     return item.id || index;
   }
+
+  // ===================== PAYMENT DEADLINE =====================
+
+// ===================== PAYMENT DEADLINE =====================
+
+checkPaymentDeadline(): void {
+  const today = new Date();
+
+  // Final payment deadline: 1 October 2026
+  const paymentDueDate = new Date(2026, 9, 1);
+
+  // Compare calendar dates only
+  today.setHours(0, 0, 0, 0);
+  paymentDueDate.setHours(0, 0, 0, 0);
+
+  // Check if deadline has passed
+  this.paymentDeadlinePassed = today >= paymentDueDate;
+
+  if (this.paymentDeadlinePassed) {
+
+    // Payment is overdue
+    this.paymentDaysRemaining = 0;
+
+  } else {
+
+    // Calculate remaining days
+    const differenceMs =
+      paymentDueDate.getTime() - today.getTime();
+
+    this.paymentDaysRemaining = Math.ceil(
+      differenceMs / (1000 * 60 * 60 * 24)
+    );
+  }
+
+  // Always show the payment alert
+  this.showPaymentAlert = true;
+
+  this.cdr.detectChanges();
+}
+
+closePaymentAlert(): void {
+
+  // Do not allow the alert to be closed
+  // after the payment deadline has passed
+  if (this.paymentDeadlinePassed) {
+    return;
+  }
+
+  this.showPaymentAlert = false;
+}
+
+
 }

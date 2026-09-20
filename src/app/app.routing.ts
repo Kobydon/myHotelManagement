@@ -19,6 +19,8 @@ import { ViewLabelOrderComponent } from './view-label-order/view-label-order.com
 import { ViewDtfOrderComponent } from './view-dtf-order/view-dtf-order.component';
 import { GiversTabComponent } from './givers-tab/givers-tab.component';
 import { CustomerLayoutComponent } from './customer-layout/customer-layout.component';
+import{RoleGuard} from './role.guard';
+import { Role } from './roles';
 
 export const AppRoutes: Routes = [
   {
@@ -26,14 +28,14 @@ export const AppRoutes: Routes = [
     redirectTo: 'dashboard',
     pathMatch: 'full',
   },
-  {path:'view-order',component:ViewOrderComponent},
-   {path:'view-all-order',component:GiversTabComponent},
+  {path:'view-order',component:ViewOrderComponent,canActivate:[RoleGuard],data:{roles:[Role.DigitalPrinting]}},
+   {path:'view-all-order',component:GiversTabComponent,canActivate:[RoleGuard],data:{roles:[Role.Giver]}},
 
-   {path:'view-dtf-order',component:ViewDtfOrderComponent},
-  {path:'view-large-format-order',component:ViewDrinkOrderComponent},
-    {path:'view-label-order',component:ViewLabelOrderComponent},
+   {path:'view-dtf-order',component:ViewDtfOrderComponent,canActivate:[RoleGuard],data:{roles:[Role.Dtf]}},
+  {path:'view-large-format-order',component:ViewDrinkOrderComponent,canActivate:[RoleGuard],data:{roles:[Role.Bartender]}},
+    {path:'view-label-order',component:ViewLabelOrderComponent,canActivate:[RoleGuard],data:{roles:[Role.Label]}},
   {
-    path: '',canActivate:[AuthGuard],
+    path: '',canActivate:[AuthGuard,RoleGuard],data:{roles:[Role.Admin]},
     component: AdminLayoutComponent,
     children: [
         {
@@ -106,9 +108,9 @@ export const AppRoutes: Routes = [
       loadChildren: () => import('../app/pos/pos.module').then(x => x.PosModule)
   },
 
-  { path: 'item-list',      component: ItemListComponent },
-  { path: 'item-category-list/:id', component: ItemListCategoryComponent },
-  { path: 'item-category-list-vip/:id', component: ItemListVipComponent },
+  { path: 'item-list',      component: ItemListComponent,canActivate:[RoleGuard],data:{roles:[Role.Waiter]}},
+  { path: 'item-category-list/:id', component: ItemListCategoryComponent,canActivate:[RoleGuard],data:{roles:[Role.Waiter]}},
+  { path: 'item-category-list-vip/:id', component: ItemListVipComponent,canActivate:[RoleGuard],data:{roles:[Role.Waiter]}},
 
 
 ]},

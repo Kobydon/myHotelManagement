@@ -1,48 +1,404 @@
-<style>
-  .card-header {
-  background-color: #333;
-  color: white;
-}
+<!-- ================================================================
+     COMPREHENSIVE SALES REPORT — HELD CART REPORT DRIVEN
+     ATTENDANT-FIRST VIEW
+     ================================================================ -->
 
-.card-title i {
-  margin-right: 10px;
-}
+<div class="dashboard-wrapper">
 
-</style>
-<!-- *ngIf="user[0]?.roles == 'admin' || user[0]?.roles=='auditor' || user[0]?.roles=='accountant'" -->
-
-<div class="row" >
-  <!-- Payment Chart (Now in place of Active Bookings) -->
-  <div class="col-md-12">
-    <div class="card card-chart">
-      <div class="card-header" style="background-color: #333; color: white;">
-        <p class="card-title">
-          <i class="fa fa-line-chart me-2 text-danger"></i> TRENDS
-        </p>
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <div class="report-header">
+    <!-- <div class="report-title">
+      <i class="fa fa-bar-chart"></i>
+      <div>
+        <h4>Asempa Graphic</h4>
+        <span class="subtitle">Comprehensive Sales Report</span>
       </div>
-      <div class="card-body">
+    </div> -->
 
-  <div
-    style="
-      position: relative;
-      width: 100%;
-      height: 400px;
-    "
-  >
-
-    <canvas id="paymentChart"></canvas>
-
-  </div>
-
-</div>
+    <div class="report-meta">
+      <span class="meta-item">
+        <i class="fa fa-calendar"></i>
+        {{ reportForm.get('date_from')?.value | date:'dd MMM yyyy' }}
+        &nbsp;→&nbsp;
+        {{ reportForm.get('date_to')?.value | date:'dd MMM yyyy' }}
+      </span>
+      <span class="meta-item">
+        <i class="fa fa-clock-o"></i>
+        {{ currentDateTime }}
+      </span>
     </div>
   </div>
+
+  <!-- ============================================================
+       FILTERS
+       ============================================================ -->
+  <div class="filters-card">
+    <div class="filters-row">
+
+      <div class="filter-item">
+        <label>Date From</label>
+        <input type="date" class="form-control"
+               [formControl]="reportForm.get('date_from')">
+      </div>
+
+      <div class="filter-item">
+        <label>Date To</label>
+        <input type="date" class="form-control"
+               [formControl]="reportForm.get('date_to')">
+      </div>
+
+      <div class="filter-item">
+        <label>Attendant</label>
+        <select class="form-control" [formControl]="reportForm.get('waiter')">
+          <option value="">All Attendants</option>
+          <option *ngFor="let u of users" [value]="u.firstname +' '+ u.lastname">
+            {{ u.name || u.username }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label>Department</label>
+        <select class="form-control" [formControl]="reportForm.get('department')">
+          <option *ngFor="let d of departments" [value]="d.value">
+            {{ d.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label>Status</label>
+        <select class="form-control" [formControl]="reportForm.get('status')">
+          <option *ngFor="let s of statusOptions" [value]="s.value">
+            {{ s.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-item filter-actions">
+        <button class="btn btn-primary"
+                (click)="generateReport()"
+                [disabled]="isLoading">
+          <i class="fa" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+          {{ isLoading ? 'Generating...' : 'Generate' }}
+        </button>
+        <button class="btn btn-outline-secondary" (click)="clearFilters()">
+          <i class="fa fa-refresh"></i>
+        </button>
+        <button class="btn btn-success" (click)="exportToExcel()">
+          <i class="fa fa-file-excel-o"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STAT CARDS — DRIVEN BY HELD CART REPORT + SMS BUNDLE
+       ============================================================ -->
+  <div class="stats-grid">
+
+    <div class="stat-card card-blue">
+      <div class="stat-icon"><i class="fa fa-shopping-cart"></i></div>
+      <div class="stat-content">
+        <div class="stat-label">Total Sales</div>
+        <div class="stat-value">₵{{ totalSales | number:'1.2-2' }}</div>
+        <div class="stat-sub">{{ totalOrders }} orders</div>
+      </div>
+    </div>
+
+    <div class="stat-card card-green">
+      <div class="stat-icon"><i class="fa fa-money"></i></div>
+      <div class="stat-content">
+        <div class="stat-label">Collected</div>
+        <div class="stat-value">₵{{ totalCollected | number:'1.2-2' }}</div>
+        <div class="stat-sub">{{ collectionRate | number:'1.0-0' }}% collected</div>
+      </div>
+    </div>
+
+    <div class="stat-card card-yellow">
+      <div class="stat-icon"><i class="fa fa-balance-scale"></i></div>
+      <div class="stat-content">
+        <div class="stat-label">Balance</div>
+        <div class="stat-value">₵{{ totalBalance | number:'1.2-2' }}</div>
+        <div class="stat-sub">Outstanding</div>
+      </div>
+    </div>
+
+    <!-- NEW: SMS BUNDLE STAT CARD -->
+    <div class="stat-card card-purple">
+      <div class="stat-icon"><i class="fa fa-comments-o"></i></div>
+      <div class="stat-content">
+        <div class="stat-label">SMS Bundle Remaining</div>
+        <div class="stat-value">{{ bundleInfo.remaining | number }}</div>
+        <div class="stat-sub">
+          of {{ bundleInfo.size | number }} total ({{ bundleUsedPercent | number:'1.0-1' }}% used)
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       BUNDLE INFO PANEL — SIZE, REMAINING, USED
+       ============================================================ -->
+  <div class="bundle-panel">
+    <div class="bundle-header">
+      <h5><i class="fa fa-comments-o"></i> SMS Bundle Status</h5>
+      <button class="btn btn-sm btn-outline-secondary"
+              (click)="loadBundleInfo()"
+              title="Refresh bundle">
+        <i class="fa fa-refresh"></i>
+      </button>
+    </div>
+
+    <div class="bundle-body">
+
+      <div class="bundle-block">
+        <div class="bundle-label">Total Bundle Size</div>
+        <div class="bundle-value">{{ bundleInfo.size | number }}</div>
+        <div class="bundle-sub">SMS in total bundle</div>
+      </div>
+
+      <div class="bundle-block">
+        <div class="bundle-label">Remaining</div>
+        <div class="bundle-value text-success">
+          {{ bundleInfo.remaining | number }}
+        </div>
+        <div class="bundle-sub">SMS available</div>
+      </div>
+
+      <div class="bundle-block">
+        <div class="bundle-label">Used</div>
+        <div class="bundle-value text-danger">
+          {{ bundleUsed | number }}
+        </div>
+        <div class="bundle-sub">{{ bundleUsedPercent | number:'1.0-1' }}% consumed</div>
+      </div>
+
+      <div class="bundle-block bundle-block-wide">
+        <div class="bundle-label">Bundle Usage</div>
+        <div class="bundle-progress">
+          <div class="bundle-progress-fill"
+               [style.width.%]="bundleUsedPercent"
+               [ngClass]="bundleUsedPercent >= 90 ? 'fill-red'
+                         : bundleUsedPercent >= 60 ? 'fill-yellow'
+                         : 'fill-green'">
+          </div>
+        </div>
+        <div class="bundle-progress-labels">
+          <span>0</span>
+          <span>{{ bundleInfo.size | number }}</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MONTHLY SALES CHART
+       ============================================================ -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <h5><i class="fa fa-line-chart"></i> Monthly Sales Trend (GHS)</h5>
+      <span class="chart-sub">Source: Held Cart Report</span>
+    </div>
+    <div class="chart-body">
+      <canvas id="paymentChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ATTENDANT SUMMARY CARDS — CLICK TO DRILL DOWN
+       ============================================================ -->
+  <div class="section-header">
+    <h5>
+      <i class="fa fa-users"></i>
+      Attendants
+      <span class="badge">{{ getAttendantCount() }} attendants</span>
+    </h5>
+    <span class="hint-text">
+      <i class="fa fa-hand-pointer-o"></i> Click an attendant to view their orders
+    </span>
+  </div>
+
+  <div class="attendant-cards-grid" *ngIf="getAttendantSummary().length > 0">
+    <div class="attendant-card"
+         *ngFor="let att of getAttendantSummary()"
+         [class.active]="selectedAttendant === att.name"
+         (click)="filterByAttendant(att.name)">
+
+      <div class="attendant-card-header">
+        <div class="attendant-avatar">
+          {{ att.name.charAt(0).toUpperCase() }}
+        </div>
+        <div class="attendant-info">
+          <div class="attendant-name">{{ att.name }}</div>
+          <div class="attendant-orders">
+            <i class="fa fa-shopping-bag"></i>
+            {{ att.order_count }} order{{ att.order_count > 1 ? 's' : '' }}
+          </div>
+        </div>
+        <div class="attendant-badge"
+             [ngClass]="att.collection_rate >= 90 ? 'badge-green'
+                       : att.collection_rate >= 50 ? 'badge-yellow'
+                       : 'badge-red'">
+          {{ att.collection_rate | number:'1.0-0' }}%
+        </div>
+      </div>
+
+      <div class="attendant-card-body">
+        <div class="metric-row">
+          <span class="metric-label">Total Sales</span>
+          <span class="metric-value">₵{{ att.total_sales | number:'1.2-2' }}</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Collected</span>
+          <span class="metric-value text-success">
+            ₵{{ att.total_collected | number:'1.2-2' }}
+          </span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Balance</span>
+          <span class="metric-value"
+                [ngClass]="att.total_balance > 0 ? 'text-danger' : 'text-muted'">
+            ₵{{ att.total_balance | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="attendant-card-footer">
+        <div class="progress-bar-custom">
+          <div class="progress-fill"
+               [style.width.%]="att.collection_rate"
+               [ngClass]="att.collection_rate >= 90 ? 'fill-green'
+                         : att.collection_rate >= 50 ? 'fill-yellow'
+                         : 'fill-red'">
+          </div>
+        </div>
+        <span class="view-orders">
+          View Orders <i class="fa fa-chevron-right"></i>
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="getAttendantSummary().length === 0">
+    <i class="fa fa-inbox"></i>
+    <p>No attendants found. Generate a report to view data.</p>
+  </div>
+
+  <!-- ============================================================
+       SELECTED ATTENDANT ORDERS PANEL
+       (only shows when an attendant is selected)
+       ============================================================ -->
+  <div class="selected-attendant-panel" *ngIf="selectedAttendant">
+
+    <div class="selected-header">
+      <div class="selected-title">
+        <div class="selected-avatar">
+          {{ selectedAttendant.charAt(0).toUpperCase() }}
+        </div>
+        <div>
+          <h5>Orders by {{ selectedAttendant }}</h5>
+          <span class="selected-sub">
+            {{ filteredData.length }} order{{ filteredData.length !== 1 ? 's' : '' }}
+            &nbsp;·&nbsp;
+            Total: ₵{{ totalSales | number:'1.2-2' }}
+            &nbsp;·&nbsp;
+            Balance: ₵{{ totalBalance | number:'1.2-2' }}
+          </span>
+        </div>
+      </div>
+
+      <button class="btn btn-sm btn-outline-secondary"
+              (click)="resetAttendantFilter()">
+        <i class="fa fa-times"></i> Close
+      </button>
+    </div>
+
+    <!-- Order cards for this attendant only -->
+    <div class="orders-cards-grid">
+      <div class="order-card"
+           *ngFor="let order of filteredData"
+           [class.expanded]="expandedOrderId === order.id">
+
+        <div class="order-card-top">
+          <div class="order-id">
+            <i class="fa fa-hashtag"></i>{{ order.id }}
+          </div>
+          <div class="order-status" [ngClass]="getStatusClass(order)">
+            <i class="fa"
+               [ngClass]="getStatusIcon(order.paid_status || order.status)"></i>
+            {{ order.paid_status || order.status || 'N/A' }}
+          </div>
+        </div>
+
+        <div class="order-card-customer">
+          <div class="customer-row">
+            <i class="fa fa-user-circle"></i>
+            <span class="customer-name">{{ order.customer || 'Walk-in' }}</span>
+          </div>
+        </div>
+
+        <div class="order-card-badges" *ngIf="getDepartmentBadges(order).length > 0">
+          <span class="dept-badge" *ngFor="let badge of getDepartmentBadges(order)">
+            {{ badge }}
+          </span>
+        </div>
+
+        <div class="order-card-financials">
+          <div class="fin-row">
+            <span>Total</span>
+            <strong>₵{{ order.total | number:'1.2-2' }}</strong>
+          </div>
+          <div class="fin-row">
+            <span>Collected</span>
+            <strong class="text-success">₵{{ order.collected | number:'1.2-2' }}</strong>
+          </div>
+          <div class="fin-row">
+            <span>Balance</span>
+            <strong [ngClass]="order.balance > 0 ? 'text-danger' : 'text-muted'">
+              ₵{{ order.balance | number:'1.2-2' }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="order-card-items">
+          <div class="items-header">
+            <i class="fa fa-cube"></i>
+            {{ getTotalItems(order) }} items
+          </div>
+          <ul class="items-list" *ngIf="expandedOrderId === order.id">
+            <li *ngFor="let item of order.items">
+              <span class="item-name">{{ item.name || item.item_name }}</span>
+              <span class="item-qty">x{{ item.qty }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="order-card-footer">
+          <span class="order-date">
+            <i class="fa fa-calendar"></i>
+            {{ formatDisplayDate(order.created_at) }}
+          </span>
+          <button class="btn-toggle" (click)="toggleOrderExpand(order.id)">
+            {{ expandedOrderId === order.id ? 'Less' : 'More' }}
+            <i class="fa"
+               [ngClass]="expandedOrderId === order.id ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="empty-state small" *ngIf="filteredData.length === 0">
+      <p>No orders found for this attendant.</p>
+    </div>
+
+  </div>
+
 </div>
-
-
-
-
-
-
-
-
