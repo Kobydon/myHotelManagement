@@ -159,6 +159,12 @@
           <i class="fa fa-money"></i> Hold & Pay
         </button>
         <!-- Add to Payment Cart Button -->
+          <button class="btn btn-warning"
+            style="flex: 1; white-space: nowrap;"
+            (click)="saveCartForLater()"
+            [disabled]="cartItems.length === 0">
+      <i class="fa fa-bookmark"></i> Save for Later
+    </button>
         <button 
           class="btn btn-primary" 
           style="flex: 1; white-space: nowrap;"
@@ -380,10 +386,102 @@
         </li>
       </ul>
 
-      <!-- Merge Selected Orders -->
-      <button class="btn btn-primary mt-3" (click)="mergeSelectedOrders()" [disabled]="selectedCartIds.length === 0" *ngIf="admin">
-        Merge Selected Orders
+      <!-- ===================== SAVED CARTS (FOR LATER) ===================== -->
+<div class="saved-carts-section mt-4">
+  <div class="saved-carts-header d-flex justify-content-between align-items-center mb-2">
+    <h5 class="mb-0">
+      <i class="fa fa-bookmark"></i> Saved Carts
+      <span class="badge badge-primary">{{ savedCarts.length }}</span>
+    </h5>
+    <div>
+      <button class="btn btn-info btn-sm" (click)="toggleSavedCarts()">
+        <i class="fa" [ngClass]="{'fa-chevron-down': !showSavedCarts, 'fa-chevron-up': showSavedCarts}"></i>
+        {{ showSavedCarts ? 'Hide' : 'Show' }}
       </button>
+      <button 
+        class="btn btn-danger btn-sm ms-1" 
+        *ngIf="savedCarts.length > 0"
+        (click)="clearAllSavedCarts()">
+        <i class="fa fa-trash"></i> Clear All
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="showSavedCarts">
+    <!-- Search -->
+    <div class="input-group input-group-sm mb-2">
+      <span class="input-group-addon"><i class="fa fa-search"></i></span>
+      <input 
+        type="text" 
+        class="form-control" 
+        placeholder="Search saved carts by customer, phone, or note..."
+        [(ngModel)]="savedCartSearchTerm"
+        (input)="filterSavedCarts()"
+      />
+    </div>
+
+    <!-- Saved Cart List -->
+    <ul class="list-group" *ngIf="filteredSavedCarts.length > 0; else noSavedCarts">
+      <li 
+        *ngFor="let cart of filteredSavedCarts" 
+        class="list-group-item d-flex justify-content-between align-items-center saved-cart-item">
+        <div class="saved-cart-info">
+          <div class="saved-cart-name">
+            <i class="fa fa-user-circle"></i>
+            <strong>{{ cart.customerName }}</strong>
+            <span *ngIf="cart.customerPhone" class="text-muted ms-1">
+              📱 {{ cart.customerPhone }}
+            </span>
+          </div>
+          <div class="saved-cart-meta">
+            <span class="badge badge-info">{{ cart.cartItems?.length || 0 }} item(s)</span>
+            <span class="badge badge-success">₵{{ cart.total | number:'1.2-2' }}</span>
+            <span *ngIf="cart.existingBalance > 0" class="badge badge-warning">
+              Balance: ₵{{ cart.existingBalance | number:'1.2-2' }}
+            </span>
+            <span *ngIf="cart.discount > 0" class="badge badge-secondary">
+              {{ cart.discount }}% off
+            </span>
+          </div>
+          <div class="saved-cart-date">
+            <small class="text-muted">
+              <i class="fa fa-clock-o"></i>
+              Saved: {{ cart.savedAt | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+          </div>
+          <div *ngIf="cart.note" class="saved-cart-note">
+            <small><i class="fa fa-sticky-note-o"></i> {{ cart.note }}</small>
+          </div>
+        </div>
+        <div class="btn-group btn-group-sm">
+          <button 
+            class="btn btn-success" 
+            (click)="retrieveSavedCart(cart.id)"
+            title="Load this cart">
+            <i class="fa fa-upload"></i> Retrieve
+          </button>
+          <button 
+            class="btn btn-danger" 
+            (click)="deleteSavedCart(cart.id, $event)"
+            title="Delete saved cart">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+      </li>
+    </ul>
+
+    <ng-template #noSavedCarts>
+      <p class="text-muted text-center">
+        <i class="fa fa-inbox fa-2x"></i><br>
+        No saved carts available.
+      </p>
+    </ng-template>
+  </div>
+</div>
+      <!-- Merge Selected Orders -->
+      <!-- <button class="btn btn-primary mt-3" (click)="mergeSelectedOrders()" [disabled]="selectedCartIds.length === 0" *ngIf="admin">
+        Merge Selected Orders
+      </button> -->
 
       <ng-template #noHeldCarts>
         <p class="text-muted">No held carts available.</p>

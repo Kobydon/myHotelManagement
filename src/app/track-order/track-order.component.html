@@ -1,0 +1,491 @@
+
+<div class="tracking-page">
+
+  <!-- HEADER -->
+  <header class="tracking-header">
+    <div class="header-inner">
+
+      <div class="brand">
+        <div class="brand-logo">AF</div>
+
+        <div class="brand-info">
+          <h2>AssempahFie <span>Graphics</span></h2>
+          <p>CREATIVITY. QUALITY. EXCELLENCE.</p>
+        </div>
+      </div>
+
+      <div class="secure-indicator">
+        <span class="secure-dot"></span>
+        Secure Order Tracking
+      </div>
+
+    </div>
+  </header>
+
+
+  <main class="tracking-container">
+
+    <!-- SEARCH SECTION -->
+    <section class="search-section">
+
+      <div class="search-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 7L12 3L21 7V17L12 21L3 17V7Z"
+                stroke="currentColor" stroke-width="1.6"/>
+          <path d="M3 7L12 12L21 7M12 12V21"
+                stroke="currentColor" stroke-width="1.6"/>
+        </svg>
+      </div>
+
+      <span class="search-overline">ORDER TRACKING PORTAL</span>
+
+      <h1>Where Is Your <span>Order?</span></h1>
+
+      <p class="search-description">
+        Enter your Order ID below to view your order status,
+        production progress and payment information.
+      </p>
+
+
+      <!-- SEARCH FORM -->
+      <form class="tracking-search-form"
+            (ngSubmit)="trackOrder()">
+
+        <label for="orderId">Your Order ID</label>
+
+        <div class="search-input-wrapper">
+
+          <div class="input-icon">
+            #
+          </div>
+
+          <input
+            type="text"
+            id="orderId"
+            name="orderId"
+            [(ngModel)]="orderId"
+            placeholder="Enter your Order ID"
+            autocomplete="off"
+            inputmode="numeric"
+            required
+          />
+
+          <button
+            type="submit"
+            [disabled]="loading">
+
+            <span *ngIf="!loading">Track My Order</span>
+            <span *ngIf="loading">Searching...</span>
+
+            <span *ngIf="!loading" class="arrow">→</span>
+
+          </button>
+
+        </div>
+
+        <div class="search-hint">
+          <span>ⓘ</span>
+          Your Order ID can be found on your order receipt.
+        </div>
+
+      </form>
+
+
+      <!-- ERROR MESSAGE -->
+      <div class="search-error"
+           *ngIf="searched && errorMessage">
+
+        <span class="error-symbol">!</span>
+
+        <div>
+          <strong>Unable to find your order</strong>
+          <p>{{ errorMessage }}</p>
+        </div>
+
+      </div>
+
+
+      <!-- SEARCH LOADING -->
+      <div class="search-loading" *ngIf="loading">
+
+        <div class="loader"></div>
+
+        <span>Retrieving your order information...</span>
+
+      </div>
+
+    </section>
+
+
+    <!-- TRACKING RESULTS -->
+    <div *ngIf="searched && order && !loading"
+         class="tracking-results">
+
+
+      <!-- ORDER OVERVIEW -->
+      <section class="order-overview">
+
+        <div class="overview-top">
+
+          <div>
+            <span class="small-label">ORDER REFERENCE</span>
+
+            <h2>#AFG-{{ order.id }}</h2>
+
+            <p class="order-date">
+              Placed on {{ getOrderDate() }}
+            </p>
+          </div>
+
+          <div class="overall-status"
+               [ngClass]="getStatusClass(getOverallStatus())">
+
+            <span class="status-indicator"></span>
+
+            <div>
+              <span class="small-label">CURRENT STATUS</span>
+              <strong>{{ getOverallStatus() }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="overview-divider"></div>
+
+
+        <div class="progress-heading">
+
+          <div>
+            <h3>Order Progress</h3>
+            <p>Your order is moving through our production process.</p>
+          </div>
+
+          <strong>{{ getOverallProgress() }}%</strong>
+
+        </div>
+
+
+        <div class="main-progress">
+          <div class="main-progress-fill"
+               [style.width.%]="getOverallProgress()">
+          </div>
+        </div>
+
+        <div class="progress-footer">
+          <span>Order Received</span>
+          <span>Completion</span>
+        </div>
+
+      </section>
+
+
+      <!-- ITEMS -->
+      <section class="items-section">
+
+        <div class="section-heading">
+
+          <div>
+            <span class="section-overline">
+              PRODUCTION UPDATES
+            </span>
+
+            <h2>Your Order Journey</h2>
+
+            <p>Follow the progress of each product.</p>
+          </div>
+
+          <span class="items-count">
+            {{ items.length }} Item(s)
+          </span>
+
+        </div>
+
+
+        <div class="item-card"
+             *ngFor="let item of items; let i = index">
+
+          <div class="item-header">
+
+            <div class="item-number">{{ i + 1 }}</div>
+
+            <div class="item-details">
+
+              <h3>{{ getItemName(item) }}</h3>
+
+              <p>{{ getItemDescription(item) }}</p>
+
+              <div class="item-quantity">
+                Quantity:
+                <strong>{{ getQuantity(item) }}</strong>
+              </div>
+
+            </div>
+
+            <div class="item-status"
+                 [ngClass]="getStatusClass(getStatusText(item))">
+
+              <span class="status-indicator"></span>
+              {{ getStatusText(item) }}
+
+            </div>
+
+          </div>
+
+
+          <!-- TIMELINE -->
+          <div class="timeline-wrapper">
+
+            <div class="timeline">
+
+              <div class="timeline-step"
+                   *ngFor="let step of trackingSteps; let j = index"
+                   [class.completed]="isStepCompleted(item, j)"
+                   [class.current]="isStepCurrent(item, j)">
+
+                <div class="step-connector"
+                     *ngIf="j !== trackingSteps.length - 1">
+
+                  <div class="connector-fill"
+                       [class.filled]="getStatusIndex(item) > j">
+                  </div>
+
+                </div>
+
+                <div class="step-circle">
+
+                  <span *ngIf="isStepCompleted(item, j)">✓</span>
+
+                  <span *ngIf="!isStepCompleted(item, j)">
+                    {{ j + 1 }}
+                  </span>
+
+                </div>
+
+                <div class="step-information">
+
+                  <h4>{{ step.label }}</h4>
+
+                  <p>{{ step.description }}</p>
+
+                  <span class="step-current-label"
+                        *ngIf="isStepCurrent(item, j)">
+                    CURRENT STAGE
+                  </span>
+
+                  <span class="step-done-label"
+                        *ngIf="isStepCompleted(item, j) &&
+                               !isStepCurrent(item, j)">
+                    COMPLETED
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- ITEM FOOTER -->
+          <div class="item-footer">
+
+            <div>
+              <span class="small-label">PRODUCT STATUS</span>
+              <strong>{{ getStatusText(item) }}</strong>
+            </div>
+
+            <div class="item-price">
+              <span class="small-label">ITEM AMOUNT</span>
+
+              <strong>
+                {{ getItemPrice(item) | currency:'GHS ':'symbol':'1.2-2' }}
+              </strong>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="empty-items" *ngIf="items.length === 0">
+          <h3>No products found</h3>
+          <p>There are currently no items attached to this order.</p>
+        </div>
+
+      </section>
+
+
+      <!-- PAYMENT SUMMARY -->
+      <section class="summary-grid">
+
+        <div class="summary-card">
+
+          <div class="summary-heading">
+
+            <div class="summary-icon">₵</div>
+
+            <div>
+              <span class="section-overline">
+                FINANCIAL OVERVIEW
+              </span>
+              <h3>Payment Summary</h3>
+            </div>
+
+          </div>
+
+          <div class="summary-line">
+            <span>Total Order Amount</span>
+
+            <strong>
+              {{ getTotal() | currency:'GHS ':'symbol':'1.2-2' }}
+            </strong>
+          </div>
+
+          <div class="summary-line">
+            <span>Amount Paid</span>
+
+            <strong class="paid-amount">
+              {{ getAmountPaid() | currency:'GHS ':'symbol':'1.2-2' }}
+            </strong>
+          </div>
+
+          <div class="summary-line">
+            <span>Outstanding Balance</span>
+
+            <strong class="balance-amount">
+              {{ getBalance() | currency:'GHS ':'symbol':'1.2-2' }}
+            </strong>
+          </div>
+
+          <div class="payment-divider"></div>
+
+          <div class="payment-status-row">
+            <span>Payment Status</span>
+
+            <span class="payment-badge"
+                  [ngClass]="getStatusClass(getPaymentStatus())">
+              {{ getPaymentStatus() }}
+            </span>
+          </div>
+
+        </div>
+
+
+        <!-- ORDER INFORMATION -->
+        <div class="summary-card">
+
+          <div class="summary-heading">
+
+            <div class="summary-icon info-icon">i</div>
+
+            <div>
+              <span class="section-overline">
+                ORDER INFORMATION
+              </span>
+              <h3>Additional Details</h3>
+            </div>
+
+          </div>
+
+          <div class="summary-line">
+            <span>Order Number</span>
+            <strong>#AFG-{{ order.id }}</strong>
+          </div>
+
+          <div class="summary-line">
+            <span>Order Date</span>
+            <strong>{{ getOrderDate() }}</strong>
+          </div>
+
+          <div class="summary-line">
+            <span>Products</span>
+            <strong>{{ items.length }}</strong>
+          </div>
+
+          <div class="summary-line">
+            <span>Order Type</span>
+
+            <strong>
+              {{ order.contain_digital_printing ? 'Digital Printing' :
+                 order.contain_large_format ? 'Large Format' :
+                 order.contain_label ? 'Label Printing' :
+                 order.contain_dtf ? 'DTF Printing' :
+                 'Graphics Services' }}
+            </strong>
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ORDER NOTE -->
+      <section class="customer-note" *ngIf="order.note">
+
+        <div class="note-icon">✦</div>
+
+        <div>
+          <h3>Order Note</h3>
+          <p>{{ order.note }}</p>
+        </div>
+
+      </section>
+
+
+      <!-- SEARCH ANOTHER ORDER -->
+      <div class="another-search">
+
+        <h3>Want to track another order?</h3>
+
+        <p>Enter another Order ID to view its tracking information.</p>
+
+        <button type="button"
+                class="another-search-btn"
+                (click)="resetSearch()">
+
+          Search Another Order
+
+          <span>→</span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- BOTTOM INFORMATION -->
+    <footer class="tracking-footer">
+
+      <div class="footer-brand">
+        <div class="footer-logo">AF</div>
+
+        <div>
+          <h3>AssempahFie Graphics</h3>
+          <p>Bringing your creative ideas to life.</p>
+        </div>
+      </div>
+
+      <div class="footer-message">
+
+        <h4>Thank you for choosing us!</h4>
+
+        <p>
+          We appreciate your business. Your satisfaction is our priority.
+          Contact our team if you need assistance with your order.
+        </p>
+
+      </div>
+
+      <div class="copyright">
+        © 2026 AssempahFie Graphics. All rights reserved.
+      </div>
+
+    </footer>
+
+  </main>
+
+</div>

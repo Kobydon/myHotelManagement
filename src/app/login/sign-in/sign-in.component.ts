@@ -21,6 +21,7 @@ export class SignInComponent implements OnInit {
   isKitchen=false;
   isWaiter=false;
   isBartender = false;
+  isuvdtf=false;
 
   constructor(private fb:FormBuilder,private router:Router,private userService:userService,private toastr:ToastrService) { 
 
@@ -102,6 +103,14 @@ export class SignInComponent implements OnInit {
       localStorage.setItem('isWaiter','true');
       
       this.router.navigate(["/item-list"])
+
+
+    }
+
+     else if(this.user[0]?.roles=="uvdtf"){
+      localStorage.setItem('uvdtf','true');
+      
+      this.router.navigate(["/view-uvdtf-order"])
 
 
     }

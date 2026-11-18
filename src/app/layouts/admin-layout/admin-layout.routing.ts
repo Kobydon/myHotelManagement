@@ -70,6 +70,8 @@ import { CustomersComponent } from 'app/customers/customers.component';
 import { HeldCartReportComponent } from 'app/held-cart-report/held-cart-report.component';
 import { SendBulkMessageComponent } from 'app/send-bulk-message/send-bulk-message.component';
 import { MessageReportComponent } from 'app/message-report/message-report.component';
+import { TaxSettingsComponent } from 'app/tax/tax-settings/tax-settings.component';
+import { TaxDashboardComponent } from 'app/tax/tax-dashboard/tax-dashboard.component';
 
 
 
@@ -144,5 +146,7 @@ export const AdminLayoutRoutes: Routes = [
              {path:'salary-payment',component:SalaryPaymentComponent},
    {path:'bulk-message',component:SendBulkMessageComponent},
       {path:'message-report',component:MessageReportComponent},
+       {path:'tax-settings',component:TaxSettingsComponent},
+      {path:'tax-dashboard',component:TaxDashboardComponent},
 
 ]

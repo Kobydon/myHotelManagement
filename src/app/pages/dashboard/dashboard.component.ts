@@ -1,4 +1,3 @@
-
 import {
   Component,
   OnInit,
@@ -15,21 +14,89 @@ import { GuestService } from 'app/services/guest.service';
 import { PaymentService } from 'app/services/payment.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { userService } from 'app/user.service';
-import { Router } from '@angular/router';          // ✅ correct import
+import { Router } from '@angular/router';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
 
+/* ============================================================
+   INTERFACES
+   ============================================================ */
 export interface BundleInfo {
   size: number;
   remaining: number;
 }
 
+export interface BundlePackage {
+  id: string;
+  name: string;
+  units: number;
+  amount: number;
+  per_unit: number;
+  badge?: string;
+}
+
+export interface OrderItem {
+  name?: string;
+  item_name?: string;
+  qty?: number;
+  price?: number;
+  total?: number;
+  category?: string;
+  family?: string;
+  description?: string;
+  measurement?: {
+    width?: number;
+    height?: number;
+    unit?: string;
+    area?: number;
+  };
+  measurementWidth?: number;
+  measurementHeight?: number;
+  measurementUnit?: string;
+  measurementArea?: number;
+  [key: string]: any;
+}
+
+export interface OrderRow {
+  id: number;
+  items: OrderItem[];
+  total: number;
+  balance: number;
+  collected: number;
+  waiter?: string;
+  customer?: string;
+  note?: string;
+  status?: string;
+  paid_status?: string;
+  created_at?: string;
+  table?: string;
+  item_count?: number;
+  contain_drink?: string;
+  contain_food?: string;
+  contain_dtf?: string;
+  contain_digital_printing?: string;
+  contain_large_format?: string;
+  contain_label?: string;
+  contain_uvdtf?: string;
+}
+
+export interface CategoryStat {
+  key: string;
+  label: string;
+  count: number;
+  quantity: number;
+  revenue: number;
+  collected: number;
+  balance: number;
+}
+
+
 @Component({
   selector: 'dashboard-cmp',
   moduleId: module.id,
   templateUrl: 'dashboard.component.html',
-     styleUrls: ['dashboard.component.css']
+  styleUrls: ['dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
 
@@ -76,28 +143,26 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   public paymentChart: any;
 
   /* ============================================================
-     HELD CART REPORT (single source of truth)
+     HELD CART REPORT
      ============================================================ */
-  reportData: any[] = [];
-  filteredData: any[] = [];
+  reportData: OrderRow[] = [];
+  filteredData: OrderRow[] = [];
   summary: any = {};
 
   /* ============================================================
-     STATS  — ALL derived from held cart report
+     STATS
      ============================================================ */
-  totalSales: number = 0;
-  totalBalance: number = 0;
-  totalCollected: number = 0;
-  totalOrders: number = 0;
-  totalItems: number = 0;
-  averageOrder: number = 0;
-  uniqueCustomers: number = 0;
+  totalSales = 0;
+  totalBalance = 0;
+  totalCollected = 0;
+  totalOrders = 0;
+  totalItems = 0;
+  averageOrder = 0;
+  uniqueCustomers = 0;
 
-  /* Today's numbers — also from held cart report */
-  todayIncome: number = 0;
-  todayBalance: number = 0;
+  todayIncome = 0;
+  todayBalance = 0;
 
-  /* Monthly chart — also from held cart report */
   monthlyPayments: { [month: string]: number } = {};
   months: string[] = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -109,53 +174,79 @@ export class DashboardComponent implements OnInit, AfterViewInit {
      ============================================================ */
   reportForm: FormGroup;
 
-  dateFrom: string = '';
-  dateTo: string = '';
-  selectedWaiter: string = '';
-  selectedCashier: string = '';
-  selectedMethod: string = '';
-  selectedDepartment: string = '';
-  selectedStatus: string = '';
-  searchTerm: string = '';
+  dateFrom = '';
+  dateTo = '';
+  selectedWaiter = '';
+  selectedCashier = '';
+  selectedMethod = '';
+  selectedDepartment = '';
+  selectedStatus = '';
+  searchTerm = '';
 
-  /* UI state */
-  isLoading: boolean = false;
-  showFilters: boolean = true;
+  isLoading = false;
+  showFilters = true;
   expandedOrderId: number | null = null;
-  selectedReportType: string = 'summary';
+  selectedReportType = 'summary';
 
-  showAttendantSummary: boolean = true;
-  selectedAttendant: string = '';
+  showAttendantSummary = true;
+  selectedAttendant = '';
 
   bundleInfo: BundleInfo = { size: 0, remaining: 0 };
 
   user: any;
 
-  /* Date helpers */
   currentYear: number = new Date().getFullYear();
   currentDate: Date = new Date();
   currentDateTime: string = new Date().toLocaleString();
 
-  /* Dropdowns */
   waiters: any[] = [];
   cashiers: any[] = [];
 
+  /* ============================================================
+     DEPARTMENT OPTIONS
+     ============================================================ */
   departments = [
-    { value: 'all', label: 'All Departments' },
-    { value: 'dtf', label: '🖨️ DTF' },
-    { value: 'digital_printing', label: '🖥️ Digital Printing' },
-    { value: 'large_format', label: '📐 Large Format' },
-    { value: 'label', label: '🏷️ Label' }
+    { value: 'all',                label: 'All Departments' },
+    { value: 'dtf',                label: '🖨️ DTF' },
+    { value: 'digital_printing',   label: '🖥️ Digital Printing' },
+    { value: 'large_format',       label: '📐 Large Format' },
+    { value: 'label',              label: '🏷️ Label' },
+    { value: 'uvdtf',              label: '🌈 UV DTF' },
+    { value: 'food',               label: '🍽️ Food' },
+    { value: 'restaurant',         label: '🍽️ Restaurant' },
+    { value: 'bar',                label: '🍹 Bar' },
+    { value: 'drink',              label: '🍹 Drinks' },
+    { value: 'laundry',            label: '🧺 Laundry' },
   ];
 
   statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'paid', label: '✅ Paid' },
-    { value: 'partial', label: '⚠️ Partial' },
-    { value: 'pending', label: '⏳ Pending' },
+    { value: 'all',       label: 'All Status' },
+    { value: 'paid',      label: '✅ Paid' },
+    { value: 'partial',   label: '⚠️ Partial' },
+    { value: 'pending',   label: '⏳ Pending' },
     { value: 'confirmed', label: '📋 Confirmed' }
   ];
 
+  categoryStats: CategoryStat[] = [];
+
+  /* ============================================================
+     SMS BUNDLE — TOP-UP + REDEEM STATE
+     ============================================================ */
+  showTopUpModal = false;
+  showRedeemModal = false;
+
+  bundlePackages: BundlePackage[] = [];
+  selectedPackageId = '';
+  topUpPaymentMethod = 'cash';
+  topUpProcessing = false;
+  loadingPackages = false;
+
+  redeemCode = '';
+  redeemProcessing = false;
+
+  /* ============================================================
+     MISC
+     ============================================================ */
   usdRate: number;
   gbpRate: number;
   eurRate: number;
@@ -177,15 +268,13 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.chartViewReady = true;
-
-    /* Re-draw chart if held cart data already loaded */
     if (this.reportData && this.reportData.length > 0) {
       this.initializePaymentChart();
     }
   }
 
   /* ============================================================
-     COLLECTION RATE (used by stat cards)
+     COLLECTION RATE
      ============================================================ */
   get collectionRate(): number {
     if (!this.totalSales || this.totalSales === 0) return 0;
@@ -235,42 +324,184 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       console.log(err);
     }
   }
-async getUsers() {
-  try {
-    this.loading.start();
 
-    const users = await this.userService.getUsers();
-
-    this.users = users.filter(
-      user => user.roles === 'online'
-    );
-
-  } catch (error) {
-    /* silent */
-  } finally {
-    this.loading.stop();
+  async getUsers() {
+    try {
+      this.loading.start();
+      const users = await this.userService.getUsers();
+      this.users = users.filter(user => user.roles === 'online');
+    } catch (error) {
+      /* silent */
+    } finally {
+      this.loading.stop();
+    }
   }
-}
 
   /* ============================================================
-     BUNDLE
+     BUNDLE — LOAD INFO
      ============================================================ */
   loadBundleInfo(): void {
     this.guestService.getRemainingBundle().subscribe({
       next: (bundle) => {
-        this.bundleInfo = bundle;
-        this.updateStats();
+        this.bundleInfo = {
+          size: Number(bundle?.size) || 0,
+          remaining: Number(bundle?.remaining) || 0
+        };
       },
       error: (err) => console.error('Error loading bundle:', err)
     });
   }
 
   /* ============================================================
-     HELD CART REPORT  — SOLE SOURCE OF INCOME / BALANCE
+     SMS BUNDLE — TOP-UP
+     ============================================================ */
+  openTopUpModal(): void {
+    this.showTopUpModal = true;
+    this.selectedPackageId = '';
+    this.topUpPaymentMethod = 'cash';
+    this.topUpProcessing = false;
+    this.loadBundlePackages();
+  }
+
+  closeTopUpModal(): void {
+    this.showTopUpModal = false;
+    this.topUpProcessing = false;
+  }
+
+  loadBundlePackages(): void {
+    this.loadingPackages = true;
+    this.guestService.getBundlePackages().subscribe({
+      next: (res) => {
+        this.loadingPackages = false;
+        if (res && res.success && Array.isArray(res.data)) {
+          this.bundlePackages = res.data;
+        } else if (Array.isArray(res)) {
+          this.bundlePackages = res;
+        } else {
+          this.bundlePackages = this.fallbackPackages();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load packages', err);
+        this.loadingPackages = false;
+        this.bundlePackages = this.fallbackPackages();
+      }
+    });
+  }
+
+  /** Local fallback matching backend, so modal still works offline. */
+  private fallbackPackages(): BundlePackage[] {
+    return [
+      { id: 'starter',    name: 'Starter Pack',  units: 170000,  amount: 15000,  per_unit: 0.0882, badge: 'Small teams' },
+      { id: 'growth',     name: 'Growth Pack',   units: 500000,  amount: 25000,  per_unit: 0.0500, badge: 'Best value' },
+      { id: 'pro',        name: 'Pro Pack',      units: 700000,  amount: 38000,  per_unit: 0.0543, badge: 'Most popular' },
+      { id: 'enterprise', name: 'Enterprise',    units: 1200000, amount: 108000, per_unit: 0.0900, badge: 'Max volume' }
+    ];
+  }
+
+  get selectedPackage(): BundlePackage | null {
+    return this.bundlePackages.find(p => p.id === this.selectedPackageId) || null;
+  }
+
+  selectPackage(pkg: BundlePackage): void {
+    this.selectedPackageId = pkg.id;
+  }
+
+  confirmTopUp(): void {
+    if (!this.selectedPackageId) {
+      this.toastr.warning('Please select a package', 'Warning');
+      return;
+    }
+    this.topUpProcessing = true;
+
+    this.guestService.topUpBundle({
+      package_id: this.selectedPackageId,
+      payment_method: this.topUpPaymentMethod
+    }).subscribe({
+      next: (res) => {
+        this.topUpProcessing = false;
+        if (res && res.success) {
+          this.toastr.success(res.message || 'Top-up successful', 'Success');
+
+          const bundle = res?.data?.bundle;
+          if (bundle) {
+            this.bundleInfo = {
+              size: Number(bundle.size) || 0,
+              remaining: Number(bundle.remaining) || 0
+            };
+          } else {
+            this.loadBundleInfo();
+          }
+          this.closeTopUpModal();
+          this.cdr.detectChanges();
+        } else {
+          this.toastr.error(res?.error || 'Top-up failed', 'Error');
+        }
+      },
+      error: (err) => {
+        this.topUpProcessing = false;
+        this.toastr.error(err?.error?.error || 'Top-up failed', 'Error');
+      }
+    });
+  }
+
+  /* ============================================================
+     SMS BUNDLE — REDEEM
+     ============================================================ */
+  openRedeemModal(): void {
+    this.showRedeemModal = true;
+    this.redeemCode = '';
+    this.redeemProcessing = false;
+  }
+
+  closeRedeemModal(): void {
+    this.showRedeemModal = false;
+    this.redeemProcessing = false;
+  }
+
+  confirmRedeem(): void {
+    const code = (this.redeemCode || '').trim();
+    if (!code) {
+      this.toastr.warning('Please enter a redeem code', 'Warning');
+      return;
+    }
+    this.redeemProcessing = true;
+
+    this.guestService.redeemBundle({ code }).subscribe({
+      next: (res) => {
+        this.redeemProcessing = false;
+        if (res && res.success) {
+          this.toastr.success(res.message || 'Code redeemed', 'Success');
+
+          const bundle = res?.data?.bundle;
+          if (bundle) {
+            this.bundleInfo = {
+              size: Number(bundle.size) || 0,
+              remaining: Number(bundle.remaining) || 0
+            };
+          } else {
+            this.loadBundleInfo();
+          }
+          this.redeemCode = '';
+          this.closeRedeemModal();
+          this.cdr.detectChanges();
+        } else {
+          this.toastr.error(res?.error || 'Redeem failed', 'Error');
+        }
+      },
+      error: (err) => {
+        this.redeemProcessing = false;
+        this.toastr.error(err?.error?.error || 'Redeem failed', 'Error');
+      }
+    });
+  }
+
+  /* ============================================================
+     REPORT
      ============================================================ */
   async generateReport(): Promise<void> {
     const dateFrom = this.reportForm.get('date_from')?.value || this.dateFrom;
-    const dateTo = this.reportForm.get('date_to')?.value || this.dateTo;
+    const dateTo   = this.reportForm.get('date_to')?.value   || this.dateTo;
 
     if (!dateFrom && !dateTo) {
       this.toastr.warning('Please select a date range', 'Warning');
@@ -282,23 +513,23 @@ async getUsers() {
     try {
       const payload = {
         date_from: dateFrom,
-        date_to: dateTo,
-        waiter: this.reportForm.get('waiter')?.value || '',
-        cashier: this.reportForm.get('cashier')?.value || '',
-        method: this.reportForm.get('method')?.value || '',
-        department: this.reportForm.get('department')?.value || '',
-        status: this.reportForm.get('status')?.value || '',
-        user_id: this.user?.id || null
+        date_to:   dateTo,
+        waiter:    this.reportForm.get('waiter')?.value  || '',
+        cashier:   this.reportForm.get('cashier')?.value || '',
+        method:    this.reportForm.get('method')?.value  || '',
+        department: '',
+        status:    this.reportForm.get('status')?.value  || '',
+        user_id:   this.user?.id || null
       };
 
       const res = await this.guestService.getHeldCartReport(payload);
 
       if (res && res.success) {
-        this.reportData = res.data || [];
-        this.summary = res.summary || {};
+        this.reportData = (res.data || []) as OrderRow[];
+        this.summary    = res.summary || {};
 
         this.selectedAttendant = '';
-        this.selectedWaiter = '';
+        this.selectedWaiter    = '';
 
         this.updateStats();
         this.processMonthlyPayments();
@@ -328,15 +559,15 @@ async getUsers() {
   }
 
   /* ============================================================
-     STATS  — from held cart summary + filtered data
+     STATS
      ============================================================ */
   updateStats(): void {
-    this.totalSales = this.summary.total_sales || 0;
-    this.totalBalance = this.summary.total_balance || 0;
-    this.totalCollected = this.summary.total_collected || 0;
-    this.totalOrders = this.summary.total_orders || 0;
-    this.totalItems = this.summary.total_items || 0;
-    this.averageOrder = this.summary.average_order || 0;
+    this.totalSales      = this.summary.total_sales || 0;
+    this.totalBalance    = this.summary.total_balance || 0;
+    this.totalCollected  = this.summary.total_collected || 0;
+    this.totalOrders     = this.summary.total_orders || 0;
+    this.totalItems      = this.summary.total_items || 0;
+    this.averageOrder    = this.summary.average_order || 0;
     this.uniqueCustomers = this.summary.unique_customers || 0;
   }
 
@@ -379,10 +610,9 @@ async getUsers() {
   }
 
   /* ============================================================
-     MONTHLY SALES  — from held cart report
+     MONTHLY SALES
      ============================================================ */
   processMonthlyPayments(): void {
-    /* Reset */
     this.monthlyPayments = {
       Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
       Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0
@@ -390,23 +620,19 @@ async getUsers() {
 
     if (!this.reportData || !Array.isArray(this.reportData)) return;
 
-    this.reportData.forEach((order: any) => {
+    this.reportData.forEach((order: OrderRow) => {
       if (!order.created_at) return;
-
       const orderDate = new Date(order.created_at.replace(' ', 'T'));
       if (isNaN(orderDate.getTime())) return;
 
       const monthName = this.months[orderDate.getMonth()];
       const amount = Number(order.total) || 0;
-
       this.monthlyPayments[monthName] += amount;
     });
-
-    console.log('MONTHLY TOTALS (held cart):', this.monthlyPayments);
   }
 
   /* ============================================================
-     TODAY'S INCOME & BALANCE  — from held cart report
+     TODAY'S TOTALS
      ============================================================ */
   computeTodayTotals(): void {
     const today = new Date();
@@ -417,26 +643,23 @@ async getUsers() {
     let income = 0;
     let balance = 0;
 
-    (this.reportData || []).forEach((order: any) => {
+    (this.reportData || []).forEach((order: OrderRow) => {
       if (!order.created_at) return;
-
       const orderDate = new Date(order.created_at.replace(' ', 'T'));
       if (isNaN(orderDate.getTime())) return;
 
       if (
         orderDate.getFullYear() === y &&
-        orderDate.getMonth() === m &&
-        orderDate.getDate() === d
+        orderDate.getMonth()    === m &&
+        orderDate.getDate()     === d
       ) {
-        income += Number(order.total) || 0;
+        income  += Number(order.total) || 0;
         balance += Number(order.balance) || 0;
       }
     });
 
-    this.todayIncome = income;
+    this.todayIncome  = income;
     this.todayBalance = balance;
-
-    console.log('TODAY (held cart):', income, balance);
   }
 
   /* ============================================================
@@ -444,10 +667,7 @@ async getUsers() {
      ============================================================ */
   initializePaymentChart(): void {
     const canvas = document.getElementById('paymentChart') as HTMLCanvasElement;
-    if (!canvas) {
-      console.warn('paymentChart canvas not found yet.');
-      return;
-    }
+    if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -563,9 +783,79 @@ async getUsers() {
     const dep = new Date(departureDate);
     const isToday =
       dep.getFullYear() === now.getFullYear() &&
-      dep.getMonth() === now.getMonth() &&
-      dep.getDate() === now.getDate();
+      dep.getMonth()    === now.getMonth() &&
+      dep.getDate()     === now.getDate();
     return isToday && dep.getHours() >= 12;
+  }
+
+  /* ============================================================
+     CATEGORY HELPERS
+     ============================================================ */
+  private normalizeCategory(raw: any): string {
+    if (raw === undefined || raw === null) return '';
+    return String(raw).trim().toLowerCase().replace(/\s+/g, '_');
+  }
+
+  getItemCategory(item: OrderItem): string {
+    if (!item) return '';
+    const direct = this.normalizeCategory(item.category);
+    if (direct) return direct;
+
+    const fam = this.normalizeCategory(item.family);
+    if (fam) return fam;
+
+    const prod = item.product;
+    if (prod) {
+      const pc = this.normalizeCategory(prod.category || prod.family);
+      if (pc) return pc;
+    }
+    return 'uncategorized';
+  }
+
+  getOrderCategories(order: OrderRow): string[] {
+    const set = new Set<string>();
+    (order.items || []).forEach(it => {
+      const c = this.getItemCategory(it);
+      if (c) set.add(c);
+    });
+    return Array.from(set);
+  }
+
+  private orderMatchesDepartment(order: OrderRow, dept: string): boolean {
+    if (!dept || dept === 'all') return true;
+    const wanted = dept.toLowerCase().replace(/\s+/g, '_');
+    const cats = this.getOrderCategories(order);
+    if (!cats.length) return false;
+
+    const aliases: { [k: string]: string } = {
+      drink: 'bar',
+      drinks: 'bar',
+      food: 'restaurant',
+      uv_dtf: 'uvdtf'
+    };
+    const match = (c: string) => (aliases[c] || c) === wanted;
+    return cats.some(match);
+  }
+
+  getCategoryLabel(cat: string): string {
+    const key = (cat || '').toLowerCase().replace(/\s+/g, '_');
+    const map: { [k: string]: string } = {
+      dtf:               '🖨️ DTF',
+      digital_printing:  '🖥️ Digital Printing',
+      large_format:      '📐 Large Format',
+      label:             '🏷️ Label',
+      uvdtf:             '🌈 UV DTF',
+      uv_dtf:            '🌈 UV DTF',
+      food:              '🍽️ Food',
+      restaurant:        '🍽️ Restaurant',
+      kitchen:           '🍽️ Kitchen',
+      bar:               '🍹 Bar',
+      drink:             '🍹 Drinks',
+      drinks:            '🍹 Drinks',
+      laundry:           '🧺 Laundry',
+      uncategorized:     '📦 Uncategorized'
+    };
+    return map[key] || ('📦 ' + key.replace(/_/g, ' '));
   }
 
   /* ============================================================
@@ -597,7 +887,18 @@ async getUsers() {
       );
     }
 
+    if (this.selectedDepartment && this.selectedDepartment !== ''
+        && this.selectedDepartment !== 'all') {
+      const dept = this.selectedDepartment;
+      filtered = filtered.filter(order =>
+        this.orderMatchesDepartment(order, dept)
+      );
+    }
+
     this.filteredData = filtered;
+
+    this.rebuildCategoryStats();
+
     this.updateStatsFromFilteredData();
     this.cdr.detectChanges();
   }
@@ -607,16 +908,89 @@ async getUsers() {
     this.applyFilters();
   }
 
+  onDepartmentChange(value: string): void {
+    this.selectedDepartment = value;
+    this.applyFilters();
+  }
+
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedAttendant = '';
     this.selectedWaiter = '';
+    this.selectedDepartment = '';
     this.reportForm.reset();
     this.setDefaultDateRange();
     this.filteredData = [...this.reportData];
+    this.rebuildCategoryStats();
     this.updateStatsFromFilteredData();
     this.toastr.info('Filters cleared', 'Info');
     this.cdr.detectChanges();
+  }
+
+  /* ============================================================
+     CATEGORY BREAKDOWN
+     ============================================================ */
+  rebuildCategoryStats(): void {
+    const map = new Map<string, CategoryStat>();
+
+    (this.filteredData || []).forEach(order => {
+      const items = order.items || [];
+      if (!items.length) return;
+
+      let sumLines = 0;
+      items.forEach(it => {
+        sumLines += this.getItemLineTotal(it);
+      });
+
+      const orderCollected = Number(order.collected) || 0;
+      const orderBalance   = Number(order.balance) || 0;
+
+      items.forEach(it => {
+        const key = this.getItemCategory(it);
+        if (!key) return;
+
+        const lineTotal = this.getItemLineTotal(it);
+        const lineQty   = Number(it.qty) || 0;
+
+        const share =
+          sumLines > 0 ? lineTotal / sumLines : (1 / items.length);
+
+        if (!map.has(key)) {
+          map.set(key, {
+            key,
+            label: this.getCategoryLabel(key),
+            count: 0,
+            quantity: 0,
+            revenue: 0,
+            collected: 0,
+            balance: 0
+          });
+        }
+        const stat = map.get(key)!;
+        stat.count     += 1;
+        stat.quantity  += lineQty;
+        stat.revenue   += lineTotal;
+        stat.collected += orderCollected * share;
+        stat.balance   += orderBalance   * share;
+      });
+    });
+
+    this.categoryStats = Array.from(map.values())
+      .map(s => ({
+        ...s,
+        revenue:   Math.round(s.revenue   * 100) / 100,
+        collected: Math.round(s.collected * 100) / 100,
+        balance:   Math.round(s.balance   * 100) / 100
+      }))
+      .sort((a, b) => b.revenue - a.revenue);
+  }
+
+  private getItemLineTotal(item: OrderItem): number {
+    const direct = Number(item.total ?? item.line_total);
+    if (!isNaN(direct) && direct > 0) return direct;
+    const price = Number(item.price) || 0;
+    const qty   = Number(item.qty)   || 0;
+    return price * qty;
   }
 
   /* ============================================================
@@ -626,15 +1000,15 @@ async getUsers() {
     this.expandedOrderId = this.expandedOrderId === orderId ? null : orderId;
   }
 
-  getTotalItems(order: any): number {
+  getTotalItems(order: OrderRow): number {
     if (!order.items) return 0;
     return order.items.reduce(
-      (total: number, item: any) => total + (item.qty || 0),
+      (total: number, item: any) => total + (Number(item.qty) || 0),
       0
     );
   }
 
-  getStatusClass(order: any): string {
+  getStatusClass(order: OrderRow): string {
     const status = order.paid_status || order.status;
     switch (status) {
       case 'Success':
@@ -663,72 +1037,13 @@ async getUsers() {
     }
   }
 
-  getDepartmentBadges(order: any): string[] {
-    const badges: string[] = [];
-    if (order.contain_dtf === 'yes') badges.push('🖨️ DTF');
-    if (order.contain_digital_printing === 'yes') badges.push('🖥️ Digital Printing');
-    if (order.contain_large_format === 'yes') badges.push('📐 Large Format');
-    if (order.contain_label === 'yes') badges.push('🏷️ Label');
-    return badges;
+  getDepartmentBadges(order: OrderRow): string[] {
+    return this.getOrderCategories(order)
+      .map(c => this.getCategoryLabel(c));
   }
 
   /* ============================================================
-     EXPORT
-     ============================================================ */
-  exportToExcel(): void {
-    if (!this.filteredData || this.filteredData.length === 0) {
-      this.toastr.warning('No data to export', 'Warning');
-      return;
-    }
-
-    const exportData = this.filteredData.map(order => ({
-      'Order #': order.id,
-      'Customer': order.customer || 'Walk-in',
-      'Waiter': order.waiter || 'N/A',
-      'Total': order.total || 0,
-      'Collected': order.collected || 0,
-      'Balance': order.balance || 0,
-      'Status': order.paid_status || order.status || 'N/A',
-      'Items': this.getTotalItems(order),
-      'Date': this.formatDisplayDate(order.created_at),
-      'Note': order.note || ''
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
-
-    const summaryData = [
-      ['SALES REPORT SUMMARY (HELD CART)'],
-      [],
-      ['Metric', 'Value'],
-      ['Total Sales', this.totalSales],
-      ['Total Collected', this.totalCollected],
-      ['Total Balance', this.totalBalance],
-      ['Today Income', this.todayIncome],
-      ['Today Balance', this.todayBalance],
-      ['Total Orders', this.totalOrders],
-      ['Total Items', this.totalItems],
-      ['Average Order', this.averageOrder],
-      ['Unique Customers', this.uniqueCustomers]
-    ];
-    const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summaryWS, 'Summary');
-
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: 'xlsx',
-      type: 'array'
-    });
-    const data = new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-    saveAs(data, `sales_report_${new Date().toISOString().split('T')[0]}.xlsx`);
-
-    this.toastr.success('Report exported to Excel', 'Success');
-  }
-
-  /* ============================================================
-     ATTENDANT SUMMARY  — from held cart report
+     ATTENDANT SUMMARY
      ============================================================ */
   toggleAttendantSummary(): void {
     this.showAttendantSummary = !this.showAttendantSummary;
@@ -759,10 +1074,10 @@ async getUsers() {
         });
       }
       const entry = map.get(name);
-      entry.total_sales += Number(order.total) || 0;
+      entry.total_sales     += Number(order.total)     || 0;
       entry.total_collected += Number(order.collected) || 0;
-      entry.total_balance += Number(order.balance) || 0;
-      entry.order_count += 1;
+      entry.total_balance   += Number(order.balance)   || 0;
+      entry.order_count     += 1;
       entry.orders.push(order);
     });
 
@@ -783,6 +1098,7 @@ async getUsers() {
     this.filteredData = this.reportData.filter(
       o => (o.waiter || 'Unassigned') === name
     );
+    this.rebuildCategoryStats();
     this.updateStatsFromFilteredData();
     this.toastr.success(`Showing orders for ${name}`, 'Filter Applied');
     this.cdr.detectChanges();
@@ -792,13 +1108,81 @@ async getUsers() {
     this.selectedAttendant = '';
     this.selectedWaiter = '';
     this.filteredData = [...this.reportData];
+    this.rebuildCategoryStats();
     this.updateStatsFromFilteredData();
     this.toastr.info('Filter cleared', 'Info');
     this.cdr.detectChanges();
   }
 
   /* ============================================================
-     UNUSED — keeping exchange rate stub for compatibility
+     EXPORT
+     ============================================================ */
+  exportToExcel(): void {
+    if (!this.filteredData || this.filteredData.length === 0) {
+      this.toastr.warning('No data to export', 'Warning');
+      return;
+    }
+
+    const exportData = this.filteredData.map(order => ({
+      'Order #':  order.id,
+      'Customer': order.customer || 'Walk-in',
+      'Waiter':   order.waiter   || 'N/A',
+      'Total':    order.total     || 0,
+      'Collected': order.collected || 0,
+      'Balance':  order.balance   || 0,
+      'Status':   order.paid_status || order.status || 'N/A',
+      'Items':    this.getTotalItems(order),
+      'Categories': this.getOrderCategories(order).join(', '),
+      'Date':     this.formatDisplayDate(order.created_at),
+      'Note':     order.note || ''
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook  = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
+
+    const summaryData = [
+      ['SALES REPORT SUMMARY (HELD CART)'],
+      [],
+      ['Metric', 'Value'],
+      ['Total Sales',       this.totalSales],
+      ['Total Collected',   this.totalCollected],
+      ['Total Balance',     this.totalBalance],
+      ['Today Income',      this.todayIncome],
+      ['Today Balance',     this.todayBalance],
+      ['Total Orders',      this.totalOrders],
+      ['Total Items',       this.totalItems],
+      ['Average Order',     this.averageOrder],
+      ['Unique Customers',  this.uniqueCustomers]
+    ];
+    const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summaryWS, 'Summary');
+
+    const catRows: any[][] = [
+      ['CATEGORY BREAKDOWN'],
+      [],
+      ['Category', 'Lines', 'Quantity', 'Revenue', 'Collected', 'Balance']
+    ];
+    this.categoryStats.forEach(c => {
+      catRows.push([c.label, c.count, c.quantity, c.revenue, c.collected, c.balance]);
+    });
+    const catWS = XLSX.utils.aoa_to_sheet(catRows);
+    XLSX.utils.book_append_sheet(workbook, catWS, 'Categories');
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array'
+    });
+    const data = new Blob([excelBuffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    saveAs(data, `sales_report_${new Date().toISOString().split('T')[0]}.xlsx`);
+
+    this.toastr.success('Report exported to Excel', 'Success');
+  }
+
+  /* ============================================================
+     EXCHANGE RATES (unused)
      ============================================================ */
   getExchangeRates() {
     const apiUrl = 'https://api.exchangerate-api.com/v4/latest/USD';
@@ -814,19 +1198,19 @@ async getUsers() {
       (error: HttpErrorResponse) => console.error(error)
     );
   }
-  /* ============================================================
-   SMS BUNDLE HELPERS (used by bundle panel + stat card)
-   ============================================================ */
-get bundleUsed(): number {
-  const size = this.bundleInfo?.size || 0;
-  const remaining = this.bundleInfo?.remaining || 0;
-  return Math.max(size - remaining, 0);
-}
 
-get bundleUsedPercent(): number {
-  const size = this.bundleInfo?.size || 0;
-  if (size <= 0) return 0;
-  const used = this.bundleUsed;
-  return Math.min((used / size) * 100, 100);
-}
+  /* ============================================================
+     BUNDLE GETTERS
+     ============================================================ */
+  get bundleUsed(): number {
+    const size = this.bundleInfo?.size || 0;
+    const remaining = this.bundleInfo?.remaining || 0;
+    return Math.max(size - remaining, 0);
+  }
+
+  get bundleUsedPercent(): number {
+    const size = this.bundleInfo?.size || 0;
+    if (size <= 0) return 0;
+    return Math.min((this.bundleUsed / size) * 100, 100);
+  }
 }

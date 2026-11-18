@@ -41,7 +41,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   orderToConfirm: any = null;
   showNameError: boolean = false;
   
-  // Process Selection Properties - ALL NEW OPTIONS
+  // Process Selection Properties - ALL OPTIONS
   processCutting: boolean = false;
   processTrimming: boolean = false;
   processCreasing: boolean = false;
@@ -49,6 +49,8 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
   processMatteLaminationBothSides: boolean = false;
   processGlossLaminationOneSide: boolean = false;
   processGlossLaminationBothSides: boolean = false;
+  processSoftTouchLaminationOneSide: boolean = false;   // NEW
+  processSoftTouchLaminationBothSides: boolean = false;  // NEW
   processPouchLamination: boolean = false;
   
   // Subscriptions
@@ -610,6 +612,8 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     this.processMatteLaminationBothSides = false;
     this.processGlossLaminationOneSide = false;
     this.processGlossLaminationBothSides = false;
+    this.processSoftTouchLaminationOneSide = false;   // NEW reset
+    this.processSoftTouchLaminationBothSides = false;  // NEW reset
     this.processPouchLamination = false;
     this.showNameError = false;
   }
@@ -653,6 +657,14 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
 
     if (this.processGlossLaminationBothSides) {
       processes.push('Gloss Lamination (Both Sides)');
+    }
+
+    if (this.processSoftTouchLaminationOneSide) {
+      processes.push('Soft Touch Lamination (1 Side)');
+    }
+
+    if (this.processSoftTouchLaminationBothSides) {
+      processes.push('Soft Touch Lamination (Both Sides)');
     }
 
     if (this.processPouchLamination) {
@@ -720,6 +732,8 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     this.processMatteLaminationBothSides = false;
     this.processGlossLaminationOneSide = false;
     this.processGlossLaminationBothSides = false;
+    this.processSoftTouchLaminationOneSide = false;   // NEW reset
+    this.processSoftTouchLaminationBothSides = false;  // NEW reset
     this.processPouchLamination = false;
     this.showNameError = false;
   }
@@ -879,6 +893,9 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
             .process-badge-gloss {
               background: #8e44ad;
             }
+            .process-badge-soft-touch {
+              background: #f39c12;
+            }
             .process-badge-pouch {
               background: #1abc9c;
             }
@@ -970,7 +987,7 @@ export class ViewOrderComponent implements OnInit, OnDestroy {
     }
 
     const lamination = prompt(
-      'Enter process (optional): Cutting, Matte Lamination, Gloss Lamination'
+      'Enter process (optional): Cutting, Matte Lamination, Gloss Lamination, Soft Touch Lamination'
     );
 
     if (lamination === null) {

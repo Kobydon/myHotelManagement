@@ -1,17 +1,46 @@
 <!-- ================= PAYMENT DEADLINE ALERT ================= -->
+<!-- <div class="payment-alert" *ngIf="showPaymentAlert && !paymentDeadlinePassed">
+  <div class="alert-content">
+    <i class="fa fa-info-circle"></i>
+    <div>
+      <strong>Payment Reminder</strong>
+      <p>
+        Final payment deadline in
+        <strong>{{ paymentDaysRemaining }} day{{ paymentDaysRemaining !== 1 ? 's' : '' }}</strong>
+        ({{ paymentDueDate }}).
+      </p>
+    </div>
+    <button class="btn-close-alert" (click)="closePaymentAlert()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+</div>
 
-
-
+<div class="payment-alert overdue" *ngIf="showPaymentAlert && paymentDeadlinePassed">
+  <div class="alert-content">
+    <i class="fa fa-exclamation-triangle"></i>
+    <div>
+      <strong>Payment Deadline Passed</strong>
+      <p>The final payment deadline of {{ paymentDueDate }} has passed.</p>
+    </div>
+  </div>
+</div> -->
 <!-- ================= END PAYMENT DEADLINE ALERT ================= -->
+
+
 <div class="report-container" *blockUI="'loading'">
 
-  <!-- Header -->
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
   <div class="report-header">
     <div class="header-content">
       <div class="company-info">
         <h1>🏢 Assempahfie Graphics</h1>
-        <p class="company-tagline">Premium Printing & Graphics Services</p>
-        <p class="company-details">📍 Kokomlemle, Accra | 📞 0243210009 | 📧 asempahfie@gmail.com</p>
+        <p class="company-tagline">Premium Printing &amp; Graphics Services</p>
+        <p class="company-details">
+          📍 Kokomlemle, Accra | 📞 0243210009 | 📧 asempahfie@gmail.com
+        </p>
       </div>
       <div class="report-title">
         <h2>📊 Comprehensive Sales Report</h2>
@@ -20,63 +49,163 @@
     </div>
   </div>
 
-  <!-- Filter Section -->
+  <!-- ============================================================
+       FILTER SECTION
+       ============================================================ -->
   <div class="filter-section card">
     <div class="card-header" (click)="showFilters = !showFilters">
       <h5><i class="fa fa-filter"></i> Filters</h5>
-      <i class="fa" [ngClass]="{'fa-chevron-down': !showFilters, 'fa-chevron-up': showFilters}"></i>
+      <i class="fa"
+         [ngClass]="{'fa-chevron-down': !showFilters, 'fa-chevron-up': showFilters}"></i>
     </div>
+
     <div class="card-body" *ngIf="showFilters">
       <form [formGroup]="reportForm" class="filter-form">
+
+        <!-- ============================================================
+             QUICK DATE RANGE BUTTONS
+             ============================================================ -->
+        <div class="quick-range-bar">
+          <span class="quick-range-label">
+            <i class="fa fa-clock-o"></i> Quick Range:
+          </span>
+
+          <button type="button"
+                  class="btn-range"
+                  [class.active]="selectedRangePreset === 'daily'"
+                  (click)="setDateRange('daily')">
+            <i class="fa fa-calendar-day"></i> Daily
+          </button>
+
+          <button type="button"
+                  class="btn-range"
+                  [class.active]="selectedRangePreset === 'weekly'"
+                  (click)="setDateRange('weekly')">
+            <i class="fa fa-calendar-week"></i> Weekly
+          </button>
+
+          <button type="button"
+                  class="btn-range"
+                  [class.active]="selectedRangePreset === 'monthly'"
+                  (click)="setDateRange('monthly')">
+            <i class="fa fa-calendar"></i> Monthly
+          </button>
+
+          <button type="button"
+                  class="btn-range"
+                  [class.active]="selectedRangePreset === 'yearly'"
+                  (click)="setDateRange('yearly')">
+            <i class="fa fa-calendar-check-o"></i> Yearly
+          </button>
+        </div>
+
+        <!-- Active range hint -->
+        <div class="range-hint" *ngIf="selectedRangePreset">
+          <i class="fa fa-info-circle"></i>
+          Showing <strong>{{ selectedRangePreset | titlecase }}</strong> report:
+          {{ dateFrom | date:'dd MMM yyyy' }} → {{ dateTo | date:'dd MMM yyyy' }}
+        </div>
+
+        <!-- ============================================================
+             DATE ROW
+             ============================================================ -->
         <div class="form-row">
           <div class="form-group">
             <label><i class="fa fa-calendar"></i> Date From</label>
-            <input type="date" class="form-control" formControlName="date_from" [(ngModel)]="dateFrom" />
+            <input type="date" class="form-control"
+                   formControlName="date_from"
+                   [(ngModel)]="dateFrom"
+                   (change)="onManualDateChange()">
           </div>
+
           <div class="form-group">
             <label><i class="fa fa-calendar"></i> Date To</label>
-            <input type="date" class="form-control" formControlName="date_to" [(ngModel)]="dateTo" />
+            <input type="date" class="form-control"
+                   formControlName="date_to"
+                   [(ngModel)]="dateTo"
+                   (change)="onManualDateChange()">
           </div>
+
           <div class="form-group">
             <label><i class="fa fa-user"></i> Attendant</label>
-            <select class="form-control" formControlName="waiter" [(ngModel)]="selectedWaiter">
+            <select class="form-control"
+                    formControlName="waiter"
+                    [(ngModel)]="selectedWaiter">
               <option value="">All Attendants</option>
-              <option *ngFor="let waiter of waiters" [value]="waiter.firstname + ' ' + waiter.lastname">
+              <option *ngFor="let waiter of waiters"
+                      [value]="waiter.firstname + ' ' + waiter.lastname">
                 {{ waiter.firstname }} {{ waiter.lastname }}
               </option>
             </select>
           </div>
         </div>
+
         <div class="form-row">
+          <!-- ============================================================
+               DEPARTMENT FILTER — category-driven
+               ============================================================ -->
           <div class="form-group">
-            <label><i class="fa fa-building"></i> Department</label>
-            <select class="form-control" formControlName="department" [(ngModel)]="selectedDepartment">
-              <option *ngFor="let dept of departments" [value]="dept.value">{{ dept.label }}</option>
+            <label><i class="fa fa-building"></i> Department (Category)</label>
+            <select class="form-control"
+                    [ngModel]="selectedDepartment"
+                    (ngModelChange)="onDepartmentChange($event)"
+                    [ngModelOptions]="{standalone: true}">
+              <option *ngFor="let dept of departments" [value]="dept.value">
+                {{ dept.label }}
+              </option>
             </select>
           </div>
+
           <div class="form-group">
             <label><i class="fa fa-flag"></i> Status</label>
-            <select class="form-control" formControlName="status" [(ngModel)]="selectedStatus">
-              <option *ngFor="let status of statusOptions" [value]="status.value">{{ status.label }}</option>
+            <select class="form-control"
+                    formControlName="status"
+                    [(ngModel)]="selectedStatus">
+              <option *ngFor="let status of statusOptions" [value]="status.value">
+                {{ status.label }}
+              </option>
             </select>
           </div>
         </div>
+
+        <!-- Active department hint -->
+        <div class="filter-summary"
+             *ngIf="selectedDepartment && selectedDepartment !== 'all'">
+          <i class="fa fa-filter"></i>
+          Filtering by category:
+          <strong>{{ getCategoryLabel(selectedDepartment) }}</strong>
+          <button class="btn btn-link btn-sm p-0 ms-2"
+                  type="button"
+                  (click)="onDepartmentChange('all')">
+            Clear
+          </button>
+        </div>
+
         <div class="form-actions">
-          <button class="btn btn-primary" (click)="generateReport()">
+          <button class="btn btn-primary"
+                  type="button"
+                  (click)="generateReport()">
             <i class="fa fa-search"></i> Generate Report
           </button>
-          <button class="btn btn-secondary" (click)="clearFilters()">
+          <button class="btn btn-secondary"
+                  type="button"
+                  (click)="clearFilters()">
             <i class="fa fa-times"></i> Clear
           </button>
-          <button class="btn btn-secondary" (click)="goBack()">
+          <button class="btn btn-secondary"
+                  type="button"
+                  (click)="goBack()">
             <i class="fa fa-arrow-left"></i> Back
           </button>
         </div>
+
       </form>
     </div>
   </div>
 
-  <!-- Quick Stats -->
+  <!-- ============================================================
+       QUICK STATS
+       ============================================================ -->
   <div class="stats-grid" *ngIf="filteredData.length > 0">
     <div class="stat-card">
       <div class="stat-icon"><i class="fa fa-credit-card"></i></div>
@@ -85,20 +214,27 @@
         <div class="stat-label">Total Sales</div>
       </div>
     </div>
+
     <div class="stat-card">
-      <div class="stat-icon"><i class="fa fa-check-circle" style="color: #27ae60;"></i></div>
+      <div class="stat-icon">
+        <i class="fa fa-check-circle" style="color: #27ae60;"></i>
+      </div>
       <div class="stat-info">
         <div class="stat-value">₵{{ totalCollected | number:'1.2-2' }}</div>
         <div class="stat-label">Collected</div>
       </div>
     </div>
+
     <div class="stat-card">
-      <div class="stat-icon"><i class="fa fa-exclamation-triangle" style="color: #f39c12;"></i></div>
+      <div class="stat-icon">
+        <i class="fa fa-exclamation-triangle" style="color: #f39c12;"></i>
+      </div>
       <div class="stat-info">
         <div class="stat-value">₵{{ totalBalance | number:'1.2-2' }}</div>
         <div class="stat-label">Balance</div>
       </div>
     </div>
+
     <div class="stat-card">
       <div class="stat-icon"><i class="fa fa-shopping-cart"></i></div>
       <div class="stat-info">
@@ -106,6 +242,7 @@
         <div class="stat-label">Total Orders</div>
       </div>
     </div>
+
     <div class="stat-card">
       <div class="stat-icon"><i class="fa fa-users"></i></div>
       <div class="stat-info">
@@ -113,6 +250,7 @@
         <div class="stat-label">Unique Customers</div>
       </div>
     </div>
+
     <div class="stat-card">
       <div class="stat-icon"><i class="fa fa-calculator"></i></div>
       <div class="stat-info">
@@ -122,16 +260,89 @@
     </div>
   </div>
 
-  <!-- Search and Actions -->
+  <!-- ============================================================
+       CATEGORY BREAKDOWN — NEW
+       ============================================================ -->
+  <!-- <div class="category-breakdown"
+       *ngIf="categoryStats && categoryStats.length > 0">
+
+    <div class="category-header">
+      <div class="header-left">
+        <i class="fa fa-pie-chart"></i>
+        <h4>📊 Category Breakdown</h4>
+        <span class="badge">{{ categoryStats.length }} categories</span>
+        <span class="badge-secondary"
+              *ngIf="selectedDepartment && selectedDepartment !== 'all'">
+          Filtered: {{ getCategoryLabel(selectedDepartment) }}
+          <i class="fa fa-times-circle"
+             (click)="onDepartmentChange('all')"
+             style="cursor:pointer;margin-left:5px;"></i>
+        </span>
+      </div>
+      <div class="header-right">
+        <span class="hint-text">
+          <i class="fa fa-info-circle"></i> Click a card to filter
+        </span>
+      </div>
+    </div>
+
+    <div class="category-grid">
+      <div class="category-card"
+           *ngFor="let c of categoryStats"
+           [class.active]="selectedDepartment === c.key"
+           (click)="onDepartmentChange(c.key)">
+
+        <div class="category-card-header">
+          <div class="category-name">{{ c.label }}</div>
+          <div class="category-count">
+            {{ c.count }} line{{ c.count !== 1 ? 's' : '' }}
+          </div>
+        </div>
+
+        <div class="category-card-body">
+          <div class="metric-row">
+            <span class="metric-label">Quantity</span>
+            <span class="metric-value">{{ c.quantity | number }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Revenue</span>
+            <span class="metric-value">₵{{ c.revenue | number:'1.2-2' }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Collected</span>
+            <span class="metric-value text-success">
+              ₵{{ c.collected | number:'1.2-2' }}
+            </span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Balance</span>
+            <span class="metric-value"
+                  [ngClass]="c.balance > 0 ? 'text-danger' : 'text-muted'">
+              ₵{{ c.balance | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="category-card-footer">
+          <i class="fa fa-filter"></i>
+          {{ selectedDepartment === c.key ? 'Filtered' : 'Click to filter' }}
+        </div>
+
+      </div>
+    </div>
+
+  </div> -->
+
+  <!-- ============================================================
+       SEARCH AND ACTIONS
+       ============================================================ -->
   <div class="action-bar" *ngIf="filteredData.length > 0">
     <div class="search-box">
       <i class="fa fa-search"></i>
-      <input 
-        type="text" 
-        placeholder="Search orders..." 
-        (input)="onSearchChange($event)"
-        class="form-control"
-      />
+      <input type="text"
+             placeholder="Search orders..."
+             (input)="onSearchChange($event)"
+             class="form-control">
     </div>
     <div class="action-buttons">
       <button class="btn btn-success" (click)="exportToExcel()">
@@ -146,8 +357,11 @@
     </div>
   </div>
 
-  <!-- Attendant Breakdown Section -->
+  <!-- ============================================================
+       ATTENDANT BREAKDOWN
+       ============================================================ -->
   <div class="attendant-breakdown" *ngIf="filteredData.length > 0">
+
     <div class="attendant-header" (click)="toggleAttendantSummary()">
       <div class="header-left">
         <i class="fa fa-users"></i>
@@ -155,17 +369,23 @@
         <span class="badge">{{ getAttendantCount() }} Attendants</span>
         <span class="badge-secondary" *ngIf="selectedAttendant">
           Filtered: {{ selectedAttendant }}
-          <i class="fa fa-times-circle" (click)="resetAttendantFilter(); $event.stopPropagation()" style="cursor:pointer;margin-left:5px;"></i>
+          <i class="fa fa-times-circle"
+             (click)="resetAttendantFilter(); $event.stopPropagation()"
+             style="cursor:pointer;margin-left:5px;"></i>
         </span>
       </div>
       <div class="header-right">
-        <span class="total-badge">₵{{ totalCollected | number:'1.2-2' }} Collected</span>
-        <i class="fa" [ngClass]="{'fa-chevron-down': !showAttendantSummary, 'fa-chevron-up': showAttendantSummary}"></i>
+        <span class="total-badge">
+          ₵{{ totalCollected | number:'1.2-2' }} Collected
+        </span>
+        <i class="fa"
+           [ngClass]="{'fa-chevron-down': !showAttendantSummary,
+                       'fa-chevron-up': showAttendantSummary}"></i>
       </div>
     </div>
-    
+
     <div class="attendant-body" *ngIf="showAttendantSummary">
-      <!-- Summary Stats Row -->
+
       <div class="attendant-stats-row">
         <div class="stat-item">
           <span class="stat-label">Total Attendants</span>
@@ -177,35 +397,37 @@
         </div>
         <div class="stat-item">
           <span class="stat-label">Total Collected</span>
-          <span class="stat-value text-success">₵{{ totalCollected | number:'1.2-2' }}</span>
+          <span class="stat-value text-success">
+            ₵{{ totalCollected | number:'1.2-2' }}
+          </span>
         </div>
         <div class="stat-item">
           <span class="stat-label">Total Balance</span>
-          <span class="stat-value text-danger">₵{{ totalBalance | number:'1.2-2' }}</span>
+          <span class="stat-value text-danger">
+            ₵{{ totalBalance | number:'1.2-2' }}
+          </span>
         </div>
       </div>
 
-      <!-- Attendant Cards Grid -->
       <div class="attendant-grid">
-        <div *ngFor="let attendant of getAttendantSummary()" 
-             class="attendant-card" 
+        <div *ngFor="let attendant of getAttendantSummary()"
+             class="attendant-card"
              [class.high-performing]="attendant.collection_rate >= 90"
              [class.medium-performing]="attendant.collection_rate >= 70 && attendant.collection_rate < 90"
              [class.low-performing]="attendant.collection_rate < 70">
-          
+
           <div class="attendant-card-header">
-            <div class="avatar">
-              <i class="fa fa-user-circle"></i>
-            </div>
+            <div class="avatar"><i class="fa fa-user-circle"></i></div>
             <div class="attendant-info">
               <h5 class="attendant-name">{{ attendant.name || 'Unassigned' }}</h5>
               <span class="order-count">{{ attendant.order_count }} orders</span>
             </div>
-            <div class="performance-badge" [ngClass]="{
-              'excellent': attendant.collection_rate >= 90,
-              'good': attendant.collection_rate >= 70 && attendant.collection_rate < 90,
-              'needs-improvement': attendant.collection_rate < 70
-            }">
+            <div class="performance-badge"
+                 [ngClass]="{
+                   'excellent': attendant.collection_rate >= 90,
+                   'good': attendant.collection_rate >= 70 && attendant.collection_rate < 90,
+                   'needs-improvement': attendant.collection_rate < 70
+                 }">
               {{ attendant.collection_rate | number:'1.0-0' }}%
             </div>
           </div>
@@ -216,21 +438,27 @@
                 <span class="stat-icon">💰</span>
                 <div>
                   <span class="stat-label-small">Sales</span>
-                  <span class="stat-amount">₵{{ attendant.total_sales | number:'1.2-2' }}</span>
+                  <span class="stat-amount">
+                    ₵{{ attendant.total_sales | number:'1.2-2' }}
+                  </span>
                 </div>
               </div>
               <div class="stat">
                 <span class="stat-icon">✅</span>
                 <div>
                   <span class="stat-label-small">Collected</span>
-                  <span class="stat-amount text-success">₵{{ attendant.total_collected | number:'1.2-2' }}</span>
+                  <span class="stat-amount text-success">
+                    ₵{{ attendant.total_collected | number:'1.2-2' }}
+                  </span>
                 </div>
               </div>
               <div class="stat">
                 <span class="stat-icon">⚠️</span>
                 <div>
                   <span class="stat-label-small">Balance</span>
-                  <span class="stat-amount text-danger">₵{{ attendant.total_balance | number:'1.2-2' }}</span>
+                  <span class="stat-amount text-danger">
+                    ₵{{ attendant.total_balance | number:'1.2-2' }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -242,7 +470,7 @@
               <span>{{ attendant.collection_rate | number:'1.0-0' }}%</span>
             </div>
             <div class="progress-bar">
-              <div class="progress-fill" 
+              <div class="progress-fill"
                    [style.width.%]="attendant.collection_rate"
                    [ngClass]="{
                      'fill-excellent': attendant.collection_rate >= 90,
@@ -253,9 +481,11 @@
             </div>
           </div>
 
-          <button class="btn-view-details" (click)="filterByAttendant(attendant.name)">
+          <button class="btn-view-details"
+                  (click)="filterByAttendant(attendant.name)">
             <i class="fa fa-eye"></i> View Orders
           </button>
+
         </div>
       </div>
 
@@ -263,19 +493,24 @@
         <i class="fa fa-users fa-3x"></i>
         <p>No attendant data available for this period</p>
       </div>
+
     </div>
   </div>
 
-  <!-- Report Content -->
+  <!-- ============================================================
+       REPORT CONTENT (printable)
+       ============================================================ -->
   <div id="reportContent" *ngIf="filteredData.length > 0; else noData">
-    <!-- Report Header (for print/PDF) -->
+
     <div class="report-print-header">
       <h1>Assempahfie Graphics</h1>
       <h3>Comprehensive Sales Report</h3>
-      <p>Period: {{ dateFrom | date:'dd/MM/yyyy' }} - {{ dateTo | date:'dd/MM/yyyy' }}</p>
+      <p>
+        Period: {{ dateFrom | date:'dd/MM/yyyy' }}
+        — {{ dateTo | date:'dd/MM/yyyy' }}
+      </p>
     </div>
 
-    <!-- Summary Cards -->
     <div class="summary-cards">
       <div class="summary-card">
         <div class="summary-value">₵{{ totalSales | number:'1.2-2' }}</div>
@@ -286,21 +521,26 @@
         <div class="summary-label">Collected</div>
       </div>
       <div class="summary-card" style="border-left-color: #f39c12;">
-        <div class="summary-value" style="color: #f39c12;">₵{{ totalBalance | number:'1.2-2' }}</div>
+        <div class="summary-value" style="color: #f39c12;">
+          ₵{{ totalBalance | number:'1.2-2' }}
+        </div>
         <div class="summary-label">Balance</div>
       </div>
       <div class="summary-card" style="border-left-color: #3498db;">
-        <div class="summary-value" style="color: #3498db;">{{ totalOrders }}</div>
+        <div class="summary-value" style="color: #3498db;">
+          {{ totalOrders }}
+        </div>
         <div class="summary-label">Total Orders</div>
       </div>
     </div>
 
-    <!-- Department Breakdown -->
-    <div class="department-breakdown" *ngIf="summary.department_stats">
-      <h4><i class="fa fa-building"></i> Department Breakdown</h4>
+    <!-- Category Breakdown (print) -->
+    <div class="department-breakdown"
+         *ngIf="categoryStats && categoryStats.length > 0">
+      <h4><i class="fa fa-pie-chart"></i> Category Breakdown</h4>
       <div class="department-chips">
-        <span *ngFor="let dept of summary.department_stats | keyvalue" class="dept-chip">
-          {{ dept.key }}: ₵{{ dept.value | number:'1.2-2' }}
+        <span *ngFor="let c of categoryStats" class="dept-chip">
+          {{ c.label }}: ₵{{ c.revenue | number:'1.2-2' }}
         </span>
       </div>
     </div>
@@ -325,47 +565,52 @@
         </thead>
         <tbody>
           <ng-container *ngFor="let order of filteredData; trackBy: trackByOrderId">
-            <!-- Main Order Row -->
-            <tr
-              (click)="toggleOrderExpand(order.id)"
-              [class.expanded]="isOrderExpanded(order.id)"
-              class="order-row"
-            >
+
+            <tr (click)="toggleOrderExpand(order.id)"
+                [class.expanded]="isOrderExpanded(order.id)"
+                class="order-row">
+
               <td><strong>#{{ order.id }}</strong></td>
               <td>{{ order.customer || 'Walk-in' }}</td>
               <td>{{ order.waiter || 'N/A' }}</td>
               <td>{{ getTotalItems(order) }}</td>
               <td class="amount">₵{{ order.total | number:'1.2-2' }}</td>
-              <td class="amount collected">₵{{ order.collected | number:'1.2-2' }}</td>
-              <td class="amount balance" [class.has-balance]="order.balance > 0">
+              <td class="amount collected">
+                ₵{{ order.collected | number:'1.2-2' }}
+              </td>
+              <td class="amount balance"
+                  [class.has-balance]="order.balance > 0">
                 ₵{{ order.balance | number:'1.2-2' }}
                 <span *ngIf="order.balance > 0" class="balance-badge">⚠️</span>
               </td>
               <td>
                 <span class="status-badge" [ngClass]="getStatusClass(order)">
-                  <i class="fa" [ngClass]="getStatusIcon(order.paid_status)"></i>
+                  <i class="fa"
+                     [ngClass]="getStatusIcon(order.paid_status)"></i>
                   {{ order.paid_status || 'N/A' }}
                 </span>
               </td>
               <td>{{ order.status || 'N/A' }}</td>
               <td>
-                <span *ngFor="let dept of getDepartmentBadges(order)" class="dept-badge">
+                <!-- Badges are now derived from item categories -->
+                <span *ngFor="let dept of getDepartmentBadges(order)"
+                      class="dept-badge">
                   {{ dept }}
                 </span>
               </td>
               <td>{{ order.created_at | date:'dd/MM/yy HH:mm' }}</td>
             </tr>
 
-            <!-- Expanded Order Row -->
             <tr *ngIf="isOrderExpanded(order.id)" class="expanded-row">
               <td colspan="11">
                 <div class="expanded-content">
-                  <h5>Order #{{ order.id }} - Items</h5>
+                  <h5>Order #{{ order.id }} — Items</h5>
                   <table class="items-detail-table">
                     <thead>
                       <tr>
                         <th>Item</th>
                         <th>Description</th>
+                        <th>Category</th>
                         <th>Qty</th>
                         <th>Price</th>
                         <th>Work done by</th>
@@ -374,8 +619,12 @@
                     </thead>
                     <tbody>
                       <tr *ngFor="let item of order.items; trackBy: trackByItemId">
-                        <td>{{ item.name }}</td>
+                        <td>{{ item.name || item.item_name }}</td>
                         <td>{{ item.description || 'N/A' }}</td>
+                        <td>
+                          <!-- Category tag per line -->
+                          {{ getCategoryLabel(getItemCategory(item)) }}
+                        </td>
                         <td>{{ item.qty }}</td>
                         <td>₵{{ item.price | number:'1.2-2' }}</td>
                         <td>{{ item.checked_by || 'N/A' }}</td>
@@ -384,15 +633,20 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <td colspan="5" class="total-label">Total</td>
-                        <td class="total-value">₵{{ order.total | number:'1.2-2' }}</td>
+                        <td colspan="6" class="total-label">Total</td>
+                        <td class="total-value">
+                          ₵{{ order.total | number:'1.2-2' }}
+                        </td>
                       </tr>
                       <tr>
-                        <td colspan="5" class="total-label">Balance</td>
-                        <td class="total-value balance">₵{{ order.balance | number:'1.2-2' }}</td>
+                        <td colspan="6" class="total-label">Balance</td>
+                        <td class="total-value balance">
+                          ₵{{ order.balance | number:'1.2-2' }}
+                        </td>
                       </tr>
                     </tfoot>
                   </table>
+
                   <div class="order-note" *ngIf="order.note">
                     <strong>Note:</strong> {{ order.note }}
                   </div>
@@ -414,15 +668,20 @@
       </table>
     </div>
 
-    <!-- Footer -->
     <div class="report-footer">
-      <p>Generated by: <strong>{{ user?.[0]?.firstname || '' }} {{ user?.[0]?.lastname || '' }}</strong></p>
+      <p>
+        Generated by:
+        <strong>{{ user?.[0]?.firstname || '' }} {{ user?.[0]?.lastname || '' }}</strong>
+      </p>
       <p>Date: {{ getCurrentDateTime() }}</p>
       <p class="signature">Signature: __________________________</p>
     </div>
+
   </div>
 
-  <!-- No Data -->
+  <!-- ============================================================
+       NO DATA
+       ============================================================ -->
   <ng-template #noData>
     <div class="no-data">
       <i class="fa fa-inbox fa-4x"></i>
@@ -430,4 +689,5 @@
       <p>Select a date range and click "Generate Report" to view sales data.</p>
     </div>
   </ng-template>
+
 </div>

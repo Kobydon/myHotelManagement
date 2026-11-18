@@ -1335,6 +1335,17 @@ updateDeliveryStatus(data: any): Promise<any> {
         }
 
         
+        getHeldOrdersuvDTF(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_dtf_uv`));
+        }
+
+        
+
+        getHeldOrdersLabelProcesseduvDTF(){
+          return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_uvdtf_processed`));
+        }
+
+
       
         getHeldOrdersLabelProcessed(){
           return lastValueFrom(this.http.get<any>(`${this.guestUrl}/guest/get_helding_orders_label_processed`));
@@ -1461,7 +1472,82 @@ updateCustomer(data: any){
     return this.http.get<BundleInfo>(`${this.guestUrl}/guest/get_remaining_bundle`);
   }
 
-  
+    getPackages() {
+    return this.http.get<any>(`${this.guestUrl}/guest/get_sms_bundle_packages`);
+  }
+
+  getBundleInfo() {
+    return this.http.get<any>(`${this.guestUrl}/guest/get_sms_bundle_info`);
+  }
+
+  topUp(packageId: string, paymentMethod: string, note = '') {
+    return this.http.post<any>(`${this.guestUrl}/guest/sms_bundle_topup`, {
+      package_id: packageId,
+      payment_method: paymentMethod,
+      note,
+    });
+  }
+
+  redeem(code: string) {
+    return this.http.post<any>(`${this.guestUrl}/guest/sms_bundle_redeem`, { code });
+  }
+
+  getHistory() {
+    return this.http.get<any>(`${this.guestUrl}/guest/get_sms_bundle_history`);
+  }
+
+  /* ============================================================
+   SMS BUNDLE ENDPOINTS
+   ============================================================ */
+getBundlePackages() {
+  return this.http.get<any>(`${this.guestUrl}/guest/get_sms_bundle_packages`);
+}
+
+
+
+topUpBundle(payload: { package_id: string; payment_method: string; note?: string }) {
+  return this.http.post<any>(`${this.guestUrl}/guest/sms_bundle_topup`, payload);
+}
+
+redeemBundle(payload: { code: string }) {
+  return this.http.post<any>(`${this.guestUrl}/guest/sms_bundle_redeem`, payload);
+}
+/* ============================================================
+   TAX ENDPOINTS
+   ============================================================ */
+getTaxRates(includeInactive = false) {
+  return this.http.get<any>(`${this.guestUrl}/guest/tax_rates`, {
+    params: { include_inactive: String(includeInactive) }
+  });
+}
+
+createTaxRate(payload: any) {
+  return this.http.post<any>(`${this.guestUrl}/guest/tax_rates`, payload);
+}
+
+updateTaxRate(id: number, payload: any) {
+  return this.http.put<any>(`${this.guestUrl}/guest/tax_rates/${id}`, payload);
+}
+
+deleteTaxRate(id: number) {
+  return this.http.delete<any>(`${this.guestUrl}/guest/tax_rates/${id}`);
+}
+
+getTaxConfig() {
+  return this.http.get<any>(`${this.guestUrl}/guest/tax_config`);
+}
+
+updateTaxConfig(payload: any) {
+  return this.http.put<any>(`${this.guestUrl}/guest/tax_config`, payload);
+}
+
+getTaxReport(params: { date_from?: string; date_to?: string; waiter?: string; status?: string }) {
+  return this.http.get<any>(`${this.guestUrl}/guest/tax_report`, { params: params as any });
+}
+
+getBundleHistory() {
+  return this.http.get<any>(`${this.guestUrl}/guest/get_sms_bundle_history`);
+}
 }
 
 

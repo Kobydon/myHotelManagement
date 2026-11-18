@@ -1,0 +1,205 @@
+<div class="tax-page">
+
+  <!-- ==========================================
+       HEADER
+       ========================================== -->
+  <div class="page-header">
+    <div class="header-info">
+      <h2><i class="fa fa-percent"></i> Tax Dashboard</h2>
+      <p class="page-sub">Automatic tax extraction from held-cart sales</p>
+    </div>
+    <div class="page-actions">
+      <a class="btn btn-outline-secondary" routerLink="/tax-settings">
+        <i class="fa fa-cog"></i> Settings
+      </a>
+      <button type="button" class="btn btn-primary" (click)="exportCsv()">
+        <i class="fa fa-download"></i> Export CSV
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       FILTERS
+       ========================================== -->
+  <div class="filter-card" [formGroup]="filterForm">
+    <div class="filter-row">
+      <div class="filter-field">
+        <label>From Date</label>
+        <input type="date" class="form-control" formControlName="date_from">
+      </div>
+      <div class="filter-field">
+        <label>To Date</label>
+        <input type="date" class="form-control" formControlName="date_to">
+      </div>
+      <div class="filter-field">
+        <label>Waiter</label>
+        <input type="text" class="form-control" placeholder="All waiters" formControlName="waiter">
+      </div>
+      <div class="filter-field">
+        <label>Status</label>
+        <select class="form-control" formControlName="status">
+          <option value="">All Statuses</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+          <option value="partial">Partial</option>
+        </select>
+      </div>
+      <div class="filter-field filter-buttons">
+        <button type="button" class="btn btn-primary" [disabled]="loading" (click)="loadReport()">
+          <i class="fa" [ngClass]="loading ? 'fa-spinner fa-spin' : 'fa-search'"></i>
+          {{ loading ? 'Loading...' : 'Apply' }}
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="resetFilters()" title="Reset filters">
+          <i class="fa fa-refresh"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       NO TAX RATES WARNING
+       ========================================== -->
+  <div class="warning-card" *ngIf="report && report.rates.length === 0">
+    <div class="warning-icon"><i class="fa fa-exclamation-triangle"></i></div>
+    <div class="warning-content">
+      <strong>No tax rates configured.</strong>
+      <p>Add tax rates in <a routerLink="/tax-settings">Tax Settings</a> before running reports.</p>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SUMMARY STATS
+       ========================================== -->
+  <div class="stats-row" *ngIf="report">
+    <div class="stat-card border-blue">
+      <div class="stat-icon bg-blue"><i class="fa fa-money"></i></div>
+      <div class="stat-info">
+        <span class="stat-label">Gross Sales</span>
+        <span class="stat-value">₵{{ report.summary.gross_sales | number:'1.2-2' }}</span>
+        <span class="stat-sub">{{ report.summary.order_count }} orders</span>
+      </div>
+    </div>
+
+    <div class="stat-card border-green">
+      <div class="stat-icon bg-green"><i class="fa fa-line-chart"></i></div>
+      <div class="stat-info">
+        <span class="stat-label">Net Sales</span>
+        <span class="stat-value">₵{{ report.summary.net_sales | number:'1.2-2' }}</span>
+        <span class="stat-sub">Excluding tax</span>
+      </div>
+    </div>
+
+    <div class="stat-card border-red">
+      <div class="stat-icon bg-red"><i class="fa fa-percent"></i></div>
+      <div class="stat-info">
+        <span class="stat-label">Tax Collected</span>
+        <span class="stat-value text-danger">₵{{ report.summary.total_tax | number:'1.2-2' }}</span>
+        <span class="stat-sub">Effective: {{ report.summary.effective_rate | number:'1.2-2' }}%</span>
+      </div>
+    </div>
+
+    <div class="stat-card border-orange">
+      <div class="stat-icon bg-orange"><i class="fa fa-list"></i></div>
+      <div class="stat-info">
+        <span class="stat-label">Combined Rate</span>
+        <span class="stat-value">{{ report.summary.total_tax_pct | number:'1.2-2' }}%</span>
+        <span class="stat-sub">{{ report.rates.length }} active rates</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       BREAKDOWN
+       ========================================== -->
+  <div class="panel" *ngIf="report && report.rate_breakdown.length > 0">
+    <div class="panel-header">
+      <h3><i class="fa fa-pie-chart"></i> Tax Breakdown</h3>
+    </div>
+    <div class="breakdown-grid">
+      <div class="breakdown-card" *ngFor="let r of report.rate_breakdown">
+        <div class="bd-header">
+          <span class="bd-name">{{ r.name }}</span>
+          <span class="bd-rate">{{ r.rate | number:'1.2-2' }}%</span>
+        </div>
+        <div class="bd-amount">₵{{ r.tax_collected | number:'1.2-2' }}</div>
+        <div class="bd-code">{{ r.short_code }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CHART
+       ========================================== -->
+  <div class="panel" *ngIf="report && report.monthly_series.length > 0">
+    <div class="panel-header">
+      <h3><i class="fa fa-bar-chart"></i> Monthly Trend</h3>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="dot bg-red"></span> Tax</span>
+        <span class="legend-item"><span class="dot bg-blue"></span> Gross</span>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="taxChart"></canvas>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       ORDERS TABLE
+       ========================================== -->
+  <div class="panel" *ngIf="report && report.orders.length > 0">
+    <div class="panel-header">
+      <h3><i class="fa fa-table"></i> Order Breakdown <span class="badge">{{ report.orders.length }}</span></h3>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Customer</th>
+            <th>Waiter</th>
+            <th>Date</th>
+            <th class="text-right">Gross</th>
+            <th class="text-right">Net</th>
+            <th class="text-right">Tax</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of report.orders; trackBy: trackById">
+            <td><strong>#{{ o.id }}</strong></td>
+            <td class="customer-cell">{{ o.customer || 'Walk-in' }}</td>
+            <td class="waiter-cell">{{ o.waiter || 'Unassigned' }}</td>
+            <td class="date-cell">
+              {{ o.created_at ? (o.created_at | date:'dd MMM yy, HH:mm') : '—' }}
+            </td>
+            <td class="text-right">₵{{ o.total | number:'1.2-2' }}</td>
+            <td class="text-right">₵{{ o.net | number:'1.2-2' }}</td>
+            <td class="text-right text-danger font-bold">₵{{ o.tax | number:'1.2-2' }}</td>
+            <td>
+              <span class="status-pill" [ngClass]="'status-' + (o.status || 'unknown').toLowerCase()">
+                {{ o.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       EMPTY / LOADING STATES
+       ========================================== -->
+  <div class="empty-state" *ngIf="!loading && report && report.orders.length === 0">
+    <div class="empty-icon"><i class="fa fa-inbox"></i></div>
+    <h4>No Tax Data Found</h4>
+    <p>Try adjusting your filters or date range.</p>
+  </div>
+
+  <div class="empty-state" *ngIf="loading">
+    <div class="empty-icon"><i class="fa fa-spinner fa-spin"></i></div>
+    <h4>Loading tax data...</h4>
+    <p>Please wait while we process your report.</p>
+  </div>
+
+</div>

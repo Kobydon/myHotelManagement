@@ -1,0 +1,229 @@
+<div class="tax-page" #formContainer>
+
+  <!-- ==========================================
+       PAGE HEADER
+       ========================================== -->
+  <div class="page-header">
+    <div class="header-info">
+      <h2><i class="fa fa-sliders"></i> Tax Settings</h2>
+      <p class="page-sub">Manage your company tax rates and reporting behaviour</p>
+    </div>
+    <div class="page-actions">
+      <a class="btn btn-outline-secondary" routerLink="/tax-dashboard">
+        <i class="fa fa-percent"></i> Go to Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       SLIDING FORM (INLINE, NO MODAL)
+       ========================================== -->
+  <div class="slide-form-wrapper" [class.open]="showRateModal">
+    <div class="slide-form-card">
+      <div class="slide-form-header">
+        <h3>
+          <i class="fa" [ngClass]="editingRate ? 'fa-edit' : 'fa-plus-circle'"></i>
+          {{ editingRate ? 'Edit Tax Rate' : 'Create New Tax Rate' }}
+        </h3>
+        <button type="button" class="btn-close" (click)="closeRateModal()">
+          <i class="fa fa-times"></i>
+        </button>
+      </div>
+
+      <div class="slide-form-body">
+        <!-- ROW 1 -->
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>Tax Name <span class="required">*</span></label>
+            <input type="text" class="form-control" placeholder="e.g. VAT, NHIL, GETFund"
+                   [(ngModel)]="rateForm.name" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group flex-1">
+            <label>Short Code</label>
+            <input type="text" class="form-control" placeholder="VAT" maxlength="10"
+                   [(ngModel)]="rateForm.short_code" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group flex-1">
+            <label>Rate (%) <span class="required">*</span></label>
+            <input type="number" class="form-control" placeholder="15.00" min="0" max="100" step="0.01"
+                   [(ngModel)]="rateForm.rate" [ngModelOptions]="{standalone: true}">
+          </div>
+        </div>
+
+        <!-- ROW 2 -->
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>Description <span class="optional">(Optional)</span></label>
+            <input type="text" class="form-control" placeholder="Brief description of this tax"
+                   [(ngModel)]="rateForm.description" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group flex-1">
+            <label>Applies To</label>
+            <select class="form-control" [(ngModel)]="rateForm.applies_to" [ngModelOptions]="{standalone: true}">
+              <option value="all">All items</option>
+              <option value="food">Food</option>
+              <option value="bar">Bar / Drinks</option>
+              <option value="printing">Printing</option>
+              <option value="laundry">Laundry</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label>Display Order</label>
+            <input type="number" class="form-control" min="1"
+                   [(ngModel)]="rateForm.display_order" [ngModelOptions]="{standalone: true}">
+          </div>
+        </div>
+
+        <!-- TOGGLE -->
+        <div class="form-row align-center mt-2">
+          <label class="toggle-switch">
+            <input type="checkbox" [(ngModel)]="rateForm.is_active" [ngModelOptions]="{standalone: true}">
+            <span class="slider"></span>
+            <span class="toggle-label">Include this rate in tax calculations</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="slide-form-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeRateModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" [disabled]="savingRate" (click)="saveRate()">
+          <i class="fa" [ngClass]="savingRate ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+          {{ savingRate ? 'Saving...' : 'Save Tax Rate' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       TAX CONFIGURATION PANEL
+       ========================================== -->
+  <div class="panel">
+    <div class="panel-header">
+      <h3><i class="fa fa-cogs"></i> Report Behaviour</h3>
+    </div>
+
+    <div class="config-grid">
+      <div class="form-group">
+        <label>Company Tax Number (TIN)</label>
+        <input type="text" class="form-control" placeholder="e.g. C0012345678"
+               [(ngModel)]="config.tax_number" [ngModelOptions]="{standalone: true}">
+      </div>
+      <div class="form-group">
+        <label>Rounding Mode</label>
+        <select class="form-control" [(ngModel)]="config.rounding_mode" [ngModelOptions]="{standalone: true}">
+          <option value="half_up">Round half up (standard)</option>
+          <option value="floor">Always round down</option>
+          <option value="ceil">Always round up</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Decimal Places</label>
+        <select class="form-control" [(ngModel)]="config.rounding_places" [ngModelOptions]="{standalone: true}">
+          <option [ngValue]="0">0</option>
+          <option [ngValue]="1">1</option>
+          <option [ngValue]="2">2 (standard)</option>
+          <option [ngValue]="3">3</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="checkbox-row">
+      <label class="check-item">
+        <input type="checkbox" [(ngModel)]="config.tax_inclusive" [ngModelOptions]="{standalone: true}">
+        <span>
+          <strong>Prices include tax</strong>
+          <small>If checked, tax is extracted from the total. If unchecked, tax is added on top.</small>
+        </span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" [(ngModel)]="config.show_tax_on_receipt" [ngModelOptions]="{standalone: true}">
+        <span>
+          <strong>Show tax breakdown on receipts</strong>
+          <small>Display each tax line on printed receipts.</small>
+        </span>
+      </label>
+    </div>
+
+    <div class="panel-footer">
+      <button type="button" class="btn btn-primary" [disabled]="savingConfig" (click)="saveConfig()">
+        <i class="fa" [ngClass]="savingConfig ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+        {{ savingConfig ? 'Saving...' : 'Save Settings' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       TAX RATES LIST PANEL
+       ========================================== -->
+  <div class="panel">
+    <div class="panel-header">
+      <h3><i class="fa fa-list-ul"></i> Configured Tax Rates <span class="badge">{{ rates.length }}</span></h3>
+      
+      <div class="header-actions">
+        <label class="include-inactive">
+          <input type="checkbox" [checked]="includeInactive" (change)="toggleIncludeInactive()">
+          Show inactive
+        </label>
+        <button type="button" class="btn btn-primary btn-sm" (click)="openNewRate()" *ngIf="!showRateModal">
+          <i class="fa fa-plus"></i> Add Rate
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="loadingRates">
+      <i class="fa fa-spinner fa-spin"></i>
+      <p>Loading tax rates...</p>
+    </div>
+
+    <div class="empty-state" *ngIf="!loadingRates && rates.length === 0">
+      <div class="empty-icon"><i class="fa fa-percent"></i></div>
+      <h4>No Tax Rates Yet</h4>
+      <p>Click "Add Rate" above to create your first tax rate.</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loadingRates && rates.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tax Name</th>
+            <th>Code</th>
+            <th>Rate</th>
+            <th>Applies To</th>
+            <th>Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rates">
+            <td>
+              <div class="table-title">{{ r.name }}</div>
+              <div class="table-sub" *ngIf="r.description">{{ r.description }}</div>
+            </td>
+            <td><span class="code-badge">{{ r.short_code }}</span></td>
+            <td><strong class="rate-text">{{ r.rate | number:'1.2-2' }}%</strong></td>
+            <td><span class="applies-to">{{ r.applies_to | titlecase }}</span></td>
+            <td>
+              <button type="button" class="status-pill" 
+                      [ngClass]="r.is_active ? 'status-active' : 'status-inactive'"
+                      (click)="toggleActive(r)">
+                <span class="dot"></span>
+                {{ r.is_active ? 'Active' : 'Inactive' }}
+              </button>
+            </td>
+            <td class="text-right">
+              <button type="button" class="action-btn edit" (click)="editRate(r)" title="Edit">
+                <i class="fa fa-pencil"></i>
+              </button>
+              <button type="button" class="action-btn delete" (click)="deleteRate(r)" title="Delete">
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

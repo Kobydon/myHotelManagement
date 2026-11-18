@@ -432,6 +432,11 @@ export class CartService {
     return this.http.get(`${this.orderUrl}/load_held_order/${holdId}`);
   }
 
+  trackOrder(holdId: number): Observable<any> {
+    return this.http.get(`${this.orderUrl}/track_order/${holdId}`);
+  }
+
+
   removeHeldCart(holdId: number): Observable<any> {
     return this.http.delete(`${this.orderUrl}/remove_held_order/${holdId}`);
   }
@@ -654,4 +659,132 @@ export class CartService {
     const filtered = completed.filter(o => o.local_id !== localId);
     this.saveCompletedMultiOrders(filtered);
   }
+
+  // ===================== SAVED CARTS (FOR LATER RETRIEVAL) =====================
+
+private savedCartsStorageKey = 'pos_saved_carts';
+
+/**
+ * Get all saved carts
+ */
+public getSavedCarts(): any[] {
+  return this.safeParse(localStorage.getItem(this.savedCartsStorageKey), []);
+}
+
+/**
+ * Save all saved carts
+ */
+private persistSavedCarts(carts: any[]): void {
+  localStorage.setItem(this.savedCartsStorageKey, JSON.stringify(carts));
+}
+
+/**
+ * Save current cart for later retrieval
+ */
+public saveCartForLater(data: {
+  customerId?: string;
+  customerName: string;
+  customerPhone?: string;
+  note?: string;
+  table?: string;
+  discount?: number;
+  cartItems: any[];
+  total: number;
+  subtotal?: number;
+  existingBalance?: number;
+  holdOrderId?: number | null;
+}): any {
+  const savedCarts = this.getSavedCarts();
+  
+  // Check if a saved cart already exists for this customer
+  const existingIndex = savedCarts.findIndex(
+    (c: any) => 
+      (data.customerId && c.customerId === data.customerId) ||
+      (data.customerPhone && c.customerPhone === data.customerPhone)
+  );
+
+  const savedCart = {
+    id: `SAVED_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    customerId: data.customerId || null,
+    customerName: data.customerName || 'Walk-in Customer',
+    customerPhone: data.customerPhone || '',
+    note: data.note || '',
+    table: data.table || '',
+    discount: data.discount || 0,
+    subtotal: data.subtotal || data.total || 0,
+    total: data.total || 0,
+    existingBalance: data.existingBalance || 0,
+    holdOrderId: data.holdOrderId || null,
+    cartItems: JSON.parse(JSON.stringify(data.cartItems || [])), // deep clone
+    savedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  if (existingIndex !== -1) {
+    // Update existing saved cart
+    savedCart.id = savedCarts[existingIndex].id;
+    savedCart.savedAt = savedCarts[existingIndex].savedAt;
+    savedCarts[existingIndex] = savedCart;
+  } else {
+    savedCarts.push(savedCart);
+  }
+
+  this.persistSavedCarts(savedCarts);
+  console.log(`💾 Cart saved for later: ${savedCart.customerName} (${savedCart.id})`);
+  return savedCart;
+}
+
+/**
+ * Retrieve a saved cart by ID
+ */
+public getSavedCartById(id: string): any | null {
+  const savedCarts = this.getSavedCarts();
+  return savedCarts.find((c: any) => c.id === id) || null;
+}
+
+/**
+ * Retrieve saved carts for a specific customer
+ */
+public getSavedCartsByCustomer(customerId: string, phone?: string): any[] {
+  return this.getSavedCarts().filter((c: any) =>
+    (customerId && c.customerId === customerId) ||
+    (phone && c.customerPhone === phone)
+  );
+}
+
+/**
+ * Load a saved cart into the active cart
+ */
+public loadSavedCart(id: string): any | null {
+  const savedCart = this.getSavedCartById(id);
+  if (!savedCart) {
+    console.warn('⚠️ Saved cart not found:', id);
+    return null;
+  }
+
+  // Replace active cart with saved cart items
+  this.updateCart(savedCart.cartItems || []);
+  console.log(`📂 Loaded saved cart: ${savedCart.customerName}`);
+  return savedCart;
+}
+
+/**
+ * Delete a saved cart
+ */
+public deleteSavedCart(id: string): boolean {
+  const savedCarts = this.getSavedCarts();
+  const filtered = savedCarts.filter((c: any) => c.id !== id);
+  if (filtered.length === savedCarts.length) return false;
+  this.persistSavedCarts(filtered);
+  console.log(`🗑️ Deleted saved cart: ${id}`);
+  return true;
+}
+
+/**
+ * Clear all saved carts
+ */
+public clearSavedCarts(): void {
+  localStorage.removeItem(this.savedCartsStorageKey);
+  console.log('🧹 All saved carts cleared');
+}
 }

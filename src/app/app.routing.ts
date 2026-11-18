@@ -21,6 +21,8 @@ import { GiversTabComponent } from './givers-tab/givers-tab.component';
 import { CustomerLayoutComponent } from './customer-layout/customer-layout.component';
 import{RoleGuard} from './role.guard';
 import { Role } from './roles';
+import { ViewUvDtfComponent } from './view-uv-dtf/view-uv-dtf.component';
+import { TrackOrderComponent } from './track-order/track-order.component';
 
 export const AppRoutes: Routes = [
   {
@@ -29,6 +31,7 @@ export const AppRoutes: Routes = [
     pathMatch: 'full',
   },
   {path:'view-order',component:ViewOrderComponent,canActivate:[RoleGuard],data:{roles:[Role.DigitalPrinting]}},
+    {path:'view-uvdtf-order',component:ViewUvDtfComponent,canActivate:[RoleGuard],data:{roles:[Role.uvdtf]}},
    {path:'view-all-order',component:GiversTabComponent,canActivate:[RoleGuard],data:{roles:[Role.Giver]}},
 
    {path:'view-dtf-order',component:ViewDtfOrderComponent,canActivate:[RoleGuard],data:{roles:[Role.Dtf]}},
@@ -52,6 +55,10 @@ export const AppRoutes: Routes = [
       path: '',
       loadChildren: () => import('../../src/app/login/login.module').then(x => x.LoginModule)
   }]},
+  {
+  path: 'track-order',
+  component: TrackOrderComponent
+},
 
 
   {

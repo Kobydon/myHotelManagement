@@ -80,12 +80,16 @@ import { HeldCartReportComponent } from 'app/held-cart-report/held-cart-report.c
 import { SendBulkMessageComponent } from 'app/send-bulk-message/send-bulk-message.component';
 import { MessageReportComponent } from 'app/message-report/message-report.component';
 
+// ============================================================
+// TAX FEATURE IMPORTS
+// ============================================================
+import { TaxDashboardComponent } from 'app/tax/tax-dashboard/tax-dashboard.component';
+import { TaxSettingsComponent } from 'app/tax/tax-settings/tax-settings.component';
+import { TaxService } from 'app/tax/tax.service';
 
-    
 
 @NgModule({
   imports: [
-    
     RouterModule.forChild(AdminLayoutRoutes),
     HttpClientModule,
     CommonModule,
@@ -93,14 +97,10 @@ import { MessageReportComponent } from 'app/message-report/message-report.compon
     ReactiveFormsModule,
     NgbModule,
     BlockUIModule.forRoot({
-    
-      template: LoadingTemplate ,
+      template: LoadingTemplate,
       // delayStart: 50,
       // delayStop: 300
     }),
-
-
-    
   ],
   declarations: [
     GuestComponent,
@@ -123,7 +123,7 @@ import { MessageReportComponent } from 'app/message-report/message-report.compon
     LedgerPagesComponent,
     AccountReceivablePagesComponent,
     GopDeductionComponent,
-   StockSheetComponent,
+    StockSheetComponent,
     BookingsComponent,
     PaymentComponent,
 
@@ -136,20 +136,50 @@ import { MessageReportComponent } from 'app/message-report/message-report.compon
     DetailedReportComponent,
     PurchaseRequestComponent,
     AddPurchaseRequestComponent,
-    IncomeComponent,CustomersComponent,
-    BudgetComponent,AddAccountComponent,AccountGroupComponent,BalancesheetComponent,SalaryTemplateComponent,
-    BudgetReportComponent,TodaysFoodChefComponent,
-    DailyIncomeReportComponent,ReceivedItemsComponent,DetailedSummaryTwoComponent,PrintVorcherComponent,
+    IncomeComponent,
+    CustomersComponent,
+    BudgetComponent,
+    AddAccountComponent,
+    AccountGroupComponent,
+    BalancesheetComponent,
+    SalaryTemplateComponent,
+    BudgetReportComponent,
+    TodaysFoodChefComponent,
+    DailyIncomeReportComponent,
+    ReceivedItemsComponent,
+    DetailedSummaryTwoComponent,
+    PrintVorcherComponent,
 
     DailyIncomeReportDatesBetweenComponent,
-    ItemComponent,ItemCategoryComponent,ItemGroupComponent,ItemFamilyComponent,FinancialOverviewComponent,AllSessionsComponent,
-    StoreComponent,StockComponent,DepartmentsComponent,TransferStockComponent,VendorComponent,PurchaseOrderComponent,ReturnRequestComponent,
-    AddEventPaymentComponent,OutsideStockSideComponent,CanceledOrderComponent,CocktailSetupComponent,SalaryPaymentComponent,
-    HeldCartReportComponent,SendBulkMessageComponent,MessageReportComponent
+    ItemComponent,
+    ItemCategoryComponent,
+    ItemGroupComponent,
+    ItemFamilyComponent,
+    FinancialOverviewComponent,
+    AllSessionsComponent,
+    StoreComponent,
+    StockComponent,
+    DepartmentsComponent,
+    TransferStockComponent,
+    VendorComponent,
+    PurchaseOrderComponent,
+    ReturnRequestComponent,
+    AddEventPaymentComponent,
+    OutsideStockSideComponent,
+    CanceledOrderComponent,
+    CocktailSetupComponent,
+    SalaryPaymentComponent,
+    HeldCartReportComponent,
+    SendBulkMessageComponent,
+    MessageReportComponent,
 
-
-
+    // ✅ TAX FEATURE
+    TaxDashboardComponent,
+    TaxSettingsComponent,
+  ],
+  providers: [
+    // ✅ TAX SERVICE
+    TaxService,
   ]
 })
-
 export class AdminLayoutModule {}

@@ -102,6 +102,9 @@ import { ChatModule } from './chat/chat.module';
 import { ChatComponent } from './chat/chat.component';
 import { SendBulkMessageComponent } from './send-bulk-message/send-bulk-message.component';
 import { MessageReportComponent } from './message-report/message-report.component';
+import { ViewUvDtfComponent } from './view-uv-dtf/view-uv-dtf.component';
+import { BundlePackagesComponent } from './bundle-packages/bundle-packages.component';
+import { TrackOrderComponent } from './track-order/track-order.component';
 
 @NgModule({
   declarations: [
@@ -121,6 +124,9 @@ import { MessageReportComponent } from './message-report/message-report.componen
     ViewDtfOrderComponent,
     GiversTabComponent,
     CustomerLayoutComponent,
+    ViewUvDtfComponent,
+    BundlePackagesComponent,
+    TrackOrderComponent,
    
     
     // ❌ Remove ChatComponent from declarations if it's already in ChatModule

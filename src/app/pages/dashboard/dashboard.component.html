@@ -1,6 +1,7 @@
 <!-- ================================================================
      COMPREHENSIVE SALES REPORT — HELD CART REPORT DRIVEN
-     ATTENDANT-FIRST VIEW
+     ATTENDANT-FIRST VIEW + CATEGORY-DRIVEN DEPARTMENT FILTER
+     + SMS BUNDLE TOP-UP & REDEEM
      ================================================================ -->
 
 <div class="dashboard-wrapper">
@@ -9,14 +10,6 @@
        HEADER
        ============================================================ -->
   <div class="report-header">
-    <!-- <div class="report-title">
-      <i class="fa fa-bar-chart"></i>
-      <div>
-        <h4>Asempa Graphic</h4>
-        <span class="subtitle">Comprehensive Sales Report</span>
-      </div>
-    </div> -->
-
     <div class="report-meta">
       <span class="meta-item">
         <i class="fa fa-calendar"></i>
@@ -54,14 +47,17 @@
         <select class="form-control" [formControl]="reportForm.get('waiter')">
           <option value="">All Attendants</option>
           <option *ngFor="let u of users" [value]="u.firstname +' '+ u.lastname">
-            {{ u.name || u.username }}
+            {{ u.firstname +' '+ u.lastname }}
           </option>
         </select>
       </div>
 
       <div class="filter-item">
-        <label>Department</label>
-        <select class="form-control" [formControl]="reportForm.get('department')">
+        <label>Department (Category)</label>
+        <select class="form-control"
+                [ngModel]="selectedDepartment"
+                (ngModelChange)="onDepartmentChange($event)"
+                [ngModelOptions]="{standalone: true}">
           <option *ngFor="let d of departments" [value]="d.value">
             {{ d.label }}
           </option>
@@ -93,10 +89,20 @@
       </div>
 
     </div>
+
+    <div class="filter-summary" *ngIf="selectedDepartment && selectedDepartment !== 'all'">
+      <i class="fa fa-filter"></i>
+      Filtering by category:
+      <strong>{{ getCategoryLabel(selectedDepartment) }}</strong>
+      <button class="btn btn-link btn-sm p-0 ms-2"
+              (click)="onDepartmentChange('all')">
+        Clear
+      </button>
+    </div>
   </div>
 
   <!-- ============================================================
-       STAT CARDS — DRIVEN BY HELD CART REPORT + SMS BUNDLE
+       STAT CARDS
        ============================================================ -->
   <div class="stats-grid">
 
@@ -127,8 +133,8 @@
       </div>
     </div>
 
-    <!-- NEW: SMS BUNDLE STAT CARD -->
-    <div class="stat-card card-purple">
+    <div class="stat-card card-purple"
+         [class.bundle-empty]="bundleInfo.remaining === 0">
       <div class="stat-icon"><i class="fa fa-comments-o"></i></div>
       <div class="stat-content">
         <div class="stat-label">SMS Bundle Remaining</div>
@@ -142,20 +148,28 @@
   </div>
 
   <!-- ============================================================
-       BUNDLE INFO PANEL — SIZE, REMAINING, USED
+       BUNDLE INFO PANEL (with Top Up + Redeem)
        ============================================================ -->
   <div class="bundle-panel">
     <div class="bundle-header">
       <h5><i class="fa fa-comments-o"></i> SMS Bundle Status</h5>
-      <button class="btn btn-sm btn-outline-secondary"
-              (click)="loadBundleInfo()"
-              title="Refresh bundle">
-        <i class="fa fa-refresh"></i>
-      </button>
+
+      <div class="bundle-header-actions">
+        <button class="btn btn-sm btn-primary" (click)="openTopUpModal()">
+          <i class="fa fa-plus-circle"></i> Top Up
+        </button>
+        <button class="btn btn-sm btn-success" (click)="openRedeemModal()">
+          <i class="fa fa-ticket"></i> Redeem
+        </button>
+        <button class="btn btn-sm btn-outline-secondary"
+                (click)="loadBundleInfo()"
+                title="Refresh bundle">
+          <i class="fa fa-refresh"></i>
+        </button>
+      </div>
     </div>
 
     <div class="bundle-body">
-
       <div class="bundle-block">
         <div class="bundle-label">Total Bundle Size</div>
         <div class="bundle-value">{{ bundleInfo.size | number }}</div>
@@ -193,9 +207,93 @@
           <span>{{ bundleInfo.size | number }}</span>
         </div>
       </div>
+    </div>
 
+    <!-- Inline quick redeem text box -->
+    <div class="quick-redeem-row">
+      <label><i class="fa fa-ticket"></i> Quick Redeem</label>
+      <div class="quick-redeem-input-group">
+        <input type="text"
+               class="form-control"
+               placeholder="Enter redeem code (e.g. AFG-XXXX-YYYY)"
+               [(ngModel)]="redeemCode"
+               [ngModelOptions]="{standalone: true}"
+               (keyup.enter)="confirmRedeem()">
+        <button class="btn btn-success"
+                [disabled]="redeemProcessing || !redeemCode"
+                (click)="confirmRedeem()">
+          <i class="fa" [ngClass]="redeemProcessing ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+          {{ redeemProcessing ? 'Redeeming...' : 'Redeem' }}
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- ============================================================
+       CATEGORY BREAKDOWN PANEL
+       ============================================================ -->
+  <!-- <div class="category-panel" *ngIf="categoryStats.length > 0">
+
+    <div class="category-panel-header">
+      <h5>
+        <i class="fa fa-pie-chart"></i>
+        Category Breakdown
+        <span class="badge">{{ categoryStats.length }} categories</span>
+      </h5>
+      <span class="hint-text">
+        <i class="fa fa-info-circle"></i>
+        Aggregated from line-item categories
+      </span>
+    </div>
+
+    <div class="category-grid">
+      <div class="category-card"
+           *ngFor="let c of categoryStats"
+           [class.active]="selectedDepartment === c.key"
+           (click)="onDepartmentChange(c.key)">
+
+        <div class="category-card-header">
+          <div class="category-name">{{ c.label }}</div>
+          <div class="category-count">
+            {{ c.count }} line{{ c.count !== 1 ? 's' : '' }}
+          </div>
+        </div>
+
+        <div class="category-card-body">
+          <div class="metric-row">
+            <span class="metric-label">Quantity</span>
+            <span class="metric-value">{{ c.quantity | number }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Revenue</span>
+            <span class="metric-value">₵{{ c.revenue | number:'1.2-2' }}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Collected</span>
+            <span class="metric-value text-success">
+              ₵{{ c.collected | number:'1.2-2' }}
+            </span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Balance</span>
+            <span class="metric-value"
+                  [ngClass]="c.balance > 0 ? 'text-danger' : 'text-muted'">
+              ₵{{ c.balance | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="category-card-footer">
+          <span class="view-hint">
+            <i class="fa fa-filter"></i>
+            {{ selectedDepartment === c.key ? 'Filtered' : 'Click to filter' }}
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+  </div> -->
 
   <!-- ============================================================
        MONTHLY SALES CHART
@@ -211,7 +309,7 @@
   </div>
 
   <!-- ============================================================
-       ATTENDANT SUMMARY CARDS — CLICK TO DRILL DOWN
+       ATTENDANT SUMMARY CARDS
        ============================================================ -->
   <div class="section-header">
     <h5>
@@ -293,7 +391,6 @@
 
   <!-- ============================================================
        SELECTED ATTENDANT ORDERS PANEL
-       (only shows when an attendant is selected)
        ============================================================ -->
   <div class="selected-attendant-panel" *ngIf="selectedAttendant">
 
@@ -320,7 +417,6 @@
       </button>
     </div>
 
-    <!-- Order cards for this attendant only -->
     <div class="orders-cards-grid">
       <div class="order-card"
            *ngFor="let order of filteredData"
@@ -375,6 +471,9 @@
           <ul class="items-list" *ngIf="expandedOrderId === order.id">
             <li *ngFor="let item of order.items">
               <span class="item-name">{{ item.name || item.item_name }}</span>
+              <span class="item-cat">
+                {{ getCategoryLabel(getItemCategory(item)) }}
+              </span>
               <span class="item-qty">x{{ item.qty }}</span>
             </li>
           </ul>
@@ -401,4 +500,159 @@
 
   </div>
 
+</div>
+
+
+<!-- ============================================================
+     TOP-UP MODAL
+     ============================================================ -->
+<div class="modal-backdrop" *ngIf="showTopUpModal" (click)="closeTopUpModal()"></div>
+
+<div class="modal-container" *ngIf="showTopUpModal">
+  <div class="modal-card">
+
+    <div class="modal-header">
+      <h5><i class="fa fa-plus-circle"></i> Top Up SMS Bundle</h5>
+      <button class="modal-close" (click)="closeTopUpModal()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <p class="modal-intro">
+        Select a bundle package below. Units are added instantly to your account.
+      </p>
+
+      <div class="loading-packages" *ngIf="loadingPackages">
+        <i class="fa fa-spinner fa-spin"></i> Loading packages...
+      </div>
+
+      <div class="package-grid" *ngIf="!loadingPackages">
+        <div class="package-card"
+             *ngFor="let pkg of bundlePackages"
+             [class.selected]="selectedPackageId === pkg.id"
+             (click)="selectPackage(pkg)">
+
+          <div class="package-radio">
+            <i class="fa"
+               [ngClass]="selectedPackageId === pkg.id
+                          ? 'fa-dot-circle-o'
+                          : 'fa-circle-o'"></i>
+          </div>
+
+          <div class="package-body">
+            <div class="package-name">{{ pkg.name }}</div>
+            <div class="package-units">
+              <i class="fa fa-comments"></i>
+              {{ pkg.units | number }} SMS
+            </div>
+            <div class="package-price">
+              ₵{{ pkg.amount | number:'1.2-2' }}
+            </div>
+            <div class="package-per-unit">
+              ₵{{ pkg.per_unit | number:'1.4-4' }} per SMS
+            </div>
+          </div>
+
+          <div class="package-check" *ngIf="selectedPackageId === pkg.id">
+            <i class="fa fa-check"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="selectedPackage">
+        <label>Payment Method</label>
+        <select class="form-control"
+                [(ngModel)]="topUpPaymentMethod"
+                [ngModelOptions]="{standalone: true}">
+          <option value="cash">💵 Cash</option>
+          <option value="momo">📱 Mobile Money</option>
+          <option value="bank">🏦 Bank Transfer</option>
+          <option value="card">💳 Card</option>
+        </select>
+      </div>
+
+      <div class="order-summary" *ngIf="selectedPackage">
+        <div class="summary-row">
+          <span>Package</span>
+          <strong>{{ selectedPackage.name }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>SMS Units</span>
+          <strong>{{ selectedPackage.units | number }}</strong>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <strong>₵{{ selectedPackage.amount | number:'1.2-2' }}</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline-secondary" (click)="closeTopUpModal()">
+        Cancel
+      </button>
+      <button class="btn btn-primary"
+              [disabled]="!selectedPackageId || topUpProcessing"
+              (click)="confirmTopUp()">
+        <i class="fa" [ngClass]="topUpProcessing ? 'fa-spinner fa-spin' : 'fa-check'"></i>
+        {{ topUpProcessing ? 'Processing...' : 'Confirm Top Up' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ============================================================
+     REDEEM MODAL
+     ============================================================ -->
+<div class="modal-backdrop" *ngIf="showRedeemModal" (click)="closeRedeemModal()"></div>
+
+<div class="modal-container" *ngIf="showRedeemModal">
+  <div class="modal-card modal-small">
+
+    <div class="modal-header">
+      <h5><i class="fa fa-ticket"></i> Redeem SMS Bundle</h5>
+      <button class="modal-close" (click)="closeRedeemModal()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-intro">
+        Enter your redeem code below to add SMS units to your bundle.
+      </p>
+
+      <div class="form-group">
+        <label>Redeem Code</label>
+        <input type="text"
+               class="form-control form-control-lg redeem-input"
+               placeholder="e.g. AFG-1A2B-3C4D"
+               [(ngModel)]="redeemCode"
+               [ngModelOptions]="{standalone: true}"
+               (keyup.enter)="confirmRedeem()"
+               autofocus>
+        <small class="text-muted">
+          <i class="fa fa-info-circle"></i>
+          Codes are case-insensitive and can only be used once.
+        </small>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-outline-secondary" (click)="closeRedeemModal()">
+        Cancel
+      </button>
+      <button class="btn btn-success"
+              [disabled]="!redeemCode || redeemProcessing"
+              (click)="confirmRedeem()">
+        <i class="fa" [ngClass]="redeemProcessing ? 'fa-spinner fa-spin' : 'fa-gift'"></i>
+        {{ redeemProcessing ? 'Redeeming...' : 'Redeem Now' }}
+      </button>
+    </div>
+
+  </div>
 </div>

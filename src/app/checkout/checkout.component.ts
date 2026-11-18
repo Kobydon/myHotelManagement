@@ -8,6 +8,8 @@ import { ToastrService } from 'ngx-toastr';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import * as JsBarcode from 'jsbarcode';
+import { ThisReceiver } from '@angular/compiler';
+import { normalize } from 'path';
 
 @Component({
   selector: 'checkout-list',
@@ -201,7 +203,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.loadHeldCarts();
     this.getCurrentSession();
     this.getItemsList();
-    
+    this.loadSavedCarts();
     this.loadMultiOrders();
     this.loadCompletedOrders();
     
@@ -803,15 +805,18 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.clearCart();
 
       this.loadHeldCarts();
-
       this.holdOrderId = null;
       this.existingBalance = 0;
       this.total = 0;
       this.isBalancePayment = false;
+        
 
       this.closePaymentModal();
   this.printHoldAndPayReceipt(response, orderId);
+  this.createForm.patchValue({customer:"",phone:"",note:""})
+        this.clearCustomerSelection();
       this.cdr.detectChanges();
+
 
     },
 
@@ -988,6 +993,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   processPayment(): void {
+      if (!this.createForm.value.customer) {
+    this.toastr.warning('Please select a customer', 'Warning');
+    return;
+  }
     if (!this.amountPaid || this.amountPaid <= 0) {
       this.toastr.warning('Please enter a valid amount', 'Warning');
       return;
@@ -1097,7 +1106,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.printBillAfterPayment(orderResponse, orderId);
     
     this.admin = false;
+    this.createForm.patchValue({note:"",customer:"",phone:""})
     this.cdr.detectChanges();
+    
     
     if (balance > 0) {
       this.toastr.success(`Payment successful! Balance: ₵${this.formatCurrency(balance)}`, 'Partial Payment');
@@ -3766,6 +3777,7 @@ isOrderFullyPaid(orderId: string): boolean {
     }
 
     this.isProcessingPaymentCart = true;
+   
     this.closePaymentModal();
 
     // Process each order
@@ -4270,5 +4282,203 @@ getPaymentCartTotalBalance(): number {
     total += this.getOrderBalance(order.id);
   });
   return this.roundToTwoDecimals(total);
+
+
+
+
+  
+}
+// ===================== SAVED CARTS (FOR LATER) =====================
+
+showSavedCarts: boolean = false;
+savedCarts: any[] = [];
+savedCartSearchTerm: string = '';
+filteredSavedCarts: any[] = [];
+
+/**
+ * Save current cart for later retrieval
+ */
+saveCartForLater(): void {
+  if (this.cartItems.length === 0) {
+    this.toastr.warning('Cart is empty', 'Warning');
+    return;
+  }
+
+  // Get customer info
+  const customerId = this.createForm.value.customer || '';
+  let customerName = 'Walk-in Customer';
+  let customerPhone = '';
+
+  if (customerId && this.customers) {
+    const customer = this.customers.find((c: any) => c.id == customerId);
+    if (customer) {
+      customerName = `${customer.firstname || ''} ${customer.lastname || ''}`.trim();
+      customerPhone = customer.phone || '';
+    }
+  }
+
+  // If no customer selected, ask for a name
+  if (!customerId) {
+    const manualName = prompt('Enter customer name for this saved cart:');
+    if (!manualName || !manualName.trim()) {
+      this.toastr.warning('Customer name is required to save cart', 'Warning');
+      return;
+    }
+    customerName = manualName.trim();
+  }
+
+  // Calculate totals
+  const subtotal = this.cartItems.reduce((sum, item) => {
+    return sum + ((Number(item.price) || 0) * (Number(item.qty) || 0));
+  }, 0);
+
+  let discount = Number(this.createForm.value.discount) || 0;
+  discount = Math.max(0, Math.min(100, discount));
+  const discountAmount = (discount / 100) * subtotal;
+  const finalTotal = this.roundToTwoDecimals(subtotal - discountAmount);
+
+  const saved = this.cartService.saveCartForLater({
+    customerId: customerId || undefined,
+    customerName: customerName,
+    customerPhone: customerPhone,
+    note: this.createForm.value.note || '',
+    table: this.createForm.value.table || '',
+    discount: discount,
+    cartItems: this.cartItems,
+    subtotal: this.roundToTwoDecimals(subtotal),
+    total: finalTotal,
+    existingBalance: this.existingBalance || 0,
+    holdOrderId: this.holdOrderId || null
+  });
+
+  // Clear the active cart
+  this.clearCart();
+  this.createForm.patchValue({
+    discount: 0,
+    note: '',
+    customer: ''
+  });
+  this.customerSearchTerm = '';
+  this.selectedCustomer = null;
+
+  this.loadSavedCarts();
+  this.toastr.success(
+    `Cart saved for ${customerName}. Retrieve it anytime from Saved Carts.`,
+    'Saved for Later'
+  );
+  this.cdr.detectChanges();
+}
+
+/**
+ * Load all saved carts
+ */
+loadSavedCarts(): void {
+  this.savedCarts = this.cartService.getSavedCarts();
+  this.filteredSavedCarts = [...this.savedCarts];
+  this.cdr.detectChanges();
+}
+
+/**
+ * Toggle saved carts panel
+ */
+toggleSavedCarts(): void {
+  this.showSavedCarts = !this.showSavedCarts;
+  if (this.showSavedCarts) {
+    this.loadSavedCarts();
+  }
+  this.cdr.detectChanges();
+}
+
+/**
+ * Filter saved carts by search term
+ */
+filterSavedCarts(): void {
+  const term = (this.savedCartSearchTerm || '').trim().toLowerCase();
+  if (!term) {
+    this.filteredSavedCarts = [...this.savedCarts];
+    return;
+  }
+  this.filteredSavedCarts = this.savedCarts.filter((cart: any) => {
+    const name = (cart.customerName || '').toLowerCase();
+    const phone = (cart.customerPhone || '').toLowerCase();
+    const note = (cart.note || '').toLowerCase();
+    return name.includes(term) || phone.includes(term) || note.includes(term);
+  });
+}
+
+/**
+ * Retrieve (load) a saved cart into the active cart
+ */
+retrieveSavedCart(savedCartId: string): void {
+  if (this.cartItems.length > 0) {
+    if (!confirm('Current cart has items. Clear and load saved cart?')) {
+      return;
+    }
+  }
+
+  const saved = this.cartService.loadSavedCart(savedCartId);
+  if (!saved) {
+    this.toastr.error('Saved cart not found', 'Error');
+    return;
+  }
+
+  // Restore form values
+  this.createForm.patchValue({
+    customer: saved.customerId || '',
+    note: saved.note || '',
+    table: saved.table || '',
+    discount: saved.discount || 0
+  });
+
+  // Restore customer search term
+  if (saved.customerId && this.customers) {
+    const customer = this.customers.find((c: any) => c.id == saved.customerId);
+    if (customer) {
+      this.customerSearchTerm = `${customer.firstname} ${customer.lastname}`.trim();
+      this.selectedCustomer = customer;
+    }
+  }
+
+  // Restore balance / held order info
+  this.existingBalance = saved.existingBalance || 0;
+  this.holdOrderId = saved.holdOrderId || null;
+  this.isBalancePayment = this.existingBalance > 0;
+
+  // Recalculate total
+  this.recalculateTotal();
+
+  // Delete the saved cart (since it's now active)
+  this.cartService.deleteSavedCart(savedCartId);
+  this.loadSavedCarts();
+
+  this.toastr.success(
+    `Loaded cart for ${saved.customerName}`,
+    'Cart Retrieved'
+  );
+  this.cdr.detectChanges();
+}
+
+/**
+ * Delete a saved cart
+ */
+deleteSavedCart(savedCartId: string, event?: Event): void {
+  if (event) event.stopPropagation();
+  if (!confirm('Delete this saved cart permanently?')) return;
+  
+  const deleted = this.cartService.deleteSavedCart(savedCartId);
+  if (deleted) {
+    this.loadSavedCarts();
+    this.toastr.info('Saved cart deleted', 'Removed');
+  }
+}
+
+/**
+ * Clear all saved carts
+ */
+clearAllSavedCarts(): void {
+  if (!confirm('Delete ALL saved carts? This cannot be undone.')) return;
+  this.cartService.clearSavedCarts();
+  this.loadSavedCarts();
+  this.toastr.info('All saved carts cleared', 'Cleared');
 }
 }

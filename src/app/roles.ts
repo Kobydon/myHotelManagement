@@ -7,6 +7,7 @@ export enum Role {
   Label          = 'label',
   Giver          = 'isgiver',
   Customer       = 'iscustomer',
+  uvdtf          = 'uvdtf',
 }
 
 /**
@@ -21,6 +22,7 @@ export const ROLE_CONFIG: Record<Role, { flag: string; route: string }> = {
   [Role.Label]:           { flag: 'label',             route: '/view-label-order' },
   [Role.Giver]:           { flag: 'isgiver',           route: '/view-all-order' },
   [Role.Customer]:        { flag: 'iscustomer',        route: '/customer-category' },
+  [Role.uvdtf]:           { flag: 'uvdtf',             route: '/view-uvdtf-order' },
 };
 
 /**

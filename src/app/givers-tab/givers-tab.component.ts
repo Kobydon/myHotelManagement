@@ -84,17 +84,11 @@ export class GiversTabComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadCustomers();
     this.loadGiversOrders();
     this.loadProcessedOrders();
-    this.getUser();
+
     this.setDefaultDateRange();
     
     // Auto-refresh every 30 seconds
-    this.refreshInterval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        console.log("🔄 Auto-refreshing Givers orders...");
-        this.loadGiversOrders();
-        this.loadProcessedOrders();
-      }
-    }, 400000);
+    
   }
 
   ngAfterViewInit(): void {

@@ -700,7 +700,34 @@
     </div>
   </div>
 
-  <!-- Row 3: Pouch Lamination -->
+  <!-- Row 3: Soft Touch Lamination (NEW) -->
+  <div class="checkbox-row">
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="softTouchOneSide"
+        [(ngModel)]="processSoftTouchLaminationOneSide"
+      />
+      <label class="form-check-label" for="softTouchOneSide">
+        🖐️ Soft Touch Lamination (1 Side)
+      </label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="softTouchBothSides"
+        [(ngModel)]="processSoftTouchLaminationBothSides"
+      />
+      <label class="form-check-label" for="softTouchBothSides">
+        🖐️ Soft Touch Lamination (Both Sides)
+      </label>
+    </div>
+  </div>
+
+  <!-- Row 4: Pouch Lamination -->
   <div class="checkbox-row">
     <div class="form-check form-check-inline">
       <input
@@ -720,6 +747,7 @@
        *ngIf="processCutting || processTrimming || processCreasing || 
               processMatteLaminationOneSide || processMatteLaminationBothSides || 
               processGlossLaminationOneSide || processGlossLaminationBothSides || 
+              processSoftTouchLaminationOneSide || processSoftTouchLaminationBothSides ||
               processPouchLamination">
     <small class="text-muted">Selected processes:</small>
     <div class="mt-1">
@@ -730,12 +758,15 @@
       <span class="process-tag process-tag-matte-both" *ngIf="processMatteLaminationBothSides">📋 Matte (Both)</span>
       <span class="process-tag process-tag-gloss" *ngIf="processGlossLaminationOneSide">✨ Gloss (1 Side)</span>
       <span class="process-tag process-tag-gloss-both" *ngIf="processGlossLaminationBothSides">✨ Gloss (Both)</span>
+      <span class="process-tag process-tag-soft-touch" *ngIf="processSoftTouchLaminationOneSide">🖐️ Soft Touch (1 Side)</span>
+      <span class="process-tag process-tag-soft-touch-both" *ngIf="processSoftTouchLaminationBothSides">🖐️ Soft Touch (Both)</span>
       <span class="process-tag process-tag-pouch" *ngIf="processPouchLamination">📁 Pouch</span>
     </div>
   </div>
   <div class="text-muted" *ngIf="!processCutting && !processTrimming && !processCreasing && 
                                !processMatteLaminationOneSide && !processMatteLaminationBothSides && 
                                !processGlossLaminationOneSide && !processGlossLaminationBothSides && 
+                               !processSoftTouchLaminationOneSide && !processSoftTouchLaminationBothSides &&
                                !processPouchLamination">
     <small><i class="fa fa-info-circle"></i> No processes selected (optional)</small>
   </div>
